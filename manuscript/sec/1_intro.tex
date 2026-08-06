@@ -1,202 +1,154 @@
 \section{Introduction}
 \label{sec:intro}
 
-Please follow the steps outlined below when submitting your manuscript to the IEEE Computer Society Press.
-This style guide now has several important modifications (for example, you are no longer warned against the use of sticky tape to attach your artwork to the paper), so all authors should read this new version.
+Robots deployed for weeks, months, or years encounter environmental change under
+three distinct observation regimes. First, an object can move while it remains in
+the robot's field of view. The system then observes the motion itself and can
+represent the entity by a trajectory, temporal bounding boxes, timestamps, and
+time-indexed geometry. Second, the robot can observe an element, look elsewhere
+while the same mapping session remains active, and later re-observe the affected
+region after the element has moved, disappeared, or been replaced. In this case,
+the transition is hidden: the system observes only the scene before and after the
+change. Third, one mapping session can terminate completely, the environment can
+change while the robot is absent, and a later independent session must continue
+from persistent scene memory. Importantly, the third regime does not replace the
+first two: a new session must reason about changes since the previous deployment
+while simultaneously tracking visible motion and reconciling additional hidden
+changes occurring during its own traversal.
 
-%-------------------------------------------------------------------------
-\subsection{Language}
+These regimes require different inferences and must not be collapsed into a
+single notion of ``dynamic.'' Continuously observed motion supports an actual
+trajectory. A hidden transition does not: if the old location is later observed
+as free space and stable geometry appears elsewhere, the honest interpretation
+may be an absence at the old location and a new element at the new location,
+unless identity can be established reliably. Moreover, no match is not evidence
+of absence. Geometry inherited from an earlier observation must remain
+\emph{unobserved} when the new trajectory provides insufficient visibility, and
+may be removed only when later measurements contradict it. Across independent
+sessions, the same distinction must survive the termination of the online SLAM
+process. This requires a scene memory that preserves more than an isolated final
+reconstruction and that can become the prior of the next deployment.
 
-All manuscripts must be in English.
+A large body of dynamic SLAM work addresses the first regime. Systems such as
+Co-Fusion and MaskFusion jointly segment, track, and reconstruct moving
+objects~\cite{runz2017cofusion,runz2018maskfusion}, while DynaSLAM and related
+approaches protect camera tracking and static mapping by rejecting dynamic
+measurements~\cite{bescos2018dynaslam}. More recent systems estimate motion more
+explicitly: Dynablox detects diverse moving geometry from conservative free-space
+evidence~\cite{schmid2023dynablox}, and DynoSAM jointly optimizes camera state,
+object motion, and object structure~\cite{morris2025dynosam}. Earlier long-term
+LiDAR mapping also combined point-wise dynamic classification, velocity
+estimation, and map maintenance over repeated surveys~\cite{pomerleau2014longterm}.
+These methods provide important mechanisms for visible dynamics, but their map
+representations and treatment of longer-term change differ substantially from a
+dense object- and structure-aware history of a scene.
 
-\subsection{Dual submission}
+Several systems have moved closer to connecting visible and hidden change.
+Changing-SLAM combines dynamic-keypoint filtering and object tracking with a
+Bayesian object-belief map and long-term data association~\cite{soares2023changing}.
+Its primary output, however, remains camera localization and an ORB-feature-based
+sparse map, rather than a dense metric-semantic reconstruction of scene evolution.
+Gaussian Mapping for Evolving Scenes (GaME) updates a 3D Gaussian representation
+when the scene changes outside the current view and removes stale keyframes, but
+is formulated around evolving novel-view-synthesis maps rather than persistent
+robot-centric scene memory across process-separated deployments~\cite{yugay2026game}.
 
-Please refer to the author guidelines on the \confName\ \confYear\ web page for a
-discussion of the policy on dual submissions.
+Khronos provides the closest dense formulation within a continuously running
+mapping problem. It defines Spatio-Temporal Metric-Semantic SLAM (SMS) and
+factorizes scene evolution into a fast process for continuously observed
+short-term dynamics and a slower global process for abrupt changes occurring
+during observation gaps~\cite{schmid2024khronos}. This directly covers the first
+two regimes: visible motion is represented over time, whereas hidden changes are
+inferred during global reconciliation. The published formulation, however,
+estimates one evolving spatio-temporal map over a continuous temporal sequence. It
+does not define a process-separated continuation protocol in which a completed
+session exports a persistent scene state, a later session imports it as its
+initial prior, and the new session again runs the complete visible- and
+hidden-change machinery.
 
-\subsection{Paper length}
-Papers, excluding the references section, must be no longer than eight pages in length.
-The references section will not be included in the page count, and there is no limit on the length of the references section.
-For example, a paper of eight pages with two pages of references would have a total length of 10 pages.
-{\bf There will be no extra page charges for \confName\ \confYear.}
+A complementary literature addresses long-term and multi-session mapping. Dynamic
+Pose Graph SLAM and subsequent local-map systems update or replace outdated map
+parts across revisits and multiple mapping sessions~\cite{walcott2012dynamic,lazaro2018efficient}.
+Feature-persistence filters maintain Bayesian beliefs about whether landmarks
+remain useful over time~\cite{rosen2016lifelong,hashemifar2020persistence}. At a
+denser object-aware level, Panoptic Multi-TSDFs maintains active and inactive
+volumetric submaps and distinguishes persistent, absent, and unobserved
+entities~\cite{schmid2022panoptic}. POCD updates object-level volumetric maps for
+changes between robot runs, while POV-SLAM jointly reasons about semi-static
+objects and robot pose over repeated visits~\cite{qian2022pocd,qian2023povslam}.
+ObVi-SLAM maintains a compact map of persistent objects across deployment
+sessions~\cite{adkins2024obvislam}, and Living Scenes associates and reconstructs
+objects from scans captured at different times~\cite{zhu2024livingscenes}.
+A concurrent preprint, OASIS-Map, further studies object association and
+appeared, disappeared, moved, and unknown states across revisits~\cite{oh2026oasismap}.
+% STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-06.
+% Re-check its publication status before submission and decide whether to retain it.
+These approaches provide strong components for the third regime, but they do not
+maintain a dense spatio-temporal metric-semantic scene representation in which
+every new session also reconstructs visible dynamics and reconciles hidden
+within-session changes.
 
-Overlength papers will simply not be reviewed.
-This includes papers where margins and formatting are deemed to have been significantly altered from those laid down by this style guide.
-Note that this \LaTeX\ guide already sets the figure captions and references in a smaller font.
-The reason why such papers will not be reviewed is that there is no provision for supervised revisions of manuscripts.
-The review process cannot determine the suitability of the paper for presentation in eight pages if it is reviewed in 11 pages.
+This separation leaves a practical gap for long-term robotic operation. Restarting
+from an empty map discards valid historical coverage. Replacing the old map with
+the newest reconstruction loses regions that the new traversal did not observe.
+Conversely, unconditional map union preserves stale surfaces and duplicated
+objects. Pairwise change detection alone is also insufficient: after applying an
+inter-session update, the new deployment remains a dynamic mapping session in
+which additional visible and hidden changes can occur. A long-term robot therefore
+needs a recurring process in which each session consumes persistent memory,
+performs complete dynamic scene mapping, and emits an updated memory for the next
+session.
 
-%-------------------------------------------------------------------------
-\subsection{The ruler}
-The \LaTeX\ style defines a printed ruler that should be present in the version submitted for review.
-The ruler is provided in order that reviewers may comment on particular lines in the paper without circumlocution.
-If you are preparing a document using a non-\LaTeX\ document preparation system, arrange for an equivalent ruler to appear on the final output pages.
-The presence or absence of the ruler should not change the appearance of any other content on the page.
-The camera-ready copy should not contain a ruler.
-(\LaTeX\ users may use the options of \texttt{cvpr.sty} to switch between different versions.)
-
-Reviewers:
-note that the ruler measurements do not align well with lines in the paper --- this turns out to be very difficult to do well when the paper contains many figures and equations, and, when done, looks ugly.
-Use fractional references (\eg, this line is $087.5$), although in most cases the approximate location would be adequate.
-
-
-\subsection{Paper ID}
-Make sure that the Paper ID from the submission system is visible in the version submitted for review (replacing the ``*****'' you see in this document).
-If you are using the \LaTeX\ template, \textbf{make sure to update paper ID in the appropriate place in the tex file}.
-
-
-\subsection{Mathematics}
-
-Please, number all of your sections and displayed equations as in these examples:
+We formalize this problem as \emph{Persistent Spatio-Temporal Metric-Semantic
+SLAM} (P-SMS). Let $\mathcal{S}^{k}$ denote the $k$-th independent mapping
+session, with observations $\mathcal{Z}^{k}$, and let $\mathcal{M}^{k-1}$ be the
+persistent scene memory produced by the preceding session. P-SMS seeks the
+recurring update
 \begin{equation}
-  E = m\cdot c^2
-  \label{eq:important}
+    \left(\mathcal{M}^{k},\,\mathcal{H}^{k}\right)
+    =
+    \Phi\!\left(\mathcal{M}^{k-1},\mathcal{Z}^{k}\right),
+    \label{eq:psms_update}
 \end{equation}
-and
-\begin{equation}
-  v = a\cdot t.
-  \label{eq:also-important}
-\end{equation}
-It is important for the reader to be able to refer to any particular equation.
-Just because you did not refer to it in the text does not mean that some future reader might not need to refer to it.
-It is cumbersome to have to use circumlocutions like ``the equation second from the top of page 3 column 1''.
-(Note that the ruler will not be present in the final copy, so is not an alternative to equation numbers).
-All authors will benefit from reading Mermin's description of how to write mathematics:
-\url{http://www.pamitc.org/documents/mermin.pdf}.
+where $\mathcal{H}^{k}$ stores the time-indexed history of dynamics observed
+within session $k$, and $\mathcal{M}^{k}$ is the updated current-scene memory
+that survives process termination. Within each session, $\Phi$ must support both
+continuous visible motion and abrupt hidden change. Across sessions, it must
+retain previously valid but unobserved geometry, remove inherited content only
+when contradicted by reliable current evidence, incorporate genuinely new
+content, and preserve the information required to repeat the same process in
+session $k+1$.
 
-\subsection{Blind review}
+We instantiate P-SMS by extending dense single-session spatio-temporal mapping
+with a persistent scene-memory and reconciliation layer. A completed session
+exports stable scene geometry, object-level memory, change evidence, and session
+provenance. A later independent session loads this state as its prior, updates it
+using current surface and visibility evidence, and concurrently runs the same
+within-session machinery for visible motion and hidden changes. Cross-session
+change is therefore not treated as an isolated third detector. It is the
+persistent update that connects complete dynamic mapping sessions into one
+long-term robotic system.
 
-Many authors misunderstand the concept of anonymizing for blind review.
-Blind review does not mean that one must remove citations to one's own work---in fact it is often impossible to review a paper unless the previous citations are known and available.
+To the best of our knowledge, no existing \emph{dense metric-semantic SLAM}
+system jointly provides (i) time-indexed reconstruction of motion observed by the
+robot, (ii) reconciliation of changes occurring outside the robot's view during a
+running session, and (iii) persistent continuation of the same scene memory
+across independent process-separated sessions. Our contributions are:
+\begin{itemize}
+    \item We introduce P-SMS, a problem formulation that explicitly connects
+    continuously observed dynamics, hidden within-session changes, and
+    inter-session environmental evolution in a recurring long-term mapping
+    process.
 
-Blind review means that you do not use the words ``my'' or ``our'' when citing previous work.
-That is all.
-(But see below for tech reports.)
+    \item We develop a persistent scene-memory architecture that transfers a
+    dense current map, object memory, change evidence, and session provenance
+    between deployments, while retaining complete visible- and hidden-change
+    processing inside every session.
 
-Saying ``this builds on the work of Lucy Smith [1]'' does not mean that you are Lucy Smith;
-it says that you are building on her work.
-If you are Smith and Jones, do not say ``as we show in [7]'', say ``as Smith and Jones show in [7]'' and at the end of the paper, include reference 7 as you would any other cited work.
-
-An example of a bad paper just asking to be rejected:
-\begin{quote}
-\begin{center}
-    An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper, we present a performance analysis of our previous paper [1], and show that it is inferior to all previously known methods.
-   Why the previous paper was accepted without this analysis is beyond me.
-
-   [1] Removed for blind review
-\end{quote}
-
-
-An example of an acceptable paper:
-\begin{quote}
-\begin{center}
-     An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper, we present a performance analysis of the paper of Smith \etal [1], and show it to be inferior to all previously known methods.
-   Why the previous paper was accepted without this analysis is beyond me.
-
-   [1] Smith, L and Jones, C. ``The frobnicatable foo filter, a fundamental contribution to human knowledge''. Nature 381(12), 1-213.
-\end{quote}
-
-If you are making a submission to another conference at the same time that covers similar or overlapping material, you may need to refer to that submission to explain the differences, just as you would if you had previously published related work.
-In such cases, include the anonymized parallel submission~\cite{Authors14} as supplemental material and cite it as
-\begin{quote}
-[1] Authors. ``The frobnicatable foo filter'', F\&G 2014 Submission ID 324, Supplied as supplemental material {\tt fg324.pdf}.
-\end{quote}
-
-Finally, you may feel you need to tell the reader that more details can be found elsewhere and refer them to a technical report.
-For conference submissions, the paper must stand on its own, and not {\em require} the reviewer to go to a tech report for further details.
-Thus, you may say in the body of the paper ``further details may be found in~\cite{Authors14b}''.
-Then submit the tech report as supplemental material.
-Again, do not assume that the reviewers will read this material.
-
-Sometimes your paper is about a problem that you tested using a tool that is widely known to be restricted to a single institution.
-For example, let's say it's 1969, you have solved a key problem on the Apollo lander, and you believe that the 1970 audience would like to hear about your
-solution.
-The work is a development of your celebrated 1968 paper entitled ``Zero-g frobnication: How being the only people in the world with access to the Apollo lander source code makes us a wow at parties'', by Zeus \etal.
-
-You can handle this paper like any other.
-Do not write ``We show how to improve our previous work [Anonymous, 1968].
-This time we tested the algorithm on a lunar lander [name of lander removed for blind review]''.
-That would be silly, and would immediately identify the authors.
-Instead write the following:
-\begin{quotation}
-\noindent
-   We describe a system for zero-g frobnication.
-   This system is new because it handles the following cases:
-   A, B.  Previous systems [Zeus et al. 1968] did not  handle case B properly.
-   Ours handles it by including a foo term in the bar integral.
-
-   ...
-
-   The proposed system was integrated with the Apollo lunar lander, and went all the way to the moon, don't you know.
-   It displayed the following behaviours, which show how well we solved cases A and B: ...
-\end{quotation}
-As you can see, the above text follows standard scientific convention, reads better than the first version, and does not explicitly name you as the authors.
-A reviewer might think that it is likely that the new article was written by Zeus \etal, but cannot make any decision based on that guess.
-He or she would have to be sure that no other authors could have been contracted to solve problem B.
-\medskip
-
-\noindent
-FAQ\medskip\\
-{\bf Q:} Are acknowledgements OK?\\
-{\bf A:} No.  Leave them for the final copy.\medskip\\
-{\bf Q:} How do I cite my results reported in open challenges?
-{\bf A:} To conform with the double-blind review policy, you can report results of other challenge participants together with your results in your paper.
-However, for your results, you should not identify yourself and should not mention your participation in the challenge.
-Instead, present your results referring to the method proposed in your paper and draw conclusions based on the experimental comparison with other results.\medskip\\
-
-\begin{figure}[t]
-  \centering
-  \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-
-   \caption{Example of caption.
-   It is set in Roman so that mathematics (always set in Roman: $B \sin A = A \sin B$) may be included without an ugly clash.}
-   \label{fig:onecol}
-\end{figure}
-
-\subsection{Miscellaneous}
-
-\noindent
-Compare the following:\\
-\begin{tabular}{ll}
- \verb'$conf_a$' &  $conf_a$ \\
- \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
-\end{tabular}\\
-See The \TeX book, p165.
-
-The space after \eg, meaning ``for example'', should not be a sentence-ending space.
-So \eg is correct, {\em e.g.} is not.
-The provided \verb'\eg' macro takes care of this.
-
-When citing a multi-author paper, you may save space by using ``et alia'', shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word).
-If you use the \verb'\etal' macro provided, then you need not worry about double periods when used at the end of a sentence as in Alpher \etal.
-However, use it only when there are three or more authors.
-Thus, the following is correct:
-   ``Frobnication has been trendy lately.
-   It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-   Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
-
-This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...'' because reference~\cite{Alpher03} has only two authors.
-
-\begin{figure*}
-  \centering
-  \begin{subfigure}{0.68\linewidth}
-    \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-    \caption{An example of a subfigure.}
-    \label{fig:short-a}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}{0.28\linewidth}
-    \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-    \caption{Another example of a subfigure.}
-    \label{fig:short-b}
-  \end{subfigure}
-  \caption{Example of a short caption, which should be centered.}
-  \label{fig:short}
-\end{figure*}
+    \item We establish an evaluation protocol that separates the three regimes
+    while testing them in a common multi-session episode, including current-map
+    reconstruction, change-state estimation, preservation of unobserved regions,
+    dynamic-to-static leakage, and cross-session update cost.
+    % TODO: Replace this contribution with the finalized dataset names and
+    % quantitative headline once the benchmark and main evaluation are frozen.
+\end{itemize}
