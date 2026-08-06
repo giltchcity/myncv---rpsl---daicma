@@ -8,15 +8,16 @@ held as full PDFs and read end-to-end under the project's audit protocol.
 ## Current verified count
 
 ```text
-SELF-FETCHED + COMPLETE: 0
+SELF-FETCHED + COMPLETE: 1 (Khronos)
 USER-UPLOADED + COMPLETE: 6
-SELF-FETCHED + PENDING: 1 (Khronos)
+SELF-FETCHED + PENDING: 0
+TOTAL COMPLETE: 7
 ```
 
-The six completed PDFs were all uploaded by the user. No paper has yet been both
-independently acquired by the assistant and fully audited. This corrects earlier
-ambiguous wording that counted user-uploaded PDFs without separating acquisition
-source.
+The previous count of zero self-fetched papers is now superseded. Khronos was
+opened from the official arXiv PDF through the web PDF reader and audited across
+the full main text, problem definition, equations, method, experiments,
+limitations, and figures.
 
 ## Completion criteria
 
@@ -34,6 +35,16 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 10. exact PDF page/section/equation/figure support;
 11. overlap with the project and claims it does or does not threaten.
 
+## Independently fetched and complete
+
+| # | Paper | Source | Actual relationship |
+|---:|---|---|---|
+| 1 | Khronos: A Unified Approach for Spatio-Temporal Metric-Semantic SLAM in Dynamic Environments | official arXiv PDF, RSS 2024 | complete dense single-session D1+D2 base; no process-separated D3 continuation |
+
+Detailed audit:
+
+- `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
+
 ## User-uploaded and complete
 
 | # | Paper | Actual relationship |
@@ -45,12 +56,6 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 | 5 | Efficient Long-Term Mapping in Dynamic Environments | current-session clutter cleaning plus multi-session 2D pose-graph/local-map update; no D1 history or D2 |
 | 6 | ProbPer-LiLo: Probabilistic Persistency Modeling for Life-Long Mapping | recursive D3 static point/voxel-map refinement; dynamic and quasi-static content removed |
 
-## Independently fetched but pending
-
-- **Khronos, RSS 2024:** official arXiv PDF successfully opened through the web
-  PDF reader on 2026-08-07. It is not complete until all pages, equations,
-  experiments, figures, and limitations are audited and recorded.
-
 ## Acquisition policy
 
 The user does **not** need to upload every paper.
@@ -59,6 +64,8 @@ The user does **not** need to upload every paper.
   acquired by the assistant using the web PDF reader.
 - The local container currently cannot resolve external hosts reliably, so a PDF
   may be read through the web PDF interface without being saved as a local file.
+  This still counts as self-fetched when the official full PDF is opened and
+  audited end-to-end.
 - Paywalled papers without an accessible author copy require the user to upload
   the PDF or provide an accessible copy; the assistant cannot use the user's ETH
   institutional login.
