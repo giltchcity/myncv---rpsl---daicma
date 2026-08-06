@@ -23,6 +23,7 @@ _build/
 # third-party PDFs are not redistributed in this public repository.
 literature/pdfs/
 literature/download_manifest.generated.json
+literature/gaussian_download_manifest.generated.json
 
 # Keep large experiment artifacts outside this paper repository.
 *.4dmap
