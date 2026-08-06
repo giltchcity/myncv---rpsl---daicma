@@ -2,22 +2,20 @@
 
 Status: **2026-08-07**
 
-This tracker is the only authoritative count of papers that have actually been
-held as full PDFs and read end-to-end under the project's audit protocol.
+This tracker is the only authoritative count of papers whose full PDFs have
+actually been opened and read end-to-end under the project's audit protocol.
 
 ## Current verified count
 
 ```text
-SELF-FETCHED + COMPLETE: 1 (Khronos)
+SELF-FETCHED + COMPLETE: 6
 USER-UPLOADED + COMPLETE: 6
 SELF-FETCHED + PENDING: 0
-TOTAL COMPLETE: 7
+TOTAL COMPLETE: 12
 ```
 
-The previous count of zero self-fetched papers is now superseded. Khronos was
-opened from the official arXiv PDF through the web PDF reader and audited across
-the full main text, problem definition, equations, method, experiments,
-limitations, and figures.
+The self-fetched set consists of Khronos plus five core D3 papers independently
+opened from official or author-hosted full PDFs through the web PDF reader.
 
 ## Completion criteria
 
@@ -40,10 +38,16 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 | # | Paper | Source | Actual relationship |
 |---:|---|---|---|
 | 1 | Khronos: A Unified Approach for Spatio-Temporal Metric-Semantic SLAM in Dynamic Environments | official arXiv PDF, RSS 2024 | complete dense single-session D1+D2 base; no process-separated D3 continuation |
+| 2 | Panoptic Multi-TSDFs | official arXiv PDF, ICRA 2022 | dense D3 object/submap representation with persistent/absent/unobserved states; D1 left for future work |
+| 3 | POCD: Probabilistic Object-Level Change Detection and Mapping in Semi-Static Environments | official arXiv PDF, RSS 2022 | object-level D3 map with Gaussian--Beta stationarity/change belief; external poses; no retained D1 |
+| 4 | POV-SLAM: Probabilistic Object-Oriented Variational SLAM in Semi-Static Environments | official arXiv PDF, RSS 2023 | joint pose/object-consistency D3 SLAM; no complete D1 history or same-session D2 output |
+| 5 | LT-Mapper: A Modular Framework for LiDAR-Based Lifelong Mapping | official arXiv PDF, ICRA 2022 | D3 geometric current-map maintenance with positive/negative changes; moving content removed |
+| 6 | ObVi-SLAM: Long-Term Object-Visual SLAM | official arXiv PDF / author manuscript, RA-L 2024 | genuine recursive deployment object prior; static object landmarks only |
 
-Detailed audit:
+Detailed audits:
 
 - `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
+- `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
 
 ## User-uploaded and complete
 
@@ -56,16 +60,34 @@ Detailed audit:
 | 5 | Efficient Long-Term Mapping in Dynamic Environments | current-session clutter cleaning plus multi-session 2D pose-graph/local-map update; no D1 history or D2 |
 | 6 | ProbPer-LiLo: Probabilistic Persistency Modeling for Life-Long Mapping | recursive D3 static point/voxel-map refinement; dynamic and quasi-static content removed |
 
+## Still pending
+
+The remaining direct-core queue includes, at minimum:
+
+- Changing-SLAM;
+- Detection and Tracking of General Movable Objects in Large 3D Maps;
+- LTC-Mapping;
+- GaME;
+- Perpetua;
+- Lost & Found;
+- OASIS-Map;
+- Dynamic Pose Graph SLAM;
+- Pomerleau et al. 2014;
+- selected Gaussian/4D representatives.
+
+The broader candidate pool is not counted until each exact PDF is acquired and
+passes the complete checklist.
+
 ## Acquisition policy
 
 The user does **not** need to upload every paper.
 
 - Open-access, arXiv, CVF, RSS, PMLR, NeurIPS, and author-hosted PDFs must be
   acquired by the assistant using the web PDF reader.
-- The local container currently cannot resolve external hosts reliably, so a PDF
-  may be read through the web PDF interface without being saved as a local file.
-  This still counts as self-fetched when the official full PDF is opened and
-  audited end-to-end.
+- The local container cannot always resolve external hosts, so a PDF may be read
+  through the web PDF interface without being saved as a local file. This counts
+  as self-fetched only when the official full PDF is opened and audited
+  end-to-end.
 - Paywalled papers without an accessible author copy require the user to upload
   the PDF or provide an accessible copy; the assistant cannot use the user's ETH
   institutional login.
