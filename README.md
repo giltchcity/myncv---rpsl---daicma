@@ -12,18 +12,22 @@ for the current Khronos-based scene-memory project.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
 5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of PDFs
-   actually held and read end-to-end. Current verified count: 6.**
+   actually opened and read end-to-end. Current verified count: 12.**
 6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding PDF-level
    literature standard.
-7. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
+7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete
+   self-fetched Khronos audit.
+8. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete audits of
+   Panoptic Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
+9. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
    correction for SuperMap, DYMRO-SLAM, and ELite.
-8. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
-   correction for Efficient Long-Term Mapping and ProbPer-LiLo.
-9. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
-   it must not be used as evidence.
-10. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
-11. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
-12. `literature/README.md`: local PDF download and hash workflow.
+10. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
+    correction for Efficient Long-Term Mapping and ProbPer-LiLo.
+11. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
+    it must not be used as evidence.
+12. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
+13. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
+14. `literature/README.md`: local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -51,8 +55,28 @@ The following earlier claim has been explicitly withdrawn:
 That standard had not been met. The only valid count is maintained in
 `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
 
-Verified full-PDF audits so far:
+Current verified total:
 
+```text
+self-fetched and complete: 6
+user-uploaded and complete: 6
+total complete: 12
+```
+
+Key verified classifications:
+
+- **Khronos:** complete dense D1+D2 inside one continuous session; no published
+  process-separated D3 continuation.
+- **Panoptic Multi-TSDFs:** dense D3 object/submap state with
+  persistent/absent/unobserved; D1 tracking is future work.
+- **POCD:** object-level D3 mapping with Gaussian--Beta change/stationarity
+  belief; external poses; no retained D1.
+- **POV-SLAM:** joint robot-pose and semi-static object-consistency D3 SLAM; no
+  complete D1 history or explicit same-session D2 output.
+- **LT-Mapper:** D3 geometric current-map maintenance with positive/negative
+  changes; moving content is removed.
+- **ObVi-SLAM:** genuine recursive deployment object prior, restricted to static
+  object landmarks.
 - **SuperMap:** one continuous RGB-D/point-cloud stream; ten-minute change run;
   semantic object-map maintenance rather than process-separated D3.
 - **DYMRO-SLAM:** dynamic feature rejection for ORB-SLAM3 localization.
