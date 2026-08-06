@@ -23,7 +23,7 @@
 @String(CSVT = {IEEE Trans. Circuit Syst. Video Technol.})
 
 % -----------------------------------------------------------------------------
-% Dynamic SLAM and continuously observed motion.
+% Single-session dynamic SLAM and dense dynamic mapping.
 % -----------------------------------------------------------------------------
 
 @inproceedings{runz2017cofusion,
@@ -44,6 +44,24 @@
   doi       = {10.1109/ISMAR.2018.00024}
 }
 
+@inproceedings{xu2019midfusion,
+  author    = {Binbin Xu and Wenbin Li and Dimos Tzoumanikas and Michael Bloesch and Andrew J. Davison and Stefan Leutenegger},
+  title     = {{MID-Fusion}: Octree-Based Object-Level Multi-Instance Dynamic {SLAM}},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  pages     = {5231--5237},
+  year      = {2019},
+  doi       = {10.1109/ICRA.2019.8794371}
+}
+
+@inproceedings{strecke2019emfusion,
+  author    = {Michael Strecke and J{\"o}rg St{\"u}ckler},
+  title     = {{EM-Fusion}: Dynamic Object-Level {SLAM} With Probabilistic Data Association},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+  pages     = {5864--5873},
+  year      = {2019},
+  doi       = {10.1109/ICCV.2019.00596}
+}
+
 @article{bescos2018dynaslam,
   author  = {Berta Bescos and Jos{\'e} M. F{\'a}cil and Javier Civera and Jos{\'e} Neira},
   title   = {{DynaSLAM}: Tracking, Mapping, and Inpainting in Dynamic Scenes},
@@ -53,6 +71,17 @@
   pages   = {4076--4083},
   year    = {2018},
   doi     = {10.1109/LRA.2018.2860039}
+}
+
+@article{bescos2021dynaslam2,
+  author  = {Berta Bescos and Carlos Campos and Juan D. Tard{\'o}s and Jos{\'e} Neira},
+  title   = {{DynaSLAM II}: Tightly-Coupled Multi-Object Tracking and {SLAM}},
+  journal = {IEEE Robotics and Automation Letters},
+  volume  = {6},
+  number  = {3},
+  pages   = {5191--5198},
+  year    = {2021},
+  doi     = {10.1109/LRA.2021.3068640}
 }
 
 @article{schmid2023dynablox,
@@ -66,6 +95,17 @@
   doi     = {10.1109/LRA.2023.3305239}
 }
 
+@article{mersch2023volumetric,
+  author  = {Benedikt Mersch and Tiziano Guadagnino and Xieyuanli Chen and Ignacio Vizzo and Jens Behley and Cyrill Stachniss},
+  title   = {Building Volumetric Beliefs for Dynamic Environments Exploiting Map-Based Moving Object Segmentation},
+  journal = {IEEE Robotics and Automation Letters},
+  volume  = {8},
+  number  = {8},
+  pages   = {5180--5187},
+  year    = {2023},
+  doi     = {10.1109/LRA.2023.3292583}
+}
+
 @article{morris2025dynosam,
   author  = {Jesse Morris and Yiduo Wang and Mikolaj Kliniewski and Viorela Ila},
   title   = {{DynoSAM}: Open-Source Smoothing and Mapping Framework for Dynamic {SLAM}},
@@ -75,18 +115,31 @@
   doi     = {10.1109/TRO.2025.3641813}
 }
 
+% Manuscript/preprint status; retain in the audit but cite in the paper only if
+% its final publication record is verified before submission.
+@misc{zhang2020vdoslam,
+  author        = {Jun Zhang and Mina Henein and Robert Mahony and Viorela Ila},
+  title         = {{VDO-SLAM}: A Visual Dynamic Object-Aware {SLAM} System},
+  year          = {2020},
+  eprint        = {2005.11052},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  note          = {Manuscript/preprint; publication status checked 2026-08-07}
+}
+
 % -----------------------------------------------------------------------------
-% Work spanning dynamic and longer-term map evolution.
-% These are especially important when formulating the novelty boundary.
+% Single-session hidden change and unified D1+D2 mapping.
 % -----------------------------------------------------------------------------
 
-@inproceedings{pomerleau2014longterm,
-  author    = {Fran{\c{c}}ois Pomerleau and Philipp Kr{\"u}si and Francis Colas and Paul Furgale and Roland Siegwart},
-  title     = {Long-Term 3D Map Maintenance in Dynamic Environments},
-  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
-  pages     = {3712--3719},
-  year      = {2014},
-  doi       = {10.1109/ICRA.2014.6907397}
+@article{bore2019movable,
+  author  = {Nils Bore and Johan Ekekrantz and Patric Jensfelt and John Folkesson},
+  title   = {Detection and Tracking of General Movable Objects in Large Three-Dimensional Maps},
+  journal = {IEEE Transactions on Robotics},
+  volume  = {35},
+  number  = {1},
+  pages   = {231--247},
+  year    = {2019},
+  doi     = {10.1109/TRO.2018.2876111}
 }
 
 @article{soares2023changing,
@@ -117,15 +170,16 @@
 }
 
 % -----------------------------------------------------------------------------
-% Long-term, lifelong, and multi-session mapping.
+% Cross-session scene-memory and long-term map maintenance.
 % -----------------------------------------------------------------------------
 
-@inproceedings{walcott2012dynamic,
-  author    = {Aisha Walcott-Bryant and Michael Kaess and Hordur Johannsson and John J. Leonard},
-  title     = {Dynamic Pose Graph {SLAM}: Long-Term Mapping in Low Dynamic Environments},
-  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages     = {1871--1878},
-  year      = {2012}
+@inproceedings{pomerleau2014longterm,
+  author    = {Fran{\c{c}}ois Pomerleau and Philipp Kr{\"u}si and Francis Colas and Paul Furgale and Roland Siegwart},
+  title     = {Long-Term 3D Map Maintenance in Dynamic Environments},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  pages     = {3712--3719},
+  year      = {2014},
+  doi       = {10.1109/ICRA.2014.6907397}
 }
 
 @inproceedings{lazaro2018efficient,
@@ -135,6 +189,15 @@
   pages     = {153--160},
   year      = {2018},
   doi       = {10.1109/IROS.2018.8594310}
+}
+
+@inproceedings{breitfuss2024rbif,
+  author    = {Matthias Breitfuss and Marcus Geimer and Christoph Gruber},
+  title     = {Long-Term Map-Maintenance in Changing Environments Using Ray-Bundle-Impact-Factor Estimation},
+  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  pages     = {12271--12278},
+  year      = {2024},
+  doi       = {10.1109/IROS58592.2024.10802029}
 }
 
 @inproceedings{rosen2016lifelong,
@@ -153,17 +216,6 @@
   pages     = {7307--7313},
   year      = {2020},
   doi       = {10.1109/ICRA40945.2020.9196913}
-}
-
-@article{bore2019movable,
-  author  = {Nils Bore and Johan Ekekrantz and Patric Jensfelt and John Folkesson},
-  title   = {Detection and Tracking of General Movable Objects in Large Three-Dimensional Maps},
-  journal = {IEEE Transactions on Robotics},
-  volume  = {35},
-  number  = {1},
-  pages   = {231--247},
-  year    = {2019},
-  doi     = {10.1109/TRO.2018.2876111}
 }
 
 @inproceedings{schmid2022panoptic,
@@ -211,8 +263,6 @@
 }
 
 % PREPRINT / UNDER REVIEW as of 2026-08-06.
-% Re-check the publication status before submission and decide whether this
-% concurrent work should remain in the final related-work discussion.
 @misc{oh2026oasismap,
   author        = {Haedam Oh and Yifu Tao and Nived Chebrolu and Maurice Fallon},
   title         = {{OASIS-Map}: Object-Level Change Detection in Multi-Session Mapping Using Semantic Correspondence Matching},
@@ -221,61 +271,4 @@
   archivePrefix = {arXiv},
   primaryClass  = {cs.RO},
   note          = {Under-review preprint; status checked 2026-08-06}
-}
-
-% -----------------------------------------------------------------------------
-% CVPR template placeholders retained temporarily because the untouched template
-% sections still cite them. Remove these entries together with the template text.
-% -----------------------------------------------------------------------------
-
-@misc{Authors14,
-  author = {FirstName LastName},
-  title  = {The frobnicatable foo filter},
-  note   = {Face and Gesture submission ID 324. Supplied as supplemental material {\tt fg324.pdf}},
-  year   = {2014}
-}
-
-@misc{Authors14b,
-  author = {FirstName LastName},
-  title  = {Frobnication tutorial},
-  note   = {Supplied as supplemental material {\tt tr.pdf}},
-  year   = {2014}
-}
-
-@article{Alpher02,
-  author  = {FirstName Alpher},
-  title   = {Frobnication},
-  journal = PAMI,
-  volume  = {12},
-  number  = {1},
-  pages   = {234--778},
-  year    = {2002}
-}
-
-@article{Alpher03,
-  author  = {FirstName Alpher and FirstName Fotheringham-Smythe},
-  title   = {Frobnication Revisited},
-  journal = {Journal of Foo},
-  volume  = {13},
-  number  = {1},
-  pages   = {234--778},
-  year    = {2003}
-}
-
-@article{Alpher04,
-  author  = {FirstName Alpher and FirstName Fotheringham-Smythe and FirstName Gamow},
-  title   = {Can a Machine Frobnicate?},
-  journal = {Journal of Foo},
-  volume  = {14},
-  number  = {1},
-  pages   = {234--778},
-  year    = {2004}
-}
-
-@inproceedings{Alpher05,
-  author    = {FirstName Alpher and FirstName Gamow},
-  title     = {Can a Computer Frobnicate?},
-  booktitle = CVPR,
-  pages     = {234--778},
-  year      = {2005}
 }
