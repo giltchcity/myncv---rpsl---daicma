@@ -12,13 +12,14 @@ Therefore:
 
 - official/open download locations are versioned in `papers.json`;
 - the Gaussian-specific audit set is versioned in `gaussian_papers.json`;
+- newly added traditional dynamic/multi-session papers are versioned in
+  `traditional_additions.json`;
 - PDFs are downloaded to the ignored directory `literature/pdfs/`;
 - the downloader records the exact byte size and SHA-256 of each local copy;
-- technical conclusions and short source excerpts are versioned in
-  `../06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md` and
-  `../07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`;
-- OASIS-Map, GS-LTS, and GS-DIFF are explicitly marked as unpublished preprints
-  until their status changes.
+- technical conclusions and short source excerpts are versioned in the
+  repository evidence ledgers;
+- OASIS-Map, GS-LTS, GS-DIFF, and other unreviewed work are explicitly marked as
+  preprints until their status changes.
 
 ## Download the core papers
 
@@ -37,6 +38,25 @@ python3 literature/download_papers.py \
   --key qian2023povslam
 ```
 
+## Download the newly added traditional mapping papers
+
+```bash
+python3 literature/download_papers.py \
+  --manifest literature/traditional_additions.json \
+  --generated-manifest literature/traditional_additions_download_manifest.generated.json
+```
+
+Selected additions only:
+
+```bash
+python3 literature/download_papers.py \
+  --manifest literature/traditional_additions.json \
+  --generated-manifest literature/traditional_additions_download_manifest.generated.json \
+  --key xu2019midfusion \
+  --key strecke2019emfusion \
+  --key bescos2021dynaslam2
+```
+
 ## Download the Gaussian audit set
 
 ```bash
@@ -45,7 +65,7 @@ python3 literature/download_papers.py \
   --generated-manifest literature/gaussian_download_manifest.generated.json
 ```
 
-Selected Gaussian papers:
+The current manuscript retains only three representative Gaussian papers:
 
 ```bash
 python3 literature/download_papers.py \
@@ -58,16 +78,9 @@ python3 literature/download_papers.py \
 
 Force a fresh download by adding `--overwrite`.
 
-The commands create:
-
-```text
-literature/pdfs/*.pdf
-literature/download_manifest.generated.json
-literature/gaussian_download_manifest.generated.json
-```
-
-These outputs are ignored by Git. The generated manifests record the exact
-SHA-256 hash of every audited local PDF.
+The commands create local PDFs and generated hash manifests. These outputs are
+ignored by Git. The generated manifests record the exact SHA-256 hash of every
+audited local PDF.
 
 ## Papers requiring manual access
 
@@ -76,10 +89,11 @@ endpoint. Obtain the author manuscript or an institutional-access copy and save
 it using the exact `filename` from the corresponding JSON manifest. Re-run the
 downloader; it will validate the PDF and add its hash to the generated manifest.
 
-Current core manual entries:
+Current manual entries include:
 
 - `pomerleau2014longterm.pdf`
 - `lazaro2018efficient.pdf`
+- `breitfuss2024rbif.pdf`
 
 All papers in `gaussian_papers.json` currently have an open arXiv or author PDF.
 
