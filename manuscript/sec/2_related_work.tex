@@ -18,9 +18,9 @@ motion from a live RGB-D stream~\cite{runz2017cofusion}. MaskFusion adds
 instance-level semantic recognition and an object-aware map, but its own
 limitations restrict tracking and reconstruction to rigid objects; non-rigid
 objects such as people are removed rather than reconstructed~\cite{runz2018maskfusion}.
-These systems therefore provide rich time-indexed object geometry for visible
-motion, but do not reason about an object that changes after it has left the
-active observation stream.
+These systems provide rich time-indexed object geometry for visible motion, but
+do not reason about an object that changes after it has left the active
+observation stream.
 
 Other dynamic-scene systems prioritize a reliable static map. DynaSLAM combines
 semantic and multi-view geometric masks to exclude moving or movable content
@@ -63,29 +63,71 @@ it does not specify or evaluate an export/import protocol through which a
 completed process becomes the initial scene belief of a later independent
 session.
 
-GaME addresses out-of-view changes in an online 3D Gaussian map~\cite{yugay2026game}.
-Its dynamic scene adaptation adds newly observed Gaussians and removes geometry
-contradicted by color and depth, while keyframe masking prevents stale
-observations from corrupting multi-view optimization. GaME receives camera poses
-and panoptic segmentation from external estimators and targets rendering-quality
-preservation rather than object trajectories or process-separated metric-semantic
-scene memory. It is therefore a strong dense hidden-change baseline, but not a
-complete visible-dynamic SLAM and multi-session memory system.
+\subsection{Gaussian SLAM in dynamic and evolving scenes}
+
+Gaussian representations have rapidly expanded the design space of dense SLAM.
+Gaussian Splatting SLAM and SplaTAM established online camera tracking and dense
+mapping directly against explicit 3D Gaussian maps~\cite{matsuki2024gaussianslam,keetha2024splatam},
+but assume that the reconstructed scene itself is static. A first dynamic branch
+retains this static-map objective and suppresses inconsistent observations.
+WildGS-SLAM learns per-pixel uncertainty to downweight dynamic distractors and
+explicitly reconstructs a Gaussian map of the static scene~\cite{zheng2025wildgsslam}.
+Gassidy detects object-level rendering-loss-flow patterns and prunes dynamic
+Gaussians before camera and map optimization~\cite{wen2025gassidy}. These methods
+substantially improve tracking and rendering in dynamic input streams, but do not
+retain the motion or geometry of the removed entities as part of the scene
+history.
+
+A second branch replaces the static Gaussian map with a time-dependent
+representation. 4D Gaussian Splatting SLAM separates static and dynamic
+Gaussians and learns deformation fields for the latter~\cite{li2025fourdgsslam}.
+D4DGS-SLAM represents the map with 4D Gaussians and uses long-term point tracks
+to estimate point dynamics, visibility, and reliability~\cite{sun2025d4dgsslam}.
+DynaGSLAM models and predicts moving-object Gaussians online~\cite{li2026dynagslam},
+Flow4DGS-SLAM propagates explicit Gaussian centers using scene-flow priors and
+models their temporal opacity and rotation~\cite{wang2026flow4dgsslam}, and
+RU4D-SLAM incorporates semantic-guided uncertainty and time-varying Gaussian
+attributes for robust 4D reconstruction~\cite{zhao2026ru4dslam}. This line is a
+strong recent realization of visible dynamics in a photorealistic map. Its
+methods operate on continuous image sequences and optimize observed temporal
+motion; they do not define the absent--unobserved distinction for abrupt changes
+that occur outside the observed sequence, nor a persistent scene-memory update
+across completed sessions.
+
+A third Gaussian branch directly targets evolving maps. GaME updates an online
+Gaussian representation after out-of-view changes, adding newly observed
+Gaussians, removing contradicted geometry, and managing stale
+keyframes~\cite{yugay2026game}. It receives camera poses and panoptic segmentation
+from external estimators and does not retain visible dynamic trajectories.
+LT-Gaussian aligns an outdated Gaussian map with a current LiDAR stream, detects
+emerging and disappearing points through ICP and neighborhood tests, and performs
+targeted Gaussian-map updates~\cite{cheng2025ltgaussian}. GS-LTS uses a rendered
+reference view to detect medium-term object addition, removal, or relocation,
+then actively collects views and edits the Gaussian map~\cite{fu2025gslts}.
+% STATUS NOTE: GS-LTS is a preprint as of 2026-08-06.
+GS-DIFF instead compares independently reconstructed Gaussian scenes directly in
+primitive space and introduces per-primitive observability to distinguish
+structural from appearance changes~\cite{galappaththige2026gsdiff}.
+% STATUS NOTE: GS-DIFF is a preprint as of 2026-08-06.
+The latter is a change detector rather than a SLAM or map-update system. Together,
+these works show that Gaussians are promising for both observed motion and
+long-term scene revision, but the two capabilities remain separated: current 4D
+Gaussian SLAM focuses on D1, whereas evolving-map methods focus on D2 or D3
+without carrying a complete D1+D2 dynamic mapping process into every new
+session.
 
 \subsection{Long-term and multi-session map maintenance}
 
-Long-term mapping predates recent object-centric systems. Pomerleau \etal jointly
-update a 3D LiDAR map, infer point-wise static/dynamic probabilities, and estimate
+Long-term mapping predates recent object-centric systems. Pomerleau \etal update
+a 3D LiDAR point map, infer point-wise static/dynamic probabilities, and estimate
 velocities from consecutive point clouds over surveys spanning seven
-months~\cite{pomerleau2014longterm}. This work is an important counterexample to
-any broad claim of first combining dynamic tracking with long-term map update.
-Its representation is nevertheless point-level and non-semantic, does not
-maintain object identities or dense free space, and explicitly notes ambiguity
-for periodic objects. L\'azaro \etal present a full pose-graph SLAM system for
-single or multiple sessions, updating 2D local point-cloud maps and pruning
-outdated graph nodes after inter- and intra-session loop closures~\cite{lazaro2018efficient}.
-It provides explicit multi-session geometric maintenance, but not time-indexed
-dynamic-object reconstruction.
+months~\cite{pomerleau2014longterm}. Its representation is cluster-free,
+non-semantic, and point-level: it does not preserve object identity, dense free
+space, or a time-indexed object history. L\'azaro \etal present a full pose-graph
+SLAM system for single or multiple sessions, updating 2D local point-cloud maps
+and pruning outdated graph nodes after inter- and intra-session loop
+closures~\cite{lazaro2018efficient}. It provides explicit multi-session geometric
+maintenance, but not dynamic-object reconstruction.
 
 Dense object-aware methods model longer-term change more explicitly. Panoptic
 Multi-TSDFs separates the scene into active and inactive volumetric submaps and
@@ -121,13 +163,14 @@ the time of writing.
 
 \subsection{Positioning of this work}
 
-Prior work therefore invalidates a broad claim that visible dynamics and
-long-term map update have never been combined: point-level long-term LiDAR
-mapping~\cite{pomerleau2014longterm} and sparse Changing-SLAM~\cite{soares2023changing}
-already span important parts of that space. Our target is narrower. Khronos
-provides dense time-indexed visible-motion reconstruction and same-session
-hidden-change reconciliation, while the multi-session methods above preserve
-geometric, feature, or object memories but do not carry the complete dense
+Prior work has already combined portions of visible dynamics and long-term map
+maintenance at point or sparse-object level~\cite{pomerleau2014longterm,soares2023changing},
+and recent Gaussian methods now provide strong photorealistic implementations of
+either continuous 4D reconstruction or evolving-map update. Our target is
+narrower than a broad first-unification claim. Khronos provides dense
+time-indexed visible-motion reconstruction and same-session hidden-change
+reconciliation, while multi-session volumetric, object, and Gaussian methods
+preserve different forms of long-term memory without carrying the complete dense
 spatio-temporal mapping process into every new independent session. We study the
 missing recurring interface: each session loads a persistent dense
 metric-semantic scene memory, handles both visible dynamics and hidden changes,
