@@ -5,77 +5,71 @@ Status: **2026-08-07**
 Priority is based on overlap with the canonical D1+D2 / D3 story, not title or
 popularity.
 
-## Completed correction audit
+## Direct-core queue: complete
 
-The following uploaded papers have now been read across the full method,
-experiments, figures, and limitations:
+The fixed direct-core PDF queue is now complete. The verified total is 28 primary
+texts, with details in `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
 
-- **SuperMap:** continuous-stream semantic object map; relevant to object-level
-  D2-like maintenance, not process-separated D3.
-- **DYMRO-SLAM:** dynamic-feature rejection for robust localization; low relevance.
-- **ELite:** strong point-level D3 lifelong-map update; not D1+D2 and deliberately
-  removes D1 dynamic history.
+Completed direct-core groups:
 
-See `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`.
+- dense/sparse D1+D2: Khronos and Changing-SLAM;
+- D2 object reasoning: General Movable Objects, LTC-Mapping, SuperMap, GaME;
+- D3 object/volume: Panoptic Multi-TSDFs, POCD, POV-SLAM, ObVi-SLAM,
+  OASIS-Map, Living Scenes;
+- D3 geometry/static maps: Dynamic Pose Graph SLAM, Pomerleau 2014,
+  Efficient Long-Term Mapping, LT-Mapper, RBIF, ELite, ProbPer-LiLo,
+  LT-Gaussian;
+- D1 entity/4D representations: Lost & Found, DYNEMO-SLAM, 4DGS-SLAM,
+  4DTAM, DynaGSLAM, 4D Primitive-Mache;
+- persistence theory: Perpetua;
+- low-relevance robustness control: DYMRO-SLAM.
 
-## Priority A - can still change the novelty boundary
+Detailed audits are in files `13`, `16`, and `18`--`21`.
 
-### A1. ProbPer-LiLo
+## Remaining task: bounded citation-chain saturation
 
-Resolve from the full paper:
+The next task is not to add papers for quantity. It is to inspect references and
+citing papers of the closest systems and answer one question:
 
-- exact factor-graph variables and temporal links;
-- whether observability is distinct from object existence;
-- whether the map retains dynamic/quasi-static history or removes it;
-- session serialization and recursive update protocol;
-- whether structural geometry is represented.
+> Does any uncatalogued paper implement a complete D1+D2 session, export the
+> required dense object-and-structural scene state, initialize an independent
+> later session, reconcile D3, resume D1+D2, and recursively export the next
+> prior?
 
-### A2. DYNEMO-SLAM / Dynamic Situational Graphs
+Priority seeds for backward/forward chaining:
 
-Resolve:
+1. Khronos and Changing-SLAM;
+2. Panoptic Multi-TSDFs, POCD, POV-SLAM, and OASIS-Map;
+3. ObVi-SLAM and ProbPer-LiLo;
+4. Pomerleau 2014, Dynamic Pose Graph SLAM, LT-Mapper, ELite, and RBIF;
+5. GaME and LT-Gaussian;
+6. SuperMap and DYNEMO-SLAM.
 
-- moving agents versus displaced objects;
-- time-indexed entity geometry and identity;
-- handling of reactivation after long gaps;
-- whether any independent-session state is restored;
-- how close the entity graph is to Khronos's representation.
+A newly found paper is promoted to full-text audit only when it introduces a new
+state variable, temporal protocol, representation, or recurring session
+architecture not already covered by the 28 verified papers.
 
-### A3. Perpetua
+## Stop rule
 
-Resolve:
+The novelty audit may be considered saturated for the submission draft only
+when:
 
-- persistence/emergence filter equations;
-- multi-hypothesis state and parameter learning;
-- relationship between missing observation and absence;
-- how it could serve as a theoretical baseline without being a dense mapper.
-
-### A4. OASIS-Map
-
-Resolve:
-
-- exact cross-session association variables;
-- treatment of unknown/unobserved content;
-- dependence on an external multi-session SLAM backend;
-- publication status before submission.
-
-## Priority B - strong method or baseline relevance
-
-- RBIF: ray/voxel contradiction and conservative deletion;
-- LTC-Mapping: visibility and non-detection object confidence;
-- LT-Mapper and Lifelong 3D Mapping: multi-session alignment, positive/negative
-  changes, version control;
-- 4D Primitive-Mache: object permanence inside one video, for D1 representation
-  boundaries;
-- GaME and LT-Gaussian: representation-adjacent D2/D3.
+1. backward references of all closest seeds have been screened;
+2. forward/citing-paper searches have been performed using at least two
+   independent query formulations;
+3. no new direct neighbour survives title/abstract screening and full-text
+   verification;
+4. every manuscript novelty sentence is supported by the verified matrix;
+5. publication status is refreshed immediately before submission.
 
 ## Reading rule
 
-No method enters the Introduction or supports a novelty claim until the original
-paper has been checked for:
+No newly discovered method enters the Introduction or supports a novelty claim
+until the original complete text has been checked for:
 
-1. input/session protocol;
-2. state variables and representation;
-3. actual update equations;
-4. output retained versus discarded;
-5. experiment protocol and metrics;
-6. limitations and future-work boundaries.
+- input and session protocol;
+- state variables and representation;
+- update equations;
+- retained versus discarded output;
+- experiments, metrics, and baselines;
+- limitations and future-work boundaries.
