@@ -14,12 +14,14 @@ Therefore:
 - the Gaussian-specific audit set is versioned in `gaussian_papers.json`;
 - newly added traditional dynamic/multi-session papers are versioned in
   `traditional_additions.json`;
+- the broad-search high-priority set is versioned in
+  `broad_priority_papers.json`;
 - PDFs are downloaded to the ignored directory `literature/pdfs/`;
 - the downloader records the exact byte size and SHA-256 of each local copy;
 - technical conclusions and short source excerpts are versioned in the
   repository evidence ledgers;
-- OASIS-Map, GS-LTS, GS-DIFF, and other unreviewed work are explicitly marked as
-  preprints until their status changes.
+- unpublished and under-review work is explicitly marked until its status
+  changes.
 
 ## Download the core papers
 
@@ -46,17 +48,6 @@ python3 literature/download_papers.py \
   --generated-manifest literature/traditional_additions_download_manifest.generated.json
 ```
 
-Selected additions only:
-
-```bash
-python3 literature/download_papers.py \
-  --manifest literature/traditional_additions.json \
-  --generated-manifest literature/traditional_additions_download_manifest.generated.json \
-  --key xu2019midfusion \
-  --key strecke2019emfusion \
-  --key bescos2021dynaslam2
-```
-
 ## Download the Gaussian audit set
 
 ```bash
@@ -65,15 +56,27 @@ python3 literature/download_papers.py \
   --generated-manifest literature/gaussian_download_manifest.generated.json
 ```
 
-The current manuscript retains only three representative Gaussian papers:
+The manuscript currently retains six to seven Gaussian representatives spanning
+robust static mapping, D1 reconstruction, D2 evolution, and D3 map revision.
+
+## Download the broad-search priority set
 
 ```bash
 python3 literature/download_papers.py \
-  --manifest literature/gaussian_papers.json \
-  --generated-manifest literature/gaussian_download_manifest.generated.json \
-  --key li2025fourdgsslam \
-  --key yugay2026game \
-  --key cheng2025ltgaussian
+  --manifest literature/broad_priority_papers.json \
+  --generated-manifest literature/broad_priority_download_manifest.generated.json
+```
+
+Selected highest-priority papers:
+
+```bash
+python3 literature/download_papers.py \
+  --manifest literature/broad_priority_papers.json \
+  --generated-manifest literature/broad_priority_download_manifest.generated.json \
+  --key zhao2026supermap \
+  --key giberna2025dynemo \
+  --key mazur2026primitive \
+  --key matezbandera2022ltc
 ```
 
 Force a fresh download by adding `--overwrite`.
@@ -89,13 +92,14 @@ endpoint. Obtain the author manuscript or an institutional-access copy and save
 it using the exact `filename` from the corresponding JSON manifest. Re-run the
 downloader; it will validate the PDF and add its hash to the generated manifest.
 
-Current manual entries include:
+Important manual-access priorities currently include:
 
 - `pomerleau2014longterm.pdf`
 - `lazaro2018efficient.pdf`
 - `breitfuss2024rbif.pdf`
-
-All papers in `gaussian_papers.json` currently have an open arXiv or author PDF.
+- `ali2026probperlilo.pdf`
+- `krajnik2017fremen.pdf`
+- `chen2024slamramu.pdf`
 
 ## Full-text reading rule
 
