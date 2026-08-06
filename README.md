@@ -14,13 +14,26 @@ working paper package.
 3. `02_CODE_AND_MODULES.md`: implementation entry points and module behavior.
 4. `03_CLAIMS_AND_EVIDENCE.md`: what is proved, preliminary, or not yet proved.
 5. `04_PROGRESS_2026-08-06.md`: dated progress and reproducible artifact paths.
-6. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and D1/D2/D3 scope.
-7. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
+6. `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`: **authoritative D1/D2/D3
+   hierarchy and corrected classification of all currently cited methods.**
+7. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and earlier scope audit.
+8. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
    allowed conclusions, limitations, and prohibited misreadings for the core
    robotics and SLAM literature.
-8. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
+9. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
    static-map Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.
-9. `literature/README.md`: reproducible local PDF download and hash workflow.
+10. `literature/README.md`: reproducible local PDF download and hash workflow.
+
+## Canonical Storyline
+
+```text
+D1 + D2 = dynamic mapping inside each continuously running session
+D3      = persistent scene-memory continuation across completed sessions
+```
+
+Every new D3 session loads prior memory, reconciles changes since the previous
+session, and simultaneously runs new D1 and D2 events. The authoritative wording
+and classification rules are in `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`.
 
 ## Working Title
 
@@ -75,6 +88,7 @@ CVPR/
   05_LITERATURE_STATUS_2026-08-06.md
   06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
   07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
+  08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md
   GITHUB_OVERLEAF_WORKFLOW.md
   literature/
     README.md
