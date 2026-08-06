@@ -11,14 +11,16 @@ necessarily grant permission to republish the PDF inside this repository.
 Therefore:
 
 - official/open download locations are versioned in `papers.json`;
+- the Gaussian-specific audit set is versioned in `gaussian_papers.json`;
 - PDFs are downloaded to the ignored directory `literature/pdfs/`;
 - the downloader records the exact byte size and SHA-256 of each local copy;
 - technical conclusions and short source excerpts are versioned in
-  `../06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`;
-- OASIS-Map is explicitly marked as an under-review preprint until its status
-  changes.
+  `../06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md` and
+  `../07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`;
+- OASIS-Map, GS-LTS, and GS-DIFF are explicitly marked as unpublished preprints
+  until their status changes.
 
-## Download the open PDFs
+## Download the core papers
 
 From the repository root:
 
@@ -26,7 +28,7 @@ From the repository root:
 python3 literature/download_papers.py
 ```
 
-Download selected papers only:
+Download selected core papers only:
 
 ```bash
 python3 literature/download_papers.py \
@@ -35,33 +37,51 @@ python3 literature/download_papers.py \
   --key qian2023povslam
 ```
 
-Force a fresh download:
+## Download the Gaussian audit set
 
 ```bash
-python3 literature/download_papers.py --overwrite
+python3 literature/download_papers.py \
+  --manifest literature/gaussian_papers.json \
+  --generated-manifest literature/gaussian_download_manifest.generated.json
 ```
 
-The command creates:
+Selected Gaussian papers:
+
+```bash
+python3 literature/download_papers.py \
+  --manifest literature/gaussian_papers.json \
+  --generated-manifest literature/gaussian_download_manifest.generated.json \
+  --key li2025fourdgsslam \
+  --key yugay2026game \
+  --key cheng2025ltgaussian
+```
+
+Force a fresh download by adding `--overwrite`.
+
+The commands create:
 
 ```text
 literature/pdfs/*.pdf
 literature/download_manifest.generated.json
+literature/gaussian_download_manifest.generated.json
 ```
 
-Both are ignored by Git. The generated manifest records the exact SHA-256 hash
-of every audited local PDF.
+These outputs are ignored by Git. The generated manifests record the exact
+SHA-256 hash of every audited local PDF.
 
 ## Papers requiring manual access
 
 Entries with `pdf_url: null` cannot be fetched reliably from a stable public PDF
 endpoint. Obtain the author manuscript or an institutional-access copy and save
-it using the exact `filename` from `papers.json`. Re-run the downloader; it will
-validate the PDF and add its hash to the generated manifest.
+it using the exact `filename` from the corresponding JSON manifest. Re-run the
+downloader; it will validate the PDF and add its hash to the generated manifest.
 
-Current manual entries:
+Current core manual entries:
 
 - `pomerleau2014longterm.pdf`
 - `lazaro2018efficient.pdf`
+
+All papers in `gaussian_papers.json` currently have an open arXiv or author PDF.
 
 ## Full-text reading rule
 
@@ -78,4 +98,7 @@ Before adding or changing a technical sentence in the manuscript:
 
 A sentence in another paper's related-work section is not evidence of the cited
 method's own contribution. An author criticism is not a capability. A future-work
-statement is not an implemented component.
+statement is not an implemented component. A method that removes dynamics to
+recover a static map must not be described as retaining dynamic history, and a
+pairwise Gaussian change detector must not be described as a multi-session SLAM
+system.
