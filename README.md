@@ -14,6 +14,8 @@ working paper package.
 3. `02_CODE_AND_MODULES.md`: implementation entry points and module behavior.
 4. `03_CLAIMS_AND_EVIDENCE.md`: what is proved, preliminary, or not yet proved.
 5. `04_PROGRESS_2026-08-06.md`: dated progress and reproducible artifact paths.
+6. `05_LITERATURE_STATUS_2026-08-06.md`: publication status, D1/D2/D3 coverage,
+   original-text evidence, and novelty-boundary warnings.
 
 ## Working Title
 
@@ -55,6 +57,7 @@ CVPR/
   02_CODE_AND_MODULES.md
   03_CLAIMS_AND_EVIDENCE.md
   04_PROGRESS_2026-08-06.md
+  05_LITERATURE_STATUS_2026-08-06.md
   GITHUB_OVERLEAF_WORKFLOW.md
   manuscript/
     main.tex
