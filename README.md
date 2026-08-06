@@ -12,20 +12,23 @@ for the current Khronos-based scene-memory project.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: what is established, preliminary, or unproved.
 5. `04_PROGRESS_2026-08-06.md`: dated technical status.
-6. `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`: authoritative D1/D2/D3
+6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: **binding PDF-level
+   literature standard, audit reset, and priority sequence.**
+7. `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`: authoritative D1/D2/D3
    hierarchy.
-7. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: mandatory
-   correction after full-text reading of the three uploaded papers. This file
-   overrides older shorthand descriptions of SuperMap and ELite.
-8. `12_NOVELTY_AND_METHOD_SPACE_AUDIT_2026-08-07.md`: corrected novelty and
-   method-space analysis.
-9. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: high-recall literature
-   map with corrected method classifications.
-10. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining papers to read
-    at full-text depth.
-11. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: core robotics/SLAM evidence.
-12. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: Gaussian evidence.
-13. `literature/README.md`: local PDF download and hash workflow.
+8. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: correction
+   after full-text reading of the uploaded papers.
+9. `12_NOVELTY_AND_METHOD_SPACE_AUDIT_2026-08-07.md`: provisional novelty and
+   method-space analysis; all non-PDF-audited entries require revalidation.
+10. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: high-recall candidate
+    pool, not an authoritative source of technical claims.
+11. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: papers awaiting complete
+    PDF audits.
+12. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: earlier core evidence ledger;
+    revalidate against the authoritative protocol.
+13. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: earlier Gaussian
+    evidence ledger; revalidate against the authoritative protocol.
+14. `literature/README.md`: local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -36,6 +39,23 @@ D3      = persistent scene-memory continuation across completed sessions
 
 Every new D3 session loads prior memory, reconciles changes since the previous
 session, and simultaneously runs new D1 and D2 events.
+
+## Literature-Audit Hold
+
+No universal-negative or first-work claim is currently authorized. A paper may
+influence Introduction, Related Work, novelty, method design, or baseline choice
+only after its original PDF has been audited across:
+
+- exact problem and temporal protocol;
+- inputs, assumptions, and estimated variables;
+- representation and update equations;
+- what is discarded or not represented;
+- experiments, metrics, and limitations;
+- D1/D2/D3 coverage under this project's definitions;
+- exact source pages, sections, equations, and figures.
+
+Older labels such as `FULL` and `PRIMARY` are deprecated unless revalidated in
+`14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`.
 
 ## Full-Text Correction Summary
 
@@ -48,6 +68,8 @@ The paper title alone never determines overlap:
   has no retained dynamic map or session memory.
 - **ELite** is a strong point-level D3 lifelong-map updater; local ephemerality is
   a dynamic-removal score, not the project's D1/D2 decomposition.
+- **DYNEMO-SLAM** jointly optimizes robot and entity poses inside a continuous
+  graph, but does not provide process-separated D3 scene-memory transfer.
 
 ## Working Title
 
@@ -108,6 +130,7 @@ CVPR/
   11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md
   12_NOVELTY_AND_METHOD_SPACE_AUDIT_2026-08-07.md
   13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md
+  14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md
   GITHUB_OVERLEAF_WORKFLOW.md
   literature/
   manuscript/
