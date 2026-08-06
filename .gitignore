@@ -1,0 +1,36 @@
+# LaTeX build products
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Local build and editor state
+_build/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Keep large experiment artifacts outside this paper repository.
+*.4dmap
+*.panmap
+*.bag
+*.db3
+*.mcap
+*.ply
+
+# Baseline build/run products if the source snapshot is used locally
+code/session_update_baseline/build/
+code/session_update_baseline/runs/
+code/session_update_baseline/rounds/
+code/session_update_baseline/visual_compare/
+**/__pycache__/
+*.pyc
