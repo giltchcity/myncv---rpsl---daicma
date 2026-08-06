@@ -1,0 +1,123 @@
+{
+  "checked_on": "2026-08-06",
+  "purpose": "Full-text audit cache for Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.",
+  "papers": [
+    {
+      "key": "matsuki2024gaussianslam",
+      "title": "Gaussian Splatting SLAM",
+      "status": "published",
+      "venue": "CVPR 2024",
+      "pdf_url": "https://arxiv.org/pdf/2312.06741",
+      "landing_url": "https://openaccess.thecvf.com/content/CVPR2024/html/Matsuki_Gaussian_Splatting_SLAM_CVPR_2024_paper.html",
+      "filename": "matsuki2024gaussianslam.pdf"
+    },
+    {
+      "key": "keetha2024splatam",
+      "title": "SplaTAM: Splat, Track & Map 3D Gaussians for Dense RGB-D SLAM",
+      "status": "published",
+      "venue": "CVPR 2024",
+      "pdf_url": "https://arxiv.org/pdf/2312.02126",
+      "landing_url": "https://openaccess.thecvf.com/content/CVPR2024/html/Keetha_SplaTAM_Splat_Track__Map_3D_Gaussians_for_Dense_RGB-D_CVPR_2024_paper.html",
+      "filename": "keetha2024splatam.pdf"
+    },
+    {
+      "key": "zheng2025wildgsslam",
+      "title": "WildGS-SLAM: Monocular Gaussian Splatting SLAM in Dynamic Environments",
+      "status": "published",
+      "venue": "CVPR 2025",
+      "pdf_url": "https://arxiv.org/pdf/2504.03886",
+      "landing_url": "https://openaccess.thecvf.com/content/CVPR2025/html/Zheng_WildGS-SLAM_Monocular_Gaussian_Splatting_SLAM_in_Dynamic_Environments_CVPR_2025_paper.html",
+      "filename": "zheng2025wildgsslam.pdf"
+    },
+    {
+      "key": "wen2025gassidy",
+      "title": "Gassidy: Gaussian Splatting SLAM in Dynamic Environments",
+      "status": "published",
+      "venue": "ICRA 2025",
+      "pdf_url": "https://arxiv.org/pdf/2411.15476",
+      "landing_url": "https://doi.org/10.1109/ICRA55743.2025.11127678",
+      "filename": "wen2025gassidy.pdf"
+    },
+    {
+      "key": "li2025fourdgsslam",
+      "title": "4D Gaussian Splatting SLAM",
+      "status": "published",
+      "venue": "ICCV 2025",
+      "pdf_url": "https://arxiv.org/pdf/2503.16710",
+      "landing_url": "https://openaccess.thecvf.com/content/ICCV2025/html/Li_4D_Gaussian_Splatting_SLAM_ICCV_2025_paper.html",
+      "filename": "li2025fourdgsslam.pdf"
+    },
+    {
+      "key": "sun2025d4dgsslam",
+      "title": "Embracing Dynamics: Dynamics-Aware 4D Gaussian Splatting SLAM",
+      "status": "published",
+      "venue": "IROS 2025",
+      "pdf_url": "https://arxiv.org/pdf/2504.04844",
+      "landing_url": "https://zhicongsun.github.io/d4dgs",
+      "filename": "sun2025d4dgsslam.pdf"
+    },
+    {
+      "key": "li2026dynagslam",
+      "title": "DynaGSLAM: Real-Time Gaussian-Splatting SLAM for Online Rendering, Tracking, Motion Predictions of Moving Objects in Dynamic Scenes",
+      "status": "published",
+      "venue": "WACV 2026",
+      "pdf_url": "https://arxiv.org/pdf/2503.11979",
+      "landing_url": "https://openaccess.thecvf.com/content/WACV2026/html/Li_DynaGSLAM_Real-Time_Gaussian-Splatting_SLAM_for_Online_Rendering_Tracking_Motion_Predictions_WACV_2026_paper.html",
+      "filename": "li2026dynagslam.pdf"
+    },
+    {
+      "key": "wang2026flow4dgsslam",
+      "title": "Flow4DGS-SLAM: Optical Flow-Guided 4D Gaussian Splatting SLAM",
+      "status": "published",
+      "venue": "CVPR 2026",
+      "pdf_url": "https://arxiv.org/pdf/2604.22339",
+      "landing_url": "https://openaccess.thecvf.com/content/CVPR2026/html/Wang_Flow4DGS-SLAM_Optical_Flow-Guided_4D_Gaussian_Splatting_SLAM_CVPR_2026_paper.html",
+      "filename": "wang2026flow4dgsslam.pdf"
+    },
+    {
+      "key": "zhao2026ru4dslam",
+      "title": "RU4D-SLAM: Reweighting Uncertainty in Gaussian Splatting SLAM for 4D Scene Reconstruction",
+      "status": "published",
+      "venue": "CVPR Findings 2026",
+      "pdf_url": "https://arxiv.org/pdf/2602.20807",
+      "landing_url": "https://ru4d-slam.github.io/",
+      "filename": "zhao2026ru4dslam.pdf"
+    },
+    {
+      "key": "yugay2026game",
+      "title": "Gaussian Mapping for Evolving Scenes",
+      "status": "published",
+      "venue": "CVPR 2026",
+      "pdf_url": "https://arxiv.org/pdf/2506.06909",
+      "landing_url": "https://openaccess.thecvf.com/content/CVPR2026/html/Yugay_Gaussian_Mapping_for_Evolving_Scenes_CVPR_2026_paper.html",
+      "filename": "yugay2026game.pdf"
+    },
+    {
+      "key": "cheng2025ltgaussian",
+      "title": "LT-Gaussian: Long-Term Map Update Using 3D Gaussian Splatting for Autonomous Driving",
+      "status": "published",
+      "venue": "IEEE IV 2025",
+      "pdf_url": "https://arxiv.org/pdf/2508.01704",
+      "landing_url": "https://doi.org/10.1109/IV64158.2025.11097624",
+      "filename": "cheng2025ltgaussian.pdf"
+    },
+    {
+      "key": "fu2025gslts",
+      "title": "GS-LTS: 3D Gaussian Splatting-Based Adaptive Modeling for Long-Term Service Robots",
+      "status": "preprint as of 2026-08-06",
+      "venue": "arXiv 2025",
+      "pdf_url": "https://arxiv.org/pdf/2503.17733",
+      "landing_url": "https://arxiv.org/abs/2503.17733",
+      "filename": "fu2025gslts.pdf"
+    },
+    {
+      "key": "galappaththige2026gsdiff",
+      "title": "From Pixels to Primitives: Scene Change Detection in 3D Gaussian Splatting",
+      "status": "preprint as of 2026-08-06",
+      "venue": "arXiv 2026",
+      "pdf_url": "https://arxiv.org/pdf/2605.07203",
+      "landing_url": "https://arxiv.org/abs/2605.07203",
+      "filename": "galappaththige2026gsdiff.pdf"
+    }
+  ]
+}
