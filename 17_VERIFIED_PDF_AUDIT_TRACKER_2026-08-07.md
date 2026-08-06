@@ -8,14 +8,11 @@ actually been opened and read end-to-end under the project's audit protocol.
 ## Current verified count
 
 ```text
-SELF-FETCHED + COMPLETE: 6
+SELF-FETCHED + COMPLETE: 10
 USER-UPLOADED + COMPLETE: 6
 SELF-FETCHED + PENDING: 0
-TOTAL COMPLETE: 12
+TOTAL COMPLETE: 16
 ```
-
-The self-fetched set consists of Khronos plus five core D3 papers independently
-opened from official or author-hosted full PDFs through the web PDF reader.
 
 ## Completion criteria
 
@@ -43,11 +40,16 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 | 4 | POV-SLAM: Probabilistic Object-Oriented Variational SLAM in Semi-Static Environments | official arXiv PDF, RSS 2023 | joint pose/object-consistency D3 SLAM; no complete D1 history or same-session D2 output |
 | 5 | LT-Mapper: A Modular Framework for LiDAR-Based Lifelong Mapping | official arXiv PDF, ICRA 2022 | D3 geometric current-map maintenance with positive/negative changes; moving content removed |
 | 6 | ObVi-SLAM: Long-Term Object-Visual SLAM | official arXiv PDF / author manuscript, RA-L 2024 | genuine recursive deployment object prior; static object landmarks only |
+| 7 | Visual Localization and Mapping in Dynamic and Changing Environments (Changing-SLAM) | open-access Springer PDF, JINT 2023 | genuine sparse object-level D1+D2 visual SLAM; no process-separated D3 |
+| 8 | Detection and Tracking of General Movable Objects in Large 3D Maps | official arXiv full manuscript, T-RO 2019 | probabilistic D2 object identity/location tracking across observation gaps; not SLAM and no dense map |
+| 9 | Perpetua: Multi-Hypothesis Persistence Modeling for Semi-Static Environments | official arXiv accepted manuscript, IROS 2025 | feature-existence prediction theory; no geometry, SLAM, or session-memory protocol |
+| 10 | Lost & Found: Tracking Changes from Egocentric Observations in 3D Dynamic Scene Graphs | official arXiv full manuscript, RA-L 2025 | observed D1 interaction trajectories and scene-graph updates; object must remain visible; no D2/D3 |
 
 Detailed audits:
 
 - `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
 - `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
+- `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`
 
 ## User-uploaded and complete
 
@@ -64,16 +66,14 @@ Detailed audits:
 
 The remaining direct-core queue includes, at minimum:
 
-- Changing-SLAM;
-- Detection and Tracking of General Movable Objects in Large 3D Maps;
-- LTC-Mapping;
+- LTC-Mapping: full article obtained, exact PDF acquisition/verification still
+  pending before it is counted;
 - GaME;
-- Perpetua;
-- Lost & Found;
 - OASIS-Map;
 - Dynamic Pose Graph SLAM;
 - Pomerleau et al. 2014;
-- selected Gaussian/4D representatives.
+- selected Gaussian/4D representatives;
+- additional papers discovered through forward/backward citation chaining.
 
 The broader candidate pool is not counted until each exact PDF is acquired and
 passes the complete checklist.
