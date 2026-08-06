@@ -36,20 +36,16 @@ persistence requirement to this same scene reasoning: the distinction among
 persistent, absent, unobserved, and new content must survive termination of the
 online SLAM process and become available to the next independent session.
 
-A large body of dynamic SLAM work addresses D1. Systems such as Co-Fusion and
-MaskFusion jointly segment, track, and reconstruct rigid moving
-objects~\cite{runz2017cofusion,runz2018maskfusion}, whereas DynaSLAM and related
-approaches protect camera tracking and static mapping by rejecting dynamic
-measurements~\cite{bescos2018dynaslam}. Dynablox detects moving geometry from a
-conservative estimate of free space~\cite{schmid2023dynablox}, and DynoSAM
-jointly optimizes camera state, object motion, and object
-structure~\cite{morris2025dynosam}. Recent Gaussian systems have further
-introduced time-dependent radiance-field representations for continuously
-observed dynamics. These methods provide increasingly rich D1 estimates, but D1
-alone does not determine what happened while a region was outside the current
-view.
+A large body of dynamic SLAM work addresses D1. Dense object-level systems
+segment, track, and reconstruct moving entities~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion},
+while tightly coupled estimators jointly optimize camera state, object motion,
+and scene structure~\cite{bescos2021dynaslam2,morris2025dynosam}. Recent 4D and
+Gaussian methods further construct photorealistic or non-rigid temporal
+representations from continuous image streams. These systems increasingly
+capture what moved while it was observed, but D1 alone cannot determine what
+happened while a region was outside the current view.
 
-Several systems connect visible motion with changes revealed after an
+Several methods connect visible motion with changes revealed after an
 observation gap. Changing-SLAM combines dynamic-keypoint filtering and object
 tracking with a Bayesian object-belief map and long-term data
 association~\cite{soares2023changing}; its geometric output nevertheless remains
@@ -59,31 +55,37 @@ Spatio-Temporal Metric-Semantic SLAM (SMS) and factorizes one continuously
 running estimation problem into a fast process for D1 and a slower global
 process for D2~\cite{schmid2024khronos}. Visible motion is represented over time,
 whereas changes that occur while the robot is looking elsewhere are inferred
-when the affected region is revisited. Gaussian Mapping for Evolving Scenes
-(GaME) similarly updates a dense Gaussian representation after out-of-view
-changes, but receives poses and panoptic segmentation from external systems and
-does not retain visible dynamic trajectories~\cite{yugay2026game}.
+when the affected region is revisited. GaME similarly updates a dense Gaussian
+representation after out-of-view changes, but receives poses and panoptic
+segmentation from external systems and does not retain visible dynamic
+trajectories~\cite{yugay2026game}.
 
-The published Khronos formulation estimates one evolving spatio-temporal map
-over a temporal sequence $t=0,\ldots,T$. It does not define a process-separated
-continuation protocol in which a completed session exports persistent scene
-memory, a later session imports it as its initial prior, and the new session
-again runs the complete D1+D2 machinery. Conversely, long-term and multi-session
-methods concentrate on D3. Panoptic Multi-TSDFs maintains active and inactive
-volumetric submaps and distinguishes persistent, absent, and unobserved
-entities~\cite{schmid2022panoptic}. POCD updates object-level volumetric maps for
-changes between robot traversals, while POV-SLAM jointly reasons about
-semi-static objects and robot pose over repeated visits~\cite{qian2022pocd,qian2023povslam}.
-ObVi-SLAM maintains persistent object landmarks across deployments~\cite{adkins2024obvislam},
-and Living Scenes associates and reconstructs objects from scans captured at
-different times~\cite{zhu2024livingscenes}. A concurrent preprint, OASIS-Map,
-studies object association and appeared, disappeared, moved, and unknown states
-across mapping sessions~\cite{oh2026oasismap}.
-% STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-06.
-% Re-check its publication status before submission and decide whether to retain it.
-These approaches provide strong D3 components, but they do not carry a complete
-dense D1+D2 spatio-temporal mapping process into every newly initialized
-session.
+Recent semantic-memory systems narrow the gap further. SuperMap fuses geometric
+SLAM with asynchronous open-vocabulary perception, maintains object identities
+through geometric, existence, and semantic-confidence updates, and records
+appearance, disappearance, relocation, spatial relations, and history in a
+queryable 4D scene graph~\cite{zhao2026supermap}. Its public demonstrations show a
+continuous campus-scale deployment and make it a major contemporary comparison
+for persistent semantic memory. The remaining question for our problem is not
+whether semantics can persist during a long run, but whether a completed dense
+D1+D2 mapping process exports a sufficient state that an independently started
+session can import and recursively update.
+
+Long-term and multi-session methods concentrate on D3. Panoptic Multi-TSDFs
+initializes later mapping from prior volumetric submaps and distinguishes
+persistent, absent, and unobserved entities~\cite{schmid2022panoptic}. POCD
+updates object-level volumetric maps for changes between traversals, while
+POV-SLAM jointly reasons about semi-static objects and robot pose over repeated
+visits~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers persistent object
+landmarks across deployments~\cite{adkins2024obvislam}, and OASIS-Map associates
+objects and change states across completed mapping sessions~\cite{oh2026oasismap}.
+% STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-07.
+ProbPer-LiLo is a particularly relevant recent development: it uses a discrete
+probabilistic factor graph to classify object persistency and refine 3D maps from
+multiple sessions~\cite{ali2026probperlilo}. These approaches provide strong D3
+representations and update mechanisms, but primarily target stable geometric or
+object maps rather than carrying a complete dense D1+D2 scene history into every
+new deployment.
 
 This separation leaves a practical gap for long-term robotic operation.
 Restarting from an empty map discards valid historical coverage. Replacing the
@@ -128,9 +130,9 @@ an isolated detector operating after mapping has finished.
 To the best of our knowledge, no existing \emph{dense metric-semantic SLAM}
 system jointly provides (i) D1 time-indexed reconstruction of motion observed by
 the robot, (ii) D2 reconciliation of changes occurring outside the robot's view
-within the same running session, and (iii) D3 persistent continuation of the
-same scene memory across independent process-separated sessions. Our
-contributions are:
+within the same running session, and (iii) D3 process-separated continuation in
+which the exported scene state initializes an independent later session that
+again performs D1+D2. Our contributions are:
 \begin{itemize}
     \item We introduce P-SMS, a problem formulation with two intra-session
     dynamic modes, D1 and D2, connected across deployments by a persistent D3
