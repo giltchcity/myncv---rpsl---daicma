@@ -12,22 +12,24 @@ for the current Khronos-based scene-memory project.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
 5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of PDFs
-   actually opened and read end-to-end. Current verified count: 12.**
+   actually opened and read end-to-end. Current verified count: 16.**
 6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding PDF-level
    literature standard.
-7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete
-   self-fetched Khronos audit.
-8. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete audits of
-   Panoptic Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
-9. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
-   correction for SuperMap, DYMRO-SLAM, and ELite.
-10. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
-    correction for Efficient Long-Term Mapping and ProbPer-LiLo.
-11. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
+7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete Khronos
+   audit.
+8. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
+   Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
+9. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
+   Changing-SLAM, General Movable Objects, Perpetua, and Lost & Found.
+10. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
+    DYMRO-SLAM, and ELite.
+11. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
+    Long-Term Mapping and ProbPer-LiLo.
+12. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
     it must not be used as evidence.
-12. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
-13. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
-14. `literature/README.md`: local PDF download and hash workflow.
+13. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
+14. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
+15. `literature/README.md`: local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -46,48 +48,32 @@ Technical statements may enter the manuscript only after the original PDF has
 been read across its exact problem, inputs, state variables, method, experiments,
 and limitations.
 
-The following earlier claim has been explicitly withdrawn:
-
-```text
-38 papers were fully audited and the literature search was saturated.
-```
-
-That standard had not been met. The only valid count is maintained in
-`17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
+The earlier claim that 38 papers had been fully audited was withdrawn. The only
+valid count is maintained in `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
 
 Current verified total:
 
 ```text
-self-fetched and complete: 6
+self-fetched and complete: 10
 user-uploaded and complete: 6
-total complete: 12
+total complete: 16
 ```
 
-Key verified classifications:
+Key verified boundaries now include:
 
-- **Khronos:** complete dense D1+D2 inside one continuous session; no published
-  process-separated D3 continuation.
-- **Panoptic Multi-TSDFs:** dense D3 object/submap state with
-  persistent/absent/unobserved; D1 tracking is future work.
-- **POCD:** object-level D3 mapping with Gaussian--Beta change/stationarity
-  belief; external poses; no retained D1.
-- **POV-SLAM:** joint robot-pose and semi-static object-consistency D3 SLAM; no
-  complete D1 history or explicit same-session D2 output.
-- **LT-Mapper:** D3 geometric current-map maintenance with positive/negative
-  changes; moving content is removed.
-- **ObVi-SLAM:** genuine recursive deployment object prior, restricted to static
-  object landmarks.
-- **SuperMap:** one continuous RGB-D/point-cloud stream; ten-minute change run;
-  semantic object-map maintenance rather than process-separated D3.
-- **DYMRO-SLAM:** dynamic feature rejection for ORB-SLAM3 localization.
-- **DYNEMO-SLAM:** one continuous dynamic-entity scene-graph SLAM run.
-- **ELite:** current-session dynamic-point removal plus cross-session point-map
-  ephemerality and refinement.
-- **Efficient Long-Term Mapping:** free-space-aware cleaning of 2D local maps
-  plus multi-session pose-graph/local-map maintenance; no D1/D2 state.
-- **ProbPer-LiLo:** binary static/non-static persistence modeling followed by
-  recursive static lifelong-map refinement; all dynamic and quasi-static content
-  is removed rather than preserved.
+- **Khronos:** complete dense D1+D2 inside one continuous session.
+- **Changing-SLAM:** genuine sparse object-level D1+D2 visual SLAM; no D3.
+- **General Movable Objects:** probabilistic D2 identity/location tracking over
+  observation gaps; not SLAM and no dense map.
+- **Lost & Found:** observed D1 interaction trajectories and scene-graph update;
+  object must remain visible.
+- **Perpetua:** feature existence/persistence prediction theory; no geometry or
+  mapping protocol.
+- **Panoptic Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, ObVi-SLAM, ELite,
+  ProbPer-LiLo, and Efficient Long-Term Mapping:** different D3 map-maintenance
+  or deployment-prior mechanisms, generally without retained D1 histories.
+- **SuperMap:** continuous-stream semantic object-map maintenance, not
+  process-separated D3.
 
 ## Working Title
 
