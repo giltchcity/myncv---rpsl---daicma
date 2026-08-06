@@ -16,20 +16,23 @@ working paper package.
 5. `04_PROGRESS_2026-08-06.md`: dated progress and reproducible artifact paths.
 6. `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`: **authoritative D1/D2/D3
    hierarchy and corrected classification of all currently cited methods.**
-7. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: high-recall map of the
+7. `12_NOVELTY_AND_METHOD_SPACE_AUDIT_2026-08-07.md`: **current novelty
+   boundary, existing method mechanisms, prohibited claims, and the recommended
+   persistent-scene-belief research direction.**
+8. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: high-recall map of the
    major dynamic-map, 4D reconstruction, scene-memory, lifelong-map, neural, and
    Gaussian research families.
-8. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: papers most likely to
+9. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: papers most likely to
    change the novelty boundary and the exact questions to resolve.
-9. `09_TRADITIONAL_REAUDIT_AND_GAUSSIAN_SELECTION_2026-08-07.md`: traditional
-   mapping additions and baseline feasibility.
-10. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and earlier scope audit.
-11. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
-   allowed conclusions, limitations, and prohibited misreadings for the core
-   robotics and SLAM literature.
-12. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
-   static-map Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.
-13. `literature/README.md`: reproducible local PDF download and hash workflow.
+10. `09_TRADITIONAL_REAUDIT_AND_GAUSSIAN_SELECTION_2026-08-07.md`: traditional
+    mapping additions and baseline feasibility.
+11. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and earlier scope audit.
+12. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
+    allowed conclusions, limitations, and prohibited misreadings for the core
+    robotics and SLAM literature.
+13. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
+    static-map Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.
+14. `literature/README.md`: reproducible local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -105,6 +108,7 @@ CVPR/
   09_TRADITIONAL_REAUDIT_AND_GAUSSIAN_SELECTION_2026-08-07.md
   10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md
   11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md
+  12_NOVELTY_AND_METHOD_SPACE_AUDIT_2026-08-07.md
   GITHUB_OVERLEAF_WORKFLOW.md
   literature/
     README.md
