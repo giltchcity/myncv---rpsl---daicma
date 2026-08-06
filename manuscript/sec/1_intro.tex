@@ -32,8 +32,8 @@ element at the new location unless identity can be established reliably.
 Moreover, no match is not evidence of absence. Geometry must remain
 \emph{unobserved} when the current trajectory provides insufficient visibility
 and may be removed only when later measurements contradict it. D3 adds a
-persistence requirement to this same scene reasoning: the distinction among
-persistent, absent, unobserved, and new content must survive termination of the
+persistence requirement to this same scene reasoning: observability, existence,
+identity, geometry, and supporting evidence must survive termination of the
 online SLAM process and become available to the next independent session.
 
 A large body of dynamic SLAM work addresses D1. Dense object-level systems
@@ -65,11 +65,11 @@ SLAM with asynchronous open-vocabulary perception, maintains object identities
 through geometric, existence, and semantic-confidence updates, and records
 appearance, disappearance, relocation, spatial relations, and history in a
 queryable 4D scene graph~\cite{zhao2026supermap}. Its public demonstrations show a
-continuous campus-scale deployment and make it a major contemporary comparison
-for persistent semantic memory. The remaining question for our problem is not
-whether semantics can persist during a long run, but whether a completed dense
-D1+D2 mapping process exports a sufficient state that an independently started
-session can import and recursively update.
+continuous campus-scale deployment and establish that persistent instance
+identity and semantic scene history are not new by themselves. The remaining
+question for our problem is which dense scene belief a completed D1+D2 process
+must export so that an independently started session can reactivate unresolved
+hypotheses and resume the same inference.
 
 Long-term and multi-session methods concentrate on D3. Panoptic Multi-TSDFs
 initializes later mapping from prior volumetric submaps and distinguishes
@@ -80,28 +80,37 @@ visits~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers persistent objec
 landmarks across deployments~\cite{adkins2024obvislam}, and OASIS-Map associates
 objects and change states across completed mapping sessions~\cite{oh2026oasismap}.
 % STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-07.
-ProbPer-LiLo is a particularly relevant recent development: it uses a discrete
-probabilistic factor graph to classify object persistency and refine 3D maps from
-multiple sessions~\cite{ali2026probperlilo}. These approaches provide strong D3
-representations and update mechanisms, but primarily target stable geometric or
-object maps rather than carrying a complete dense D1+D2 scene history into every
-new deployment.
+ProbPer-LiLo uses a discrete probabilistic factor graph to classify object
+persistency and refine 3D maps from multiple sessions~\cite{ali2026probperlilo}.
 
-This separation leaves a practical gap for long-term robotic operation.
-Restarting from an empty map discards valid historical coverage. Replacing the
-old map with the newest reconstruction loses regions that the new traversal did
-not observe. Conversely, unconditional map union preserves stale surfaces and
-duplicated objects. Pairwise change detection is also insufficient: after an
-inter-session update, the new deployment remains a dynamic SLAM session in which
-new D1 and D2 events continue to occur. A long-term robot therefore needs a
-recurring process in which each session consumes persistent memory, performs
-complete single-session dynamic mapping, and emits an updated memory for the
-next session.
+ELite is an especially important predecessor because it explicitly estimates
+local ephemerality within a session and global ephemerality across sessions, and
+recursively updates a lifelong point map from each new session~\cite{gil2025elite}.
+It additionally provides static and delta maps. Thus, a two-timescale hierarchy,
+Bayesian transiency, recursive multi-session update, and map history are not new
+in isolation. ELite, however, removes locally dynamic points to construct a clean
+session map; it does not retain D1 object trajectories and temporal geometry or
+formulate D2 as a joint belief over observability, existence, and identity. More
+generally, existing D3 systems primarily target stable geometric or object maps
+rather than carrying a complete dense D1+D2 scene belief into every new
+deployment.
+
+This leaves a narrower but practically important gap. Restarting from an empty
+map discards valid historical coverage. Replacing the old map with the newest
+reconstruction loses regions that the new traversal did not observe. Conversely,
+unconditional map union preserves stale surfaces and duplicated objects.
+Maintaining only a clean static map discards observed dynamic history, while an
+object-only memory cannot update structural geometry. Pairwise change detection
+is also insufficient: after an inter-session update, the new deployment remains
+a dynamic SLAM session in which new D1 and D2 events continue to occur. A
+long-term robot therefore needs a recurring process in which each session
+consumes a structured scene belief, performs complete single-session dynamic
+mapping, and emits an updated belief for the next session.
 
 We formalize this problem as \emph{Persistent Spatio-Temporal Metric-Semantic
 SLAM} (P-SMS). Let $\mathcal{S}^{k}$ denote the $k$-th independent mapping
 session, with observations $\mathcal{Z}^{k}$, and let $\mathcal{M}^{k-1}$ be the
-persistent scene memory produced by the preceding session. P-SMS seeks the
+persistent scene belief produced by the preceding session. P-SMS seeks the
 recurring update
 \begin{equation}
     \left(\mathcal{M}^{k},\,\mathcal{H}^{k}\right)
@@ -110,43 +119,44 @@ recurring update
     \label{eq:psms_update}
 \end{equation}
 where $\mathcal{H}^{k}$ stores the time-indexed D1 history observed within
-session $k$, while $\mathcal{M}^{k}$ is the updated current-scene memory that
-survives process termination. During session $k$, $\Phi$ must support both D1
-and D2. Across the boundary from $k-1$ to $k$, it must reconcile D3 by retaining
-previously valid but unobserved geometry, removing inherited content only when
-contradicted by reliable current evidence, incorporating genuinely new content,
-and preserving the information required to repeat the same process in session
-$k+1$.
+session $k$, while $\mathcal{M}^{k}$ stores the current metric-semantic state,
+unresolved observability and identity hypotheses, and their supporting evidence.
+During session $k$, $\Phi$ must support both D1 and D2. Across the boundary from
+$k-1$ to $k$, it must reconcile D3 by retaining previously valid but unobserved
+content, removing inherited content only when contradicted by reliable current
+evidence, incorporating genuinely new content, and preserving the information
+required to repeat the same process in session $k+1$.
 
 We instantiate P-SMS by extending dense single-session spatio-temporal mapping
-with a persistent scene-memory and reconciliation layer. A completed session
-exports stable scene geometry, object-level memory, change evidence, and session
-provenance. A later independent session loads this state as its prior, reconciles
-inter-session changes using current surface and visibility evidence, and
-concurrently runs the same D1+D2 machinery as before. D3 is therefore the
-persistent interface connecting complete dynamic mapping sessions, rather than
-an isolated detector operating after mapping has finished.
+with a persistent scene-belief and reconciliation layer. A completed session
+exports stable geometry, object and structural memory, unresolved change
+hypotheses, evidence, and session provenance. A later independent session loads
+this state as its prior, reconciles inter-session changes using current surface
+and visibility evidence, and concurrently runs the same D1+D2 machinery as
+before. D3 is therefore the probabilistic interface connecting complete dynamic
+mapping sessions, rather than an isolated detector operating after mapping has
+finished.
 
-To the best of our knowledge, no existing \emph{dense metric-semantic SLAM}
-system jointly provides (i) D1 time-indexed reconstruction of motion observed by
-the robot, (ii) D2 reconciliation of changes occurring outside the robot's view
-within the same running session, and (iii) D3 process-separated continuation in
-which the exported scene state initializes an independent later session that
-again performs D1+D2. Our contributions are:
+In the primary literature we audited, existing systems either retain rich
+dynamic histories inside a continuously running session or maintain/refine maps
+across deployments. To the best of our knowledge, no existing \emph{dense
+metric-semantic SLAM} system exports the sufficient scene belief required for an
+independently initialized session to reconcile inter-session change, retain
+observability and identity ambiguity, and resume complete D1+D2 inference. Our
+contributions are:
 \begin{itemize}
-    \item We introduce P-SMS, a problem formulation with two intra-session
-    dynamic modes, D1 and D2, connected across deployments by a persistent D3
-    scene-memory update.
+    \item We formulate process-separated persistent SMS, in which every session
+    performs D1+D2 and exports the structured scene belief required for recursive
+    D3 continuation.
 
-    \item We develop a persistent scene-memory architecture that transfers a
-    dense current map, object memory, change evidence, and session provenance
-    between deployments, while retaining complete D1+D2 processing inside every
-    session.
+    \item We develop a persistent scene-belief architecture that transfers dense
+    current geometry, object and structural memory, unresolved change
+    hypotheses, evidence, and session provenance between deployments.
 
     \item We establish an evaluation protocol that tests D1 and D2 within each
-    session and D3 across independent sessions, including current-map
+    session and recursive D3 across independent sessions, including current-map
     reconstruction, change-state estimation, preservation of unobserved regions,
-    dynamic-to-static leakage, and cross-session update cost.
-    % TODO: Replace this contribution with finalized dataset names and the
-    % quantitative headline once the benchmark and main evaluation are frozen.
+    dynamic-to-static leakage, identity ambiguity, and cross-session update cost.
+    % TODO: Replace these contribution statements with the finalized inference
+    % model, dataset names, and quantitative headline after the method is frozen.
 \end{itemize}
