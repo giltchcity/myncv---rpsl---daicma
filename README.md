@@ -11,17 +11,19 @@ for the current Khronos-based scene-memory project.
 2. `01_STORYLINE.md`: canonical D1+D2 / D3 research story.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
-5. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding PDF-level
+5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of PDFs
+   actually held and read end-to-end. Current verified count: 6.**
+6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding PDF-level
    literature standard.
-6. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
+7. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
    correction for SuperMap, DYMRO-SLAM, and ELite.
-7. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
+8. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: verified
    correction for Efficient Long-Term Mapping and ProbPer-LiLo.
-8. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
+9. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
    it must not be used as evidence.
-9. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
-10. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
-11. `literature/README.md`: local PDF download and hash workflow.
+10. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
+11. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
+12. `literature/README.md`: local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -46,9 +48,10 @@ The following earlier claim has been explicitly withdrawn:
 38 papers were fully audited and the literature search was saturated.
 ```
 
-That standard had not been met.
+That standard had not been met. The only valid count is maintained in
+`17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
 
-Verified corrections so far include:
+Verified full-PDF audits so far:
 
 - **SuperMap:** one continuous RGB-D/point-cloud stream; ten-minute change run;
   semantic object-map maintenance rather than process-separated D3.
