@@ -87,17 +87,17 @@ or hidden D2 transitions. ELite therefore provides a strong cross-session
 geometric update baseline, but intentionally discards the dynamic history that
 our target retains.
 
-This leaves a narrower but practically important gap. Restarting from an empty
-map discards valid historical coverage. Replacing the old map with the newest
-reconstruction loses regions that the new traversal did not observe. Conversely,
-unconditional map union preserves stale surfaces and duplicated objects.
-Maintaining only a clean static map discards observed dynamic history, while an
-object-only memory cannot update structural geometry. Pairwise change detection
-is also insufficient: after an inter-session update, the new deployment remains
-a dynamic SLAM session in which new D1 and D2 events continue to occur. A
-long-term robot therefore needs a recurring process in which each session
-consumes persistent scene state, performs complete single-session dynamic
-mapping, and emits an updated state for the next deployment.
+This leaves a narrower but practically important question. Restarting from an
+empty map discards valid historical coverage. Replacing the old map with the
+newest reconstruction loses regions that the new traversal did not observe.
+Conversely, unconditional map union preserves stale surfaces and duplicated
+objects. Maintaining only a clean static map discards observed dynamic history,
+while an object-only memory cannot update structural geometry. Pairwise change
+detection is also insufficient: after an inter-session update, the new
+deployment remains a dynamic SLAM session in which new D1 and D2 events continue
+to occur. We study the recurring process in which each session consumes
+persistent scene state, performs complete single-session dynamic mapping, and
+emits an updated state for the next deployment.
 
 We formalize this problem as \emph{Persistent Spatio-Temporal Metric-Semantic
 SLAM} (P-SMS). Let $\mathcal{S}^{k}$ denote the $k$-th independent mapping
@@ -128,13 +128,14 @@ and concurrently runs the same D1+D2 machinery as before. D3 is therefore the
 interface connecting complete dynamic mapping sessions, rather than an isolated
 change detector or a static-map cleanup stage.
 
-In the primary literature audited so far, existing systems either retain rich
-dynamic histories inside a continuously running session or maintain and refine
-clean geometric/object maps across deployments. To the best of our knowledge, no
-existing \emph{dense metric-semantic SLAM} system exports the state required for
-an independently initialized session to reconcile inter-session changes and
-resume complete D1+D2 inference while retaining both dynamic history and current
-structural geometry. Our contributions are:
+% NOVELTY AUDIT HOLD:
+% The systematic PDF-level literature audit is not yet complete. Do not insert a
+% universal-negative or first-work claim here. The final positioning sentence
+% must be written only after every high-priority paper in
+% 14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md has been audited.
+Our current system design and evaluation are organized around the following
+contributions, whose final novelty wording will be frozen after the full-text
+audit:
 \begin{itemize}
     \item We formulate process-separated persistent SMS, in which every session
     performs D1+D2 and exports the scene state required for recursive D3
@@ -149,5 +150,5 @@ structural geometry. Our contributions are:
     reconstruction, change-state estimation, preservation of unobserved regions,
     dynamic-to-static leakage, and cross-session update cost.
     % TODO: Replace these contribution statements with the finalized inference
-    % model, dataset names, and quantitative headline after the method is frozen.
+    % model, dataset names, quantitative headline, and audited novelty wording.
 \end{itemize}
