@@ -19,6 +19,11 @@ _build/
 *.swo
 *~
 
+# Local literature audit cache. Source URLs and hashes are versioned, but
+# third-party PDFs are not redistributed in this public repository.
+literature/pdfs/
+literature/download_manifest.generated.json
+
 # Keep large experiment artifacts outside this paper repository.
 *.4dmap
 *.panmap
