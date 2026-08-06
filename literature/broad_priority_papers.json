@@ -1,0 +1,127 @@
+{
+  "checked_on": "2026-08-07",
+  "purpose": "Priority full-text set discovered during the broad dynamic-mapping search. PDFs are downloaded locally and not committed.",
+  "papers": [
+    {
+      "key": "zhao2026supermap",
+      "title": "SuperMap: A Spatio-Temporal SLAM System for Visual-Language Navigation",
+      "status": "published",
+      "venue": "RSS 2026",
+      "pdf_url": "https://www.roboticsproceedings.org/rss22/p052.pdf",
+      "landing_url": "https://superodometry.com/supermap",
+      "filename": "zhao2026supermap.pdf"
+    },
+    {
+      "key": "ali2026probperlilo",
+      "title": "ProbPer-LiLo: Probabilistic Persistency Modeling for Life-Long Mapping",
+      "status": "published",
+      "venue": "IEEE RA-L 2026",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1109/LRA.2026.3653311",
+      "filename": "ali2026probperlilo.pdf",
+      "manual_note": "Obtain through institutional access or an author manuscript."
+    },
+    {
+      "key": "giberna2025dynemo",
+      "title": "DYNEMO-SLAM: Dynamic Entity and Motion-Aware 3D Scene Graph SLAM",
+      "status": "preprint as of 2026-08-07",
+      "venue": "arXiv 2025",
+      "pdf_url": "https://arxiv.org/pdf/2503.02050",
+      "landing_url": "https://arxiv.org/abs/2503.02050",
+      "filename": "giberna2025dynemo.pdf"
+    },
+    {
+      "key": "mazur2026primitive",
+      "title": "4D Primitive-Mache: Glueing Primitives for Persistent 4D Scene Reconstruction",
+      "status": "published",
+      "venue": "CVPR 2026 Oral",
+      "pdf_url": "https://arxiv.org/pdf/2512.16564",
+      "landing_url": "https://makezur.github.io/4DPM/",
+      "filename": "mazur2026primitive.pdf"
+    },
+    {
+      "key": "matezbandera2022ltc",
+      "title": "LTC-Mapping: Enhancing Long-Term Consistency of Object-Oriented Semantic Maps in Robotics",
+      "status": "published",
+      "venue": "Sensors 2022",
+      "pdf_url": "https://mdpi-res.com/d_attachment/sensors/sensors-22-05308/article_deploy/sensors-22-05308-v2.pdf",
+      "landing_url": "https://www.mdpi.com/1424-8220/22/14/5308",
+      "filename": "matezbandera2022ltc.pdf"
+    },
+    {
+      "key": "krajnik2017fremen",
+      "title": "FreMEn: Frequency Map Enhancement for Long-Term Mobile Robot Autonomy in Changing Environments",
+      "status": "published",
+      "venue": "IEEE T-RO 2017",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1109/TRO.2017.2665664",
+      "filename": "krajnik2017fremen.pdf",
+      "manual_note": "Obtain through institutional access or the authors' repository."
+    },
+    {
+      "key": "senanayake2016sthm",
+      "title": "Spatio-Temporal Hilbert Maps for Continuous Occupancy Representation in Dynamic Environments",
+      "status": "published",
+      "venue": "NeurIPS 2016",
+      "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2016/file/6f2688a5fce7d48c8d19762b88c32c3b-Paper.pdf",
+      "landing_url": "https://proceedings.neurips.cc/paper/2016/hash/6f2688a5fce7d48c8d19762b88c32c3b-Abstract.html",
+      "filename": "senanayake2016sthm.pdf"
+    },
+    {
+      "key": "kurenkov2023scenegraphmemory",
+      "title": "Modeling Dynamic Environments with Scene Graph Memory",
+      "status": "published",
+      "venue": "ICML 2023",
+      "pdf_url": "https://proceedings.mlr.press/v202/kurenkov23a/kurenkov23a.pdf",
+      "landing_url": "https://proceedings.mlr.press/v202/kurenkov23a.html",
+      "filename": "kurenkov2023scenegraphmemory.pdf"
+    },
+    {
+      "key": "xian2026llmf",
+      "title": "A Lifelong Mapping Framework with Multi-View Projection in a Changing Environment",
+      "status": "published",
+      "venue": "Integrated Computer-Aided Engineering 2026",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1177/10692509261442329",
+      "filename": "xian2026llmf.pdf",
+      "manual_note": "Open-access article page; download PDF manually if the endpoint blocks scripted retrieval."
+    },
+    {
+      "key": "yang2025lifelong3d",
+      "title": "Lifelong 3D Mapping Framework for Hand-Held and Robot-Mounted LiDAR Mapping Systems",
+      "status": "preprint as of 2026-08-07",
+      "venue": "arXiv 2025",
+      "pdf_url": "https://arxiv.org/pdf/2501.18110",
+      "landing_url": "https://arxiv.org/abs/2501.18110",
+      "filename": "yang2025lifelong3d.pdf"
+    },
+    {
+      "key": "chen2024slamramu",
+      "title": "SLAM-RAMU: 3D LiDAR-IMU Lifelong SLAM with Relocalization and Autonomous Map Updating",
+      "status": "published",
+      "venue": "Industrial Robot 2024",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1108/IR-09-2023-0223",
+      "filename": "chen2024slamramu.pdf",
+      "manual_note": "Obtain through the institutional repository or publisher access."
+    },
+    {
+      "key": "matsuki2025fourdtam",
+      "title": "4DTAM: Non-Rigid Tracking and Mapping via Dynamic Surface Gaussians",
+      "status": "published",
+      "venue": "CVPR 2025",
+      "pdf_url": "https://arxiv.org/pdf/2505.22859",
+      "landing_url": "https://muskie82.github.io/4dtam/",
+      "filename": "matsuki2025fourdtam.pdf"
+    },
+    {
+      "key": "li2026dynagslam",
+      "title": "DynaGSLAM: Real-Time Gaussian-Splatting SLAM for Dynamic Scenes",
+      "status": "published",
+      "venue": "WACV 2026",
+      "pdf_url": "https://openaccess.thecvf.com/content/WACV2026/papers/Li_DynaGSLAM_Real-Time_Gaussian-Splatting_SLAM_for_Online_Rendering_Tracking_Motion_Predictions_WACV_2026_paper.pdf",
+      "landing_url": "https://openaccess.thecvf.com/content/WACV2026/html/Li_DynaGSLAM_Real-Time_Gaussian-Splatting_SLAM_for_Online_Rendering_Tracking_Motion_Predictions_WACV_2026_paper.html",
+      "filename": "li2026dynagslam.pdf"
+    }
+  ]
+}
