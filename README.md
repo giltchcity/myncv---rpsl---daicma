@@ -16,13 +16,16 @@ working paper package.
 5. `04_PROGRESS_2026-08-06.md`: dated progress and reproducible artifact paths.
 6. `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`: **authoritative D1/D2/D3
    hierarchy and corrected classification of all currently cited methods.**
-7. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and earlier scope audit.
-8. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
+7. `09_TRADITIONAL_REAUDIT_AND_GAUSSIAN_SELECTION_2026-08-07.md`: traditional
+   mapping additions, baseline feasibility, and the decision to retain only
+   three representative Gaussian papers in the manuscript.
+8. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and earlier scope audit.
+9. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
    allowed conclusions, limitations, and prohibited misreadings for the core
    robotics and SLAM literature.
-9. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
+10. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
    static-map Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.
-10. `literature/README.md`: reproducible local PDF download and hash workflow.
+11. `literature/README.md`: reproducible local PDF download and hash workflow.
 
 ## Canonical Storyline
 
@@ -70,10 +73,11 @@ interpretation boundaries.
 Technical statements about prior work must be grounded in the original full
 paper, including its assumptions, method, experiments, and limitations. The
 repository does not redistribute third-party PDFs. Instead,
-`literature/papers.json` and `literature/gaussian_papers.json` record open sources,
-and `literature/download_papers.py` downloads local audit copies and computes
-their SHA-256 hashes. The PDFs and generated hash manifests are intentionally
-ignored by Git.
+`literature/papers.json`, `literature/gaussian_papers.json`, and
+`literature/traditional_additions.json` record open sources, and
+`literature/download_papers.py` downloads local audit copies and computes their
+SHA-256 hashes. The PDFs and generated hash manifests are intentionally ignored
+by Git.
 
 ## Repository Layout
 
@@ -89,11 +93,13 @@ CVPR/
   06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
   07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
   08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md
+  09_TRADITIONAL_REAUDIT_AND_GAUSSIAN_SELECTION_2026-08-07.md
   GITHUB_OVERLEAF_WORKFLOW.md
   literature/
     README.md
     papers.json
     gaussian_papers.json
+    traditional_additions.json
     download_papers.py
     pdfs/                                  # local, ignored
     download_manifest.generated.json       # local, ignored
