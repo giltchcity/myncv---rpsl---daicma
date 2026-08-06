@@ -12,6 +12,15 @@
       "filename": "zhao2026supermap.pdf"
     },
     {
+      "key": "gil2025elite",
+      "title": "Ephemerality Meets LiDAR-Based Lifelong Mapping",
+      "status": "published",
+      "venue": "ICRA 2025",
+      "pdf_url": "https://arxiv.org/pdf/2502.13452",
+      "landing_url": "https://arxiv.org/abs/2502.13452",
+      "filename": "gil2025elite.pdf"
+    },
+    {
       "key": "ali2026probperlilo",
       "title": "ProbPer-LiLo: Probabilistic Persistency Modeling for Life-Long Mapping",
       "status": "published",
@@ -22,6 +31,15 @@
       "manual_note": "Obtain through institutional access or an author manuscript."
     },
     {
+      "key": "saavedraruiz2025perpetua",
+      "title": "Perpetua: Multi-Hypothesis Persistence Modeling for Semi-Static Environments",
+      "status": "published",
+      "venue": "IROS 2025",
+      "pdf_url": "https://arxiv.org/pdf/2507.18808",
+      "landing_url": "https://montrealrobotics.ca/perpetua/",
+      "filename": "saavedraruiz2025perpetua.pdf"
+    },
+    {
       "key": "giberna2025dynemo",
       "title": "DYNEMO-SLAM: Dynamic Entity and Motion-Aware 3D Scene Graph SLAM",
       "status": "preprint as of 2026-08-07",
@@ -29,6 +47,33 @@
       "pdf_url": "https://arxiv.org/pdf/2503.02050",
       "landing_url": "https://arxiv.org/abs/2503.02050",
       "filename": "giberna2025dynemo.pdf"
+    },
+    {
+      "key": "behrens2025lostfound",
+      "title": "Lost & Found: Tracking Changes From Egocentric Observations in 3D Dynamic Scene Graphs",
+      "status": "published",
+      "venue": "IEEE RA-L 2025",
+      "pdf_url": "https://arxiv.org/pdf/2411.19162",
+      "landing_url": "https://behretj.github.io/LostAndFound/",
+      "filename": "behrens2025lostfound.pdf"
+    },
+    {
+      "key": "jiang2025dualmap",
+      "title": "DualMap: Online Open-Vocabulary Semantic Mapping for Natural Language Navigation in Dynamic Changing Scenes",
+      "status": "published",
+      "venue": "IEEE RA-L 2025",
+      "pdf_url": "https://arxiv.org/pdf/2506.01950",
+      "landing_url": "https://github.com/Eku127/DualMap",
+      "filename": "jiang2025dualmap.pdf"
+    },
+    {
+      "key": "kim2022ltmapper",
+      "title": "LT-Mapper: A Modular Framework for LiDAR-Based Lifelong Mapping",
+      "status": "published",
+      "venue": "ICRA 2022",
+      "pdf_url": "https://arxiv.org/pdf/2107.07712",
+      "landing_url": "https://arxiv.org/abs/2107.07712",
+      "filename": "kim2022ltmapper.pdf"
     },
     {
       "key": "mazur2026primitive",
