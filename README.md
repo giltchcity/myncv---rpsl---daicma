@@ -16,9 +16,11 @@ working paper package.
 5. `04_PROGRESS_2026-08-06.md`: dated progress and reproducible artifact paths.
 6. `05_LITERATURE_STATUS_2026-08-06.md`: publication status and D1/D2/D3 scope.
 7. `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: section/page-grounded evidence,
-   allowed conclusions, limitations, and prohibited misreadings for every paper
-   cited in the current Introduction and Related Work.
-8. `literature/README.md`: reproducible local PDF download and hash workflow.
+   allowed conclusions, limitations, and prohibited misreadings for the core
+   robotics and SLAM literature.
+8. `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`: dedicated audit of
+   static-map Gaussian SLAM, 4D Gaussian SLAM, and evolving Gaussian maps.
+9. `literature/README.md`: reproducible local PDF download and hash workflow.
 
 ## Working Title
 
@@ -55,10 +57,10 @@ interpretation boundaries.
 Technical statements about prior work must be grounded in the original full
 paper, including its assumptions, method, experiments, and limitations. The
 repository does not redistribute third-party PDFs. Instead,
-`literature/papers.json` records official/open sources and
-`literature/download_papers.py` downloads local audit copies and computes their
-SHA-256 hashes. The PDFs and generated hash manifest are intentionally ignored
-by Git.
+`literature/papers.json` and `literature/gaussian_papers.json` record open sources,
+and `literature/download_papers.py` downloads local audit copies and computes
+their SHA-256 hashes. The PDFs and generated hash manifests are intentionally
+ignored by Git.
 
 ## Repository Layout
 
@@ -72,18 +74,22 @@ CVPR/
   04_PROGRESS_2026-08-06.md
   05_LITERATURE_STATUS_2026-08-06.md
   06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
+  07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md
   GITHUB_OVERLEAF_WORKFLOW.md
   literature/
     README.md
     papers.json
+    gaussian_papers.json
     download_papers.py
-    pdfs/                         # local, ignored
-    download_manifest.generated.json  # local, ignored
+    pdfs/                                  # local, ignored
+    download_manifest.generated.json       # local, ignored
+    gaussian_download_manifest.generated.json # local, ignored
   manuscript/
     main.tex
     cvpr.sty
     preamble.tex
     main.bib
+    gaussian.bib
     sec/
       0_abstract.tex
       1_intro.tex
