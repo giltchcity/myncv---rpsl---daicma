@@ -1,475 +1,255 @@
-# Novelty and Method-Space Audit: Persistent D1+D2 Sessions Across D3
+# Corrected Novelty and Method-Space Audit
 
 Status checked: **2026-08-07**
 
-This is the current author-side novelty audit. It is intentionally stricter than
-the manuscript. It records what the literature already contains, what has only
-a superficial resemblance to this project, and what methodological territory
-remains plausibly defensible.
+This file supersedes the earlier version of the novelty audit. The correction was
+triggered by a full-text reread of SuperMap, DYMRO-SLAM, and ELite. In particular,
+the earlier audit overestimated their overlap by treating words such as
+`spatio-temporal`, `persistent`, and `lifelong` as if they were equivalent to the
+project's D1/D2/D3 taxonomy.
+
+For detailed source-grounded corrections, read
+`13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`.
 
 ## 1. Canonical problem
 
 ```text
 Within each continuously running session:
   D1 = motion is observed while it occurs
-  D2 = the scene changes while the robot looks elsewhere
+  D2 = a change occurs while the robot looks elsewhere
 
 Across completed independent sessions:
-  D3 = Session B imports persistent scene memory from completed Session A,
-       reconciles A-to-B change, runs its own D1+D2, and exports memory for C
+  D3 = Session B imports persistent scene state from completed Session A,
+       reconciles A-to-B change, runs its own D1+D2, and exports state for C
 ```
 
-D1 and D2 are two observation modes inside one session. D3 is the persistent
-interface between complete sessions. An arbitrary sequence split or a software
-checkpoint is not a D3 experiment.
+D1 and D2 are two observation modes in one dynamic-mapping session. D3 is the
+interface connecting complete sessions. An arbitrary sequence cut is not D3.
 
-## 2. Is the exact three-part problem already proposed?
+## 2. Honest novelty conclusion
 
-### Honest answer
+The phrase **“nobody has considered three kinds of dynamics”** is too broad.
+Prior work contains most individual ingredients:
 
-We cannot prove a universal negative over all publications. The safe conclusion
-from the primary literature audited so far is:
+- dense D1 trajectories and dynamic geometry;
+- D2 fragment/object association across observation gaps;
+- visibility, free-space, persistence, absence, and non-detection evidence;
+- cross-session map alignment and point/object map updates;
+- point-wise ephemerality, object stationarity, and delta maps;
+- continuous object-centric semantic scene graphs.
 
-> We found many systems that combine two temporal scales or several adjacent
-> capabilities, but did not find a dense metric-semantic system that retains D1
-> time-indexed dynamic histories, performs explicit D2 hidden-change reasoning,
-> exports a sufficient scene belief at process termination, and initializes an
-> independent Session B that again performs D1+D2 before recursively exporting
-> its state to Session C.
+However, the three uploaded papers do **not** already solve this project's exact
+problem:
 
-The broad phrase **“three kinds of dynamics have never been considered
-jointly” is not defensible**. Several papers already use nearly equivalent
-high-level language:
+- SuperMap is one continuous-stream object-centric semantic SLAM system;
+- DYMRO-SLAM is dynamic-feature filtering for robust localization;
+- ELite is point-level D3 lifelong-map maintenance that removes D1 dynamics.
 
-- Khronos unifies short-term motion and long-term/out-of-view change inside one
-  continuous spatio-temporal SLAM problem.
-- ELite explicitly models local ephemerality inside one session and global
-  ephemerality across sessions, then recursively updates a lifelong map.
-- SuperMap builds persistent object identities and a queryable 4D scene graph
-  with appearance, disappearance, and relocation.
-- DYNEMO-SLAM jointly represents moving agents and intermittently displaced
-  objects in an optimizable scene-graph SLAM backend.
-- ProbPer-LiLo models object persistency probabilistically and refines maps from
-  multiple sessions.
+The safe conclusion remains:
 
-The potential novelty is therefore not the existence of three labels or two
-temporal scales. It is the **retained state and recursive inference interface**
-that connects complete D1+D2 mapping sessions.
+> In the primary literature audited so far, we did not find a dense
+> metric-semantic SLAM system in which a completed D1+D2 session exports the
+> state needed by an independently started session to reconcile D3, resume D1
+> and D2, and recursively export the next persistent state while retaining both
+> dynamic history and current structural geometry.
 
-## 3. Strongest novelty neighbours
+This is a literature-based `to the best of our knowledge` claim, not a proof of a
+universal negative.
 
-### 3.1 Khronos — dense D1+D2, no published process-separated bridge
+## 3. Corrected closest-method ranking
 
-**Status:** RSS 2024, published.
+### 3.1 Khronos: closest problem and representation base
 
-**Implemented state:** robot trajectory, background mesh, object fragments,
-dynamic trajectories, temporal object geometry, and global reconciliation.
+Khronos already solves dense single-session D1+D2:
 
-**What it already establishes:** A dense spatio-temporal metric-semantic map can
-jointly represent continuously observed motion and changes revealed after an
-observation gap.
+- active-window tracking and time-indexed dynamic entities;
+- background mesh and object fragments;
+- global reconciliation across observation gaps;
+- ray/free-space evidence.
 
-**Boundary:** The published problem is indexed over one temporal sequence
-`t=0,...,T`. The paper does not evaluate a completed-A export / independent-B
-import / B-resumes-D1+D2 / B-exports-to-C protocol.
+Its published formulation is one continuously running problem over
+`t=0,...,T`. The paper does not provide a process-separated A-export/B-import
+protocol that resumes the complete estimator.
 
-**Consequence:** The proposed work cannot claim D1 or D2 as new. Its task is to
-identify and persist the state needed for Khronos-like inference to recur after
-process termination.
+**Implication:** D1 and D2 are inherited capabilities, not new contributions.
 
-### 3.2 ELite — the strongest two-timescale lifelong-map predecessor
+### 3.2 Panoptic Multi-TSDFs / POCD / POV-SLAM: closest D3 state and inference
 
-**Status:** ICRA 2025, published, DOI 10.1109/ICRA55743.2025.11127618.
+These methods supply dense or object-level cross-session mechanisms:
 
-**Original formulation:** ELite has local ephemerality `epsilon_l`, the
-probability that a point is dynamic within one session, and global ephemerality
-`epsilon_g`, the long-term probability that a point is transient. It recursively
-updates
+- prior/current volumetric submaps;
+- persistent, absent, and unobserved states;
+- object stationarity/change beliefs;
+- repeated-visit pose and object consistency.
 
-```text
-M_t = L(M_{t-1}, S_t)
-```
+They do not preserve the complete D1 trajectories and temporal geometry of every
+new session.
 
-from a previous lifelong map and a new session. It performs multi-session
-alignment, dynamic-object removal, and map update. It stores a lifelong point
-map, a thresholded static map, and a delta map.
+**Implication:** hard state names, object stationarity, and cross-session object
+updates are not new by themselves.
 
-**Why it is a serious threat:** It already contributes two temporal scales,
-point-wise ray evidence, Bayesian local/global ephemerality, multi-session
-alignment, recursive update, change categories, and map history.
+### 3.3 ELite: strong point-level D3 baseline, not the same hierarchy
 
-**Critical difference:** ELite deliberately discards high-local-ephemerality
-points to create a cleaned session map. It does not retain D1 object identities,
-trajectories, temporal bounding boxes, or time-indexed geometry. Its local state
-is dynamic-versus-static ephemerality, not a D2 model separating observability,
-existence, and identity after an unobserved transition. Its principal output is
-an up-to-date static/lifelong point map, not a complete dense dynamic scene
-history.
+ELite performs:
 
-**Consequence:** Never claim that a local/global temporal hierarchy, ray-based
-Bayesian persistence, recursive session map update, or a lifelong/static/delta
-map trio is new by itself.
+- multi-session LiDAR map alignment;
+- local point ephemerality estimated from rays;
+- removal of current-session dynamic points;
+- recursive global ephemerality and lifelong/static/delta maps.
 
-### 3.3 SuperMap — the strongest persistent semantic-memory neighbour
+Its local ephemerality is a dynamic-versus-static removal score. It does not
+represent D1 trajectories or D2 hidden transitions and identities. ELite is
+therefore a strong D3 geometry baseline, but it does not propose the same
+D1+D2-over-D3 system.
 
-**Status:** RSS 2026, published.
+**Implication:** ray-based point ephemerality and recursive point-map update are
+existing mechanisms, but they do not invalidate the full scene-memory problem.
 
-**Implemented state:** high-frequency geometric SLAM, asynchronous
-open-vocabulary detections, 3D-aware instance association/reactivation,
-existence confidence, label confidence, stable object identity, spatial and
-temporal graph edges, and a queryable 4D scene graph.
+### 3.4 SuperMap: relevant semantic-object mapper, not a D3 predecessor
 
-**What it already establishes:** Persistent object identity, semantic history,
-appearance/disappearance/relocation, stale-content pruning, and language-facing
-4D scene memory are not new concepts.
+SuperMap formally processes one continuous RGB-D/point-cloud sequence and
+updates pose, instance IDs, and object map at every time step. It maintains:
 
-**Boundary found in the public protocol:** Its public demonstration is a
-continuous two-hour deployment. The inspected public materials do not establish
-a completed Session A exporting a dense scene belief that an independent Session
-B imports before resuming full D1+D2 metric-semantic reconstruction. This is an
-absence of an evaluated protocol, not a claim that its software could never be
-extended to do so.
+- open-vocabulary instance association;
+- observable/unobservable/disappeared point evidence;
+- Bayesian semantic fusion;
+- spatial and temporal scene-graph edges;
+- object additions/removals in a ten-minute continuous experiment.
 
-**Consequence:** The proposed method must go beyond open-vocabulary instance
-association and confidence updates. It needs a precise process-boundary belief
-and dense geometry update semantics.
+Its own limitations state that highly dynamic object tracking remains weak. It
+does not export a completed dense session state to an independent new process.
 
-### 3.4 ProbPer-LiLo — probabilistic multi-session object persistency
+**Implication:** SuperMap is relevant to instance identity, semantic confidence,
+and object-level D2-like maintenance, but it is not a major threat to D3
+continuation novelty.
 
-**Status:** IEEE RA-L 2026, published, DOI 10.1109/LRA.2026.3653311.
+### 3.5 DYMRO-SLAM: low relevance
 
-**Implemented capability verified from public primary metadata:** a discrete
-probabilistic factor graph classifies object state; dynamic and quasi-static
-objects are removed; static maps from multiple sessions are used for semantic
-and geometric map refinement.
+DYMRO-SLAM removes dynamic features using Mask R-CNN and improves ORB-SLAM3
+tracking using optical flow. It evaluates camera ATE/APE and runtime. It does not
+store dynamic-object trajectories, scene changes, or multi-session memory.
 
-**Boundary:** The objective is preservation/refinement of stable localization
-structure. The public material inspected does not indicate retention of D1
-trajectories or a complete D1+D2 history.
+**Implication:** it belongs only to a broad dynamic-robust localization category
+and should not shape the core method or claim.
 
-**Consequence:** A factor graph for persistency, quasi-static classification, or
-multi-session static-map refinement cannot be the sole novelty.
+## 4. Existing method mechanisms by component
 
-### 3.5 Panoptic Multi-TSDFs, POCD, and POV-SLAM — dense/object D3 foundations
+### D1 mechanisms already established
 
-- **Panoptic Multi-TSDFs:** active/inactive object volumes and
-  persistent/absent/unobserved states; a later run starts from an earlier prior;
-  short-term tracking is left for future work.
-- **POCD:** object TSDFs and Gaussian--Beta stationarity/change beliefs between
-  traversals; poses supplied externally; explicit dynamics left for future work.
-- **POV-SLAM:** variational joint pose and semi-static object consistency over
-  repeated visits.
-
-**Consequence:** The state words `persistent`, `absent`, `unobserved`, object
-stationarity, and object-level cross-session association are existing ideas.
-The new method needs either a materially richer joint belief or a new way to
-carry complete dynamic mapping through the session boundary.
-
-### 3.6 DYNEMO-SLAM and Lost & Found — dynamic entities in scene graphs
-
-**DYNEMO-SLAM status:** preprint as of 2026-08-07.
-
-It stores entity IDs, semantic class, pose, uncertainty, point-cloud fragments,
-and time-indexed entity poses in an optimizable hierarchical scene graph. It adds
-keyframe--entity, intra-entity, entity--floor, and dynamic-aware loop-closure
-constraints for moving agents and displaced objects.
-
-**Lost & Found status:** IEEE RA-L 2025, published.
-
-It observes human-object interactions, estimates the object's 6-DoF trajectory
-during the interaction, and updates a transformable 3D scene graph. Prior
-interaction history can later locate an object hidden in a drawer.
-
-**Boundary:** These methods provide strong D1 object histories and scene-graph
-updates. Their transitions are observed or handled inside one graph/run; they do
-not establish the complete recursive dense D1+D2-over-D3 protocol targeted here.
-
-### 3.7 Perpetua — existing multi-hypothesis persistence/emergence theory
-
-**Status:** IROS 2025, published, DOI 10.1109/IROS60139.2025.11247086.
-
-It considers semi-static features whose appearance/disappearance transitions are
-not necessarily observed. The state is binary feature presence. It chains
-mixtures of persistence and emergence filters, learns parameters online, tracks
-multiple temporal hypotheses, handles reappearance, and predicts future feature
-state under missing observations.
-
-**Consequence:** A standard persistence filter, emergence filter,
-multi-hypothesis survival model, or prediction under missing observations is not
-new by itself. Perpetua is not a dense SLAM system and does not model geometry,
-identity association, D1 trajectories, or session-map materialization, but it is
-a mandatory theoretical baseline for any probabilistic existence model.
-
-### 3.8 LT-Mapper and lifelong map/version-control systems
-
-LT-Mapper, Lifelong 3D Mapping Framework, ELite, LLMF, RBIF, NDT lifelong SLAM,
-and industrial lifelong-map systems already provide combinations of:
-
-- multi-session alignment or pose-graph optimization;
-- dynamic point removal;
-- positive/negative change detection;
-- current/base/delta maps;
-- map version control and rollback;
-- conservative ray/voxel updates;
-- long-term coordinate consistency.
-
-**Consequence:** Save/load, map differencing, version control, current-map
-maintenance, and conservative union/deletion are engineering requirements, not
-sufficient methodological novelty.
-
-## 4. Existing method mechanisms by problem component
-
-### D1: motion observed inside a session
-
-Existing solutions include:
-
-- semantic/geometric rejection of dynamic measurements;
+- semantic/geometric dynamic-feature filtering;
 - per-object surfel, TSDF, SDF, octree, Gaussian, or primitive maps;
-- robot--object joint bundle adjustment or factor graphs;
-- object pose/velocity/shape trajectories and temporal boxes;
-- scene-graph entity factors and dynamic-aware loop closure;
-- non-rigid canonical/deformation models;
-- optical-flow/scene-flow-driven 4D Gaussians;
-- motion extrapolation and forecasting through occlusion.
+- joint robot/object bundle adjustment and factor graphs;
+- pose, velocity, shape, trajectory, and temporal box estimation;
+- rigid and non-rigid 4D reconstruction.
 
-### D2: hidden transition in the same running session
+### D2 mechanisms already established
 
-Existing mechanisms include:
-
-- local-motion versus global-jump association;
-- fragment association and global reconciliation;
-- ray presence/absence verification;
-- visibility-aware detections and repeated non-detections;
-- inactivity/reactivation and existence-confidence updates;
+- local motion versus global jump association;
+- object/fragment reactivation after observation gaps;
+- ray presence/absence and visibility reasoning;
+- detections versus repeated non-detections;
 - persistent/absent/unobserved/new states;
-- stale keyframe or contradicted-map removal;
-- persistence/emergence filters and multi-hypothesis temporal models;
-- same-object-moved versus disappearance/reappearance hypotheses.
+- stale map/keyframe removal;
+- existence confidence and semantic confidence.
 
-### D3: completed-session continuation
+### D3 mechanisms already established
 
-Existing mechanisms include:
+- multi-session alignment and loop closure;
+- prior/current submap comparison;
+- positive/negative change detection;
+- point-wise ephemerality and object stationarity;
+- lifelong/static/delta maps;
+- map version control and rollback;
+- persistent object landmarks and cross-session association.
 
-- multi-session loop closure, registration, and pose-graph alignment;
-- prior-run/current-run submap comparison;
-- local/global ephemerality and recursive point-map update;
-- object stationarity/persistency factor graphs;
-- positive/negative change and delta maps;
-- map refinement, version control, and rollback;
-- persistent semantic/object landmarks across deployments;
-- cross-session object correspondence and unknown states;
-- old-map/current-scan Gaussian revision.
+## 5. Method claims to avoid
 
-### Cross-cutting latent variables already used in the literature
+The following are insufficient as a primary contribution:
 
-- existence/persistence;
-- stationarity/ephemerality;
-- observability/visibility;
-- object identity and association;
-- geometry/pose uncertainty;
-- semantic-label confidence;
-- motion-mode or change-category variables;
-- temporal priors and periodicity;
-- session alignment and provenance.
-
-## 5. Claims and method directions that must be avoided
-
-The following are not sufficient as the paper's primary method contribution:
-
-1. **A three-label taxonomy.** The literature already separates short/long,
-   local/global, moving/quasi-static/persistent, and appearance/disappearance.
-2. **Checkpoint/save/load alone.** This proves software persistence, not a new
-   scene inference model.
-3. **Naive union, overwrite, nearest-neighbour deletion, or ray gating alone.**
-   These are essential baselines and implementation components.
-4. **A scalar Beta or ephemerality score alone.** POCD and ELite already use
-   probabilistic scalar transiency/stationarity updates.
-5. **A persistence filter or emergence filter alone.** Perpetua already provides
-   mixtures, reappearance, adaptation, and prediction.
-6. **An existence-confidence state machine alone.** SuperMap and LTC-Mapping
-   already maintain confidence from detections/non-detections.
-7. **Object association alone.** OASIS-Map, SuperMap, Living Scenes, DYNEMO, and
-   many object-SLAM systems already address it.
-8. **Dynamic masking or semantic promotion alone.** This is a supporting D1
-   component, not the cross-session contribution.
-9. **Current static-map maintenance or map version control alone.** LT-Mapper,
-   ELite, Lifelong 3D Mapping, and production lifelong systems already do this.
-10. **A representation swap to Gaussians, neural fields, or scene graphs.** A new
-    representation without new persistent inference is unlikely to be enough.
-11. **Pairwise A/B differencing only.** It does not show a recurring long-term
-    system. The experiment must include B's own D1+D2 and preferably Session C.
-12. **Combining Khronos with Panoptic/POCD as a pipeline.** A composition of
-    existing mechanisms needs a new latent-state formulation, inference rule,
-    or experimentally demonstrated capability.
+1. naming D1, D2, and D3;
+2. save/load or checkpoint support alone;
+3. naive union, overwrite, distance deletion, or ray deletion alone;
+4. one scalar persistence/ephemerality score;
+5. object association or semantic confidence alone;
+6. dynamic masking or promotion alone;
+7. a base/current/delta map trio alone;
+8. swapping TSDFs for Gaussians or scene graphs;
+9. combining Khronos with Panoptic/POCD without new inference;
+10. an A/B pairwise experiment without B's own D1+D2 and preferably Session C.
 
 ## 6. Defensible method territory
 
-### Core candidate: persistent sufficient scene belief
+The strongest remaining question is:
 
-The most defensible direction is to define the minimum probabilistic state that
-a completed dynamic-mapping session must export so that an independent future
-session can resume complete D1+D2 inference.
+> What state must a completed dense D1+D2 mapping session persist so that an
+> independent later session can correctly continue, rather than merely compare
+> or clean two maps?
 
-For each object instance or structural surface patch `e`, the boundary memory
-should not be a single hard label. A candidate state is
+The persistent state should preserve at least:
 
 ```text
-B_e = {
-  existence belief,
-  observability / coverage belief,
-  identity hypotheses,
-  geometry or pose posterior,
-  semantic belief,
-  motion/change-mode belief,
-  last-support and last-contradiction times,
-  session provenance and supporting evidence
-}
+current dense object/structural geometry
+D1 dynamic histories that should not enter the static map
+object memory and semantic state
+visibility / re-observation evidence
+last support and contradiction evidence
+session provenance
+unresolved associations when the method actually supports them
 ```
 
-The important separation is:
+The important distinctions are:
 
 ```text
 not observed != observed absent
-identity uncertain != definitely new
-not continuously tracked != static
-current actionable map != complete historical memory
+observed motion != hidden transition
+clean current map != complete dynamic memory
+same semantic label != proven same instance
 ```
 
-### Hierarchical inference across the two temporal levels
+The method does not need to rebuild Khronos's D1/D2 estimator. A defensible
+contribution can be the **session-boundary state definition and update rule** that
+lets those capabilities recur while maintaining a correct current dense map.
 
-A candidate posterior for session `k` is
+A richer probabilistic identity-hypothesis model is one possible extension, but
+it should not be claimed as the established method until implemented and
+validated. The current paper should not promise latent variables that are absent
+from the code.
 
-```text
-p(X^k, T^k, A^k, C^k, M^k | M^{k-1}, Z^k, V^k)
-```
+## 7. Required evidence
 
-where:
-
-- `X^k`: robot states;
-- `T^k`: D1 time-indexed dynamic tracks;
-- `A^k`: identity/data-association hypotheses;
-- `C^k`: existence, observability, and change-mode states;
-- `M^k`: exported current scene belief;
-- `Z^k`: sensor/semantic observations;
-- `V^k`: visibility, ray, and coverage evidence.
-
-It can be factorized conceptually into:
-
-1. **D1 track factors:** observed motion, object pose/geometry, temporal support;
-2. **D2 hidden-event factors:** a transition may occur inside the interval
-   between last support and first contradictory/new observation;
-3. **D3 session-bridge factors:** transform the previous exported belief into
-   the initial prior of session `k`, accounting for session alignment, time gap,
-   and unresolved hypotheses;
-4. **materialization factors/rules:** convert the posterior into a current mesh,
-   object layer, dynamic history, and diagnostics without deleting unobserved
-   content.
-
-The key novelty would be the bridge and state sufficiency, not rebuilding every
-D1/D2 estimator from scratch.
-
-### Preserve multiple identity explanations
-
-For a chair absent at `a` and chair-like geometry new at `b`, the system should
-retain at least two hypotheses until evidence resolves them:
-
-```text
-H1: same object moved a -> b
-H2: old object absent at a + distinct new object at b
-```
-
-This differs from inventing a trajectory. It combines observability, identity,
-and existence rather than collapsing them into one distance threshold.
-
-### Objects and structural patches under one interface
-
-Existing object-centric systems often cannot represent walls, construction
-changes, or non-discrete geometry; point-level lifelong systems lack object
-identity. A promising contribution is a common entity interface for objects and
-structural patches, while allowing different motion and geometry models.
-
-### Dual output: actionable present plus auditable history
-
-Maintain both:
-
-- a current actionable metric-semantic map for localization/planning;
-- an append-only event/evidence/provenance history sufficient to explain and
-  revisit past decisions.
-
-This avoids the common choice between a clean static map and a rich dynamic
-history.
-
-## 7. Experimental requirements for the novelty claim
-
-The method is not established by an A/B merge alone. A convincing protocol needs:
+The final evaluation should demonstrate:
 
 ```text
 Session A:
-  at least one D1 event
-  at least one D2 event
-  export memory
+  D1 event
+  D2 event
+  export persistent state
 
-Between A and B:
-  real environmental interventions
+A-to-B gap:
+  real environmental intervention
 
 Independent Session B:
-  load A memory
+  load A state
   reconcile D3
-  contain new D1 and D2 events
-  export B memory
+  process new D1 and D2
+  export B state
 
 Preferably Session C:
-  demonstrate recursive memory rather than pairwise differencing
+  demonstrate recursive continuation and bounded error accumulation
 ```
 
-Required evaluations:
+Metrics should separate:
 
-- D1 trajectory/time-indexed geometry and dynamic-to-static leakage;
-- D2 persistent/absent/unobserved/new state accuracy;
-- D3 current-map geometry, stale-map removal, new-geometry recall, and
-  unobserved-region preservation;
-- identity-hypothesis accuracy or calibration;
-- A-to-A idempotence and checkpoint equivalence controls;
-- A->B->C memory growth, update cost, and error accumulation;
-- ablations of observability, identity, existence, semantics, and session bridge.
+- D1 trajectory/history and dynamic-to-static leakage;
+- D2 persistent/absent/unobserved/new decisions;
+- D3 stale removal, new geometry, and unobserved preservation;
+- dense current-map quality;
+- update time and memory growth.
 
-Core baselines should include Khronos, Panoptic Multi-TSDFs, POCD/POV-SLAM where
-compatible, ELite or an equivalent local/global ephemerality baseline, a
-Perpetua-style existence filter, ProbPer-LiLo if code/data allow, and simple
-union/overwrite/ray-only/hard-state baselines.
+## 8. Current safest positioning
 
-## 8. Safe novelty wording
-
-Recommended:
-
-> Existing work either retains rich dynamic histories within a continuously
-> running session or maintains/refines maps across deployments. In the primary
-> literature we audited, we did not find a dense metric-semantic system that
-> exports the sufficient scene belief required for an independently initialized
-> session to reconcile inter-session change and resume complete visible-motion
-> and hidden-change inference.
-
-Avoid:
-
-> We are the first to model short-, long-, and cross-session dynamics.
-
-Also avoid claiming the final novelty until the method contains more than the
-current combination of hard state labels, ray-gated deletion, semantic masking,
-and map welding.
-
-## 9. Immediate research decision
-
-Do **not** avoid existing directions merely because individual components exist.
-Reuse Khronos D1+D2, ray evidence, object association, and persistence theory as
-building blocks. Avoid presenting those blocks as new. Concentrate the research
-contribution on:
-
-1. the exported sufficient scene belief;
-2. its probabilistic D1/D2/D3 factorization;
-3. unresolved identity and observability handling;
-4. unified object/structure memory;
-5. recursive A->B->C evaluation.
-
-That is the clearest territory not occupied by ELite's cleaned lifelong point
-map, SuperMap's semantic 4D object memory, ProbPer-LiLo's stable-map refinement,
-Perpetua's feature-existence prediction, or Khronos's continuous-session SMS.
+> Khronos provides dense D1+D2 mapping within one continuous session, while
+> Panoptic Multi-TSDFs, POCD/POV-SLAM, ELite, and related lifelong systems
+> provide different cross-session map-update mechanisms. We study how to persist
+> and reconcile the complete object-and-structure scene state so that an
+> independently started session can update D3 and continue D1+D2.
