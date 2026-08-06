@@ -2,23 +2,31 @@
 
 Status: **2026-08-07**
 
-This tracker is the only authoritative count of papers whose full PDFs have
-actually been opened and read end-to-end under the project's audit protocol.
+This tracker is the only authoritative count of papers whose complete primary
+texts have actually been opened and read end-to-end under the project's audit
+protocol.
 
 ## Current verified count
 
 ```text
-SELF-FETCHED + COMPLETE: 10
+SELF-FETCHED + COMPLETE: 22
+  official/direct PDF or complete publisher paper: 21
+  author-uploaded complete full-text rendering:      1 (RBIF)
 USER-UPLOADED + COMPLETE: 6
-SELF-FETCHED + PENDING: 0
-TOTAL COMPLETE: 16
+DIRECT-CORE QUEUE PENDING: 0
+TOTAL COMPLETE: 28
 ```
+
+`RBIF` is counted separately because its complete author-uploaded paper rendering
+was read, but ResearchGate rate limiting blocked retrieval of the PDF bytes. The
+formal title, venue, authors, and DOI were independently verified. This source
+mode must remain visible whenever the audit count is reported.
 
 ## Completion criteria
 
 A paper may be marked `COMPLETE` only when all of the following are recorded:
 
-1. verified title, authors, venue/status, and PDF identity;
+1. verified title, authors, venue/status, and source identity;
 2. exact problem definition and temporal/session protocol;
 3. inputs, external assumptions, and supplied poses/labels;
 4. state variables and map representation;
@@ -27,76 +35,88 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 7. experiments, datasets, metrics, and baselines;
 8. limitations and future work;
 9. D1/D2/D3 classification under the project's definitions;
-10. exact PDF page/section/equation/figure support;
+10. exact page/section/equation/figure support;
 11. overlap with the project and claims it does or does not threaten.
 
-## Independently fetched and complete
+## Independently acquired and complete
 
-| # | Paper | Source | Actual relationship |
-|---:|---|---|---|
-| 1 | Khronos: A Unified Approach for Spatio-Temporal Metric-Semantic SLAM in Dynamic Environments | official arXiv PDF, RSS 2024 | complete dense single-session D1+D2 base; no process-separated D3 continuation |
-| 2 | Panoptic Multi-TSDFs | official arXiv PDF, ICRA 2022 | dense D3 object/submap representation with persistent/absent/unobserved states; D1 left for future work |
-| 3 | POCD: Probabilistic Object-Level Change Detection and Mapping in Semi-Static Environments | official arXiv PDF, RSS 2022 | object-level D3 map with Gaussian--Beta stationarity/change belief; external poses; no retained D1 |
-| 4 | POV-SLAM: Probabilistic Object-Oriented Variational SLAM in Semi-Static Environments | official arXiv PDF, RSS 2023 | joint pose/object-consistency D3 SLAM; no complete D1 history or same-session D2 output |
-| 5 | LT-Mapper: A Modular Framework for LiDAR-Based Lifelong Mapping | official arXiv PDF, ICRA 2022 | D3 geometric current-map maintenance with positive/negative changes; moving content removed |
-| 6 | ObVi-SLAM: Long-Term Object-Visual SLAM | official arXiv PDF / author manuscript, RA-L 2024 | genuine recursive deployment object prior; static object landmarks only |
-| 7 | Visual Localization and Mapping in Dynamic and Changing Environments (Changing-SLAM) | open-access Springer PDF, JINT 2023 | genuine sparse object-level D1+D2 visual SLAM; no process-separated D3 |
-| 8 | Detection and Tracking of General Movable Objects in Large 3D Maps | official arXiv full manuscript, T-RO 2019 | probabilistic D2 object identity/location tracking across observation gaps; not SLAM and no dense map |
-| 9 | Perpetua: Multi-Hypothesis Persistence Modeling for Semi-Static Environments | official arXiv accepted manuscript, IROS 2025 | feature-existence prediction theory; no geometry, SLAM, or session-memory protocol |
-| 10 | Lost & Found: Tracking Changes from Egocentric Observations in 3D Dynamic Scene Graphs | official arXiv full manuscript, RA-L 2025 | observed D1 interaction trajectories and scene-graph updates; object must remain visible; no D2/D3 |
+| # | Paper | Actual relationship |
+|---:|---|---|
+| 1 | Khronos, RSS 2024 | complete dense single-session D1+D2; no process-separated D3 |
+| 2 | Panoptic Multi-TSDFs, ICRA 2022 | dense D3 object/submap state; D1 future work |
+| 3 | POCD, RSS 2022 | object-level D3 change/stationarity belief; external poses; no retained D1 |
+| 4 | POV-SLAM, RSS 2023 | joint pose/object-consistency D3; no complete D1 history |
+| 5 | LT-Mapper, ICRA 2022 | D3 geometric current-map maintenance; moving content removed |
+| 6 | ObVi-SLAM, RA-L 2024 | recursive deployment object prior; static landmarks only |
+| 7 | Changing-SLAM, JINT 2023 | sparse object-level D1+D2; no process-separated D3 |
+| 8 | General Movable Objects, T-RO 2019 | probabilistic D2 object tracking; not SLAM or dense mapping |
+| 9 | Perpetua, IROS 2025 | feature-existence theory; no geometry or SLAM |
+| 10 | Lost & Found, RA-L 2025 | observed D1 interaction trajectory and graph update; no D2/D3 |
+| 11 | LTC-Mapping, Sensors 2022 | visibility/non-detection object maintenance in one stream; no D1/D3 |
+| 12 | GaME, CVPR 2026 | dense Gaussian D2 update in one continuous process; no D1/D3 |
+| 13 | OASIS-Map, preprint 2026 | object-level D3 association and change labels; external session SLAM |
+| 14 | Living Scenes, CVPR 2024 | offline cross-time object association/registration/reconstruction |
+| 15 | Dynamic Pose Graph SLAM, IROS 2012 | active 2D current map plus scan-level change history; D3 |
+| 16 | Pomerleau et al., ICRA 2014 | repeated-survey point maintenance plus instantaneous point velocity |
+| 17 | RBIF, IROS 2024 | probabilistic ray/voxel D3 geometry update; no semantic/dynamic history |
+| 18 | 4D Gaussian Splatting SLAM, ICCV 2025 | continuous-sequence Gaussian D1 |
+| 19 | 4DTAM, CVPR 2025 | continuous non-rigid Gaussian D1 |
+| 20 | DynaGSLAM, WACV 2026 | online Gaussian D1 using external DynoSAM poses |
+| 21 | 4D Primitive-Mache, CVPR 2026 | persistent/replayable D1 within one monocular video |
+| 22 | LT-Gaussian, IEEE IV 2025 | old-Gaussian-map/current-LiDAR D3 revision component |
 
 Detailed audits:
 
 - `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
 - `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
 - `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`
+- `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`
 
 ## User-uploaded and complete
 
 | # | Paper | Actual relationship |
 |---:|---|---|
-| 1 | SuperMap: A Spatio-Temporal SLAM System for Visual-Language Navigation | continuous-stream semantic/object map; D2-like object changes; no process-separated D3 |
-| 2 | DYMRO-SLAM: A Robust Stereo Visual SLAM for Dynamic Environments Leveraging Mask R-CNN and Optical Flow | dynamic-feature rejection and localization; no retained D1/D2/D3 scene memory |
-| 3 | Ephemerality Meets LiDAR-Based Lifelong Mapping (ELite) | point-level D3 static/lifelong map maintenance; current-session dynamics removed |
-| 4 | DYNEMO-SLAM: Dynamic Entity and Motion-Aware 3D Scene Graph SLAM | continuous-run robot/entity factor graph; no process-separated D3 |
-| 5 | Efficient Long-Term Mapping in Dynamic Environments | current-session clutter cleaning plus multi-session 2D pose-graph/local-map update; no D1 history or D2 |
-| 6 | ProbPer-LiLo: Probabilistic Persistency Modeling for Life-Long Mapping | recursive D3 static point/voxel-map refinement; dynamic and quasi-static content removed |
+| 1 | SuperMap, RSS 2026 | continuous semantic/object map; object-level D2-like changes; no D3 |
+| 2 | DYMRO-SLAM, IEEE Access 2025 | dynamic-feature rejection/localization only |
+| 3 | ELite, ICRA 2025 | point-level D3 lifelong/static/delta maps; current dynamics removed |
+| 4 | DYNEMO-SLAM, arXiv v2 2025 | continuous robot/entity factor graph; no process-separated D3 |
+| 5 | Efficient Long-Term Mapping, IROS 2018 | current-run clutter cleaning plus multi-session 2D map update |
+| 6 | ProbPer-LiLo, RA-L 2026 | recursive D3 static map refinement; non-static content removed |
 
-## Still pending
+Detailed audits:
 
-The remaining direct-core queue includes, at minimum:
+- `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`
+- `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`
 
-- LTC-Mapping: full article obtained, exact PDF acquisition/verification still
-  pending before it is counted;
-- GaME;
-- OASIS-Map;
-- Dynamic Pose Graph SLAM;
-- Pomerleau et al. 2014;
-- selected Gaussian/4D representatives;
-- additional papers discovered through forward/backward citation chaining.
+## Direct-core completion status
 
-The broader candidate pool is not counted until each exact PDF is acquired and
-passes the complete checklist.
+The fixed twelve-paper direct-core remainder has been completed. Across the 28
+verified papers, the following combination has not appeared in one system:
+
+```text
+retained D1 trajectories/time-indexed geometry
++ explicit same-session D2 observability/absence reasoning
++ dense object and structural current map
++ process-separated D3 export/import
++ independent B session that resumes D1+D2 and exports for C
+```
+
+This is a result for the verified set, not a universal proof. Before authorizing
+a final `to the best of our knowledge` sentence, the next step is a bounded
+citation-chain saturation pass: inspect references and citing papers of the
+closest systems and fully audit only genuinely new direct neighbours.
 
 ## Acquisition policy
 
-The user does **not** need to upload every paper.
-
-- Open-access, arXiv, CVF, RSS, PMLR, NeurIPS, and author-hosted PDFs must be
-  acquired by the assistant using the web PDF reader.
-- The local container cannot always resolve external hosts, so a PDF may be read
-  through the web PDF interface without being saved as a local file. This counts
-  as self-fetched only when the official full PDF is opened and audited
-  end-to-end.
-- Paywalled papers without an accessible author copy require the user to upload
-  the PDF or provide an accessible copy; the assistant cannot use the user's ETH
-  institutional login.
-- File names are never trusted. Identity is verified from the PDF title page,
-  venue, DOI, and publication metadata.
+- Open-access/arXiv/CVF/RSS/PMLR/NeurIPS/author papers are acquired directly.
+- A complete publisher or author-hosted full-text rendering may be used when PDF
+  bytes are blocked, but the source mode must be disclosed.
+- Paywalled papers without an accessible author version require a user-provided
+  copy; institutional credentials are not available to the assistant.
+- File names and abstracts never determine identity or D1/D2/D3 coverage.
 
 ## Honesty rule
 
-Do not report a self-acquired full-text count larger than
-`SELF-FETCHED + COMPLETE`. Do not claim saturation, novelty closure, or a
-universal negative until the direct core set is actually complete and searched
-again.
+Do not report a count larger than the totals above. The retracted file
+`15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md` must never be cited as
+completed evidence.
