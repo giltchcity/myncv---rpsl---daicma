@@ -77,15 +77,24 @@ landmarks across deployments~\cite{adkins2024obvislam}, and OASIS-Map associates
 objects and change states across completed mapping sessions~\cite{oh2026oasismap}.
 % STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-07.
 
-ELite is an important point-level D3 predecessor~\cite{gil2025elite}. It aligns a
-new LiDAR session to a previous lifelong point map, estimates local ephemerality
-to remove current-session dynamic points, and recursively updates a global
+Importantly, the broad combination of intra-session and inter-session dynamics
+is itself not new. Efficient Long-Term Mapping explicitly handles highly dynamic
+observations within a mapping session and updates local point-cloud maps across
+multiple sessions~\cite{lazaro2018efficient}. Its objective is an up-to-date 2D
+localization map: non-static observations are suppressed or merged, and outdated
+graph nodes are removed. It therefore establishes the broad engineering pattern
+of single-session dynamic suppression plus multi-session map maintenance, but it
+does not retain D1 object histories or distinguish observed D1 motion from hidden
+D2 scene transitions.
+
+ELite is a more recent point-level D3 method~\cite{gil2025elite}. It aligns a new
+LiDAR session to a previous lifelong point map, estimates local ephemerality to
+remove current-session dynamic points, and recursively updates global
 point-wise ephemerality together with lifelong, static, and delta maps. Its
 local/global ephemerality is not equivalent to D1/D2/D3: local ephemerality is a
 dynamic-removal score rather than a representation of observed D1 trajectories
-or hidden D2 transitions. ELite therefore provides a strong cross-session
-geometric update baseline, but intentionally discards the dynamic history that
-our target retains.
+or hidden D2 transitions. ELite provides a strong cross-session geometric update
+baseline, but intentionally discards the dynamic history that our target retains.
 
 This leaves a narrower but practically important question. Restarting from an
 empty map discards valid historical coverage. Replacing the old map with the
@@ -128,14 +137,13 @@ and concurrently runs the same D1+D2 machinery as before. D3 is therefore the
 interface connecting complete dynamic mapping sessions, rather than an isolated
 change detector or a static-map cleanup stage.
 
-% NOVELTY AUDIT HOLD:
-% The systematic PDF-level literature audit is not yet complete. Do not insert a
-% universal-negative or first-work claim here. The final positioning sentence
-% must be written only after every high-priority paper in
-% 14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md has been audited.
-Our current system design and evaluation are organized around the following
-contributions, whose final novelty wording will be frozen after the full-text
-audit:
+In the full-text core literature we audited, existing systems either retain rich
+dynamic histories inside one continuously running session or maintain cleaned
+geometric/object maps across sessions. To the best of our knowledge, no existing
+\emph{dense metric-semantic SLAM} system recursively transfers the state required
+to preserve D1 histories, perform explicit same-session D2 reasoning, update both
+object and structural geometry across D3, and resume the same D1+D2 process in
+each independently initialized session. Our contributions are:
 \begin{itemize}
     \item We formulate process-separated persistent SMS, in which every session
     performs D1+D2 and exports the scene state required for recursive D3
@@ -150,5 +158,5 @@ audit:
     reconstruction, change-state estimation, preservation of unobserved regions,
     dynamic-to-static leakage, and cross-session update cost.
     % TODO: Replace these contribution statements with the finalized inference
-    % model, dataset names, quantitative headline, and audited novelty wording.
+    % model, dataset names, and quantitative headline after the method is frozen.
 \end{itemize}
