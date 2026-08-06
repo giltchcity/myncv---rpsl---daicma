@@ -11,25 +11,26 @@ for the current Khronos-based scene-memory project.
 2. `01_STORYLINE.md`: canonical D1+D2 / D3 research story.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
-5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of PDFs
-   actually opened and read end-to-end. Current verified count: 16.**
-6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding PDF-level
-   literature standard.
-7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: complete Khronos
-   audit.
+5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of
+   complete primary-text audits. Current verified count: 28.**
+6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding audit
+   standard.
+7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Khronos.
 8. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
    Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
 9. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
    Changing-SLAM, General Movable Objects, Perpetua, and Lost & Found.
-10. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
+10. `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`: LTC-Mapping,
+    GaME, OASIS-Map, Living Scenes, Dynamic Pose Graph SLAM, Pomerleau 2014,
+    RBIF, 4DGS-SLAM, 4DTAM, DynaGSLAM, 4D Primitive-Mache, and LT-Gaussian.
+11. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
     DYMRO-SLAM, and ELite.
-11. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
+12. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
     Long-Term Mapping and ProbPer-LiLo.
-12. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
-    it must not be used as evidence.
-13. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
-14. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: remaining PDFs to verify.
-15. `literature/README.md`: local PDF download and hash workflow.
+13. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
+    never use it as evidence.
+14. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
+15. `literature/README.md`: source acquisition and hash workflow.
 
 ## Canonical Storyline
 
@@ -38,42 +39,48 @@ D1 + D2 = dynamic mapping inside each continuously running session
 D3      = persistent scene-memory continuation across completed sessions
 ```
 
-Every new D3 session loads prior memory, reconciles changes since the previous
+Every D3 session loads prior memory, reconciles changes since the previous
 session, and simultaneously runs new D1 and D2 events.
 
 ## Current Evidence Status
 
-No universal-negative or first-work novelty claim is currently authorized.
-Technical statements may enter the manuscript only after the original PDF has
-been read across its exact problem, inputs, state variables, method, experiments,
-and limitations.
-
-The earlier claim that 38 papers had been fully audited was withdrawn. The only
-valid count is maintained in `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
-
-Current verified total:
+The fixed direct-core queue is complete:
 
 ```text
-self-fetched and complete: 10
-user-uploaded and complete: 6
-total complete: 16
+self-acquired complete primary texts: 22
+  direct PDF/complete publisher text: 21
+  complete author full-text rendering: 1 (RBIF; PDF bytes rate-limited)
+user-uploaded complete PDFs:          6
+total verified complete:             28
+direct-core queue pending:            0
 ```
 
-Key verified boundaries now include:
+The earlier claim that 38 papers had already been fully audited was false and is
+withdrawn. Only `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` provides a valid
+count.
 
-- **Khronos:** complete dense D1+D2 inside one continuous session.
-- **Changing-SLAM:** genuine sparse object-level D1+D2 visual SLAM; no D3.
-- **General Movable Objects:** probabilistic D2 identity/location tracking over
-  observation gaps; not SLAM and no dense map.
-- **Lost & Found:** observed D1 interaction trajectories and scene-graph update;
-  object must remain visible.
-- **Perpetua:** feature existence/persistence prediction theory; no geometry or
-  mapping protocol.
-- **Panoptic Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, ObVi-SLAM, ELite,
-  ProbPer-LiLo, and Efficient Long-Term Mapping:** different D3 map-maintenance
-  or deployment-prior mechanisms, generally without retained D1 histories.
-- **SuperMap:** continuous-stream semantic object-map maintenance, not
-  process-separated D3.
+The verified set establishes:
+
+- **Dense single-session D1+D2:** Khronos; sparse object-level D1+D2:
+  Changing-SLAM.
+- **Object-level D2 theory/maintenance:** General Movable Objects, LTC-Mapping,
+  SuperMap; dense Gaussian D2: GaME.
+- **D3 geometric/static-map maintenance:** Dynamic Pose Graph SLAM, Pomerleau,
+  Efficient Long-Term Mapping, LT-Mapper, RBIF, ELite, ProbPer-LiLo, and
+  LT-Gaussian.
+- **D3 object/volumetric methods:** Panoptic Multi-TSDFs, POCD, POV-SLAM,
+  ObVi-SLAM, OASIS-Map, and Living Scenes.
+- **Rich continuous D1 representations:** Lost & Found, DYNEMO-SLAM,
+  4DGS-SLAM, 4DTAM, DynaGSLAM, and 4D Primitive-Mache.
+
+Within the verified set, no method jointly retains D1 trajectories and
+ time-indexed geometry, performs explicit same-session D2 reasoning, maintains a
+dense object-plus-structural current map, exports/imports complete state across a
+D3 process boundary, and resumes D1+D2 recursively in Session B/C.
+
+This is not yet a universal proof. A bounded forward/backward citation-chain pass
+must still test whether the closest papers lead to a genuinely new direct
+neighbour. Only such new neighbours require another complete audit.
 
 ## Working Title
 
@@ -99,12 +106,12 @@ literature evidence.
 
 ## Literature Rule
 
-A paper title or abstract never determines D1/D2/D3 coverage. In particular:
+A title or abstract never determines D1/D2/D3 coverage:
 
-- `dynamic` may mean only feature rejection;
-- `persistent` may mean identity within one video;
-- `lifelong` may mean recursively cleaning a static localization map;
-- `multi-session` does not imply that a complete dynamic-scene state is restored.
+- `dynamic` may mean only rejection or static-map cleaning;
+- `persistent` may mean permanence within one continuous video;
+- `lifelong` may mean recursive maintenance of a static localization map;
+- `multi-session` does not imply restoration of a complete dynamic-scene state.
 
-Future work is not an implemented capability, and criticism in one paper's
-Related Work is not evidence about the cited method.
+Future work is not an implemented capability, and one paper's criticism of
+another is not evidence of the cited paper's actual method.
