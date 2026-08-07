@@ -87,9 +87,10 @@ and structural state, change evidence, temporal scene information, and session
 provenance. A later independent session uses this state as a prior, retains
 inherited content that has not been sufficiently re-observed, removes old content
 only when contradicted by reliable current evidence, incorporates newly supported
-geometry, and concurrently runs within-session dynamic mapping. The design goal
-is not a native hot restart of every live backend data structure, but persistence
-of the scene-level state required for dynamic mapping to recur across deployments.
+geometry, and concurrently runs within-session dynamic mapping. The interface is
+deliberately scene-level: it transfers the persistent state required for dynamic
+reasoning to recur, rather than transient implementation state tied to a
+particular backend.
 
 Our contributions are:
 \begin{itemize}
