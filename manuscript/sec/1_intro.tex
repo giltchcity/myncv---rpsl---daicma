@@ -6,15 +6,16 @@ Robots are deployed episodically: they stop, recharge, restart, and later return
 to environments that have continued to evolve in their absence. Yet robotic
 mapping largely inherits the opposite computational assumption. A dynamic mapper
 may build rich spatio-temporal understanding while a deployment is active, but
-once that session terminates, a later deployment typically inherits at most a
-static, current, or object-level map. The geometry may persist; the dynamic
-mapping process does not.
+once that session terminates, a later deployment typically inherits a map
+representation---static, current, or object-level---rather than the temporal
+scene understanding that produced it. The geometry may persist; the dynamic
+reasoning does not.
 
-This creates a striking separation between two mature lines of research. Dynamic
-mapping and SLAM increasingly reason about \emph{how} a scene changes while a
-mapping process remains active: moving entities can be tracked through time, and
-changes revealed after temporary observation gaps can be reconciled against
-previous scene state~\cite{runz2017cofusion,xu2019midfusion,morris2025dynosam,schmid2024khronos}.
+This exposes a separation between two mature lines of research. Dynamic mapping
+and SLAM increasingly reason about \emph{how} a scene changes while a mapping
+process remains active: moving entities can be tracked through time, and changes
+revealed after temporary observation gaps can be reconciled against previous
+scene state~\cite{runz2017cofusion,xu2019midfusion,morris2025dynosam,schmid2024khronos}.
 Lifelong and multi-session mapping address the complementary problem of carrying
 information across revisits, but typically preserve an updated current map, a
 static localization map, or selected persistent landmarks rather than the full
@@ -22,8 +23,8 @@ temporal scene understanding that existed during the previous
 deployment~\cite{kim2022ltmapper,gil2025elite,ali2026probperlilo,schmid2022panoptic}.
 In short, dynamic mapping preserves temporal understanding within a session,
 whereas lifelong mapping preserves maps across sessions. What is missing is
-\emph{persistent mapping}: the ability for the dynamic mapping process itself to
-survive a deployment boundary.
+\emph{persistent mapping}: carrying enough scene-level state across deployments
+for the same dynamic reasoning to recur.
 
 This separation is artificial from the perspective of the physical world. A
 session boundary is caused by robot operation, not by an environmental reset. If
@@ -73,7 +74,8 @@ landmarks in persistent memory, while the latter does not include an integrated
 dynamic tracking module. Conversely, dense spatio-temporal systems such as
 Khronos preserve substantially richer dynamic history within one running
 session~\cite{schmid2024khronos}, but do not define the persistent session-state
-interface above. We target precisely this missing connection.
+interface above. We target precisely this missing connection: a shift from
+persistent maps to persistent mapping.
 
 We formulate the resulting problem as \emph{Persistent Spatio-Temporal
 Metric-Semantic Mapping} (P-SMS): independent robot deployments are treated as
