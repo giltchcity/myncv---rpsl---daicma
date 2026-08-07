@@ -4,7 +4,8 @@ Status: **ACTIVE / bounded citation-chain continuation, 2026-08-07**
 
 This file is the authoritative synthesis layer for the remaining literature
 question. It does **not** replace the per-paper full-text audits in files `13`,
-`16`, and `18`--`21`, and it does not change the verified count of 28.
+`16`, `18`--`21`, and `23`. The authoritative verified count is now **35 complete
+primary texts**.
 
 ## 1. Research story being tested
 
@@ -73,7 +74,7 @@ Representation density, object identity, structural geometry, semantic state,
 and backend state are secondary columns used to determine how close a candidate
 is; they are not substitutes for the eight architecture questions.
 
-## 4. Current synthesis of the 28 verified primary texts
+## 4. Synthesis of the 35 verified primary texts
 
 ### Complete or near-complete intra-session side
 
@@ -106,13 +107,39 @@ map or map-change state rather than a complete D1+D2 dynamic-scene state.
 
 ### Strong same-process D2/current-memory neighbours
 
-**GaME, LTC-Mapping, SuperMap, and General Movable Objects** establish important
-forms of out-of-view/current-memory/object maintenance. They do not, in the
-verified audits, complete the process-separated recursive architecture.
+**GaME, LTC-Mapping, SuperMap, General Movable Objects, DynaMem, DovSG,
+DynamicGSG, CubifyGS, and DREAM** establish important forms of out-of-view,
+object-lifecycle, or current-memory maintenance. Their verified protocols remain
+continuous/same-process or otherwise do not restore a complete D1+D2 session
+after an independent D3 boundary.
+
+### Newly verified multi-visit / prior-map neighbours
+
+**CogniMap3D** is a genuine multi-visit memory system. It detects and tracks
+dynamic regions within each video, but its persistent memory bank is deliberately
+constructed from **static** regions. On revisit it retrieves the static scene,
+relocalizes the camera, and updates that static memory. It therefore establishes
+multi-visit scene-memory retrieval/update, but not persistence of D1 entity
+history or restoration of complete D1+D2 state.
+
+**DGSG-Mind** is the closest of the seven newly promoted papers to the right-hand
+D3 boundary. It explicitly relocalizes a new observation against an existing
+Gaussian map and can perform later dynamic revision without requiring continuous
+online SLAM. However, its paper explicitly lists an integrated tracking module as
+future work. It therefore has strong prior-map reuse and D2-like object revision,
+but lacks the D1 tracking/history needed for a complete D1+D2 session to survive
+the boundary.
+
+**CubifyGS** also maintains persistent object identity and reusable Gaussian
+assets within a continuous stream, but the paper explicitly lists
+**cross-session asset merging** as future work.
+
+The detailed seven-paper re-audit is in
+`23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`.
 
 ## 5. Current bounded result
 
-Within the **28 verified complete primary texts**, no method has been found that
+Within the **35 verified complete primary texts**, no method has been found that
 implements the full chain:
 
 ```text
@@ -126,10 +153,23 @@ complete D1+D2 Session A
 
 This is a corpus-bounded result, not a universal proof.
 
-The remaining task is therefore not to re-label every mechanism as novel or
-non-novel. It is to close the backward/forward citation chain around the methods
-closest to either side of this architecture and test whether any uncatalogued
-paper actually bridges the two.
+The newly promoted seven papers make the boundary sharper rather than changing
+it:
+
+```text
+rich intra-session D1/D2               persistent/revisited map state
+----------------------------------      ----------------------------------
+Khronos / Changing-SLAM / DYNEMO       Panoptic / POCD / OASIS / CogniMap3D
+4D temporal systems                    DGSG-Mind / lifelong map systems
+
+                 still no verified complete bridge:
+        D1+D2 A -> terminate -> D3 -> independent B -> D1+D2 -> C
+```
+
+The remaining task is not to re-label every mechanism as novel or non-novel. It
+is to close the backward/forward citation chain around the methods closest to
+either side of this architecture and test whether any uncatalogued paper actually
+bridges the two.
 
 ## 6. Candidate-promotion rule
 
