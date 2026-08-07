@@ -4,9 +4,9 @@
 We organize prior work by the state that survives in time. The first family
 builds rich dynamic representations while one mapping process remains active.
 The second carries geometric maps across traversals. The third maintains richer
-object or scene memories across time. Our problem lies at the interface: making
-the \emph{dynamic mapping process} persistent across independently executed
-sessions.
+object or scene memories across time. Our problem lies at the interface: carrying
+sufficient scene state across independently executed sessions for the same
+dynamic reasoning to recur.
 
 \subsection{Dynamic Mapping Within a Deployment}
 
@@ -44,11 +44,12 @@ object-level semantic or visibility-aware state over a continuous
 stream~\cite{zhao2026supermap,matezbandera2022ltc}.
 
 The important boundary for our work is not whether these systems contain a
-particular tracking or update mechanism. It is temporal scope. Their rich dynamic
+particular tracking or update mechanism. It is temporal scope. Their dynamic
 reasoning is defined while a mapping process or observation stream remains
 active; they do not establish a recurring state contract through which a
 completed dynamic-mapping session initializes an independent later session that
-again executes the same full dynamic reasoning.
+again executes the same combination of observed-motion and hidden-change
+reasoning.
 
 \subsection{Lifelong and Multi-Session Map Maintenance}
 
@@ -118,8 +119,8 @@ Spatio-Temporal Hilbert Maps learn continuous time-conditioned
 occupancy~\cite{senanayake2016sthm}, and Perpetua maintains multiple hypotheses
 for feature disappearance and reappearance~\cite{saavedraruiz2025perpetua}.
 These models establish temporal persistence as a prior, but do not themselves
-provide a dense scene representation that transfers a complete dynamic-mapping
-process between deployments.
+provide a dense scene representation that transfers the scene-level state
+required for complete dynamic reasoning between deployments.
 
 \subsection{Positioning of This Work}
 
@@ -132,5 +133,5 @@ the interface between these capabilities. We study \emph{persistent mapping}:
 a complete dynamic-mapping session performs observed-motion and hidden-change
 reasoning, exports persistent scene state when it terminates, and enables an
 independently initialized later session to reconcile inter-session evolution and
-again execute the same dynamic-mapping process before producing the prior for
-the next deployment.
+again execute the same dynamic reasoning before producing the prior for the next
+deployment.
