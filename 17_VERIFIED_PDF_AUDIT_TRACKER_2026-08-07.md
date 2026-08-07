@@ -22,6 +22,27 @@ was read, but ResearchGate rate limiting blocked retrieval of the PDF bytes. The
 formal title, venue, authors, and DOI were independently verified. This source
 mode must remain visible whenever the audit count is reported.
 
+## Interpretation rule
+
+The `Actual relationship` column below is a capability summary, **not a novelty
+checklist**. A paper sharing ray deletion, object association, persistence
+beliefs, map revision, scene graphs, Gaussian updates, or relocalization with our
+system does not by itself threaten the research story.
+
+The architecture-level question is tracked separately in
+`22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`:
+
+```text
+complete D1+D2 Session A
+-> persistent export after A terminates
+-> independent Session B import
+-> D3 reconciliation
+-> B again executes complete D1+D2
+-> equivalent export for Session C
+```
+
+Do not infer a component-level novelty claim from this tracker.
+
 ## Completion criteria
 
 A paper may be marked `COMPLETE` only when all of the following are recorded:
@@ -91,20 +112,25 @@ Detailed audits:
 ## Direct-core completion status
 
 The fixed twelve-paper direct-core remainder has been completed. Across the 28
-verified papers, the following combination has not appeared in one system:
+verified papers, the following **architecture** has not appeared in one system:
 
 ```text
 retained D1 trajectories/time-indexed geometry
 + explicit same-session D2 observability/absence reasoning
-+ dense object and structural current map
-+ process-separated D3 export/import
-+ independent B session that resumes D1+D2 and exports for C
++ persistent export after Session A terminates
++ independent Session B import and D3 reconciliation
++ Session B again executes D1+D2
++ Session B exports the same state contract for Session C
 ```
+
+Dense object-plus-structural scene state is an important representation property
+of our target, but the literature search must not be reduced to checking isolated
+representation mechanisms.
 
 This is a result for the verified set, not a universal proof. Before authorizing
 a final `to the best of our knowledge` sentence, the next step is a bounded
-citation-chain saturation pass: inspect references and citing papers of the
-closest systems and fully audit only genuinely new direct neighbours.
+architecture-focused citation-chain pass: inspect references and citing papers
+of the closest systems and fully audit only genuinely new bridge candidates.
 
 ## Acquisition policy
 
@@ -117,6 +143,6 @@ closest systems and fully audit only genuinely new direct neighbours.
 
 ## Honesty rule
 
-Do not report a count larger than the totals above. The retracted file
-`15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md` must never be cited as
-completed evidence.
+Do not report a count larger than the totals above unless a newly added paper has
+met the completion criteria. The old unsupported 38-paper saturation claim is
+withdrawn and must never be used as evidence.
