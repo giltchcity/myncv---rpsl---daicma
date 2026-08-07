@@ -17,10 +17,12 @@ Before writing or auditing literature, read:
 2. `03_CLAIMS_AND_EVIDENCE.md` -- what is established, preliminary, designed, or
    not proved.
 3. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` -- only authoritative complete
-   primary-text count.
+   primary-text count; current verified total is **35**.
 4. `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md` -- authoritative
    cross-paper synthesis and the remaining literature question.
-5. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md` -- binding rules for
+5. `23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md` -- complete re-audit
+   of CubifyGS, DynaMem, CogniMap3D, DovSG, DynamicGSG, DGSG-Mind, and DREAM.
+6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md` -- binding rules for
    promoting any new paper to verified status.
 
 Older broad landscape and taxonomy files may be useful as search history, but
@@ -69,6 +71,25 @@ For every new candidate, use the eight-question checklist in
 `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`. A paper is not a direct
 architectural competitor merely because it shares one mechanism with this
 system.
+
+The current 35-paper verified corpus includes the seven promoted neighbours in
+file `23`. Their key boundaries are:
+
+- **CogniMap3D:** genuine multi-visit retrieval/relocalization/update, but the
+  persistent memory is a static-scene memory; dynamic regions are tracked only
+  to separate them from the persistent map.
+- **DGSG-Mind:** later observations can be relocalized against an existing
+  Gaussian map without continuous online SLAM, but the paper explicitly leaves
+  an integrated tracking module to future work.
+- **CubifyGS:** continuous object identity/asset maintenance, but cross-session
+  asset merging is explicitly future work.
+- **DovSG:** consecutive tasks are evaluated without manual resets; this is a
+  continuing deployment, not an independently restarted B session.
+- **DynaMem, DynamicGSG, DREAM:** strong online/current-memory update, but no
+  complete process-separated D1+D2 restoration contract.
+
+Within the verified 35-paper corpus, no complete A -> D3 -> B -> C bridge has
+been found. This is corpus-bounded, not a universal `first ever` proof.
 
 ## Project Context
 
@@ -155,6 +176,7 @@ Authoritative literature records are:
 - `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`;
 - `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`;
 - `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`;
+- `23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`;
 - `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md` -- synthesis only, not a
   substitute for per-paper primary-text evidence.
 
