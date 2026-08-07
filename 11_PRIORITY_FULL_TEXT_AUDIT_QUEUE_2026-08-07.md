@@ -5,11 +5,25 @@ Status: **2026-08-07**
 Priority is based on overlap with the canonical **session architecture**, not on
 whether a paper contains an individual mechanism that we also use.
 
-## Direct-core queue: complete
+## Verified corpus: 35 complete primary texts
 
-The fixed direct-core PDF queue is complete. The authoritative verified total
-remains **28 complete primary texts**, with details in
-`17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
+The original fixed direct-core queue is complete, and seven additional bridge
+candidates have now been fully re-audited under the architecture checklist. The
+authoritative verified total is therefore **35 complete primary texts**, with
+details in `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
+
+The seven promoted/re-audited neighbours are:
+
+- CubifyGS;
+- DynaMem;
+- CogniMap3D;
+- DovSG;
+- DynamicGSG;
+- DGSG-Mind;
+- DREAM.
+
+Their complete architecture-axis audit is recorded in
+`23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`.
 
 The completed corpus covers, among other things:
 
@@ -18,6 +32,8 @@ The completed corpus covers, among other things:
 - object-level and dense D2/current-map maintenance;
 - D3 static/geometric map maintenance;
 - D3 object/volumetric state transfer and change reasoning;
+- multi-visit static-scene memory retrieval and update;
+- prior-Gaussian-map relocalization and later object-level revision;
 - persistence and temporal-belief models.
 
 These categories describe **capability coverage**, not novelty claims.
@@ -84,16 +100,22 @@ Record the representation density and whether both objects and structural
 geometry are retained, but do not confuse those details with the architecture
 question above.
 
-## Priority seeds for backward/forward chaining
+## Priority seeds for remaining backward/forward chaining
 
-1. Khronos and Changing-SLAM: strongest verified single-session D1+D2 seeds.
-2. Panoptic Multi-TSDFs, POCD, POV-SLAM, OASIS-Map, and ObVi-SLAM: strongest
+1. **Khronos and Changing-SLAM:** strongest verified single-session D1+D2 seeds.
+2. **Panoptic Multi-TSDFs, POCD, POV-SLAM, OASIS-Map, and ObVi-SLAM:** strongest
    verified cross-session object/volumetric-state seeds.
-3. Dynamic Pose Graph SLAM, LT-Mapper, ELite, ProbPer-LiLo, RBIF, and
-   LT-Gaussian: recursive/current-map D3 seeds.
-4. DYNEMO-SLAM and the verified continuous 4D methods: rich D1/state-history
+3. **CogniMap3D and DGSG-Mind:** strongest newly verified bridge-side seeds;
+   CogniMap3D has genuine multi-visit static memory, while DGSG-Mind has
+   prior-Gaussian-map relocalization and later dynamic revision without
+   continuous online SLAM but lacks integrated tracking.
+4. **Dynamic Pose Graph SLAM, LT-Mapper, ELite, ProbPer-LiLo, RBIF, and
+   LT-Gaussian:** recursive/current-map D3 seeds.
+5. **DYNEMO-SLAM and the verified continuous 4D methods:** rich D1/state-history
    seeds.
-5. GaME and SuperMap: strong same-process change-maintenance neighbours.
+6. **GaME, SuperMap, DynaMem, DovSG, DynamicGSG, CubifyGS, and DREAM:** strong
+   same-process/current-memory neighbours that may expose forward citations to a
+   genuine bridge.
 
 A newly discovered paper is promoted to a full audit when its title/abstract and
 available method description make it plausible that it bridges **both sides** of
