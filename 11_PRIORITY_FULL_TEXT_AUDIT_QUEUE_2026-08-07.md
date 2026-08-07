@@ -2,74 +2,136 @@
 
 Status: **2026-08-07**
 
-Priority is based on overlap with the canonical D1+D2 / D3 story, not title or
-popularity.
+Priority is based on overlap with the canonical **session architecture**, not on
+whether a paper contains an individual mechanism that we also use.
 
 ## Direct-core queue: complete
 
-The fixed direct-core PDF queue is now complete. The verified total is 28 primary
-texts, with details in `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
+The fixed direct-core PDF queue is complete. The authoritative verified total
+remains **28 complete primary texts**, with details in
+`17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`.
 
-Completed direct-core groups:
+The completed corpus covers, among other things:
 
-- dense/sparse D1+D2: Khronos and Changing-SLAM;
-- D2 object reasoning: General Movable Objects, LTC-Mapping, SuperMap, GaME;
-- D3 object/volume: Panoptic Multi-TSDFs, POCD, POV-SLAM, ObVi-SLAM,
-  OASIS-Map, Living Scenes;
-- D3 geometry/static maps: Dynamic Pose Graph SLAM, Pomerleau 2014,
-  Efficient Long-Term Mapping, LT-Mapper, RBIF, ELite, ProbPer-LiLo,
-  LT-Gaussian;
-- D1 entity/4D representations: Lost & Found, DYNEMO-SLAM, 4DGS-SLAM,
-  4DTAM, DynaGSLAM, 4D Primitive-Mache;
-- persistence theory: Perpetua;
-- low-relevance robustness control: DYMRO-SLAM.
+- complete or partial single-session D1+D2 systems;
+- rich continuous D1 representations;
+- object-level and dense D2/current-map maintenance;
+- D3 static/geometric map maintenance;
+- D3 object/volumetric state transfer and change reasoning;
+- persistence and temporal-belief models.
 
-Detailed audits are in files `13`, `16`, and `18`--`21`.
+These categories describe **capability coverage**, not novelty claims.
 
-## Remaining task: bounded citation-chain saturation
+## The only remaining literature question
 
-The next task is not to add papers for quantity. It is to inspect references and
-citing papers of the closest systems and answer one question:
+The remaining citation-chain work asks one architecture-level question:
 
-> Does any uncatalogued paper implement a complete D1+D2 session, export the
-> required dense object-and-structural scene state, initialize an independent
-> later session, reconcile D3, resume D1+D2, and recursively export the next
-> prior?
+> Does any uncatalogued system run a complete D1+D2 dynamic-mapping Session A,
+> preserve sufficient scene state after A terminates, initialize an independent
+> Session B from that state, reconcile D3, let B again run the complete D1+D2
+> mapping process, and export the same kind of state recursively for Session C?
 
-Priority seeds for backward/forward chaining:
+The target chain is:
 
-1. Khronos and Changing-SLAM;
-2. Panoptic Multi-TSDFs, POCD, POV-SLAM, and OASIS-Map;
-3. ObVi-SLAM and ProbPer-LiLo;
-4. Pomerleau 2014, Dynamic Pose Graph SLAM, LT-Mapper, ELite, and RBIF;
-5. GaME and LT-Gaussian;
-6. SuperMap and DYNEMO-SLAM.
+```text
+Session A
+  complete D1 + D2
+  -> export persistent dynamic scene state
+  -> A terminates
 
-A newly found paper is promoted to full-text audit only when it introduces a new
-state variable, temporal protocol, representation, or recurring session
-architecture not already covered by the 28 verified papers.
+D3 boundary
+  environment may change while the robot/process is absent
+
+Independent Session B
+  -> import A state
+  -> reconcile A-to-B changes
+  -> run new D1 + D2 events
+  -> export B state
+
+Session C
+  -> repeat
+```
+
+A paper is a direct architectural threat only if it crosses the boundary between
+**rich intra-session dynamic mapping** and **persistent cross-session
+continuation**. Sharing ray deletion, object matching, Gaussian updates,
+persistence beliefs, scene graphs, or relocalization is not by itself evidence
+that the paper solves this recurring architecture.
+
+## Mandatory architecture checklist for every new candidate
+
+For each candidate, answer these questions from the complete primary text:
+
+1. **A/D1:** Does Session A retain observed object/entity motion as trajectory,
+   temporal geometry, or an equivalent explicit D1 history rather than merely
+   filtering dynamics?
+2. **A/D2:** While A remains active, does it reason about changes revealed after
+   an observation gap rather than only frame-to-frame motion?
+3. **Export:** What exact state survives the end of A? Static map only, object
+   priors, current geometry, dynamic histories, observability/evidence state,
+   backend state, or something else?
+4. **Process separation:** Does A actually terminate and B start independently,
+   or is the experiment one continuous process/sequence with a temporal split?
+5. **D3:** How are changes between A and B reconciled, including the distinction
+   between absence and lack of observation where applicable?
+6. **B/D1:** After loading A, can B again represent newly observed motion as D1?
+7. **B/D2:** After loading A, can B again perform the same hidden-change D2
+   reasoning within B?
+8. **Recursion:** Does B export the same state contract for C, or is the method
+   only pairwise A-versus-B comparison/update?
+
+Record the representation density and whether both objects and structural
+geometry are retained, but do not confuse those details with the architecture
+question above.
+
+## Priority seeds for backward/forward chaining
+
+1. Khronos and Changing-SLAM: strongest verified single-session D1+D2 seeds.
+2. Panoptic Multi-TSDFs, POCD, POV-SLAM, OASIS-Map, and ObVi-SLAM: strongest
+   verified cross-session object/volumetric-state seeds.
+3. Dynamic Pose Graph SLAM, LT-Mapper, ELite, ProbPer-LiLo, RBIF, and
+   LT-Gaussian: recursive/current-map D3 seeds.
+4. DYNEMO-SLAM and the verified continuous 4D methods: rich D1/state-history
+   seeds.
+5. GaME and SuperMap: strong same-process change-maintenance neighbours.
+
+A newly discovered paper is promoted to a full audit when its title/abstract and
+available method description make it plausible that it bridges **both sides** of
+the architecture. Do not promote papers merely to increase the corpus size.
 
 ## Stop rule
 
-The novelty audit may be considered saturated for the submission draft only
-when:
+The architecture search is sufficiently saturated for submission positioning
+only when:
 
 1. backward references of all closest seeds have been screened;
-2. forward/citing-paper searches have been performed using at least two
+2. forward/citing-paper searches have been performed with at least two
    independent query formulations;
-3. no new direct neighbour survives title/abstract screening and full-text
-   verification;
-4. every manuscript novelty sentence is supported by the verified matrix;
-5. publication status is refreshed immediately before submission.
+3. every plausible bridge paper has been checked from the complete primary text
+   using the eight-question checklist above;
+4. no surviving paper completes the A -> D3 -> B -> C chain;
+5. every manuscript positioning sentence is consistent with the resulting
+   architecture matrix; and
+6. publication status is refreshed immediately before submission.
+
+Until then, the allowed conclusion is bounded:
+
+> Within the verified corpus, no system has been found that recursively carries
+> a complete D1+D2 dynamic-mapping capability across an independent D3 session
+> boundary.
+
+Do not turn this into an absolute `first ever` or universal-negative statement.
 
 ## Reading rule
 
-No newly discovered method enters the Introduction or supports a novelty claim
-until the original complete text has been checked for:
+A title or abstract may screen a candidate, but it never determines coverage.
+For any promoted paper, the complete primary text must be checked for:
 
-- input and session protocol;
-- state variables and representation;
-- update equations;
-- retained versus discarded output;
-- experiments, metrics, and baselines;
+- temporal/session protocol;
+- inputs and supplied poses/labels;
+- state variables and map representation;
+- retained versus discarded dynamic history;
+- export/import state across process boundaries;
+- update equations and change evidence;
+- experiments and whether B is truly independent;
 - limitations and future-work boundaries.
