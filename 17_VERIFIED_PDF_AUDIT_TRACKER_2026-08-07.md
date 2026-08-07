@@ -9,12 +9,12 @@ protocol.
 ## Current verified count
 
 ```text
-SELF-FETCHED + COMPLETE: 22
-  official/direct PDF or complete publisher paper: 21
-  author-uploaded complete full-text rendering:      1 (RBIF)
+SELF-FETCHED + COMPLETE: 29
+  direct PDF / complete official primary-text HTML: 28
+  author-uploaded complete full-text rendering:       1 (RBIF)
 USER-UPLOADED + COMPLETE: 6
-DIRECT-CORE QUEUE PENDING: 0
-TOTAL COMPLETE: 28
+DIRECT-CORE / PROMOTED QUEUE PENDING: 0
+TOTAL COMPLETE: 35
 ```
 
 `RBIF` is counted separately because its complete author-uploaded paper rendering
@@ -22,14 +22,18 @@ was read, but ResearchGate rate limiting blocked retrieval of the PDF bytes. The
 formal title, venue, authors, and DOI were independently verified. This source
 mode must remain visible whenever the audit count is reported.
 
+The seven papers added after the original 28-paper corpus were all re-read using
+the architecture-axis checklist and are documented in
+`23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`.
+
 ## Interpretation rule
 
 The `Actual relationship` column below is a capability summary, **not a novelty
 checklist**. A paper sharing ray deletion, object association, persistence
-beliefs, map revision, scene graphs, Gaussian updates, or relocalization with our
-system does not by itself threaten the research story.
+beliefs, map revision, scene graphs, Gaussian updates, relocalization, or any
+other component with our system does not by itself threaten the research story.
 
-The architecture-level question is tracked separately in
+The architecture-level question is tracked in
 `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`:
 
 ```text
@@ -56,8 +60,8 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 7. experiments, datasets, metrics, and baselines;
 8. limitations and future work;
 9. D1/D2/D3 classification under the project's definitions;
-10. exact page/section/equation/figure support;
-11. overlap with the project and claims it does or does not threaten.
+10. exact section/equation/figure support where available;
+11. the A -> D3 -> B -> C architecture checklist for promoted bridge candidates.
 
 ## Independently acquired and complete
 
@@ -85,6 +89,13 @@ A paper may be marked `COMPLETE` only when all of the following are recorded:
 | 20 | DynaGSLAM, WACV 2026 | online Gaussian D1 using external DynoSAM poses |
 | 21 | 4D Primitive-Mache, CVPR 2026 | persistent/replayable D1 within one monocular video |
 | 22 | LT-Gaussian, IEEE IV 2025 | old-Gaussian-map/current-LiDAR D3 revision component |
+| 23 | CubifyGS, IROS 2026 | continuous object-centric Gaussian lifecycle maintenance; cross-session asset merging is future work; no complete D1+D2 restoration |
+| 24 | DynaMem, ICRA 2025 | continuous online dynamic voxel memory with add/remove updates; no retained D1 trajectory and no process-separated D3 |
+| 25 | CogniMap3D, ICLR 2026 | genuine multi-visit static-scene memory retrieval/update; tracks dynamic regions inside video but excludes them from persistent memory |
+| 26 | DovSG, RA-L 2025 | continuously updated object scene graph across consecutive tasks without manual resets; no independent D3 boundary |
+| 27 | DynamicGSG, IROS 2025 | continuous posed-RGB-D/VIO Gaussian scene-graph update; no retained D1 history or independent restart |
+| 28 | DGSG-Mind, preprint 2026 | strong prior-Gaussian-map relocalization and D2-like revision; integrated tracking is future work, so no complete D1+D2 restoration |
+| 29 | DREAM, preprint 2026 | continuous online voxel memory plus pose-graph-aware historical reintegration; no D1 entity history or process-separated D3 |
 
 Detailed audits:
 
@@ -92,6 +103,7 @@ Detailed audits:
 - `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`
 - `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`
 - `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`
+- `23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`
 
 ## User-uploaded and complete
 
@@ -109,10 +121,10 @@ Detailed audits:
 - `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`
 - `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`
 
-## Direct-core completion status
+## Architecture result after 35 complete primary texts
 
-The fixed twelve-paper direct-core remainder has been completed. Across the 28
-verified papers, the following **architecture** has not appeared in one system:
+Across the 35 verified complete primary texts, the following **architecture** has
+not appeared in one system:
 
 ```text
 retained D1 trajectories/time-indexed geometry
@@ -123,18 +135,32 @@ retained D1 trajectories/time-indexed geometry
 + Session B exports the same state contract for Session C
 ```
 
+The seven newly promoted papers materially strengthen the right-hand side of the
+landscape:
+
+- CogniMap3D provides genuine multi-visit retrieval/relocalization/update of a
+  persistent **static** scene memory;
+- DGSG-Mind provides strong later-observation relocalization against an existing
+  Gaussian map and local dynamic revision without requiring continuous online
+  SLAM, but its integrated tracking module is explicitly future work;
+- CubifyGS, DynaMem, DovSG, DynamicGSG, and DREAM provide strong continuous
+  dynamic/current-memory maintenance without the complete independent-session
+  bridge.
+
 Dense object-plus-structural scene state is an important representation property
 of our target, but the literature search must not be reduced to checking isolated
 representation mechanisms.
 
-This is a result for the verified set, not a universal proof. Before authorizing
-a final `to the best of our knowledge` sentence, the next step is a bounded
-architecture-focused citation-chain pass: inspect references and citing papers
-of the closest systems and fully audit only genuinely new bridge candidates.
+This remains a result for the verified corpus, not a universal proof. Before
+authorizing a final absolute or `first ever` claim, the bounded architecture-
+focused backward/forward citation-chain stop rule in files `11` and `22` still
+applies.
 
 ## Acquisition policy
 
 - Open-access/arXiv/CVF/RSS/PMLR/NeurIPS/author papers are acquired directly.
+- A complete official or author-hosted primary-text HTML rendering may be used
+  when it contains the full paper; source mode must remain disclosed.
 - A complete publisher or author-hosted full-text rendering may be used when PDF
   bytes are blocked, but the source mode must be disclosed.
 - Paywalled papers without an accessible author version require a user-provided
@@ -143,6 +169,6 @@ of the closest systems and fully audit only genuinely new bridge candidates.
 
 ## Honesty rule
 
-Do not report a count larger than the totals above unless a newly added paper has
-met the completion criteria. The old unsupported 38-paper saturation claim is
+Do not report a count larger than **35** unless a newly added paper has met the
+completion criteria above. The old unsupported 38-paper saturation claim is
 withdrawn and must never be used as evidence.
