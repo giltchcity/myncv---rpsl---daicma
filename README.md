@@ -13,34 +13,70 @@ for the current Khronos-based scene-memory project.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
 5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of
    complete primary-text audits. Current verified count: 28.**
-6. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding audit
+6. `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`: authoritative synthesis
+   of the remaining A -> D3 -> B -> C literature question.
+7. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding audit
    standard.
-7. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Khronos.
-8. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
+8. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Khronos.
+9. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
    Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
-9. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
-   Changing-SLAM, General Movable Objects, Perpetua, and Lost & Found.
-10. `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`: LTC-Mapping,
+10. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
+    Changing-SLAM, General Movable Objects, Perpetua, and Lost & Found.
+11. `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`: LTC-Mapping,
     GaME, OASIS-Map, Living Scenes, Dynamic Pose Graph SLAM, Pomerleau 2014,
     RBIF, 4DGS-SLAM, 4DTAM, DynaGSLAM, 4D Primitive-Mache, and LT-Gaussian.
-11. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
+12. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
     DYMRO-SLAM, and ELite.
-12. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
+13. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
     Long-Term Mapping and ProbPer-LiLo.
-13. `15_SATURATED_CORE_FULL_TEXT_NOVELTY_AUDIT_2026-08-07.md`: **retracted**;
-    never use it as evidence.
-14. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only.
-15. `literature/README.md`: source acquisition and hash workflow.
+14. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: architecture-focused
+    citation-chain queue and stop rule.
+15. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only;
+    never use it as full-text evidence.
+16. `literature/README.md`: source acquisition and hash workflow.
 
 ## Canonical Storyline
 
 ```text
-D1 + D2 = dynamic mapping inside each continuously running session
-D3      = persistent scene-memory continuation across completed sessions
+inside every continuously running session:
+  D1 = observed motion with explicit temporal history
+  D2 = hidden/out-of-view change reasoning
+
+across completed independent sessions:
+  D3 = persistent scene-state continuation and inter-session reconciliation
 ```
 
-Every D3 session loads prior memory, reconciles changes since the previous
-session, and simultaneously runs new D1 and D2 events.
+D3 is not a third detector. It is the interface connecting complete D1+D2
+sessions:
+
+```text
+Session A runs D1 + D2
+-> export persistent scene state
+-> Session A terminates
+-> environment changes between sessions
+-> independent Session B imports A state and reconciles D3
+-> Session B again runs new D1 + D2
+-> export B state
+-> Session C repeats
+```
+
+A temporal split of one continuous sequence is not sufficient evidence of D3.
+
+## The Literature Question
+
+The paper is **not** built around claiming that individual mechanisms such as ray
+deletion, object association, persistence beliefs, scene graphs, Gaussian map
+updates, relocalization, or map merging are new.
+
+The remaining literature question is architecture-level:
+
+> Has any prior system carried a complete D1+D2 dynamic-mapping capability across
+> a real process-separated D3 boundary so that an independent B session imports
+> A's persistent state, reconciles inter-session changes, again performs D1 and
+> D2, and exports equivalent state recursively for C?
+
+Use `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md` for this synthesis. Do
+not turn component overlap into a novelty checklist.
 
 ## Current Evidence Status
 
@@ -56,31 +92,25 @@ direct-core queue pending:            0
 ```
 
 The earlier claim that 38 papers had already been fully audited was false and is
-withdrawn. Only `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` provides a valid
-count.
+withdrawn. The obsolete saturation artifact has been removed from the current
+tree; Git history retains the correction record. Only
+`17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` provides a valid count.
 
-The verified set establishes:
+Within the 28 verified complete primary texts, no system has been found that
+completes the full architecture:
 
-- **Dense single-session D1+D2:** Khronos; sparse object-level D1+D2:
-  Changing-SLAM.
-- **Object-level D2 theory/maintenance:** General Movable Objects, LTC-Mapping,
-  SuperMap; dense Gaussian D2: GaME.
-- **D3 geometric/static-map maintenance:** Dynamic Pose Graph SLAM, Pomerleau,
-  Efficient Long-Term Mapping, LT-Mapper, RBIF, ELite, ProbPer-LiLo, and
-  LT-Gaussian.
-- **D3 object/volumetric methods:** Panoptic Multi-TSDFs, POCD, POV-SLAM,
-  ObVi-SLAM, OASIS-Map, and Living Scenes.
-- **Rich continuous D1 representations:** Lost & Found, DYNEMO-SLAM,
-  4DGS-SLAM, 4DTAM, DynaGSLAM, and 4D Primitive-Mache.
+```text
+complete D1+D2 Session A
++ persistent export after A terminates
++ independent Session B import
++ D3 reconciliation
++ B again executes complete D1+D2
++ equivalent export for Session C
+```
 
-Within the verified set, no method jointly retains D1 trajectories and
- time-indexed geometry, performs explicit same-session D2 reasoning, maintains a
-dense object-plus-structural current map, exports/imports complete state across a
-D3 process boundary, and resumes D1+D2 recursively in Session B/C.
-
-This is not yet a universal proof. A bounded forward/backward citation-chain pass
-must still test whether the closest papers lead to a genuinely new direct
-neighbour. Only such new neighbours require another complete audit.
+This is a **verified-corpus result**, not a universal proof. A bounded
+forward/backward architecture-focused citation-chain pass remains required before
+stronger positioning is authorized.
 
 ## Working Title
 
@@ -90,8 +120,8 @@ Environments**
 ## One-Sentence Project Description
 
 We extend a Khronos-based mapping pipeline with persistent cross-session scene
-memory and conservative evidence-gated reconciliation, while retaining
-Khronos's within-session dynamic tracking.
+memory and conservative evidence-gated reconciliation so that complete
+within-session dynamic mapping can recur across independent deployments.
 
 ## Technical Sources
 
@@ -111,7 +141,8 @@ A title or abstract never determines D1/D2/D3 coverage:
 - `dynamic` may mean only rejection or static-map cleaning;
 - `persistent` may mean permanence within one continuous video;
 - `lifelong` may mean recursive maintenance of a static localization map;
-- `multi-session` does not imply restoration of a complete dynamic-scene state.
+- `multi-session` does not imply restoration of a complete dynamic-scene state;
+- sharing a mechanism does not imply sharing the full session architecture.
 
 Future work is not an implemented capability, and one paper's criticism of
 another is not evidence of the cited paper's actual method.
