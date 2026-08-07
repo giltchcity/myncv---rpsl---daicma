@@ -1,165 +1,136 @@
 \section{Related Work}
 \label{sec:related_work}
 
-We organize prior work according to the two-level temporal structure of our
-problem. D1 and D2 are complementary observation modes inside one continuously
-running dynamic-mapping session: D1 models motion while it is observed, whereas
-D2 infers a change revealed only after the robot revisits a region. D3 connects
-completed independent sessions through persistent scene state.
+We organize prior work by the state that survives in time. The first family
+builds rich dynamic representations while one mapping process remains active.
+The second carries geometric maps across traversals. The third maintains richer
+object or scene memories across time. Our problem lies at the interface: making
+the \emph{dynamic mapping process} persistent across independently executed
+sessions.
 
-\subsection{Single-session dynamic mapping: D1 and D2}
+\subsection{Dynamic Mapping Within a Deployment}
 
-Dense object-level SLAM has developed increasingly expressive D1
-representations. Co-Fusion maintains independent surfel models for a static
-background and multiple rigid objects~\cite{runz2017cofusion}. MID-Fusion uses
-object-level octree volumes and estimates geometric, semantic, and motion
-properties~\cite{xu2019midfusion}, while EM-Fusion combines local signed-distance
+Dense dynamic SLAM increasingly models moving entities rather than treating them
+only as outliers. Co-Fusion maintains separate surfel models for a static
+background and multiple rigid objects~\cite{runz2017cofusion}; MID-Fusion uses
+object-level octree volumes and jointly estimates geometry, semantics, and
+motion~\cite{xu2019midfusion}; and EM-Fusion combines local signed-distance
 volumes with probabilistic data association and occlusion
 reasoning~\cite{strecke2019emfusion}. Feature-based systems emphasize joint state
 estimation: DynaSLAM~II tightly couples camera, object trajectories, and scene
-structure~\cite{bescos2021dynaslam2}, and DynoSAM provides factor-graph
-formulations for joint robot and object motion
-estimation~\cite{morris2025dynosam}. DYNEMO-SLAM incorporates moving agents and
-relocated objects into an optimizable 3D scene graph, but evaluates a
-marker-based continuous-run setting and leaves real perception and association
-outside its scope~\cite{giberna2025dynemo}. Lost~\&~Found reconstructs the
-6-DoF trajectory of an object during an observed human--object interaction and
-updates a scene graph, but requires the manipulated object to remain in the
-egocentric field of view~\cite{behrens2025lostfound}.
+structure~\cite{bescos2021dynaslam2}, while DynoSAM formulates joint robot and
+object motion estimation in a factor graph~\cite{morris2025dynosam}. Recent 4D
+representations extend this idea to non-rigid or photorealistic temporal scene
+models, including dynamic surface Gaussians in 4DTAM~\cite{matsuki2025fourdtam},
+4D Gaussian Splatting SLAM~\cite{li2025fourdgsslam}, DynaGSLAM~\cite{li2026dynagslam},
+and persistent primitive-based reconstruction in 4D
+Primitive-Mache~\cite{mazur2026primitive}. These methods provide increasingly
+expressive forms of D1: the transition itself is observed and represented over
+time.
 
-A larger robustness literature treats dynamic content primarily as interference.
-Semantic masks, geometric checks, or optical flow exclude moving measurements so
-that camera localization and a static map remain reliable. DynaSLAM and
-DYMRO-SLAM are representative examples. Such methods are relevant localization
-baselines but do not preserve moving entities as D1 history.
+Dynamic mapping also requires reasoning when the transition is not observed.
+Bore \etal model intermittently visible movable objects using local-motion and
+global-jump processes~\cite{bore2019movable}. Changing-SLAM combines dynamic
+feature filtering, object tracking, a Bayesian persistence map, and long-term
+association in a sparse SLAM system~\cite{soares2023changing}. Khronos provides
+the closest dense formulation to our within-session setting: an active temporal
+window handles observed dynamics, while a global process reconciles scene
+fragments separated by observation gaps using spatio-temporal and ray-based
+evidence~\cite{schmid2024khronos}. GaME addresses a related representation-level
+problem by updating a posed RGB-D Gaussian map after out-of-view scene changes,
+adding newly supported geometry and removing ray-contradicted
+Gaussians~\cite{yugay2026game}. SuperMap and LTC-Mapping likewise maintain
+object-level semantic or visibility-aware state over a continuous
+stream~\cite{zhao2026supermap,matezbandera2022ltc}.
 
-Non-rigid and 4D reconstruction broadens D1 beyond rigid objects. 4DTAM jointly
-estimates camera motion and a deforming surface represented by dynamic surface
-Gaussians~\cite{matsuki2025fourdtam}. 4D Gaussian Splatting SLAM separates static
-and deformable Gaussians and optimizes a continuous-sequence 4D
-representation~\cite{li2025fourdgsslam}, while DynaGSLAM propagates and renders
-moving Gaussians using poses supplied by DynoSAM~\cite{li2026dynagslam}.
-4D Primitive-Mache decomposes one monocular video into rigid primitives and uses
-motion grouping and extrapolation to preserve object permanence during temporary
-occlusion~\cite{mazur2026primitive}. In this literature, \emph{persistent}
-usually denotes continuity within one video rather than state transfer between
-independent mapping sessions.
+The important boundary for our work is not whether these systems contain a
+particular tracking or update mechanism. It is temporal scope. Their rich dynamic
+reasoning is defined while a mapping process or observation stream remains
+active; they do not establish a recurring state contract through which a
+completed dynamic-mapping session initializes an independent later session that
+again executes the same full dynamic reasoning.
 
-D2 requires reasoning beyond frame-to-frame tracking. Bore \etal model movable
-objects with linked local-motion and global-jump processes while the robot
-observes only part of a known map~\cite{bore2019movable}. Changing-SLAM combines
-dynamic-feature filtering with a Bayesian object-persistence map and long-term
-association inside ORB-SLAM3~\cite{soares2023changing}. It is a genuine sparse
-D1+D2 system, but evaluates camera localization rather than dense scene-history
-accuracy. Khronos provides the closest dense formulation: an active temporal
-window tracks visible motion, whereas a global process reconciles fragments
-separated by observation gaps using spatio-temporal and ray-based
-evidence~\cite{schmid2024khronos}.
+\subsection{Lifelong and Multi-Session Map Maintenance}
 
-LTC-Mapping provides a complementary object-map mechanism. Given externally
-estimated poses, it maintains 3D object boxes, class confidence, vertex
-visibility, and repeated non-detections; objects are removed when accumulated
-evidence makes the `Other' class dominant~\cite{matezbandera2022ltc}. SuperMap
-similarly maintains open-vocabulary instances, object-point occupancy and
-semantic confidence, and spatial/temporal scene-graph relations in one
-continuous stream~\cite{zhao2026supermap}. Both are relevant to visibility-aware
-object maintenance, but neither retains dense D1 temporal geometry or defines a
-process-separated D3 restoration protocol.
+A complementary literature maintains maps over repeated traversals. Dynamic Pose
+Graph SLAM edits outdated laser geometry while retaining a separate history of
+added and removed points~\cite{walcott2012dynamic}. Pomerleau \etal estimate
+point-wise dynamic probabilities over repeated LiDAR surveys and maintain a
+long-term 3D map~\cite{pomerleau2014longterm}. Efficient Long-Term Mapping uses
+free-space-aware local-cloud merging to suppress transient clutter and fuses
+local maps across inter-session loop closures~\cite{lazaro2018efficient}.
+LT-Mapper separates multi-session alignment, dynamic-object removal, and
+positive/negative map-change management~\cite{kim2022ltmapper}, while RBIF uses
+probabilistic ray--voxel interference for conservative long-term occupancy
+updates~\cite{breitfuss2024rbif}.
 
-GaME is the strongest recent dense representation-level D2 method. It updates
-one posed RGB-D Gaussian map after out-of-view changes by adding currently
-supported geometry, removing ray-contradicted Gaussians, and suppressing stale
-keyframes~\cite{yugay2026game}. It explicitly excludes short-term dynamic-object
-tracking and relies on external poses, so it is not a complete D1+D2 SLAM system.
+More recent methods make this maintenance explicitly recursive. ELite estimates
+local ephemerality to remove dynamic LiDAR returns and updates point-wise global
+ephemerality in a lifelong map~\cite{gil2025elite}. ProbPer-LiLo models semantic
+clusters as static or non-static, removes dynamic and quasi-static content, and
+recursively refines prior and current static maps through semantic voxel
+comparison~\cite{ali2026probperlilo}. LT-Gaussian transfers the same long-term
+revision pattern to 3D Gaussian maps by aligning a new traversal, removing
+outdated Gaussian centers, and initializing emerging geometry~\cite{cheng2025ltgaussian}.
 
-\subsection{Cross-session current-map maintenance: D3}
+These methods solve an important deployment problem: preserving a useful map
+when the environment changes. Their dominant output, however, is a cleaned,
+current, or geometrically revised representation for subsequent localization or
+mapping. Rich observed motion histories and within-session hidden-change state
+are not the persistent object of estimation. Thus map longevity and temporal
+scene understanding remain largely separate concerns.
 
-A major lifelong-mapping family aims to maintain a clean, current localization
-map. Dynamic Pose Graph SLAM stores active scan geometry together with a separate
-history of added and removed laser points, while assuming high-dynamic content
-has already been filtered~\cite{walcott2012dynamic}. Efficient Long-Term Mapping
-uses free-space-aware local-cloud merging to suppress transient clutter and
-fuses local maps across inter-session loop closures while removing outdated graph
-nodes~\cite{lazaro2018efficient}. LT-Mapper separates multi-session alignment,
-dynamic-object removal, and positive/negative map change
-management~\cite{kim2022ltmapper}.
+\subsection{Persistent Object and Scene Memories}
 
-Pomerleau \etal maintain point-wise dynamic probabilities over repeated LiDAR
-surveys and estimate instantaneous point velocities for currently dynamic
-returns~\cite{pomerleau2014longterm}. This combines point-level motion cues with
-long-term map maintenance, but does not retain object identities or trajectories.
-RBIF instead models ray bundles and map voxels probabilistically to perform
-conservative sub-voxel occupancy updates without destructive holes~\cite{breitfuss2024rbif}.
-These systems establish current-map maintenance, ray contradiction, and
-scan-level change history as prior work, but not complete dynamic scene memory.
+Object- and volume-centric systems retain richer state across time. Panoptic
+Multi-TSDFs propagates active and inactive volumetric submaps between mapping
+runs and distinguishes persistent, absent, and unobserved entities~\cite{schmid2022panoptic}.
+POCD maintains object-level volumes and stationarity/change beliefs between
+traversals~\cite{qian2022pocd}, while POV-SLAM jointly estimates robot pose and
+semi-static object consistency over repeated visits~\cite{qian2023povslam}.
+ObVi-SLAM transfers selected long-term object landmarks between deployments for
+localization~\cite{adkins2024obvislam}. OASIS-Map builds separate object maps for
+previous and current sessions, associates them through semantic correspondence,
+and labels objects as static, moved, appeared, disappeared, or
+unknown~\cite{oh2026oasismap}. Living Scenes instead performs offline object
+association, registration, and reconstruction from scans captured at irregular
+times~\cite{zhu2024livingscenes}.
 
-ELite estimates local ephemerality from rays to remove dynamic points in each new
-LiDAR session and recursively updates point-wise global ephemerality in a
-lifelong map~\cite{gil2025elite}. ProbPer-LiLo models semantic clusters as binary
-static/non-static variables, removes both dynamic and quasi-static content, and
-then refines prior and current static maps through semantic voxel
-comparison~\cite{ali2026probperlilo}. Both demonstrate recursive multi-session
-map update, but their target is the static part of the environment and observed
-D1 history is deliberately discarded.
+Recent scene-memory systems further blur the boundary between mapping and
+long-term recall, but their persistent state remains different from ours.
+CogniMap3D detects and tracks dynamic regions in monocular video, then builds a
+memory bank from \emph{static} point-cloud landmarks and visual/geometric
+features; later visits retrieve a stored scene, relocalize against it, and merge
+new static observations~\cite{wang2026cognimap3d}. Its goal is persistent static
+spatial memory in the presence of dynamics, rather than persistence of dynamic
+entity history. DGSG-Mind constructs an instance-aware Gaussian/voxel map and
+hierarchical scene graph from posed RGB-D data, relocalizes later observations
+against the Gaussian map, and performs localized object-level additions and
+removals~\cite{ge2026dgsgmind}. This provides a strong current-scene memory for
+long-term embodied tasks, but the method does not contain an integrated dynamic
+tracking module and therefore does not preserve an observed D1 trajectory/state
+across the update process.
 
-LT-Gaussian transfers the same map-revision pattern to Gaussian splatting. It
-aligns a current LiDAR traversal to an outdated Gaussian map, removes
-old-Gaussian centers inferred to have disappeared, initializes emerging
-Gaussians, and briefly refines the result~\cite{cheng2025ltgaussian}. Its output
-is an updated rendering map rather than a D1+D2 scene state.
+Predictive persistence models address another complementary aspect of long-term
+reasoning. Occupancy-grid HMMs learn transition probabilities~\cite{meyerdelius2012changinggrid},
+FreMEn compactly models periodic environmental processes~\cite{krajnik2017fremen},
+Spatio-Temporal Hilbert Maps learn continuous time-conditioned
+occupancy~\cite{senanayake2016sthm}, and Perpetua maintains multiple hypotheses
+for feature disappearance and reappearance~\cite{saavedraruiz2025perpetua}.
+These models establish temporal persistence as a prior, but do not themselves
+provide a dense scene representation that transfers a complete dynamic-mapping
+process between deployments.
 
-\subsection{Cross-session object and volumetric state}
+\subsection{Positioning of This Work}
 
-Object- and volume-centric methods retain richer D3 semantics. Panoptic
-Multi-TSDFs initializes a later run from prior active and inactive volumetric
-submaps and updates entities as persistent, absent, or
-unobserved~\cite{schmid2022panoptic}. POCD maintains object-level volumes and
-stationarity/change beliefs between traversals~\cite{qian2022pocd}, while
-POV-SLAM jointly estimates robot pose and semi-static object consistency over
-repeated visits~\cite{qian2023povslam}. ObVi-SLAM explicitly transfers a selected
-long-term object-landmark map from one deployment to the next for
-localization~\cite{adkins2024obvislam}.
-
-OASIS-Map builds separate object maps for a previous and current session using
-poses supplied by an external multi-session SLAM system, associates objects with
-dense semantic correspondences, and labels them static, moved, appeared,
-disappeared, or unknown~\cite{oh2026oasismap}. Its coverage gate prevents an
-unmatched object from being declared appeared or disappeared when the other
-session did not sufficiently observe its volume. OASIS-Map remains an
-under-review preprint at the time of writing.
-
-Living Scenes addresses a different offline problem: given object-segmented 3D
-scans captured at irregular times, it matches instances, estimates their 6-DoF
-relative transformations, and accumulates observations into more complete object
-reconstructions~\cite{zhu2024livingscenes}. It explicitly does not reconstruct
-the unobserved intermediate motion and does not estimate robot poses or maintain
-a dense background map.
-
-\subsection{Predictive persistence models}
-
-A complementary literature predicts recurring or semi-static state rather than
-maintaining dense scene geometry. Occupancy-grid HMMs learn cell transition
-probabilities~\cite{meyerdelius2012changinggrid}, FreMEn represents periodic
-processes with compact frequency spectra~\cite{krajnik2017fremen}, and
-Spatio-Temporal Hilbert Maps learn continuous time-conditioned occupancy
-functions~\cite{senanayake2016sthm}. Perpetua models feature appearance and
-disappearance with mixtures of persistence and emergence filters and maintains
-multiple temporal hypotheses~\cite{saavedraruiz2025perpetua}. These methods
-establish persistence and temporal prediction as prior mechanisms, but do not
-provide dense scene geometry or a complete SLAM continuation protocol.
-
-\subsection{Positioning of this work}
-
-The audited literature separates more sharply than broad terms such as
-``dynamic,'' ``persistent,'' or ``lifelong'' suggest. Khronos provides dense
-D1+D2 inference inside one continuous session, and Changing-SLAM provides a
-sparse object-level counterpart. Lifelong systems such as Dynamic Pose Graph
-SLAM, LT-Mapper, ELite, ProbPer-LiLo, RBIF, and LT-Gaussian carry maps across
-sessions but generally suppress dynamic content to maintain a current static
-representation. Panoptic Multi-TSDFs, POCD/POV-SLAM, ObVi-SLAM, OASIS-Map, and
-Living Scenes retain richer object or volumetric cross-session state, but do not
-preserve the complete D1 history of every session. Our target is the interface
-between these families: a complete dense D1+D2 session exports persistent object
-and structural scene state, an independently started session reconciles D3 from
-that state, and the new session again executes D1+D2 before producing the prior
-for the next deployment.
+The distinction that matters for our work is therefore not \emph{dynamic} versus
+\emph{lifelong} as broad labels. Existing dynamic systems can preserve rich
+temporal state while a deployment is active; lifelong systems can preserve and
+revise maps across deployments; and recent object/scene memories can recall and
+update substantially richer persistent representations. What remains missing is
+the interface between these capabilities. We study \emph{persistent mapping}:
+a complete dynamic-mapping session performs observed-motion and hidden-change
+reasoning, exports persistent scene state when it terminates, and enables an
+independently initialized later session to reconcile inter-session evolution and
+again execute the same dynamic-mapping process before producing the prior for
+the next deployment.
