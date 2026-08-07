@@ -1,6 +1,6 @@
 # Agent Handoff
 
-Date: 2026-08-06
+Date: 2026-08-07
 
 ## Your Role
 
@@ -9,10 +9,26 @@ Do not redesign the mapping system unless explicitly asked. First turn the
 verified implementation and experiment history into a precise paper outline,
 method description, claim table, and figure plan.
 
+## Authoritative Reading Order
+
+Before writing or auditing literature, read:
+
+1. `01_STORYLINE.md` -- canonical D1+D2 / D3 research story.
+2. `03_CLAIMS_AND_EVIDENCE.md` -- what is established, preliminary, designed, or
+   not proved.
+3. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` -- only authoritative complete
+   primary-text count.
+4. `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md` -- authoritative
+   cross-paper synthesis and the remaining literature question.
+5. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md` -- binding rules for
+   promoting any new paper to verified status.
+
+Older broad landscape and taxonomy files may be useful as search history, but
+must not override these documents.
+
 ## Canonical Storyline
 
-Read `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md` before writing. The hierarchy
-is binding:
+The hierarchy is binding:
 
 ```text
 D1 + D2 = dynamic mapping inside every continuously running session
@@ -34,6 +50,25 @@ Do not describe D1, D2, and D3 as three parallel detectors. D1 and D2 are the tw
 intra-session observation modes; D3 is the interface connecting complete D1+D2
 sessions. Splitting a continuous sequence and restarting at the cut is a
 checkpoint/recovery control, not by itself a D3 experiment.
+
+## Literature Question
+
+Do not convert the project into a component-level novelty checklist. The paper is
+not claiming that ray deletion, object association, persistence beliefs,
+Gaussian updates, scene graphs, relocalization, or map merging are individually
+new.
+
+The remaining architecture-level question is:
+
+> Does prior work run a complete D1+D2 Session A, preserve sufficient scene state
+> after A terminates, initialize an independent Session B from that state,
+> reconcile D3, let B again execute complete D1+D2, and export the same state
+> contract recursively for Session C?
+
+For every new candidate, use the eight-question checklist in
+`22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`. A paper is not a direct
+architectural competitor merely because it shares one mechanism with this
+system.
 
 ## Project Context
 
@@ -85,30 +120,43 @@ Do not write any of the following as established facts:
 - The current method is still largely a combination of existing mechanisms; the
   final methodological innovation and mathematical model remain under
   development.
+- Do not claim that the complete A -> D3 -> B -> C architecture has been proved
+  by the current Office pipeline unless B is shown to execute new D1 and D2
+  events and the recursive state contract is validated.
 
 ## Paper Tasks
 
 1. Keep Introduction, Related Work, problem formulation, method, and experiments
    consistent with the D1+D2 / D3 hierarchy.
-2. Draft an explicit claim/evidence table using `03_CLAIMS_AND_EVIDENCE.md`.
+2. Keep every contribution sentence consistent with `03_CLAIMS_AND_EVIDENCE.md`.
 3. Develop a principled persistent scene-memory representation and inference
    mechanism that lets a complete D1+D2 session recur after a D3 boundary.
-4. Plan one system figure showing Session A D1+D2 -> memory -> D3 -> Session B
+4. Close the architecture-focused citation chain defined in files `11` and `22`;
+   do not add papers merely for corpus size.
+5. Plan one system figure showing Session A D1+D2 -> memory -> D3 -> Session B
    D1+D2, one evidence-state figure, one process figure, and one
    failure/ablation figure.
-5. Leave quantitative placeholders where official comparable metrics are still
+6. Leave quantitative placeholders where official comparable metrics are still
    missing. Never invent or transplant numbers from a different evaluator.
 
 ## Literature Rule
 
 Every technical statement about prior work must be grounded in the original
-full paper, including assumptions, method, experiments, and limitations. A
+complete paper, including assumptions, method, experiments, and limitations. A
 paper's criticism of prior work is not its own capability. Future work is not an
-implemented component. Use the source ledgers in:
+implemented component.
 
-- `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`
-- `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`
-- `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`
+Authoritative literature records are:
+
+- `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` -- count and per-paper status;
+- `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`;
+- `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`;
+- `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`;
+- `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`;
+- `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`;
+- `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`;
+- `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md` -- synthesis only, not a
+  substitute for per-paper primary-text evidence.
 
 ## Useful Starting Artifacts
 
