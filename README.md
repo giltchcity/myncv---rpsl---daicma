@@ -12,28 +12,31 @@ for the current Khronos-based scene-memory project.
 3. `02_CODE_AND_MODULES.md`: implementation entry points.
 4. `03_CLAIMS_AND_EVIDENCE.md`: established, preliminary, and unproved claims.
 5. `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md`: **authoritative count of
-   complete primary-text audits. Current verified count: 28.**
+   complete primary-text audits. Current verified count: 35.**
 6. `22_ARCHITECTURE_AXIS_CITATION_AUDIT_2026-08-07.md`: authoritative synthesis
    of the remaining A -> D3 -> B -> C literature question.
-7. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding audit
+7. `23_SEVEN_NEIGHBOURS_ARCHITECTURE_REAUDIT_2026-08-07.md`: complete
+   architecture-axis re-audit of CubifyGS, DynaMem, CogniMap3D, DovSG,
+   DynamicGSG, DGSG-Mind, and DREAM.
+8. `14_AUTHORITATIVE_FULL_TEXT_AUDIT_PROTOCOL_2026-08-07.md`: binding audit
    standard.
-8. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Khronos.
-9. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
-   Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
-10. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
+9. `18_KHRONOS_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Khronos.
+10. `19_CORE_D3_SELF_FETCHED_FULL_TEXT_AUDIT_2026-08-07.md`: Panoptic
+    Multi-TSDFs, POCD, POV-SLAM, LT-Mapper, and ObVi-SLAM.
+11. `20_CORE_D1_D2_AND_PERSISTENCE_SELF_FETCHED_AUDIT_2026-08-07.md`:
     Changing-SLAM, General Movable Objects, Perpetua, and Lost & Found.
-11. `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`: LTC-Mapping,
+12. `21_REMAINING_DIRECT_CORE_FULL_TEXT_AUDIT_2026-08-07.md`: LTC-Mapping,
     GaME, OASIS-Map, Living Scenes, Dynamic Pose Graph SLAM, Pomerleau 2014,
     RBIF, 4DGS-SLAM, 4DTAM, DynaGSLAM, 4D Primitive-Mache, and LT-Gaussian.
-12. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
+13. `13_SUPERMAP_DYMRO_ELITE_FULL_TEXT_CORRECTION_2026-08-07.md`: SuperMap,
     DYMRO-SLAM, and ELite.
-13. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
+14. `16_EFFICIENT_MAPPING_PROBPER_FULL_TEXT_CORRECTION_2026-08-07.md`: Efficient
     Long-Term Mapping and ProbPer-LiLo.
-14. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: architecture-focused
+15. `11_PRIORITY_FULL_TEXT_AUDIT_QUEUE_2026-08-07.md`: architecture-focused
     citation-chain queue and stop rule.
-15. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only;
+16. `10_BROAD_DYNAMIC_MAPPING_LANDSCAPE_2026-08-07.md`: candidate pool only;
     never use it as full-text evidence.
-16. `literature/README.md`: source acquisition and hash workflow.
+17. `literature/README.md`: source acquisition and hash workflow.
 
 ## Canonical Storyline
 
@@ -80,23 +83,26 @@ not turn component overlap into a novelty checklist.
 
 ## Current Evidence Status
 
-The fixed direct-core queue is complete:
+The verified corpus now contains **35 complete primary texts**:
 
 ```text
-self-acquired complete primary texts: 22
-  direct PDF/complete publisher text: 21
-  complete author full-text rendering: 1 (RBIF; PDF bytes rate-limited)
-user-uploaded complete PDFs:          6
-total verified complete:             28
-direct-core queue pending:            0
+self-acquired complete primary texts: 29
+  direct PDF / complete official primary-text HTML: 28
+  complete author full-text rendering:               1 (RBIF; PDF bytes rate-limited)
+user-uploaded complete PDFs:                          6
+total verified complete:                            35
+known promoted queue pending:                        0
 ```
+
+The seven papers added after the original 28-paper corpus were re-read end-to-end
+under the correct architecture checklist and are recorded in file `23`.
 
 The earlier claim that 38 papers had already been fully audited was false and is
 withdrawn. The obsolete saturation artifact has been removed from the current
 tree; Git history retains the correction record. Only
 `17_VERIFIED_PDF_AUDIT_TRACKER_2026-08-07.md` provides a valid count.
 
-Within the 28 verified complete primary texts, no system has been found that
+Within the 35 verified complete primary texts, no system has been found that
 completes the full architecture:
 
 ```text
@@ -107,6 +113,20 @@ complete D1+D2 Session A
 + B again executes complete D1+D2
 + equivalent export for Session C
 ```
+
+The new seven sharpen the boundary:
+
+- **CogniMap3D** provides genuine multi-visit recall/relocalization/update, but
+  its persistent memory is static-scene memory; dynamic regions are tracked
+  inside video and excluded from the persistent map.
+- **DGSG-Mind** can relocalize later observations against an existing Gaussian
+  map without continuous online SLAM and perform local dynamic revision, but its
+  integrated tracking module is explicitly future work.
+- **CubifyGS** has persistent object identity and reusable assets inside a
+  continuous stream, but cross-session asset merging is explicitly future work.
+- **DynaMem, DovSG, DynamicGSG, and DREAM** provide strong long-horizon/current-
+  memory update inside continuing deployments rather than complete independent
+  D1+D2 session restoration.
 
 This is a **verified-corpus result**, not a universal proof. A bounded
 forward/backward architecture-focused citation-chain pass remains required before
