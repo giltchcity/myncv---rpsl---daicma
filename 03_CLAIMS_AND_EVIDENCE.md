@@ -28,7 +28,12 @@ silently reused for another claim.
 | Semantic promotion extends the principal Human track | DIRECT controlled comparison | 114 -> 170 samples; endpoint 11.62 -> 14.52 s | “Semantic promotion extends the reliable tracked interval.” |
 | Dynamic person remains tracked for all visible frames | NOT PROVED | Later intervals are mostly outside 5 m and one short interval fails allocation confidence | Do not claim. |
 | Dynamic-residue distance cleanup improves the map | DISPROVED for tested setting | 119 candidates were protected floor; unsafe deletion reduced F1 | Report as a failure/ablation. |
-| Current Base1 improves official Khronos final-current background F1 | NOT PROVED; historical test negative | Historical delta F1 was negative at 5/10/20/50 cm | Do not claim improvement yet. |
+| Current method improves official Khronos final-current background F1 | DIRECT (2026-09-20/21) | Real ABC, 1cm pseudo-GT, observed domain, F1@5cm: Memory+Prior 0.9663 (B) / 0.9531 (C) vs Khronos 0.9637 / 0.9526; Panoptic 0.8866 / 0.8845. Synthetic A/B against true GT, plain two-mesh F1@5cm: 0.9760 (B) vs Khronos 0.8364, Panoptic 0.9210 | "The method exceeds both baselines at every stage of both datasets." Report the unfiltered real-data row alongside. |
+| The geometric gain is not threshold tuning | DIRECT | Agreement 0 / 0.25 / 0.5 voxel give 0.9636 / 0.9634 / 0.9632 at stage B, inside the 0.02 pp run-to-run variance; 1.0 voxel degrades to 0.9547 | "Performance is flat in the agreement scale up to the representation's resolution." |
+| Retirement removes misplaced duplicates, not coverage | DIRECT | Disabling geometric retirement costs 0.07 pp recall and 3.6 pp precision at stage B | "Retired surface is almost entirely displaced duplicate within the observed domain." |
+| Memory carries coverage the current session cannot obtain | DIRECT | Stage C surface area 534.0 m2 vs Clean 337.7 and Khronos 299.1; 5.95% of in-room surface is inherited and never exposed by this session's rays, 91.7% of it backed by the previous session's measurement | "Memory contributes surface no single session reconstructs." Do not call it accuracy. |
+| The real pseudo-GT can adjudicate cross-session geometry at 5 cm | DISPROVED | On static structure both sessions observed, A's and B's pseudo-GT disagree by more than 5 cm on 10.2% of surface (median 1.3 cm, p90 5.1 cm) | Report as an evaluation limit: a perfect memory scores at most ~90% precision on inherited static surface. |
+| Storage is bounded across sessions | DIRECT | Real A/B/C 43 GB -> 1.3 GB with map content verified identical | "Endpoint-snapshot storage bounds state size without changing the map." |
 | Office reversed A/B has official comparable change P/R/F1 | NOT PROVED | Retimed B does not match stock GT query time | Describe as pipeline/qualitative A/B only. |
 | Base1 performs native Khronos backend restart | NOT PROVED / false description | PGMO, active window, ray hash, and backend threads are not restored | Call it reconciliation-level continuation. |
 | Structural patches support full persistent/absent/new updates | DESIGN | Unified model exists; full patch updater does not | Present as method extension/future implementation unless completed. |
@@ -95,3 +100,35 @@ GT-aligned evaluation.
 6. A dataset/protocol that contains genuine process-separated changes rather
    than only the reversed Office demonstration.
 
+## Dead hypotheses (2026-09-20/21). Do not redo these.
+
+Measured and rejected; each cost at least one full run.
+
+* Instrumentation probes altering backend cadence produced an apparent 0.12 pp
+  regression. Removing the probes reproduced the reference result exactly.
+* Out-of-room geometry: 73% of it is wrong but it carries only 0.1% of scored
+  false-positive mass, and cropping moves every method equally.
+* A room crop must be oriented to the room (44.5 deg); axis-aligned boxes cut the
+  corners. Even oriented, the ranking does not change.
+* Naive union or "persistent" references reward stale object poses, because the
+  earlier session's furniture positions enter the reference.
+* Retiring inherited surface on free-space or occlusion evidence beyond the
+  existing rule: +0.13 pp, at the cost of weakening "unobserved is kept".
+* Repairing the TSDF prior's replacement guard, either by tightening its radius
+  to half a voxel (-4.7 pp precision) or by only erasing vertices whose faces are
+  fully replaceable (+23.4 m2 area but only +0.11 pp recall against -1.05 pp
+  precision). See `24_TSDF_PRIOR_GUARD_EXPERIMENTS_2026-09-21.md`.
+
+## Two versions, both current
+
+`main` and `memory-tsdf-prior` are the two ends of a precision/coverage trade and
+both should appear in the ablation:
+
+| real data | main, no prior | memory-tsdf-prior |
+|---|---|---|
+| observed-domain F1, B / C | 0.9643 / 0.9552 | 0.9663 / 0.9531 |
+| unfiltered + room crop, B / C | 0.9337 / 0.9393 | 0.9584 / 0.9465 |
+| surface area, B / C | 341.6 / 534.0 | 224.3 / 368.6 |
+
+`memory-tsdf-prior` is the version that meets the stated bar at every stage of
+both metrics; `main` is the coverage-maximising end.
