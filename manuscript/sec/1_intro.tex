@@ -38,8 +38,8 @@ necessary: earlier surfaces may be unchanged, obsolete, or simply outside the
 new camera's view.
 
 Our approach stores each object's successive geometric states separately. A
-state includes its surface, temporal extent, and the observations from which it
-was reconstructed. Current measurements then determine whether to refine that
+state includes its surface, temporal extent, and provenance identifying the
+observations used to reconstruct it. Current measurements then determine whether to refine that
 state, replace it with a new state, or leave it unresolved. Depth measurements
 behind an old surface provide physical evidence that its former location is
 empty. However, imperfect reconstructed surfaces can produce the same pattern
