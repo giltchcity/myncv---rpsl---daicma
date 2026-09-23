@@ -1,120 +1,151 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We test whether carrying scene state from one mapping run to the next preserves
-useful geometry, removes obsolete object states, and continues to handle changes
-during the new run. We use repeated real-room recordings, controlled synthetic
-data with exact ground truth, and public RGB-D sequences.
+Our experiments separate two questions. First, can a dynamic mapper still model
+motion and hidden changes during one run? Second, can the scene state from one
+completed run be loaded into a later revisit and updated correctly? Khronos
+provides the single-run dynamic-mapping baseline, Panoptic Multi-TSDFs provides
+the repeated-visit mapping baseline, and our from-scratch variant removes only
+the cross-run memory from our system.
 
-\subsection{Datasets and Baselines}
+\subsection{Experimental Design}
 \label{sec:datasets}
 
-\paragraph{Repeated real-room runs.}
-We use three RGB-D runs, A, B, and C, recorded in the same occupied room on
-three days. The data contain 20 physical object identities, changes within each
-run, and 16 annotated changed states between A and B. Object reference surfaces
-are aggregated from depth during manually annotated presence intervals, using
-2\,cm voxels observed in at least three frames. Scene geometry is evaluated
-against a 1\,cm reconstruction from the measurements of each run. Run A builds
-the initial map; B and C are later revisits.
-
-\paragraph{Controlled synthetic runs.}
-Two Isaac Sim sequences, A and B, revisit a furnished apartment with scripted
-visible motion, changes that occur while the affected object is outside the
-camera view, and changes between the two runs. A contains 4,186 frames and B
-contains 4,041 frames at 30\,Hz. Per-frame object poses, visibility, and the
-scene mesh are known exactly. The annotations contain 24 hidden changes in A,
-10 in B, and 32 changes between A and B.
-
-\paragraph{Public sequences.}
-We use three 3RScan reference/rescan pairs~\cite{wald2019rio}: an unchanged
-scene, a scene with two moved chairs and one removed chair, and a scene with a
-non-rigid blanket change. We initialize the map from the reference scan and load
-it for the rescan. Bonn RGB-D Dynamic~\cite{palazzolo2019bonn} provides short
-box-manipulation sequences, and TUM~\cite{sturm2012tum} provides dynamic-person
-sequences.
-
-\paragraph{Baselines.}
-We compare with the official Khronos release~\cite{schmid2024khronos} and
-Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. Khronos starts each run from an
-empty map. Panoptic loads the previous map using the same supplied rigid
-alignment as our method. \emph{Ours, from scratch} runs our method with the same
-settings but without importing state from the previous run.
-
-\subsection{Metrics}
-\label{sec:protocols}
-
-\paragraph{Object reconstruction.}
-We report object precision, recall, and F1 with the Khronos online object
-evaluator using a 2\,m surface-association gate.
-
-\paragraph{Changed object states.}
-For an annotated object-state surface $G$ and predicted map $M$, we measure the
-fraction of sampled reference surface that is represented by predicted surface
-of the same semantic class within 10\,cm,
-\begin{equation}
- r(G,M)=\frac{|\{x\in G:d(x,M_{\ell(G)})\le0.10\,\mathrm{m}\}|}{|G|},
- \label{eq:representedness}
-\end{equation}
-where $M_{\ell(G)}$ denotes predicted surface with the class label of $G$ and
-$|G|$ is the number of sampled reference points. A state is represented when
-$r(G,M)\ge0.5$. A moved object contributes two events: disappearance of its old
-state and appearance of its new state.
-
-A \emph{hidden change} occurs within one run while the affected object is
-outside the camera view and is scored when the region is observed again. A
-\emph{between-run change} compares the state imported from one run with the
-state reconstructed by the next run. Precision, recall, and F1 are computed over
-appearance and disappearance events. \emph{Old-location residue} is
-$r(G_{\mathrm{old}},M_{\mathrm{final}})$ for a state that should have departed;
-lower values mean less obsolete surface remains at its old location.
-
-\paragraph{Scene geometry.}
-Geometry precision is the fraction of predicted surface samples within a
-distance threshold of the reference, and recall is the fraction of reference
-samples within the threshold of the prediction. We report their F1 at 5\,cm in
-the tables and also evaluate 10 and 20\,cm. Real-room results use a room crop,
-synthetic results use the simulator mesh, and 3RScan uses the rescan
-reconstruction.
+\begin{table}[t]
+\centering\small
+\caption{Role of the compared methods.}
+\label{tab:method_roles}
+\begin{tabular}{lp{4.7cm}}
+\toprule
+Method & How it is run \\
+\midrule
+Khronos & Starts from an empty map for each run; evaluates dynamic mapping within one run. \\
+Panoptic & Loads the previous map at a revisit; evaluates cross-run map updates. \\
+Ours & Loads the previous dynamic scene state and continues dynamic mapping in the new run. \\
+Ours, scratch & Our pipeline without loading previous-run state; memory ablation. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table*}[t]
 \centering\small
-\caption{Repeated real-room runs. Object scores summarize the online map over
-each run. Hidden-change F1 measures changes discovered after an observation gap
-within the same run. Geometry is room-crop F1@5\,cm. All values are percentages.
-Dashes mark values not reported for that method and metric.}
-\label{tab:real}
-\begin{tabular}{llccc}
+\caption{Datasets and the role each plays in the evaluation.}
+\label{tab:datasets}
+\begin{tabular}{llll}
 \toprule
-Method & Run & Object P/R/F1 & Hidden-change F1 & Geometry F1 (P/R) \\
+Dataset & Runs / visits & Main changes & Purpose \\
 \midrule
-Ours & A & 100.0/88.7/93.0 & 100.0 & 90.6 (86.0/95.8) \\
-Ours & B & 99.4/98.0/98.7 & 100.0 & 92.4 (87.1/98.4) \\
-Ours & C & 99.0/98.3/98.6 & 100.0 & 91.6 (85.4/98.9) \\
-Ours, from scratch & B & 99.9/93.0/94.6 & -- & 96.6 (95.2/98.0) \\
-Ours, from scratch & C & 99.5/95.0/96.4 & -- & 95.2 (92.1/98.4) \\
-Khronos & A & 100.0/83.7/89.1 & 100.0 & 91.0 (85.7/97.1) \\
-Khronos & B & 96.5/88.8/91.5 & 66.7 & 95.9 (93.5/98.3) \\
-Khronos & C & 95.3/77.0/83.8 & 66.7 & 94.7 (91.0/98.7) \\
-Panoptic & A & -- & -- & 92.4 (93.8/91.0) \\
-Panoptic & B & -- & -- & 93.6 (92.2/95.0) \\
-Panoptic & C & -- & -- & 93.0 (88.6/97.8) \\
+Real RGB-D room & 3 & within-run and between-run object changes & full real repeated-mapping pipeline \\
+Isaac Sim apartment & 2 & visible, hidden, and between-run changes & full pipeline with exact geometry and poses \\
+3RScan & 2 per scene & changes between scans & public repeated-visit evaluation \\
+Bonn RGB-D Dynamic & 1 & visible box motion & single-run object-motion check \\
+TUM RGB-D & 1 & moving people & single-run dynamic-background check \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-\subsection{Repeated Real-Room Mapping}
+\paragraph{Repeated real-room runs.}
+We record the same room three times with an RGB-D camera. Run A lasts 133\,s;
+run B lasts 135\,s and is recorded about six hours later; run C lasts 241\,s
+and is recorded about twelve days after B. A starts from an empty map, B loads
+the state exported by A, and C loads the state exported by B. A rigid transform
+aligns B and C to the coordinate frame of A. Persistent instance IDs are
+provided across the three runs.
 
-Carrying scene state improves object reconstruction in the later runs. Object F1
-rises from 94.6 to 98.7 in B and from 96.4 to 98.6 in C relative to our
-from-scratch runs. Compared with Khronos, the gains are 7.2 and 14.8 percentage
-points. Hidden-change F1 is 100.0 in B and C, compared with 66.7 for Khronos.
+The data contain 20 physical object identities. Hidden within-run changes
+produce five evaluated state-change events: one in A, two in B, and two in C.
+Between A and B, seven moved objects, one newly added object, and one removed
+object produce 16 appearance/disappearance events. Between B and C, four moved
+objects and two removed objects produce 10 events. Object reference surfaces are
+aggregated from the RGB-D measurements during manually annotated presence
+intervals.
+
+\paragraph{Controlled synthetic runs.}
+Two Isaac Sim runs observe the same furnished apartment. A contains 4,186 frames
+and B contains 4,041 frames at 30\,Hz. Both use ground-truth camera poses,
+semantics, and instance IDs. Run B loads the final state from A. The evaluated
+within-run hidden changes contain 24 events in A and 10 in B; the A-to-B revisit
+contains 32 evaluated appearance/disappearance events. The simulator also
+provides the complete scene mesh, allowing geometry retained from the previous
+run to receive credit even when B does not re-observe it.
+
+\paragraph{Public sequences.}
+For 3RScan~\cite{wald2019rio}, we use a reference scan as the first run and load
+its map for the rescan. The current evaluation contains three reference/rescan
+pairs: an unchanged case, a case with moved and removed chairs, and a third
+changing scene. Khronos is run on the rescan from scratch. Bonn RGB-D
+Dynamic~\cite{palazzolo2019bonn} and TUM~\cite{sturm2012tum} contain only one
+visit, so no previous map is loaded; they check the single-run behavior of our
+dynamic-mapping pipeline.
+
+\subsection{Metrics}
+\label{sec:protocols}
+
+\paragraph{Online object reconstruction.}
+We use the Khronos object evaluator. Predicted and reference objects of the same
+semantic class are associated by surface distance with the published 2\,m gate.
+Object precision, recall, and F1 are evaluated over time and weighted by state
+duration. This metric measures the quality of the online object map during one
+run.
+
+\paragraph{Object-state changes.}
+For an annotated object-state surface $G$ and predicted map $M$, define
+\begin{equation}
+ r(G,M)=\frac{|\{x\in G:d(x,M_{\ell(G)})\le0.10\,\mathrm{m}\}|}{|G|},
+ \label{eq:representedness}
+\end{equation}
+where $M_{\ell(G)}$ is predicted surface with the semantic class of $G$. A state
+is represented when $r(G,M)\ge0.5$. A moved object contributes two events:
+disappearance of the old state and appearance of the new state. A removed
+object contributes one disappearance; a newly added object contributes one
+appearance. Precision, recall, and F1 are computed over these events.
+
+We use the same state definition for hidden changes discovered after an
+observation gap within a run and for changes between two runs. \emph{Old-location
+residue} measures the fraction of an old object surface that is still present
+after later sensor observations have confirmed that location to be empty.
+
+\paragraph{Scene geometry.}
+Geometry precision measures how much predicted surface is supported by the
+reference; recall measures how much reference surface is reconstructed. For the
+synthetic apartment the reference is the complete simulator mesh. For the real
+room the reference is reconstructed from each run's own RGB-D measurements, so
+we report geometry inside the region observed by that run. All geometry results
+below use a 5\,cm distance threshold.
+
+\subsection{Repeated Real-Room Mapping}
 
 \begin{table}[t]
 \centering\small
-\caption{Changes between real-room runs. Event scores are percentages.
-Old-location residue is obsolete surface remaining at the departed state
-(lower is better).}
+\caption{Single-run behavior on the repeated real-room data. Values are
+percentages. Dashes indicate values not reported for that method.}
+\label{tab:real}
+\begin{tabular}{llcc}
+\toprule
+Method & Run & Object P/R/F1 & Hidden-change F1 \\
+\midrule
+Ours & A & 100.0/88.7/93.0 & 100.0 \\
+Ours & B & 99.4/98.0/98.7 & 100.0 \\
+Ours & C & 99.0/98.3/98.6 & 100.0 \\
+Ours, scratch & B & 99.9/93.0/94.6 & -- \\
+Ours, scratch & C & 99.5/95.0/96.4 & -- \\
+Khronos & A & 100.0/83.7/89.1 & 100.0 \\
+Khronos & B & 96.5/88.8/91.5 & 66.7 \\
+Khronos & C & 95.3/77.0/83.8 & 66.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Loading the previous scene state improves the online object map in both later
+runs. Object F1 rises from 94.6 to 98.7 in B and from 96.4 to 98.6 in C relative
+to our from-scratch runs. Compared with Khronos, the corresponding F1 gains are
+7.2 and 14.8 percentage points. Our method detects all five evaluated hidden
+within-run changes across A, B, and C.
+
+\begin{table}[t]
+\centering\small
+\caption{Changes between real-room runs. Event scores are percentages and
+old-location residue is lower-is-better.}
 \label{tab:real_d3}
 \begin{tabular}{llcc}
 \toprule
@@ -128,20 +159,17 @@ Panoptic & B$\rightarrow$C & 37.5/37.5/37.5 & 60.1 \\
 \end{tabular}
 \end{table}
 
-Our method detects 15 of 16 changed states from A to B and all annotated changes
-from B to C. Old-location residue is 6.8\% and 10.9\%, compared with 57.1\%
-and 60.1\% for Panoptic. Geometry recall in B and C is 98.4\% and 98.9\%,
-slightly above the 98.0\% and 98.4\% from-scratch results. Precision decreases
-because small alignment errors can leave both the old and newly reconstructed
-background surfaces in the map.
+Across runs, our method detects 15 of 16 events from A to B and all 10 events
+from B to C. The missed A-to-B event is the old state of a swivel chair that is
+not fully removed. Old-location residue is 6.8\% and 10.9\%, compared with
+57.1\% and 60.1\% for Panoptic.
 
-\subsection{Controlled Synthetic Changes}
+\subsection{Controlled Synthetic Mapping}
 
 \begin{table}[t]
 \centering\small
-\caption{Synthetic apartment. Hidden is hidden-change F1 within a run; Across is
-event F1 between runs. Geometry F1 uses the true scene mesh at 5\,cm. All values
-are percentages. Dashes mark values not reported for that method and metric.}
+\caption{Synthetic apartment. Hidden is within-run hidden-change F1 and Across
+is A-to-B change F1. Geometry uses the complete simulator mesh at 5\,cm.}
 \label{tab:synthetic}
 \begin{tabular}{llrrrr}
 \toprule
@@ -149,6 +177,7 @@ Method & Run / pair & Object & Geometry & Hidden & Across \\
 \midrule
 Ours & A & 84.5 & 97.2 & 100.0 & -- \\
 Ours & A$\rightarrow$B & 91.1 & 97.7 & 100.0 & 95.1 \\
+Ours, scratch & B & -- & 86.7 & 100.0 & -- \\
 Khronos & A & 71.4 & 91.4 & 68.0 & -- \\
 Khronos & B & 66.8 & 83.6 & 94.7 & -- \\
 Panoptic & A & -- & 93.8 & -- & -- \\
@@ -158,19 +187,52 @@ Panoptic & A$\rightarrow$B & -- & 92.1 & -- & 91.8 \\
 \end{table}
 
 With exact ground truth, our method detects all 24 hidden changes in A and all
-10 in B. It detects 29 of 32 changes between runs with no false event. Geometry
-F1 is 97.2 in A and 97.7 after A-to-B, compared with 91.4 and 83.6 for Khronos.
-The three missed between-run changes are two objects whose new locations receive
-little camera coverage and one chair displaced at the image border.
+10 in B, and detects 29 of 32 changes between runs without a false event. The
+complete scene reference also makes the geometric value of memory visible:
+after loading A, B reaches 97.31\% precision and 98.14\% recall, whereas the
+from-scratch B map reaches 96.92\% precision and 78.47\% recall. The gain is
+therefore almost entirely coverage rather than a precision trade-off.
 
-\subsection{Public-Sequence Results}
+\subsection{Geometry Under Real and Synthetic References}
+
+\begin{table}[t]
+\centering\small
+\caption{Effect of loading previous scene state on geometry at 5\,cm. Synthetic
+uses the complete scene mesh; real-room scores are restricted to the region
+observed in the current run.}
+\label{tab:geometry_memory}
+\begin{tabular}{llcc}
+\toprule
+Data & Method & Precision & Recall \\
+\midrule
+Synthetic B & Ours & 97.31 & 98.14 \\
+Synthetic B & Ours, scratch & 96.92 & 78.47 \\
+Real B & Ours & 89.92 & 98.68 \\
+Real B & Ours, scratch & 95.55 & 98.37 \\
+Real C & Ours & 86.46 & 99.13 \\
+Real C & Ours, scratch & 92.57 & 98.71 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two references expose different aspects of the map. In simulation, the
+complete reference includes surfaces remembered from A even when B does not see
+them again, so loading memory raises recall by almost 20 percentage points while
+precision stays unchanged. In the real room, each reference is reconstructed
+from the current run itself; surfaces remembered only from an earlier run do not
+increase recall. Recall therefore changes little, while precision drops by
+5--6 points even inside the currently observed region. The dominant visible
+failure is duplicate background geometry: a single rigid alignment does not
+remove all residual misalignment, so old and newly reconstructed walls can form
+two nearby surfaces.
+
+\subsection{Public-Sequence Checks}
 
 \begin{table*}[t]
 \centering\small
-\caption{Three 3RScan rescans. Scene 1 is unchanged, Scene 2 contains moved and
-removed chairs, and Scene 3 contains a non-rigid blanket change. Geometry is
-F1@5\,cm against the rescan reconstruction. Dashes mark values not reported for
-that method and metric.}
+\caption{Current three-scene 3RScan evaluation. Scene 1 is unchanged, Scene 2
+contains moved and removed chairs, and Scene 3 contains additional scene
+changes. Geometry is F1@5\,cm against the rescan reconstruction.}
 \label{tab:3rscan}
 \begin{tabular}{llccc}
 \toprule
@@ -189,13 +251,15 @@ Scene & Method & Event TP/FP/FN & Event P/R/F1 & Geometry F1 (P/R) \\
 \end{tabular}
 \end{table*}
 
-On the unchanged 3RScan scene, our method produces no false change. In Scene 2,
+The unchanged 3RScan case produces no false event for our method. In Scene 2,
 both moved chairs are represented at their new positions and all five unchanged
-objects are retained; the removed chair is missed. Scene 3 produces one missed
-and one spurious event. Geometry F1 is higher than Khronos in all three rescans.
+objects are retained; the removed chair is missed. In Scene 3, a shelf is
+incorrectly removed and a newly appearing chest of drawers is not reconstructed.
+The non-rigid blanket change in that scene is visible too briefly to enter the
+current evaluation. Geometry F1 is higher than Khronos in all three rescans.
 
-Bonn and TUM provide single-run checks. In Bonn's placing sequence, the final box
-state has represented-surface fractions of 1.00 for our method and 0.43 for
+Bonn and TUM test only single-run behavior. In Bonn's placing sequence, the final
+box state has represented-surface fractions of 1.00 for our method and 0.43 for
 Khronos. In the moving sequence, both systems retain the first rest state because
 the observed 0.75\,m motion is below Khronos's 1\,m displacement threshold. On
 TUM \emph{walking\_xyz}, person contamination is 1.02\% for our method and
