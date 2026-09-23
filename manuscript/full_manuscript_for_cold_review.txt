@@ -1,0 +1,487 @@
+
+
+===== manuscript/sec/0_abstract.tex =====
+
+\begin{abstract}
+Robots that revisit changing environments need to keep useful geometry from
+earlier runs without preserving object positions that are no longer valid.
+Starting every run from scratch loses coverage, while simply accumulating maps
+leaves stale geometry behind. We present a method for continuing a dense dynamic
+map across independently started deployments. Built on Khronos, the method stores
+successive object states and background geometry, then updates them with new
+RGB-D observations. Depth measurements projected onto an old surface distinguish
+support, occlusion, and free-space contradiction. Evidence is accumulated before
+an old object state is removed, and a geometric comparison decides whether a
+new reconstruction refines the previous state or represents a new state. On
+three real-room deployments, cross-deployment change F1 is 96.8\% and 100.0\%,
+compared with 64.0\% and 37.5\% for Panoptic Multi-TSDFs, while surface remaining
+at departed object locations drops from 57--60\% to 7--11\%. On controlled
+synthetic data, the method reaches 97.2--97.7\% geometry F1 and detects 29 of 32
+cross-deployment changes without a false event. These results show that dense
+dynamic maps can be carried across deployments while preserving previous
+coverage and removing obsolete object states.
+\end{abstract}
+
+
+===== manuscript/sec/1_intro.tex =====
+
+\section{Introduction}
+\label{sec:intro}
+
+A robot that maps the same environment repeatedly should not have to choose
+between forgetting the past and keeping every old surface forever. Suppose a
+robot maps a room, returns the next day, and finds that a chair has moved. Some
+parts of the room are observed again, while others are not visited. A useful map
+should preserve the geometry that is still valid, remove the chair's old state
+when later measurements show that the space is empty, and add the chair at its
+new position. During the new run, the robot should also continue handling motion
+and changes exactly as it would in a normal dynamic-mapping session.
+
+Dense dynamic mapping already solves much of the within-run problem. Systems
+such as Khronos reconstruct objects and background geometry, track observed
+motion, and update the scene when objects appear or disappear after observation
+gaps~\cite{schmid2024khronos}. Long-term mapping addresses a different part of
+the problem: carrying information between visits and updating an older map when
+the environment changes~\cite{pomerleau2014longterm,lazaro2018efficient,
+schmid2022panoptic}. The remaining question is how to carry a rich dynamic scene
+state from one completed run into the next without reducing it to either a fresh
+map or a simple union of old and new geometry.
+
+We address this by storing successive geometric states of each object and
+updating them with physical evidence from later observations. Each object state
+contains its reconstructed surface, time interval, and provenance. When a new
+deployment begins, its observations are compared with the imported states.
+Depth agreement supports an old surface; a closer measurement indicates
+occlusion; a farther measurement shows that the ray passed through the old
+surface location and therefore provides evidence that the state is no longer
+present. A newly reconstructed state is either merged with the imported one or
+kept as a new state. Background geometry is handled similarly: unobserved
+surfaces are retained, contradicted surfaces are removed, and newly reconstructed
+geometry is added.
+
+The result is a dynamic map that can continue across independently started
+deployments. The next run does not receive only a final mesh; it receives the
+object-state registry, current background geometry, recorded history, and the
+statistics used for geometric absence decisions. It can therefore continue
+updating the same scene history while reconstructing new motion and changes.
+
+We evaluate the method on repeated real-room deployments, controlled synthetic
+data with exact ground truth, and public RGB-D sequences. The experiments measure
+three things directly: how well objects are represented over time, how accurately
+changed object states are detected, and how much obsolete surface remains at old
+locations. We also measure scene geometry to expose the trade-off between keeping
+earlier coverage and introducing duplicate geometry under imperfect alignment.
+
+Our contributions are:
+\begin{itemize}
+    \item a representation for carrying dense object states, background geometry,
+    and scene history from one dynamic-mapping deployment to the next;
+    \item an evidence-based update rule that uses new depth measurements to keep,
+    replace, or remove imported object states while preserving unobserved ones;
+    \item an evaluation on real, synthetic, and public data that measures retained
+    coverage, changed-state accuracy, obsolete-surface removal, and scene geometry.
+\end{itemize}
+
+
+===== manuscript/sec/2_related_work.tex =====
+
+\section{Related Work}
+\label{sec:related_work}
+
+\paragraph{Dynamic scene mapping.}
+Co-Fusion, MID-Fusion, and EM-Fusion reconstruct and track moving objects with
+object-specific surface or volume representations~\cite{runz2017cofusion,
+xu2019midfusion,strecke2019emfusion}. DynaSLAM~II and DynoSAM jointly estimate
+camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}. Khronos
+combines short-window motion tracking with global fragment association and
+geometric verification of object appearance and disappearance, producing a
+dense spatio-temporal map~\cite{schmid2024khronos}. GaME updates a Gaussian map
+when later observations reveal changed geometry~\cite{yugay2026game}. We use
+Khronos as the dynamic-mapping backbone and extend the scene state across
+separate deployments.
+
+\paragraph{Long-term map maintenance.}
+Long-term mapping methods update earlier geometry as environments change over
+repeated visits~\cite{pomerleau2014longterm,lazaro2018efficient}. Panoptic
+Multi-TSDFs maintains object and background submaps and distinguishes persistent,
+absent, and unobserved regions~\cite{schmid2022panoptic}. POCD models object-level
+change and stationarity, while POV-SLAM couples object consistency with pose
+estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers object
+landmarks between deployments~\cite{adkins2024obvislam}; OASIS-Map associates
+objects across sessions and labels them static, moved, appeared, disappeared, or
+unknown~\cite{oh2026oasismap}. Living Scenes matches and reconstructs objects
+from scans acquired at different times~\cite{zhu2024livingscenes}. These methods
+provide the main ingredients for repeated mapping: state transfer, object
+association, and conservative handling of unobserved regions. Our method applies
+these ideas to a dense dynamic map whose object histories and current geometry
+continue to be updated during each new deployment.
+
+\paragraph{Spatio-temporal scene memory.}
+Recent work also represents scene history for downstream reasoning. DAAAM builds
+a hierarchical 4D scene graph on top of Khronos-style geometric reconstruction
+and attaches detailed semantic descriptions for question answering and task
+grounding~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates
+object identities, and stores current object states together with session-level
+event histories and long-term statistics~\cite{lee2026ltmem}. These systems focus
+on organizing and querying object history. Our focus is the underlying dense
+map update: deciding which imported object and background surfaces remain valid
+when new RGB-D measurements arrive.
+
+
+===== manuscript/sec/4_method.tex =====
+
+\section{Method}
+\label{sec:method}
+
+\subsection{Stored Scene State}
+\label{sec:problem}
+
+Each deployment receives an RGB-D stream, camera poses, instance masks, and a
+rigid transform that places the previous map in the current coordinate frame.
+The evaluated system uses persistent object identities across deployments.
+
+We represent the geometry of one physical object as a sequence of
+\emph{fragments}. A fragment stores one reconstructed object state: its mesh,
+bounding box, time interval, and the observations used to build it. A fragment
+created while the object is observed moving also stores the tracked trajectory.
+At any time, one fragment is the current state of an object and earlier
+fragments remain in its history.
+
+The state exported at the end of deployment $k$ is
+\begin{equation}
+  \mathcal{S}^{k}=(B^k,\mathcal{F}^k,\mathcal{H}^k,\Theta^k),
+  \label{eq:stored_state}
+\end{equation}
+where $B^k$ is the current background mesh, $\mathcal{F}^k$ is the object
+fragment registry, $\mathcal{H}^k$ stores the recorded scene history, and
+$\Theta^k$ stores the statistics used by the absence detector. The next
+deployment loads this state and updates it with new observations.
+
+\subsection{Dynamic-Mapping Backbone}
+
+We build on Khronos~\cite{schmid2024khronos}. Its active window reconstructs
+local geometry from RGB-D input, tracks moving objects, and produces object
+fragments. Its backend maintains the global background mesh and object states.
+Our method changes how these states are carried across deployments and how later
+observations update imported geometry.
+
+For each new object segment, the system first checks whether it refines the
+current state of that object or represents a new state. Observed motion starts
+a new fragment with a trajectory. A stationary reconstruction that overlaps the
+current fragment can refine it. A reconstruction at a different location is kept
+separately until geometric evidence determines which state is current.
+
+\subsection{Geometric Evidence for Object Absence}
+\label{sec:absence}
+
+To test whether an old object state is still present, we project samples of its
+surface into later depth images. Surface samples are grouped into 5\,cm cells.
+A sample is tested only when it lies inside the image, within sensor range, and
+is viewed at an incidence angle below $60^\circ$. Let $z_f$ be the expected
+depth of the stored surface and let $d$ be the measured depth at the same pixel.
+With tolerance $\tau_s=5$\,cm,
+\begin{equation}
+\begin{array}{ll}
+ |d-z_f|\le\tau_s & \text{supports the stored surface},\\
+ d-z_f>\tau_s     & \text{passes through the stored surface},\\
+ d-z_f<-\tau_s    & \text{is occluded by a closer surface}.
+\end{array}
+\label{eq:depth_test}
+\end{equation}
+A measurement that passes through the stored surface provides evidence that the
+old state is absent. Occlusion or missing coverage provides no such evidence.
+
+Not every reconstructed sample is equally reliable. We therefore use surface
+samples that have repeatedly agreed with the object's own observations and have
+not produced contradictory depth measurements while the object was confirmed in
+place. At each reconciliation update, we measure the fraction of tested reliable
+surface that is seen through,
+\begin{equation}
+ f = \frac{\text{seen-through reliable samples}}
+          {\text{tested reliable samples}}.
+ \label{eq:through_fraction}
+\end{equation}
+The distribution of this fraction while the object is known to be present is
+estimated from previous observations of that object and pooled observations from
+the same sensor. A one-sided likelihood score measures how unusual the current
+seen-through fraction is under the presence model. The score is accumulated over
+successive updates, so a fragment is removed only after repeated evidence that
+its old location is empty.
+
+\subsection{Updating Object States}
+\label{sec:states}
+
+A new reconstruction of an imported object is initially kept separate from the
+old fragment. This prevents a moved object from being fused immediately into its
+previous position. Once enough surface has been reconstructed, the new and old
+states are compared geometrically. If most of the new surface lies within
+$\tau_o=10$\,cm of the imported surface, the two observations are treated as the
+same state and the new geometry refines the old one. Otherwise the imported
+fragment ends and the new reconstruction becomes the current state.
+
+The same update rule also handles changes found after an observation gap within
+one deployment. If the object is seen at a new location while the previous state
+has no positive support, the new fragment becomes current. If the old location
+has not been observed well enough, both states remain unresolved until additional
+measurements arrive. Objects configured as structurally static accumulate
+complementary views instead of being replaced solely by a displaced
+reconstruction.
+
+\subsection{Background Update}
+
+The previous background mesh is transformed into the new deployment frame.
+Later observation rays remove old background vertices only where free space
+contradicts them. Vertices that are not re-observed are retained, and geometry
+reconstructed during the new deployment is added to the map. This preserves
+earlier coverage while allowing directly contradicted background geometry to be
+removed.
+
+\subsection{Transfer to the Next Deployment}
+\label{sec:contract}
+
+At the end of a deployment, the system exports the current background, the object
+fragment registry, recorded object histories, and the statistics used for
+absence detection. The next deployment loads the export through the same map
+interface and continues updating the scene. Scene snapshots are recorded at each
+reconciliation update so that earlier object states remain available together
+with the current map.
+
+
+===== manuscript/sec/5_experiments.tex =====
+
+\section{Experiments}
+\label{sec:experiments}
+
+We evaluate whether carrying scene state across deployments preserves useful
+geometry, removes obsolete object states, and continues to support dynamic
+mapping in the new run. We use repeated real-room recordings, controlled
+synthetic data with exact ground truth, and public RGB-D sequences.
+
+\subsection{Datasets and Baselines}
+\label{sec:datasets}
+
+\paragraph{Repeated real-room deployments.}
+We use three RGB-D deployments, A, B, and C, recorded in the same occupied room
+on three days. The data contain 20 physical object identities, changes within
+each deployment, and 16 annotated changed states between A and B. Object
+reference surfaces are aggregated from depth during manually annotated presence
+intervals, using 2\,cm voxels observed in at least three frames. Scene geometry
+is evaluated against a 1\,cm reconstruction from the measurements of each
+deployment. B and C are used for evaluation.
+
+\paragraph{Controlled synthetic deployments.}
+Two Isaac Sim sequences revisit a furnished apartment with scripted visible
+motion, changes while the camera looks elsewhere, and changes between the end
+of A and the start of B. They contain 4,186 and 4,041 frames at 30\,Hz.
+Per-frame object poses, visibility, and the scene mesh are known exactly. The
+annotations contain 24 hidden within-deployment changes in A, 10 in B, and 32
+cross-deployment changes.
+
+\paragraph{Public sequences.}
+We use three 3RScan reference/rescan pairs~\cite{wald2019rio}: an unchanged
+scene, a scene with two moved chairs and one removed chair, and a scene with a
+non-rigid blanket change. We initialize the map from the reference scan and load
+it for the rescan. Bonn RGB-D Dynamic~\cite{palazzolo2019bonn} provides three
+short box-manipulation sequences, and TUM~\cite{sturm2012tum} provides dynamic
+person sequences.
+
+\paragraph{Baselines.}
+We compare with the official Khronos release~\cite{schmid2024khronos} and
+Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. Khronos starts each deployment
+from an empty map. Panoptic loads the previous map using the same
+inter-deployment transform as our method. \emph{Ours, from scratch} runs our
+method without importing previous-deployment state.
+
+\subsection{Metrics}
+\label{sec:protocols}
+
+\paragraph{Object reconstruction.}
+We report duration-weighted object precision, recall, and F1 over each
+deployment using the Khronos object evaluator with a 2\,m association gate.
+
+\paragraph{Changed object states.}
+For an annotated object-state surface $G$ and predicted map $M$, we measure the
+fraction of the state represented by same-class predicted surface within
+10\,cm,
+\begin{equation}
+ r(G,M)=\frac{|\{x\in G:d(x,M_{\ell(G)})\le0.10\,\mathrm{m}\}|}{|G|}.
+ \label{eq:representedness}
+\end{equation}
+A state is represented when $r(G,M)\ge0.5$. A moved object contributes the
+disappearance of its old state and the appearance of its new state.
+Precision, recall, and F1 are computed over these appearance and disappearance
+events. \emph{Old-location residue} measures how much surface from a departed
+state remains in the final map.
+
+\paragraph{Scene geometry.}
+Geometry precision, recall, and F1 compare predicted and reference surfaces at
+5, 10, and 20\,cm; the tables report 5\,cm. Real-room results use a room crop,
+synthetic results use the simulator mesh, and 3RScan uses the rescan
+reconstruction. For TUM, we additionally measure the fraction of final-map
+vertices that agree in depth with person pixels in at least three sampled
+frames.
+
+\begin{table*}[t]
+\centering\small
+\caption{Repeated real-room deployments. Object scores summarize the online map
+over each deployment. Hidden-change F1 measures state changes discovered after
+an observation gap within the same deployment. Geometry is the room-crop
+F1@5\,cm. All values are percentages.}
+\label{tab:real}
+\begin{tabular}{llccc}
+\toprule
+Method & Deployment & Object P/R/F1 & Hidden-change F1 & Geometry F1 (P/R) \\
+\midrule
+Ours & A & 100.0/88.7/93.0 & 100.0 & 90.6 (86.0/95.8) \\
+Ours & B & 99.4/98.0/98.7 & 100.0 & 92.4 (87.1/98.4) \\
+Ours & C & 99.0/98.3/98.6 & 100.0 & 91.6 (85.4/98.9) \\
+Ours, from scratch & B & 99.9/93.0/94.6 & -- & 96.6 (95.2/98.0) \\
+Ours, from scratch & C & 99.5/95.0/96.4 & -- & 95.2 (92.1/98.4) \\
+Khronos & A & 100.0/83.7/89.1 & 100.0 & 91.0 (85.7/97.1) \\
+Khronos & B & 96.5/88.8/91.5 & 66.7 & 95.9 (93.5/98.3) \\
+Khronos & C & 95.3/77.0/83.8 & 66.7 & 94.7 (91.0/98.7) \\
+Panoptic & A & -- & -- & 92.4 (93.8/91.0) \\
+Panoptic & B & -- & -- & 93.6 (92.2/95.0) \\
+Panoptic & C & -- & -- & 93.0 (88.6/97.8) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Repeated Real-Room Mapping}
+
+Carrying scene state improves object reconstruction in the later deployments.
+Object F1 rises from 94.6 to 98.7 in B and from 96.4 to 98.6 in C relative to
+our from-scratch runs. Compared with Khronos, the corresponding object F1 gains
+are 7.2 and 14.8 percentage points. Hidden-change F1 is 100.0 in B and C,
+compared with 66.7 for Khronos.
+
+\begin{table}[t]
+\centering\small
+\caption{Cross-deployment changes in the real room. Event scores are percentages;
+old-location residue is the departed surface remaining in the final map
+(lower is better).}
+\label{tab:real_d3}
+\begin{tabular}{llcc}
+\toprule
+Method & Transition & Event P/R/F1 & Residue \\
+\midrule
+Ours & A$\rightarrow$B & 100.0/93.8/96.8 & 6.8 \\
+Ours & B$\rightarrow$C & 100.0/100.0/100.0 & 10.9 \\
+Panoptic & A$\rightarrow$B & 64.0/64.0/64.0 & 57.1 \\
+Panoptic & B$\rightarrow$C & 37.5/37.5/37.5 & 60.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across deployments, our method detects 15 of 16 changed states from A to B and
+all annotated changes from B to C. Old-location residue is 6.8\% and 10.9\%,
+compared with 57.1\% and 60.1\% for Panoptic. The retained map also has higher
+geometry recall than the from-scratch variants, at the cost of lower precision
+because old and newly reconstructed background surfaces can both remain when
+the two deployments are slightly misaligned.
+
+\subsection{Controlled Synthetic Changes}
+
+\begin{table}[t]
+\centering\small
+\caption{Synthetic apartment. ``Hidden'' is within-deployment hidden-change F1;
+``Across'' is cross-deployment event F1. Geometry F1 uses the true scene mesh at
+5\,cm. All values are percentages.}
+\label{tab:synthetic}
+\begin{tabular}{llrrrr}
+\toprule
+Method & Run & Object & Geometry & Hidden & Across \\
+\midrule
+Ours & A & 84.5 & 97.2 & 100.0 & -- \\
+Ours & A$\rightarrow$B & 91.1 & 97.7 & 100.0 & 95.1 \\
+Khronos & A & 71.4 & 91.4 & 68.0 & -- \\
+Khronos & B & 66.8 & 83.6 & 94.7 & -- \\
+Panoptic & A & -- & 93.8 & -- & -- \\
+Panoptic & A$\rightarrow$B & -- & 92.1 & -- & 91.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+With exact ground truth, our method detects all 24 hidden changes in A and all
+10 in B. It detects 29 of 32 cross-deployment changes with no false event.
+Geometry F1 is 97.2 in A and 97.7 after A-to-B, compared with 91.4 and 83.6 for
+Khronos. The three missed cross-deployment changes are two objects whose new
+locations receive little camera coverage and one chair displaced at the image
+border.
+
+\subsection{Public-Sequence Results}
+
+\begin{table*}[t]
+\centering\small
+\caption{Three 3RScan rescans. Scene 1 is unchanged, Scene 2 contains moved and
+removed chairs, and Scene 3 contains a non-rigid blanket change. Geometry is
+F1@5\,cm against the rescan reconstruction.}
+\label{tab:3rscan}
+\begin{tabular}{llccc}
+\toprule
+Scene & Method & Event TP/FP/FN & Event P/R/F1 & Geometry F1 (P/R) \\
+\midrule
+1 & Ours & 0/0/0 & -- & 96.4 (96.8/95.9) \\
+1 & Panoptic & 0/1/0 & -- & -- \\
+1 & Khronos & 0/3/0 & -- & 94.0 (98.6/89.9) \\
+2 & Ours & 4/0/1 & 100/80/88.9 & 90.8 (92.3/89.4) \\
+2 & Panoptic & 4/1/1 & 80/80/80.0 & -- \\
+2 & Khronos & 4/1/1 & 80/80/80.0 & 90.0 (96.4/84.4) \\
+3 & Ours & 0/1/1 & -- & 92.7 (90.0/95.5) \\
+3 & Panoptic & 1/2/0 & 33/100/50.0 & -- \\
+3 & Khronos & 0/5/1 & -- & 83.4 (98.1/72.6) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+On the unchanged 3RScan scene, our method produces no false change. In Scene 2,
+both moved chairs are represented at their new positions and all five unchanged
+objects are retained; the removed chair is missed. Scene 3 produces one missed
+and one spurious event. Geometry F1 is higher than Khronos in all three rescans.
+
+Bonn and TUM test behavior during a single run. In Bonn's placing sequence, the
+final box state has represented-surface fractions of 1.00 for our method and
+0.43 for Khronos. In the moving sequence, both systems retain the first rest
+state because the observed 0.75\,m motion is below the 1\,m displacement
+threshold inherited from Khronos. On TUM \emph{walking\_xyz}, person
+contamination is 1.02\% for our method and 1.09\% for Khronos, while our map
+retains 29\% more static surface.
+
+\FloatBarrier
+
+
+===== manuscript/sec/6_limitations.tex =====
+
+\section{Limitations}
+\label{sec:limitations}
+
+The main failure mode is limited visibility. An old object state is removed only
+after later measurements provide enough free-space evidence, so short or partial
+revisits can leave obsolete geometry in the map. This occurs for the removed
+3RScan chair and contributes to the 10.9\% old-location residue after the third
+real-room deployment.
+
+Background geometry is currently updated as a mesh. When two deployments are
+slightly misaligned, an old wall and a newly reconstructed wall can both remain,
+reducing geometric precision. A volumetric or uncertainty-aware fusion step would
+better combine repeated background observations.
+
+Finally, the system inherits Khronos's motion-extraction threshold. Small object
+motions can therefore be reconstructed as separate static states instead of an
+observed trajectory, as in the Bonn sequence with a 0.75\,m displacement.
+
+
+===== manuscript/sec/7_conclusion.tex =====
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented a method for continuing dense dynamic maps across separate robot
+deployments. The system carries object states, background geometry, and scene
+history into the next run, then uses new depth observations to refine, replace,
+or remove imported states. On repeated real-room and synthetic experiments, the
+method preserves more object coverage while removing substantially more obsolete
+surface than the multi-session baseline. Public sequences show the same basic
+behavior and expose the remaining difficulty of limited visibility and imperfect
+background alignment. These results support persistent scene-state updates as a
+practical extension of dense dynamic mapping to repeated deployments.
