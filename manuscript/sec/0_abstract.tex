@@ -2,18 +2,19 @@
 Robots that revisit changing environments need to keep useful geometry from
 earlier runs without preserving object positions that are no longer valid.
 Starting every run from scratch loses coverage, while simply accumulating maps
-leaves stale geometry behind. We present a method for continuing a dense dynamic
-map across independently started deployments. Built on Khronos, the method stores
-successive object states and background geometry, then updates them with new
-RGB-D observations. Depth measurements projected onto an old surface distinguish
-support, occlusion, and free-space contradiction. Evidence is accumulated before
-an old object state is removed, and a geometric comparison decides whether a
-new reconstruction refines the previous state or represents a new state. On
-three real-room deployments, cross-deployment change F1 is 96.8\% and 100.0\%,
-compared with 64.0\% and 37.5\% for Panoptic Multi-TSDFs, while surface remaining
-at departed object locations drops from 57--60\% to 7--11\%. On controlled
-synthetic data, the method reaches 97.2--97.7\% geometry F1 and detects 29 of 32
-cross-deployment changes without a false event. These results show that dense
-dynamic maps can be carried across deployments while preserving previous
-coverage and removing obsolete object states.
+leaves stale geometry behind. We present a method for updating a dense dynamic
+map across separate mapping runs. Built on Khronos, the method stores successive
+object states and background geometry, then updates them with new RGB-D
+observations. We project new depth measurements onto previous surfaces to
+distinguish agreement, occlusion by a closer surface, and evidence that a
+previous surface is absent. Evidence is accumulated before removing an old
+object state, and reconstructed surfaces are compared to decide whether a new
+observation refines the previous state or represents a new one. On three
+real-room runs, F1 for detecting object changes between runs is 96.8\% and
+100.0\%, compared with 64.0\% and 37.5\% for Panoptic Multi-TSDFs, while
+obsolete surface left where objects used to be drops from 57--60\% to 7--11\%.
+On controlled synthetic data, the method reaches 97.2--97.7\% geometry F1 and
+detects 29 of 32 changes between runs without a false event. The method
+preserves previously observed geometry while removing obsolete object states
+across repeated mapping runs.
 \end{abstract}
