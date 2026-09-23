@@ -6,36 +6,36 @@ Co-Fusion, MID-Fusion, and EM-Fusion reconstruct and track moving objects with
 object-specific surface or volume representations~\cite{runz2017cofusion,
 xu2019midfusion,strecke2019emfusion}. DynaSLAM~II and DynoSAM jointly estimate
 camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}. Khronos
-combines short-window motion tracking with global fragment association and
-geometric verification of object appearance and disappearance, producing a
+tracks motion over short time windows, matches reconstructed fragments across
+time, and verifies when objects appear or disappear geometrically, producing a
 dense spatio-temporal map~\cite{schmid2024khronos}. GaME updates a Gaussian map
 when later observations reveal changed geometry~\cite{yugay2026game}. We use
-Khronos as the dynamic-mapping backbone and extend the scene state across
-separate deployments.
+Khronos as the dynamic-mapping backbone and continue its scene state across
+separate mapping runs.
 
 \paragraph{Long-term map maintenance.}
 Long-term mapping methods update earlier geometry as environments change over
 repeated visits~\cite{pomerleau2014longterm,lazaro2018efficient}. Panoptic
 Multi-TSDFs maintains object and background submaps and distinguishes persistent,
 absent, and unobserved regions~\cite{schmid2022panoptic}. POCD models object-level
-change and stationarity, while POV-SLAM couples object consistency with pose
-estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers object
-landmarks between deployments~\cite{adkins2024obvislam}; OASIS-Map associates
-objects across sessions and labels them static, moved, appeared, disappeared, or
-unknown~\cite{oh2026oasismap}. Living Scenes matches and reconstructs objects
-from scans acquired at different times~\cite{zhu2024livingscenes}. These methods
-provide the main ingredients for repeated mapping: state transfer, object
-association, and conservative handling of unobserved regions. Our method applies
-these ideas to a dense dynamic map whose object histories and current geometry
-continue to be updated during each new deployment.
+change and whether objects remain stationary, while POV-SLAM couples object
+consistency with pose estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM
+transfers object landmarks between runs~\cite{adkins2024obvislam}; OASIS-Map
+associates objects across sessions and labels them static, moved, appeared,
+disappeared, or unknown~\cite{oh2026oasismap}. Living Scenes matches and
+reconstructs objects from scans acquired at different times~\cite{zhu2024livingscenes}.
+Together, these methods transfer map state, associate objects across visits, and
+preserve regions that were not observed. Our method applies these ideas to a
+dense dynamic map that updates object histories and scene geometry during every
+mapping run.
 
 \paragraph{Spatio-temporal scene memory.}
-Recent work also represents scene history for downstream reasoning. DAAAM builds
-a hierarchical 4D scene graph on top of Khronos-style geometric reconstruction
-and attaches detailed semantic descriptions for question answering and task
-grounding~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates
+Recent work also represents scene history for later tasks such as question
+answering and task planning. DAAAM builds a hierarchical 4D scene graph on top
+of Khronos-style geometric reconstruction and attaches detailed semantic
+descriptions~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates
 object identities, and stores current object states together with session-level
-event histories and long-term statistics~\cite{lee2026ltmem}. These systems focus
-on organizing and querying object history. Our focus is the underlying dense
-map update: deciding which imported object and background surfaces remain valid
-when new RGB-D measurements arrive.
+event histories and long-term statistics~\cite{lee2026ltmem}. These systems
+organize and query object history. Our focus is the dense map update itself:
+deciding which previously mapped object and background surfaces are still valid
+under new RGB-D measurements.
