@@ -3,10 +3,12 @@
 
 We presented a method for continuing dense dynamic maps across separate mapping
 runs. The system carries object states, background geometry, and scene history
-into the next run, then uses new depth observations to refine, replace, or remove
-stored states. On repeated real-room and synthetic experiments, the method
-preserves more object coverage while removing substantially more obsolete
-surface than the multi-session baseline. Public sequences show the same basic
-behavior and expose the remaining difficulty of limited visibility and imperfect
-background alignment. These results support persistent scene-state updates as a
-practical extension of dense dynamic mapping to repeated robot runs.
+into the next run, then uses new depth observations to refine, replace, or
+remove stored states. Repeated real-room runs show that the method can reconcile
+object changes across revisits while keeping the next run fully dynamic. In
+simulation, where the complete scene is available as ground truth, carrying
+memory strongly improves geometric recall without reducing precision; the real
+runs expose the remaining difficulty of fusing slightly misaligned background
+geometry. Public sequences provide additional repeated-visit and single-run
+checks. Together, the results support persistent scene-state updates as a
+practical extension of dense dynamic mapping to repeated robot operation.
