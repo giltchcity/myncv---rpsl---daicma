@@ -1,23 +1,19 @@
 \begin{abstract}
-A robot returning to a changing room should retain the surfaces it does not
-see again, remove objects that have disappeared, and record new motion during
-its visit. Rebuilding the map loses earlier coverage, whereas simply combining
-successive maps can preserve obsolete object positions. We present a method for
-continuing dense dynamic scene maps across independently started deployments.
-Built on Khronos, it carries forward object surfaces and their temporal
-histories, background geometry, and sensor statistics. New depth observations
-are projected onto stored object surfaces to distinguish geometric support,
-free-space contradiction, and lack of visibility. An object-specific model of
-measurement inconsistency accumulates evidence before declaring a stored state
-absent; a separate geometric test decides whether a newly reconstructed object
-refines its previous state or replaces it. We evaluate the mapping backend with
-supplied camera poses, cross-session alignment, and persistent instance labels.
-On three real-room deployments, cross-session change F1 is 96.8\% and 100.0\%,
-compared with 64.0\% and 37.5\% for Panoptic Multi-TSDFs; remaining surface at
-departed object locations falls from 57--60\% to 7--11\%. Synthetic and selected
-public sequences provide complementary tests. The results also expose a cost
-of the current representation: retaining separately reconstructed background
-meshes improves coverage but can duplicate misaligned walls. The method thus
-advances cross-deployment scene maintenance while leaving geometric fusion and
-uncertain identity association as open system limitations.
+Robots that revisit changing environments need to keep useful geometry from
+earlier runs without preserving object positions that are no longer valid.
+Starting every run from scratch loses coverage, while simply accumulating maps
+leaves stale geometry behind. We present a method for continuing a dense dynamic
+map across independently started deployments. Built on Khronos, the method stores
+successive object states and background geometry, then updates them with new
+RGB-D observations. Depth measurements projected onto an old surface distinguish
+support, occlusion, and free-space contradiction. Evidence is accumulated before
+an old object state is removed, and a geometric comparison decides whether a
+new reconstruction refines the previous state or represents a new state. On
+three real-room deployments, cross-deployment change F1 is 96.8\% and 100.0\%,
+compared with 64.0\% and 37.5\% for Panoptic Multi-TSDFs, while surface remaining
+at departed object locations drops from 57--60\% to 7--11\%. On controlled
+synthetic data, the method reaches 97.2--97.7\% geometry F1 and detects 29 of 32
+cross-deployment changes without a false event. These results show that dense
+dynamic maps can be carried across deployments while preserving previous
+coverage and removing obsolete object states.
 \end{abstract}
