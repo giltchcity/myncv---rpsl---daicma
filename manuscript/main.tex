@@ -1,33 +1,15 @@
-% CVPR 2026 Paper Template; see https://github.com/cvpr-org/author-kit
-
+% Uses the repository's retained CVPR author kit.
 \documentclass[10pt,twocolumn,letterpaper]{article}
-
-%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
-% \usepackage{cvpr}              % To produce the CAMERA-READY version
-\usepackage[review]{cvpr}      % To produce the REVIEW version
-% \usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
-
-% Import additional packages in the preamble file, before hyperref
+\usepackage[review]{cvpr}
 \input{preamble}
-
-% It is strongly recommended to use hyperref, especially for the review version.
-% hyperref with option pagebackref eases the reviewers' job.
-% Please disable hyperref *only* if you encounter grave issues,
-% e.g. with the file validation for the camera-ready version.
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
-
-%%%%%%%%% PAPER ID  - PLEASE UPDATE
+% Update the submission metadata only when a target submission is registered.
 \def\paperID{*****}
 \def\confName{CVPR}
 \def\confYear{2026}
-
-%%%%%%%%% WORKING TITLE - UPDATE AFTER THE METHOD IS FROZEN
-\title{Evidence-Gated Scene Memory Reconciliation for Dynamic and Revisited Environments}
-
-%%%%%%%%% AUTHORS - PLACEHOLDERS FOR DOUBLE-BLIND DRAFTING
+\title{Continuing Dense Dynamic Maps Across Deployments}
 \author{Anonymous Authors}
-
 \begin{document}
 \maketitle
 \input{sec/0_abstract}
@@ -35,17 +17,11 @@
 \input{sec/2_related_work}
 \input{sec/4_method}
 \input{sec/5_experiments}
-
-% Planned manuscript section:
-% \input{sec/7_conclusion}
-
+\input{sec/6_limitations}
+\input{sec/7_conclusion}
 {
-    \small
-    \bibliographystyle{ieeenat_fullname}
-    \bibliography{main,gaussian,landscape,bib_additions}
+\small
+\bibliographystyle{ieeenat_fullname}
+\bibliography{main,gaussian,landscape,bib_additions,revision_context}
 }
-
-% WARNING: do not forget to delete supplementary pages from the main submission.
-% \input{sec/X_suppl}
-
 \end{document}
