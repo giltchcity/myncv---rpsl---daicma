@@ -1,184 +1,115 @@
 \section{Method}
 \label{sec:method}
 
-\subsection{Task, Inputs, and Stored State}
+\subsection{Stored Scene State}
 \label{sec:problem}
 
-Deployment $k$ receives an RGB-D stream $Z^k$, camera poses, and instance masks.
-An instance label identifies a physical object and remains consistent across
-deployments. A rigid transform aligns the previous deployment's map with the
-new deployment's coordinate frame. These poses, transforms, and labels are
-inputs; the method below updates scene state rather than estimating them.
+Each deployment receives an RGB-D stream, camera poses, instance masks, and a
+rigid transform that places the previous map in the current coordinate frame.
+The evaluated system uses persistent object identities across deployments.
 
-We keep object identity separate from its changing geometry: the same chair
-can occupy several positions over time. We represent each reconstructed state
-by a \emph{fragment}: an object-specific mesh $G_f$, a bounding box, an estimated
-start and end time, and provenance identifying its reconstruction observations
-and deployment. Observed motion additionally carries the trajectory produced by
-the tracker. Ending a fragment removes that state from the current scene; it
-does not delete the state from history. The registry groups successive fragments
-by physical identity and distinguishes the current state from historical states
-and unresolved alternatives.
+We represent the geometry of one physical object as a sequence of
+\emph{fragments}. A fragment stores one reconstructed object state: its mesh,
+bounding box, time interval, and the observations used to build it. A fragment
+created while the object is observed moving also stores the tracked trajectory.
+At any time, one fragment is the current state of an object and earlier
+fragments remain in its history.
 
-The exported scene state is written as
+The state exported at the end of deployment $k$ is
 \begin{equation}
   \mathcal{S}^{k}=(B^k,\mathcal{F}^k,\mathcal{H}^k,\Theta^k),
   \label{eq:stored_state}
 \end{equation}
-where $B^k$ is the current background mesh, $\mathcal{F}^k$ is the object-fragment
-registry, $\mathcal{H}^k$ is the recorded scene history, and $\Theta^k$ contains
-pooled sensor statistics used by the absence test. The next deployment computes
-$\mathcal{S}^{k+1}=\Phi(\mathcal{S}^{k},Z^{k+1})$ under the supplied alignment.
-Its output is a current scene together with earlier recorded states, not the
-union of every object position ever observed.
+where $B^k$ is the current background mesh, $\mathcal{F}^k$ is the object
+fragment registry, $\mathcal{H}^k$ stores the recorded scene history, and
+$\Theta^k$ stores the statistics used by the absence detector. The next
+deployment loads this state and updates it with new observations.
 
-\subsection{From Observations to State Updates}
-\label{sec:overview}
+\subsection{Dynamic-Mapping Backbone}
 
-Khronos~\cite{schmid2024khronos} supplies the reconstruction and tracking
-backbone. Its active window is the short interval over which recent observations
-are integrated and tracked. It fuses depth into a truncated signed distance field
-(TSDF), reconstructs surfaces, and exports object segments as they leave this
-window. Its backend maintains object fragments and the background in a dense
-scene graph. Our registry receives these reconstructed segments, compares them
-with stored states of the same identity, and controls their temporal updates.
-We call this comparison and update of stored states \emph{reconciliation}.
-We first describe its measurement evidence, then its state-update rules.
+We build on Khronos~\cite{schmid2024khronos}. Its active window reconstructs
+local geometry from RGB-D input, tracks moving objects, and produces object
+fragments. Its backend maintains the global background mesh and object states.
+Our method changes how these states are carried across deployments and how later
+observations update imported geometry.
 
-\subsection{When Has an Old Surface Been Observed Empty?}
+For each new object segment, the system first checks whether it refines the
+current state of that object or represents a new state. Observed motion starts
+a new fragment with a trajectory. A stationary reconstruction that overlaps the
+current fragment can refine it. A reconstruction at a different location is kept
+separately until geometric evidence determines which state is current.
+
+\subsection{Geometric Evidence for Object Absence}
 \label{sec:absence}
 
-\paragraph{Projecting a stored surface into new measurements.}
-We sample a fragment's surface into occupied cells of size 5\,cm. A cell can be
-tested when it projects inside the image, lies within sensor range, and is viewed
-at an incidence angle of at most $60^\circ$. Let $z_f$ be its projected depth
-and $d$ the measured depth at the same pixel. With tolerance $\tau_s=5$\,cm,
-measurements have three geometric interpretations:
+To test whether an old object state is still present, we project samples of its
+surface into later depth images. Surface samples are grouped into 5\,cm cells.
+A sample is tested only when it lies inside the image, within sensor range, and
+is viewed at an incidence angle below $60^\circ$. Let $z_f$ be the expected
+depth of the stored surface and let $d$ be the measured depth at the same pixel.
+With tolerance $\tau_s=5$\,cm,
 \begin{equation}
 \begin{array}{ll}
- |d-z_f|\le\tau_s & \text{surface agreement},\\
- d-z_f>\tau_s     & \text{free-space contradiction},\\
- d-z_f<-\tau_s    & \text{occlusion}.
+ |d-z_f|\le\tau_s & \text{supports the stored surface},\\
+ d-z_f>\tau_s     & \text{passes through the stored surface},\\
+ d-z_f<-\tau_s    & \text{is occluded by a closer surface}.
 \end{array}
 \label{eq:depth_test}
 \end{equation}
-Surface agreement with the object's own instance label confirms its presence.
-Agreement with another label is recorded separately: it may reflect a missed
-instance detection or another surface and does not establish disappearance.
-A depth measurement behind the stored surface is a \emph{seen-through}
-observation: the ray passed through the location where that surface was expected.
-Occlusion, invalid depth, and lack of image or range coverage supply no absence
-evidence. Overlap between two reconstructed meshes is not itself a new sensor
-observation.
+A measurement that passes through the stored surface provides evidence that the
+old state is absent. Occlusion or missing coverage provides no such evidence.
 
-\paragraph{Rejecting unreliable stored samples.}
-Depth artifacts can create surface samples that later rays pass through even
-while the object remains in place. In the real-room data, the original
-measurements of static objects showed this behavior for 12--55\% of sampled
-cells. A newly reconstructed sample becomes reliable after its identity is
-observed on the surface in at least three frames and it has never been seen
-through during observations identifying the object in place. Only reliable
-samples participate in the absence test. Imported surfaces are treated as
-reliable by the current implementation; this policy does not provide a new
-measurement of their validity in the next deployment.
-
-\paragraph{Accumulating evidence rather than deleting on one mismatch.}
-The test runs at each reconciliation update, every fifth backend update
-(approximately 2\,s of sensor time). For an update with $n\ge1$ tested reliable
-cells, define
+Not every reconstructed sample is equally reliable. We therefore use surface
+samples that have repeatedly agreed with the object's own observations and have
+not produced contradictory depth measurements while the object was confirmed in
+place. At each reconciliation update, we measure the fraction of tested reliable
+surface that is seen through,
 \begin{equation}
- f = \frac{\text{number of tested cells seen through}}{n}.
+ f = \frac{\text{seen-through reliable samples}}
+          {\text{tested reliable samples}}.
  \label{eq:through_fraction}
 \end{equation}
-An update testing no reliable cell neither changes the score nor trains the
-sensor model. When the object is positively identified in place, its observed
-fractions $f$ provide examples of measurement inconsistency under presence.
-The detector fits a Beta distribution to this history, regularized toward the
-pooled statistics of objects observed by the same sensor. The pooled statistics
-have the weight of three additional updates, and the fitted spread is not allowed
-to be narrower than the measured spread across objects. An object without its
-own history uses the pooled model.
+The distribution of this fraction while the object is known to be present is
+estimated from previous observations of that object and pooled observations from
+the same sensor. A one-sided likelihood score measures how unusual the current
+seen-through fraction is under the presence model. The score is accumulated over
+successive updates, so a fragment is removed only after repeated evidence that
+its old location is empty.
 
-For the alternative hypothesis of absence, the current detector uses a uniform
-distribution over $f$. A one-sided log-likelihood score considers unusually high
-seen-through fractions as evidence for absence. A cumulative-sum detector
-accumulates this score, weighted by the fraction of reliable surface tested for
-the first time in the current accumulation. This reduces repeated counting of
-the same surface coverage. The fragment is declared absent when the score exceeds
-$\ln 99$ and rays passing through the surface outnumber rays meeting it. We use
-this as an operating threshold, not as a demonstrated 1\% false-removal
-guarantee. The learned population statistics are carried to the next deployment.
-
-\subsection{Refine the Previous State or Start a New One?}
+\subsection{Updating Object States}
 \label{sec:states}
 
-\paragraph{Segments reconstructed during one deployment.}
-A segment arrives with an object identity, geometry, an observation interval
-$[t_0,t_1]$, and the tracker's motion flag. An observed moving segment ends the
-previous current fragment at $t_0$ and starts a new fragment carrying the observed
-trajectory. For a stationary segment, sharing an occupied 5\,cm cell with the
-current fragment permits refinement of that fragment, unless observations during
-$[t_0,t_1]$ saw through every tested reliable sample of the old state and supplied
-no same-identity surface hit. This exception matters when a displacement is
-smaller than the object's own size: old and new reconstructions may overlap even
-though the old state has ended.
+A new reconstruction of an imported object is initially kept separate from the
+old fragment. This prevents a moved object from being fused immediately into its
+previous position. Once enough surface has been reconstructed, the new and old
+states are compared geometrically. If most of the new surface lies within
+$\tau_o=10$\,cm of the imported surface, the two observations are treated as the
+same state and the new geometry refines the old one. Otherwise the imported
+fragment ends and the new reconstruction becomes the current state.
 
-A segment with no spatial overlap, or with this empty-surface evidence against
-the old state, is retained as an alternative reconstruction rather than merged
-immediately. At subsequent reconciliation updates, the old fragment can end
-through the absence test. It can also end when the same identity is observed at
-a different location and the old state has no positive surface support. This
-second route uses the supplied identity: relocation can be established before
-the camera revisits the entire old location. A nearby overlapping alternative
-cannot end the current state on proximity alone. Refinement requires positive
-support for the current state.
+The same update rule also handles changes found after an observation gap within
+one deployment. If the object is seen at a new location while the previous state
+has no positive support, the new fragment becomes current. If the old location
+has not been observed well enough, both states remain unresolved until additional
+measurements arrive. Objects configured as structurally static accumulate
+complementary views instead of being replaced solely by a displaced
+reconstruction.
 
-\paragraph{Comparing an imported state with a new reconstruction.}
-\label{sec:samestate}
-When an imported object is observed again, the new measurements initially form
-a separate reconstruction. This keeps a potentially moved object from being
-fused into its old position. For
-classes configured as movable, the comparison starts once the new reconstruction
-has at least 30 reliable cells. This is a minimum size for comparing two states,
-not the minimum number of cells for an individual absence update.
-The states are treated as the same if a majority of the new surface lies within
-$\tau_o=10$\,cm of the imported surface. Otherwise the imported fragment ends and
-the new reconstruction becomes current. The comparison runs during updates and
-at deployment completion. The current configuration exempts bed, desk, and
-wardrobe from this replacement test and merges their imported and new
-reconstructions at completion to retain complementary views. These are fixed
-class-based assumptions, not a learned mobility model.
+\subsection{Background Update}
 
-The state-comparison tolerance is distinct from the 5\,cm depth-test tolerance.
-Its current value is also the 10\,cm surface tolerance used by the change
-benchmark in \cref{sec:protocols}; the present experiments do not establish that
-these two choices can be varied independently. At deployment completion, the
-implementation performs a final state-update pass, including deferred fragment
-closures, before exporting the map. The interaction between this final pass and
-the sequential absence test is a remaining specification and validation issue
-(\cref{sec:limitations}).
+The previous background mesh is transformed into the new deployment frame.
+Later observation rays remove old background vertices only where free space
+contradicts them. Vertices that are not re-observed are retained, and geometry
+reconstructed during the new deployment is added to the map. This preserves
+earlier coverage while allowing directly contradicted background geometry to be
+removed.
 
-\subsection{Background Update and Transfer to the Next Deployment}
-\label{sec:background}
-
-The supplied inter-deployment transform places the old background in the new
-coordinate frame. Later observation rays can remove contradicted old vertices;
-vertices without such evidence are retained, and the new reconstruction is added.
-The background uses the backbone's geometric ray verifier: a later ray passing
-beyond a stored vertex can contradict it, whereas an obstructed or unavailable
-view does not. This test uses the backbone's depth tolerance, not the
-object-specific sequential detector above. This is an evidence-gated mesh update,
-not joint TSDF fusion. Consequently, two slightly misaligned reconstructions of
-the same wall can both survive when neither is contradicted by free space.
-
+\subsection{Transfer to the Next Deployment}
 \label{sec:contract}
-At completion, the deployment exports the current geometry and fragment registry,
-including time intervals and provenance, together with the scene history and
-pooled sensor statistics. A full scene snapshot is recorded at each reconciliation
-update. These are discrete recorded states; the snapshot interval does not imply
-additional sensor observations between updates. The archive uses lossless
-delta-coded snapshots, with a reported compression factor of approximately
-$30\times$, and the next independent process reads it through the same map
-interface. This transfer concerns scene memory. It is not a claim of restoring
-the complete live optimizer, active-window state, or every ray index, nor of
-numerical equivalence to uninterrupted execution.
+
+At the end of a deployment, the system exports the current background, the object
+fragment registry, recorded object histories, and the statistics used for
+absence detection. The next deployment loads the export through the same map
+interface and continues updating the scene. Scene snapshots are recorded at each
+reconciliation update so that earlier object states remain available together
+with the current map.
