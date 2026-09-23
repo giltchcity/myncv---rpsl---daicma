@@ -27,16 +27,15 @@ OASIS-Map associates objects across sessions and uses observation coverage to
 avoid treating every unmatched object as a disappearance~\cite{oh2026oasismap}.
 Living Scenes associates and reconstructs objects from scans acquired at
 different times~\cite{zhu2024livingscenes}. These works motivate conservative
-use of earlier geometry and careful association. We do not claim that map reuse,
-object history, or visibility-aware removal is new in isolation. We study their
-role in continuing a dense map that must also record motion and hidden changes
-during each new deployment.
+use of earlier geometry and careful association. Map reuse, object histories, and visibility-aware removal are established
+capabilities. Our focus is their use in a dense map that continues to record
+motion and hidden changes during each new deployment.
 
 \paragraph{Scene memory for reasoning.}
 DAAAM uses Khronos-based geometric reconstruction to build a hierarchical 4D
 scene graph with detailed descriptions for spatio-temporal question answering
-and task grounding~\cite{gorlo2025daaam}. Its object nodes are geometrically
-grounded; it is not merely a symbolic log. LT-Mem aligns independently acquired
+and task grounding~\cite{gorlo2025daaam}. Its object nodes retain a connection to
+reconstructed geometry. LT-Mem aligns independently acquired
 sessions, associates object identities, and maintains current object states,
 session-indexed events, and change-frequency statistics~\cite{lee2026ltmem}.
 Its reasoning layer receives one consolidated observation per object per
@@ -45,5 +44,5 @@ from deciding which dense surfaces remain valid as new depth measurements arrive
 within a deployment. Our output is a maintained geometric scene and its recorded
 object histories, rather than answers to language queries. Persistent identity
 is supplied to our backend, whereas cross-session identity estimation is an
-explicit component of LT-Mem; this difference is an input assumption, not a
-claimed advantage of our method.
+explicit component of LT-Mem. Our comparison therefore distinguishes the
+representation being maintained from the identity-association input.
