@@ -10,7 +10,7 @@ deployments. A rigid transform aligns the previous deployment's map with the
 new deployment's coordinate frame. These poses, transforms, and labels are
 inputs; the method below updates scene state rather than estimating them.
 
-A physical object and a geometric state are different entities. The same chair
+We keep object identity separate from its changing geometry: the same chair
 can occupy several positions over time. We represent each reconstructed state
 by a \emph{fragment}: an object-specific mesh $G_f$, a bounding box, an estimated
 start and end time, and provenance identifying its reconstruction observations
@@ -42,8 +42,8 @@ are integrated and tracked. It fuses depth into a truncated signed distance fiel
 window. Its backend maintains object fragments and the background in a dense
 scene graph. Our registry receives these reconstructed segments, compares them
 with stored states of the same identity, and controls their temporal updates.
-We first describe the evidence used in these decisions, then the state-update
-rules.
+We call this comparison and update of stored states \emph{reconciliation}.
+We first describe its measurement evidence, then its state-update rules.
 
 \subsection{When Has an Old Surface Been Observed Empty?}
 \label{sec:absence}
@@ -135,8 +135,9 @@ support for the current state.
 
 \paragraph{Comparing an imported state with a new reconstruction.}
 \label{sec:samestate}
-The new deployment initially reconstructs an imported object separately. This
-keeps a potentially moved object from being fused into its old position. For
+When an imported object is observed again, the new measurements initially form
+a separate reconstruction. This keeps a potentially moved object from being
+fused into its old position. For
 classes configured as movable, the comparison starts once the new reconstruction
 has at least 30 reliable cells. This is a minimum size for comparing two states,
 not the minimum number of cells for an individual absence update.
@@ -152,9 +153,10 @@ The state-comparison tolerance is distinct from the 5\,cm depth-test tolerance.
 Its current value is also the 10\,cm surface tolerance used by the change
 benchmark in \cref{sec:protocols}; the present experiments do not establish that
 these two choices can be varied independently. At deployment completion, the
-implementation also finalizes fragment closures whose absence is pending. This
-end-of-deployment rule is distinct from simply reaching the sequential threshold;
-its possible effect is included in the limits discussed in \cref{sec:limitations}.
+implementation performs a final state-update pass, including deferred fragment
+closures, before exporting the map. The interaction between this final pass and
+the sequential absence test is a remaining specification and validation issue
+(\cref{sec:limitations}).
 
 \subsection{Background Update and Transfer to the Next Deployment}
 \label{sec:background}
@@ -162,8 +164,10 @@ its possible effect is included in the limits discussed in \cref{sec:limitations
 The supplied inter-deployment transform places the old background in the new
 coordinate frame. Later observation rays can remove contradicted old vertices;
 vertices without such evidence are retained, and the new reconstruction is added.
-The background uses the existing ray-verification depth tolerance rather than
-the object-specific sequential test above. This is an evidence-gated mesh update,
+The background uses the backbone's geometric ray verifier: a later ray passing
+beyond a stored vertex can contradict it, whereas an obstructed or unavailable
+view does not. This test uses the backbone's depth tolerance, not the
+object-specific sequential detector above. This is an evidence-gated mesh update,
 not joint TSDF fusion. Consequently, two slightly misaligned reconstructions of
 the same wall can both survive when neither is contradicted by free space.
 
