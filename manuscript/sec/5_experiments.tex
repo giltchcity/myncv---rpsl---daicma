@@ -11,6 +11,34 @@ by approximately 0.1--0.2 percentage points in the real-room online object score
 and 0.1 percentage points in geometry. These are observed run-to-run variations,
 not confidence intervals.
 
+\begin{table*}[t]
+\centering\small
+\caption{Repeated real-room deployments. Online object scores summarize the map
+over time. Hidden-change F1 measures changes discovered within a deployment.
+Geometry is the room-crop F1 at 5\,cm against that deployment's same-sensor
+reference. All values are percentages. Our chained runs import A into B and B
+into C; our from-scratch runs import nothing. Dashes are unreported entries, not
+zero scores or evidence that a system cannot perform the task.}
+\label{tab:real}
+\begin{tabular}{llccc}
+\toprule
+Method & Deployment & Online object P/R/F1 & Hidden-change F1 & Geometry F1 (P/R) \\
+\midrule
+Ours & A & 100.0/88.7/93.0 & 100.0 & 90.6 (86.0/95.8) \\
+Ours & B & 99.4/98.0/98.7 & 100.0 & 92.4 (87.1/98.4) \\
+Ours & C & 99.0/98.3/98.6 & 100.0 & 91.6 (85.4/98.9) \\
+Ours, from scratch & B & 99.9/93.0/94.6 & -- & 96.6 (95.2/98.0) \\
+Ours, from scratch & C & 99.5/95.0/96.4 & -- & 95.2 (92.1/98.4) \\
+Khronos & A & 100.0/83.7/89.1 & 100.0 & 91.0 (85.7/97.1) \\
+Khronos & B & 96.5/88.8/91.5 & 66.7 & 95.9 (93.5/98.3) \\
+Khronos & C & 95.3/77.0/83.8 & 66.7 & 94.7 (91.0/98.7) \\
+Panoptic & A & -- & -- & 92.4 (93.8/91.0) \\
+Panoptic & B & -- & -- & 93.6 (92.2/95.0) \\
+Panoptic & C & -- & -- & 93.0 (88.6/97.8) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 \subsection{Data and Comparison Setup}
 \label{sec:datasets}
 
@@ -20,9 +48,11 @@ three days. The source dataset is named \emph{room-18}; it contains 20 physical
 object identities, changes within every deployment, and 16 annotated changed
 states for A-to-B. Each object reference surface is aggregated from depth during
 its manually annotated presence interval, using 2\,cm voxels observed in at least
-three frames. Background geometry is evaluated against a separate 1\,cm
+three frames. Scene geometry is evaluated against a separate 1\,cm
 reconstruction from that deployment's sensor measurements. This is a
 same-sensor reference, not an independent survey of the whole room.
+In the reported experimental setup, B and C were reserved for evaluation and
+were not used for development.
 
 \paragraph{Controlled synthetic visits.}
 Two Isaac Sim sequences revisit a furnished apartment with scripted visible
@@ -39,7 +69,7 @@ removed chair, and a scene with a non-rigid blanket change. Each scan is static;
 changes occur between scans. Depth is $224\times172$ at 10\,Hz. We initialize
 from the reference scan and load its state for the rescan. This is a selected
 three-scene evaluation, not a full 3RScan benchmark. Bonn RGB-D
-Dynamic~\cite{palazzolo2019bonn} contributes three short box-manipulation
+Dynamic~\cite{palazzolo2019bonn} contributes three 15--25\,s box-manipulation
 sequences. TUM~\cite{sturm2012tum} supplies walking-person observations; we
 report the available quantitative result for \emph{walking\_xyz}.
 
@@ -75,7 +105,9 @@ For an annotated object-state surface $G$ and predicted map $M$, let
  \label{eq:representedness}
 \end{equation}
 where $M_{\ell(G)}$ contains predicted surface samples of the same semantic
-class. The state is counted as represented when $r(G,M)\ge0.5$. A moved object
+class, $d(x,M_{\ell(G)})$ is the distance to its nearest surface, and $|G|$ is
+the number of reference samples. The state is counted as represented when
+$r(G,M)\ge0.5$. A moved object
 can produce a disappearance of its old state and an appearance of its new state;
 event counts are therefore not counts of distinct physical objects.
 For within-deployment changes, the test compares states before and after the
@@ -115,35 +147,7 @@ person-residue proxy, not a full geometric ground truth.
 \subsection{Can the Map Retain Coverage and Remove Obsolete States?}
 \label{sec:results}
 
-\begin{table*}[t]
-\centering\small
-\caption{Repeated real-room deployments. Online object scores summarize the map
-over time. Hidden-change F1 measures changes discovered within a deployment.
-Geometry is the room-crop F1 at 5\,cm against that deployment's same-sensor
-reference. All values are percentages. Our chained runs import A into B and B
-into C; our from-scratch runs import nothing. Dashes are unreported entries, not
-zero scores or evidence that a system cannot perform the task.}
-\label{tab:real}
-\begin{tabular}{llccc}
-\toprule
-Method & Deployment & Online object P/R/F1 & Hidden-change F1 & Geometry F1 (P/R) \\
-\midrule
-Ours & A & 100.0/88.7/93.0 & 100.0 & 90.6 (86.0/95.8) \\
-Ours & B & 99.4/98.0/98.7 & 100.0 & 92.4 (87.1/98.4) \\
-Ours & C & 99.0/98.3/98.6 & 100.0 & 91.6 (85.4/98.9) \\
-Ours, from scratch & B & 99.9/93.0/94.6 & -- & 96.6 (95.2/98.0) \\
-Ours, from scratch & C & 99.5/95.0/96.4 & -- & 95.2 (92.1/98.4) \\
-Khronos & A & 100.0/83.7/89.1 & 100.0 & 91.0 (85.7/97.1) \\
-Khronos & B & 96.5/88.8/91.5 & 66.7 & 95.9 (93.5/98.3) \\
-Khronos & C & 95.3/77.0/83.8 & 66.7 & 94.7 (91.0/98.7) \\
-Panoptic & A & -- & -- & 92.4 (93.8/91.0) \\
-Panoptic & B & -- & -- & 93.6 (92.2/95.0) \\
-Panoptic & C & -- & -- & 93.0 (88.6/97.8) \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-\begin{table}[t]
+\begin{table}[htbp]
 \centering\small
 \caption{Cross-deployment changes in the real room. Event scores are percentages;
 old-location residue measures departed surface remaining in the final map
@@ -173,8 +177,8 @@ effect on within-deployment change detection.
 Earlier coverage need not imply retaining every obsolete state. In
 \cref{tab:real_d3}, the method detects 15 of 16 changed states in A-to-B and all
 annotated changes in B-to-C. The missed A-to-B case is a swivel chair whose
-recorded motion within A and static reference annotation disagree; we retain the
-reported score rather than correcting the annotation after evaluation. Relative
+recorded motion within A and static reference annotation disagree. This case
+remains counted as a miss in the reported evaluation. Relative
 to Panoptic, old-location residue falls from 57.1\% to 6.8\% and from 60.1\% to
 10.9\%. These measurements test actual obsolete surface in the final map,
 complementing event recognition.
@@ -183,15 +187,13 @@ Geometry reveals a separate tradeoff. Our chained maps achieve recall of
 98.4\% and 98.9\%, but room-crop F1 is below both our from-scratch runs and
 Panoptic. Two effects contribute: the session-only reference omits some retained
 coverage, and imported walls can survive alongside misaligned new copies.
-Restricting evaluation to the observed domain leaves a reported gap of
-2.6--3.3 percentage points, so reference incompleteness does not fully explain
-the geometry loss. The available records do not contain the complete
-per-method observed-region table; these aggregate gaps are not a substitute for
-one.
+The room-crop scores alone cannot separate these two effects. A complete
+per-method observed-region comparison is not available in this result set, so
+we do not attribute the entire precision loss to incomplete reference coverage.
 
 \subsection{Controlled Changes with an Exact Scene Reference}
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering\small
 \caption{Synthetic apartment. All scores are percentages. ``Hidden'' denotes
 within-deployment hidden-change F1; ``Across'' denotes cross-deployment event F1.
@@ -210,18 +212,6 @@ Panoptic & A$\rightarrow$B & -- & 92.1 & -- & 91.8 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-With an exact scene reference, our method detects all 24 hidden changes in A and
-all 10 in B, as well as 29 of 32 cross-deployment events without a false event
-(\cref{tab:synthetic}). Geometry F1 is 97.2 and 97.7, compared with 91.4 and
-83.6 for Khronos. Unlike the real-room reference, this comparison is not limited
-to surfaces reconstructed by the current sensor trajectory. The missed events
-involve a table and sofa whose new locations the camera does not approach, and
-a chair displaced 0.6\,m in one frame at the image border. These examples limit
-what can be concluded from incomplete observations; they do not show that unseen
-changes are reconstructed.
-
-\subsection{Public-Data Checks and Short-Sequence Failures}
 
 \begin{table*}[t]
 \centering\small
@@ -248,6 +238,18 @@ Scene & Method & Event TP/FP/FN & Event P/R/F1 & Geometry F1 (P/R) \\
 \end{tabular}
 \end{table*}
 
+With an exact scene reference, our method detects all 24 hidden changes in A and
+all 10 in B, as well as 29 of 32 cross-deployment events without a false event
+(\cref{tab:synthetic}). Geometry F1 is 97.2 and 97.7, compared with 91.4 and
+83.6 for Khronos. Unlike the real-room reference, this comparison is not limited
+to surfaces reconstructed by the current sensor trajectory. The missed events
+involve a table and sofa whose new locations the camera does not approach, and
+a chair displaced 0.6\,m in one frame at the image border. These examples limit
+what can be concluded from incomplete observations; they do not show that unseen
+changes are reconstructed.
+
+\subsection{Public-Data Checks and Short-Sequence Failures}
+
 \paragraph{Different changes expose different limitations.}
 In \cref{tab:3rscan}, the static control produces no false event for our method.
 In Scene 2, both moved chairs are represented at their new positions while all
@@ -273,3 +275,5 @@ state in the moving sequence: the observed 0.75\,m motion is below Khronos's
 and 1.09\% for Khronos, while our map retains 29\% more static surface than
 Khronos. These are useful behavior checks, not a full evaluation of motion
 trajectory accuracy.
+
+\FloatBarrier
