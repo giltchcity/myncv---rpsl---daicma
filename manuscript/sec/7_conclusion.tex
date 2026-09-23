@@ -1,0 +1,13 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented a method for carrying a dense dynamic scene map into a later
+independently started deployment. Object states are stored with their surfaces
+and histories, then refined or ended using new geometric evidence. The approach
+retains earlier coverage while reducing obsolete object surface in the evaluated
+revisits, and the new deployment continues to reconstruct its own changes and
+motion. Its gains do not eliminate the cost of memory: separately retained
+background meshes can duplicate walls, and incomplete observations can delay
+object removal. The results identify conservative object-state reconciliation
+as a useful step toward persistent dense mapping, while making geometric fusion,
+uncertain association, and longer-horizon validation explicit next challenges.
