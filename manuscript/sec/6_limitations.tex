@@ -1,16 +1,16 @@
 \section{Limitations}
 \label{sec:limitations}
 
-The main failure mode is limited visibility. An old object state is removed only
-after later measurements provide enough free-space evidence, so short or partial
-revisits can leave obsolete geometry in the map. This occurs for the removed
-3RScan chair and contributes to the 10.9\% old-location residue after the third
-real-room run.
+The main object-level failure mode is limited visibility. An old object state is
+removed only after later measurements provide enough free-space evidence, so a
+short or partial revisit can leave obsolete geometry in the map. This occurs
+for the removed chair in the current 3RScan evaluation and contributes to the
+10.9\% old-location residue after the third real-room run.
 
-Background geometry is currently updated as a mesh. When two runs are slightly
-misaligned, an old wall and a newly reconstructed wall can both remain, reducing
-geometric precision. A volumetric or uncertainty-aware fusion step would better
-combine repeated background observations.
+Background geometry is currently updated as a mesh. The real runs are aligned
+with a single rigid transform, and residual local misalignment can leave an old
+wall next to the wall reconstructed during the new run. This explains much of
+the precision loss observed in the real geometry results.
 
 Finally, the system uses Khronos's motion-extraction threshold. Small object
 motions can therefore be reconstructed as separate static states instead of an
