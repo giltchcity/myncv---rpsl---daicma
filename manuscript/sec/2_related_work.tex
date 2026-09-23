@@ -1,48 +1,41 @@
 \section{Related Work}
 \label{sec:related_work}
 
-\paragraph{Reconstructing dynamic scenes.}
-Co-Fusion, MID-Fusion, and EM-Fusion reconstruct and track moving objects using
-object-specific surface or volume representations~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion}.
-DynaSLAM~II and DynoSAM couple camera and object motion estimation~\cite{bescos2021dynaslam2,morris2025dynosam}.
-These methods establish observed motion as part of the scene model rather than
-only an obstacle to localization. Changes discovered after an observation gap
-require additional reasoning. Changing-SLAM uses object-persistence beliefs and
-long-term association~\cite{soares2023changing}; Khronos combines short-window
-motion tracking with global fragment association and geometric verification of
-appearance and disappearance~\cite{schmid2024khronos}. GaME updates a Gaussian
-map when later observations reveal changed geometry~\cite{yugay2026game}.
-Our method uses Khronos as its dynamic mapping backbone and focuses on how
-previous scene states are carried into, and revised during, a later deployment.
+\paragraph{Dynamic scene mapping.}
+Co-Fusion, MID-Fusion, and EM-Fusion reconstruct and track moving objects with
+object-specific surface or volume representations~\cite{runz2017cofusion,
+xu2019midfusion,strecke2019emfusion}. DynaSLAM~II and DynoSAM jointly estimate
+camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}. Khronos
+combines short-window motion tracking with global fragment association and
+geometric verification of object appearance and disappearance, producing a
+dense spatio-temporal map~\cite{schmid2024khronos}. GaME updates a Gaussian map
+when later observations reveal changed geometry~\cite{yugay2026game}. We use
+Khronos as the dynamic-mapping backbone and extend the scene state across
+separate deployments.
 
-\paragraph{Maintaining maps across visits.}
-Long-term geometric mapping updates previous observations as environments
-change~\cite{pomerleau2014longterm,lazaro2018efficient}. Panoptic Multi-TSDFs
-maintains object and background submaps and explicitly distinguishes absence
-from lack of observation~\cite{schmid2022panoptic}. POCD estimates object-level
+\paragraph{Long-term map maintenance.}
+Long-term mapping methods update earlier geometry as environments change over
+repeated visits~\cite{pomerleau2014longterm,lazaro2018efficient}. Panoptic
+Multi-TSDFs maintains object and background submaps and distinguishes persistent,
+absent, and unobserved regions~\cite{schmid2022panoptic}. POCD models object-level
 change and stationarity, while POV-SLAM couples object consistency with pose
 estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers object
-landmarks between deployments for localization~\cite{adkins2024obvislam}.
-OASIS-Map associates objects across sessions and uses observation coverage to
-avoid treating every unmatched object as a disappearance~\cite{oh2026oasismap}.
-Living Scenes associates and reconstructs objects from scans acquired at
-different times~\cite{zhu2024livingscenes}. These works motivate conservative
-use of earlier geometry and careful association. Map reuse, object histories, and visibility-aware removal are established
-capabilities. Our focus is their use in a dense map that continues to record
-motion and hidden changes during each new deployment.
+landmarks between deployments~\cite{adkins2024obvislam}; OASIS-Map associates
+objects across sessions and labels them static, moved, appeared, disappeared, or
+unknown~\cite{oh2026oasismap}. Living Scenes matches and reconstructs objects
+from scans acquired at different times~\cite{zhu2024livingscenes}. These methods
+provide the main ingredients for repeated mapping: state transfer, object
+association, and conservative handling of unobserved regions. Our method applies
+these ideas to a dense dynamic map whose object histories and current geometry
+continue to be updated during each new deployment.
 
-\paragraph{Scene memory for reasoning.}
-DAAAM uses Khronos-based geometric reconstruction to build a hierarchical 4D
-scene graph with detailed descriptions for spatio-temporal question answering
-and task grounding~\cite{gorlo2025daaam}. Its object nodes retain a connection to
-reconstructed geometry. LT-Mem aligns independently acquired
-sessions, associates object identities, and maintains current object states,
-session-indexed events, and change-frequency statistics~\cite{lee2026ltmem}.
-Its reasoning layer receives one consolidated observation per object per
-session. This overlaps with our use of persistent object histories, but differs
-from deciding which dense surfaces remain valid as new depth measurements arrive
-within a deployment. Our output is a maintained geometric scene and its recorded
-object histories, rather than answers to language queries. Persistent identity
-is supplied to our backend, whereas cross-session identity estimation is an
-explicit component of LT-Mem. Our comparison therefore distinguishes the
-representation being maintained from the identity-association input.
+\paragraph{Spatio-temporal scene memory.}
+Recent work also represents scene history for downstream reasoning. DAAAM builds
+a hierarchical 4D scene graph on top of Khronos-style geometric reconstruction
+and attaches detailed semantic descriptions for question answering and task
+grounding~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates
+object identities, and stores current object states together with session-level
+event histories and long-term statistics~\cite{lee2026ltmem}. These systems focus
+on organizing and querying object history. Our focus is the underlying dense
+map update: deciding which imported object and background surfaces remain valid
+when new RGB-D measurements arrive.
