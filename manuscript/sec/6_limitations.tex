@@ -1,0 +1,25 @@
+\section{Limitations and Scope}
+\label{sec:limitations}
+
+The method is evaluated as a mapping backend with supplied camera poses,
+inter-deployment alignment, and persistent instance identities. Automatic
+cross-deployment association and robustness to incorrect identities are not
+established by these experiments. Imported surface reliability and the fixed
+mobility classes are additional assumptions. The sequential absence threshold
+has not been calibrated as a global false-removal guarantee; its interaction
+with end-of-deployment closure also requires controlled testing.
+
+Partial views can delay removal, as shown by the 3RScan chair and 10.9\%
+real-room residue after C. Background geometry is maintained as a mesh rather
+than re-fused as uncertain measurements. The recorded real-C analysis attributes
+two thirds of carried false surface to duplicate, misaligned geometry. The
+system also inherits the motion extractor's minimum-displacement limitation.
+Addressing these cases requires changes to inference or reconstruction, not
+only a different presentation of the metrics.
+
+The current comparisons demonstrate scene-state transfer and its measured
+benefits, but do not establish equivalence to an uninterrupted run or isolate
+every proposed component. Complete observed-region results, component ablations,
+alignment perturbations, and export/import latency and memory-growth measurements
+are not reported. The three selected 3RScan pairs support case-level analysis,
+not a benchmark-wide generalization claim.
