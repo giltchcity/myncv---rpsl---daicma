@@ -1,143 +1,72 @@
 \section{Introduction}
 \label{sec:intro}
 
-Long-term robotic mapping has a two-level temporal structure. Within every
-continuously running mapping session, scene dynamics appear under two observation
-modes. In the first mode, an object moves while it remains visible to the robot;
-the system observes the transition itself and can represent the entity by a
-trajectory, temporal bounding boxes, timestamps, and time-indexed geometry. In
-the second mode, the robot observes an element, looks elsewhere while the same
-SLAM session remains active, and later re-observes the affected region after the
-element has moved, disappeared, or been replaced. The transition is then hidden:
-only the scene before and after the observation gap is available. We refer to
-these cases as continuously observed dynamics (D1) and hidden within-session
-change (D2). Together, D1 and D2 constitute dynamic mapping inside one session.
+Consider a robot that maps a room and returns the next day. A chair has moved,
+a cabinet is now hidden behind a person, and part of yesterday's route is not
+visited again. A useful map must make three different decisions: remove the
+chair's obsolete position, retain the cabinet until there is evidence that it
+has disappeared, and preserve the room surfaces outside today's observations.
+During the new visit, the robot must also keep tracking moving people and
+updating objects that change while the camera looks elsewhere. These are not
+separate uses of the map: they occur together during repeated operation.
 
-A separate requirement arises across sessions. A mapping session may terminate,
-the environment may change while the robot is absent, and a later independently
-started session must continue from persistent scene memory. We call this
-inter-session evolution D3. D3 is not a third motion detector and is not created
-by cutting one continuous sequence at an arbitrary time. Session B must import
-state produced by the completed Session A, reconcile changes since the previous
-deployment, and then operate as a complete dynamic-mapping session with its own
-D1 and D2 events before producing the memory for Session C.
+Starting each visit with an empty map avoids importing stale surfaces but loses
+previous coverage. Keeping every old surface has the opposite failure: objects
+can remain visible at positions they no longer occupy. Replacing the old map
+with the latest reconstruction again discards regions that the new camera
+trajectory did not observe. The central problem is therefore not merely storing
+more geometry. It is deciding which previous observations still describe the
+scene, while retaining the history of states that no longer do.
 
-The two intra-session modes require different inferences. Continuously observed
-motion supports an actual trajectory. A hidden transition does not: if the old
-location is later observed as free space and stable geometry appears elsewhere,
-the honest interpretation may be an absence at the old location and a new
-element at the new location unless identity can be established reliably.
-Moreover, no match is not evidence of absence. Geometry must remain
-\emph{unobserved} when the current trajectory provides insufficient visibility
-and may be removed only when later measurements contradict it. Across D3, the
-state required to reconstruct the current scene and explain unresolved changes
-must survive termination of the online process.
+Dense dynamic mapping provides an important starting point. Khronos reconstructs
+object surfaces and the background, tracks observed motion, and infers object
+appearance and disappearance after observation gaps~\cite{schmid2024khronos}.
+Long-term mapping methods provide complementary mechanisms for updating maps
+between visits. In particular, Panoptic Multi-TSDFs distinguishes persistent,
+absent, and unobserved submaps~\cite{schmid2022panoptic}, while object-based
+methods estimate changes in object state~\cite{qian2022pocd,qian2023povslam}.
+We build on these capabilities to continue a dense dynamic map across completed
+mapping runs, rather than treating each new run only as a static map comparison.
 
-A large body of dynamic SLAM work addresses D1. Dense object-level systems
-segment, track, and reconstruct moving entities~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion},
-while tightly coupled estimators jointly optimize camera state, object motion,
-and scene structure~\cite{bescos2021dynaslam2,morris2025dynosam}. Recent 4D and
-Gaussian systems construct richer temporal representations from continuous image
-streams. These methods increasingly capture what moved while it was observed,
-but D1 alone cannot determine what happened while a region was outside the
-current view.
+We use \emph{deployment} to mean one independently started mapping run. At its
+end, the system exports scene state; the next deployment loads that state and
+updates it using new RGB-D observations. Within a deployment, a visible movement
+can produce an observed trajectory. A change discovered only on re-observation
+instead supports an old state and a new state, not a reconstructed trajectory
+through the unseen interval. Across deployments, the same distinction remains
+necessary: earlier surfaces may be unchanged, obsolete, or simply outside the
+new camera's view.
 
-Several methods address changes revealed after an observation gap in the same
-running process. Changing-SLAM combines dynamic-keypoint filtering and object
-tracking with a Bayesian object-belief map and long-term data
-association~\cite{soares2023changing}. Khronos provides the closest dense
-single-session formulation: an active temporal window handles D1, whereas a
-global process reconciles fragments separated by observation gaps for
-D2~\cite{schmid2024khronos}. GaME similarly revises an online Gaussian map after
-out-of-view changes, but receives poses and panoptic segmentation externally and
-does not retain visible dynamic trajectories~\cite{yugay2026game}.
+Our approach stores each object's successive geometric states separately. A
+state includes its surface, temporal extent, and the observations from which it
+was reconstructed. Current measurements then determine whether to refine that
+state, replace it with a new state, or leave it unresolved. Depth measurements
+behind an old surface provide physical evidence that its former location is
+empty. However, imperfect reconstructed surfaces can produce the same pattern
+even when the object remains present. We therefore identify reliable surface
+samples and compare new evidence with the object's previously observed
+measurement inconsistencies before declaring it absent. Background geometry is
+also retained or removed according to later observations, although its current
+mesh-based update is less expressive than the object-state model.
 
-SuperMap addresses a different object-centric continuous-session problem. It
-processes one RGB-D or point-cloud stream, associates open-vocabulary instances,
-updates point occupancy and semantic confidence, and records spatial and
-temporal object relations for language-guided navigation~\cite{zhao2026supermap}.
-Its change experiment contains additions and removals during a ten-minute
-continuous run. It is therefore relevant to semantic identity and online
-object-map maintenance, but it does not define process-separated D3 continuation
-or preserve dense Khronos-style D1 geometry.
+We instantiate this approach as an extension of Khronos. The inherited
+capabilities are dense reconstruction, motion tracking, and the underlying scene
+representation. Our additions concern the management of successive object
+states, projected evidence for removing an old state, geometric comparison of
+inherited and newly reconstructed states, and transfer of scene memory to the
+next deployment. Camera poses, alignment between deployments, and persistent
+instance labels are inputs to the evaluated backend. We do not claim a new
+object re-identification algorithm or restoration of every internal SLAM
+optimizer state.
 
-Long-term mapping methods instead concentrate on maintaining a current static or
-semi-static map across sessions. Efficient Long-Term Mapping reuses a pose graph
-whose nodes contain 2D local point clouds; within a session, a ray/depth cloud
-merging rule suppresses traces from moving people, and across sessions loop
-closures trigger local-map fusion and outdated-node removal~\cite{lazaro2018efficient}.
-This is current-map cleaning and maintenance, not D1 trajectory reconstruction or
-D2 hidden-change inference. ELite similarly estimates local ephemerality to
-remove current-session dynamic LiDAR points before recursively updating a
-point-wise lifelong map across sessions~\cite{gil2025elite}.
-
-ProbPer-LiLo provides a more recent large-scale D3 map-refinement
-pipeline~\cite{ali2026probperlilo}. It explicitly seeks the static part of the
-environment: dynamic and quasi-static clusters are classified as non-static and
-removed, after which prior and current static maps are voxelized, compared, and
-merged into a refined lifelong map. Its experiments recursively use an updated
-map as the prior for a later traversal. This demonstrates genuine repeated D3
-map refinement, but not the preservation or continuation of D1 and D2 scene
-history.
-
-Object- and volume-centric D3 methods retain richer semantic state. Panoptic
-Multi-TSDFs initializes a later run from prior volumetric submaps and
-distinguishes persistent, absent, and unobserved entities~\cite{schmid2022panoptic}.
-POCD updates object-level volumes for changes between traversals, while POV-SLAM
-jointly reasons about semi-static objects and robot pose over repeated
-visits~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers selected object
-landmarks across deployments~\cite{adkins2024obvislam}, and OASIS-Map associates
-object changes across completed sessions~\cite{oh2026oasismap}.
-% STATUS NOTE: OASIS-Map is an under-review preprint as of 2026-08-07.
-
-These approaches expose a practical separation. Single-session spatio-temporal
-systems preserve rich dynamic histories but terminate with the process that
-created them. Lifelong systems recursively maintain maps across deployments, but
-usually remove moving and quasi-static content to obtain a clean localization
-map. Restarting from an empty map discards historical coverage, while replacing,
-uniting, or cleaning maps alone cannot preserve the complete observed and hidden
-dynamic history. We study how a dense D1+D2 session can export persistent scene
-state that an independent new session can use while again executing D1 and D2.
-
-We formalize this task as \emph{Persistent Spatio-Temporal Metric-Semantic SLAM}
-(P-SMS). Let $\mathcal{S}^{k}$ denote the $k$-th independent mapping session,
-with observations $\mathcal{Z}^{k}$, and let $\mathcal{M}^{k-1}$ be the
-persistent scene memory produced by the preceding session. P-SMS seeks
-\begin{equation}
-    \left(\mathcal{M}^{k},\,\mathcal{H}^{k}\right)
-    =
-    \Phi\!\left(\mathcal{M}^{k-1},\mathcal{Z}^{k}\right),
-    \label{eq:psms_update}
-\end{equation}
-where $\mathcal{H}^{k}$ stores the time-indexed D1 history observed within
-session $k$, while $\mathcal{M}^{k}$ stores the current metric-semantic scene,
-object and structural memory, change evidence, and session provenance. During
-session $k$, $\Phi$ supports D1 and D2. Across the boundary from $k-1$ to $k$,
-it reconciles D3 while retaining inherited but unobserved content and removing
-old content only when contradicted by reliable current evidence.
-
-We instantiate P-SMS by extending dense single-session spatio-temporal mapping
-with a persistent scene-memory and reconciliation layer. A completed session
-exports stable geometry, object and structural memory, change evidence, and
-session provenance. A later independent session loads this state as its prior,
-reconciles inter-session changes, and concurrently runs the same D1+D2 machinery
-as before.
-
-% NOVELTY WORDING HOLD:
-% Do not insert a universal-negative or first-work claim until every directly
-% relevant paper listed in the authoritative PDF audit has been individually
-% verified from its original full text.
-Our current contributions are:
-\begin{itemize}
-    \item We formulate process-separated persistent SMS, in which every session
-    performs D1+D2 and exports scene state for recursive D3 continuation.
-
-    \item We develop a persistent scene-memory architecture that transfers dense
-    current geometry, object and structural memory, change evidence, and session
-    provenance between deployments.
-
-    \item We establish an evaluation protocol that tests D1 and D2 within each
-    session and recursive D3 across independent sessions, including current-map
-    reconstruction, preservation of unobserved regions, dynamic-to-static
-    leakage, and cross-session update cost.
-\end{itemize}
+Our contributions are threefold. First, we develop a cross-deployment scene-state
+representation and update procedure that retains dense object and background
+geometry alongside object histories while each new deployment continues dynamic
+mapping. Second, we introduce a surface-evidence test for object absence and a
+same-state comparison for reconciling inherited and newly reconstructed objects.
+Third, we evaluate the resulting system through real repeated deployments,
+controlled synthetic changes, and public sequences, measuring object-state
+accuracy, obsolete surface remaining at old locations, and the geometric cost of
+retaining prior coverage. The evaluation distinguishes the gains of scene memory
+from its remaining failure modes rather than assuming that more geometry is
+always a better map.
