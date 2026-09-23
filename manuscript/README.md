@@ -1,6 +1,6 @@
 # Manuscript
 
-**Working title:** Continuing Dense Dynamic Maps Across Deployments.
+**Working title:** Continuing Dense Dynamic Maps Across Mapping Runs.
 
 The canonical paper is `main.tex`. In Overleaf, select `manuscript/main.tex` as the main document. The section order is:
 
