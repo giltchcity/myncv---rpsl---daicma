@@ -1,72 +1,56 @@
 \section{Introduction}
 \label{sec:intro}
 
-Consider a robot that maps a room and returns the next day. A chair has moved,
-a cabinet is now hidden behind a person, and part of yesterday's route is not
-visited again. A useful map must make three different decisions: remove the
-chair's obsolete position, retain the cabinet until there is evidence that it
-has disappeared, and preserve the room surfaces outside today's observations.
-During the new visit, the robot must also keep tracking moving people and
-updating objects that change while the camera looks elsewhere. These are not
-separate uses of the map: they occur together during repeated operation.
+A robot that maps the same environment repeatedly should not have to choose
+between forgetting the past and keeping every old surface forever. Suppose a
+robot maps a room, returns the next day, and finds that a chair has moved. Some
+parts of the room are observed again, while others are not visited. A useful map
+should preserve the geometry that is still valid, remove the chair's old state
+when later measurements show that the space is empty, and add the chair at its
+new position. During the new run, the robot should also continue handling motion
+and changes exactly as it would in a normal dynamic-mapping session.
 
-Starting each visit with an empty map avoids importing stale surfaces but loses
-previous coverage. Keeping every old surface has the opposite failure: objects
-can remain visible at positions they no longer occupy. Replacing the old map
-with the latest reconstruction again discards regions that the new camera
-trajectory did not observe. The central problem is therefore not merely storing
-more geometry. It is deciding which previous observations still describe the
-scene, while retaining the history of states that no longer do.
+Dense dynamic mapping already solves much of the within-run problem. Systems
+such as Khronos reconstruct objects and background geometry, track observed
+motion, and update the scene when objects appear or disappear after observation
+gaps~\cite{schmid2024khronos}. Long-term mapping addresses a different part of
+the problem: carrying information between visits and updating an older map when
+the environment changes~\cite{pomerleau2014longterm,lazaro2018efficient,
+schmid2022panoptic}. The remaining question is how to carry a rich dynamic scene
+state from one completed run into the next without reducing it to either a fresh
+map or a simple union of old and new geometry.
 
-Dense dynamic mapping provides an important starting point. Khronos reconstructs
-object surfaces and the background, tracks observed motion, and infers object
-appearance and disappearance after observation gaps~\cite{schmid2024khronos}.
-Long-term mapping methods provide complementary mechanisms for updating maps
-between visits. In particular, Panoptic Multi-TSDFs distinguishes persistent,
-absent, and unobserved submaps~\cite{schmid2022panoptic}, while object-based
-methods estimate changes in object state~\cite{qian2022pocd,qian2023povslam}.
-We build on these capabilities to continue a dense dynamic map across completed
-mapping runs, rather than treating each new run only as a static map comparison.
+We address this by storing successive geometric states of each object and
+updating them with physical evidence from later observations. Each object state
+contains its reconstructed surface, time interval, and provenance. When a new
+deployment begins, its observations are compared with the imported states.
+Depth agreement supports an old surface; a closer measurement indicates
+occlusion; a farther measurement shows that the ray passed through the old
+surface location and therefore provides evidence that the state is no longer
+present. A newly reconstructed state is either merged with the imported one or
+kept as a new state. Background geometry is handled similarly: unobserved
+surfaces are retained, contradicted surfaces are removed, and newly reconstructed
+geometry is added.
 
-We use \emph{deployment} to mean one independently started mapping run. At its
-end, the system exports scene state; the next deployment loads that state and
-updates it using new RGB-D observations. Within a deployment, a visible movement
-can produce an observed trajectory. A change discovered only on re-observation
-instead supports an old state and a new state, not a reconstructed trajectory
-through the unseen interval. Across deployments, the same distinction remains
-necessary: earlier surfaces may be unchanged, obsolete, or simply outside the
-new camera's view.
+The result is a dynamic map that can continue across independently started
+deployments. The next run does not receive only a final mesh; it receives the
+object-state registry, current background geometry, recorded history, and the
+statistics used for geometric absence decisions. It can therefore continue
+updating the same scene history while reconstructing new motion and changes.
 
-Our approach stores each object's successive geometric states separately. A
-state includes its surface, temporal extent, and provenance identifying the
-observations used to reconstruct it. Current measurements then determine whether to refine that
-state, replace it with a new state, or leave it unresolved. Depth measurements
-behind an old surface provide physical evidence that its former location is
-empty. However, imperfect reconstructed surfaces can produce the same pattern
-even when the object remains present. We therefore identify reliable surface
-samples and compare new evidence with the object's previously observed
-measurement inconsistencies before declaring it absent. Background geometry is
-also retained or removed according to later observations, although its current
-mesh-based update is less expressive than the object-state model.
+We evaluate the method on repeated real-room deployments, controlled synthetic
+data with exact ground truth, and public RGB-D sequences. The experiments measure
+three things directly: how well objects are represented over time, how accurately
+changed object states are detected, and how much obsolete surface remains at old
+locations. We also measure scene geometry to expose the trade-off between keeping
+earlier coverage and introducing duplicate geometry under imperfect alignment.
 
-We instantiate this approach as an extension of Khronos. The inherited
-capabilities are dense reconstruction, motion tracking, and the underlying scene
-representation. Our additions concern the management of successive object
-states, projected evidence for removing an old state, geometric comparison of
-inherited and newly reconstructed states, and transfer of scene memory to the
-next deployment. Camera poses, alignment between deployments, and persistent
-instance labels are inputs to the evaluated backend. We do not claim a new
-object re-identification algorithm or restoration of every internal SLAM
-optimizer state.
-
-Our contributions are threefold. First, we develop a cross-deployment scene-state
-representation and update procedure that retains dense object and background
-geometry alongside object histories while each new deployment continues dynamic
-mapping. Second, we introduce a surface-evidence test for object absence and a
-same-state comparison for reconciling inherited and newly reconstructed objects.
-Third, we evaluate the resulting system through real repeated deployments,
-controlled synthetic changes, and public sequences, measuring object-state
-accuracy, obsolete surface remaining at old locations, and the geometric cost of
-retaining prior coverage. The evaluation distinguishes the gains of scene memory
-from its remaining failure modes rather than assuming that more geometry is
-always a better map.
+Our contributions are:
+\begin{itemize}
+    \item a representation for carrying dense object states, background geometry,
+    and scene history from one dynamic-mapping deployment to the next;
+    \item an evidence-based update rule that uses new depth measurements to keep,
+    replace, or remove imported object states while preserving unobserved ones;
+    \item an evaluation on real, synthetic, and public data that measures retained
+    coverage, changed-state accuracy, obsolete-surface removal, and scene geometry.
+\end{itemize}
