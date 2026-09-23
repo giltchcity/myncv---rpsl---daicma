@@ -1,36 +1,29 @@
-# Manuscript Source
+# Manuscript
 
-This directory contains the official CVPR LaTeX author kit used for drafting.
-As of 2026-08-06, CVPR 2027 has not published an official kit, so the latest
-official `CVPR2026` release is used provisionally. Replace it with the official
-target-year kit before submission and recheck all author guidelines.
+**Working title:** Continuing Dense Dynamic Maps Across Deployments.
 
-Current structure:
+The canonical paper is `main.tex`. In Overleaf, select `manuscript/main.tex` as the main document. Its complete section order is:
 
-```text
-main.tex
-cvpr.sty
-preamble.tex
-main.bib
-ieeenat_fullname.bst
-rebuttal.tex
-sec/
-figures/
-```
+1. `sec/0_abstract.tex`
+2. `sec/1_intro.tex`
+3. `sec/2_related_work.tex`
+4. `sec/4_method.tex`
+5. `sec/5_experiments.tex`
+6. `sec/6_limitations.tex`
+7. `sec/7_conclusion.tex`
 
-Source release:
+The historical files under `../paper_sections_20260923/` are preserved snapshots, not the current manuscript.
 
-```text
-repository: https://github.com/cvpr-org/author-kit
-release:    CVPR2026-v1(latex)
-commit:     12909ae
-downloaded: 2026-08-06
-```
+## Build
 
-The official files are currently unchanged. `OFFICIAL_AUTHOR_KIT_README.md`
-contains the upstream README. In Overleaf, set `manuscript/main.tex` as the main
-document after importing the GitHub repository.
+From this directory, run `latexmk -pdf main.tex`, or run `pdflatex main.tex`, `bibtex main`, and `pdflatex main.tex` twice. The paper uses `main.bib`, `gaussian.bib`, `landscape.bib`, `bib_additions.bib`, and `revision_context.bib`.
 
-Do not create an unofficial replacement for `cvpr.sty`. When the official
-target-year kit is released, replace the author-kit files together and review
-the formatting instructions before submission.
+The repository's original CVPR author kit is retained: release `CVPR2026-v1(latex)`, upstream commit `12909ae`, acquired 2026-08-06. `cvpr.sty` and `ieeenat_fullname.bst` have not been replaced or edited. Verify the correct target-year kit, submission metadata, page limits, and author guidelines before submission. The current paper ID is still a placeholder.
+
+## Reading proof and review record
+
+`reading_copy.tex` is a separate two-column proof wrapper using the same seven section files and `reading_refs.bib`. It can be compiled without the CVPR style and was used for the supplied reading PDF. It is not the official submission layout and does not establish template compliance.
+
+`READABILITY_REVIEW_20260924.md` records the full rewrite, three actual self-review passes, preservation of the 152 numerical result-table entries, and remaining source specifications. An attempted independent AI review failed to read any file; it is explicitly not counted as a completed review.
+
+This is a writing revision. It does not introduce new experiments, automatic re-identification, uncertainty-aware background fusion, or a proven restart-equivalence property. Unknown implementation details must be checked against the matching code and run records rather than filled in from prose.
