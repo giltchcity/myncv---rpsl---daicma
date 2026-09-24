@@ -5,37 +5,74 @@
 Co-Fusion, MID-Fusion, and EM-Fusion reconstruct and track moving objects with
 object-specific surface or volume representations~\cite{runz2017cofusion,
 xu2019midfusion,strecke2019emfusion}. DynaSLAM~II and DynoSAM jointly estimate
-camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}. Khronos
-tracks motion over short time windows, matches reconstructed fragments across
-time, and verifies when objects appear or disappear geometrically, producing a
-dense spatio-temporal map~\cite{schmid2024khronos}. GaME updates a Gaussian map
-when later observations reveal changed geometry~\cite{yugay2026game}. We use
-Khronos as the dynamic-mapping backbone and continue its scene state across
-separate mapping runs.
+camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}.
+DYNEMO-SLAM represents moving agents and relocated objects in an optimizable
+scene graph~\cite{giberna2025dynemo}, while Lost~\&~Found reconstructs 6-DoF
+object trajectories during observed human--object interactions
+~\cite{behrens2025lostfound}. Non-rigid and 4D mapping further extend this
+setting: 4DTAM models deforming surfaces~\cite{matsuki2025fourdtam}, 4D Gaussian
+Splatting SLAM and DynaGSLAM represent time-varying scenes with Gaussian
+primitives~\cite{li2025fourdgsslam,li2026dynagslam}, and 4D Primitive-Mache
+groups rigid primitives to preserve object permanence through temporary
+occlusion~\cite{mazur2026primitive}.
+
+Changes that are revealed only after an observation gap require longer-term
+reasoning within a run. Bore \etal model local object motion together with larger
+state jumps~\cite{bore2019movable}; Changing-SLAM maintains a Bayesian
+object-persistence map and long-term association~\cite{soares2023changing}.
+Khronos combines short-window motion tracking with global fragment association
+and ray-based verification of object appearance and disappearance
+~\cite{schmid2024khronos}. LTC-Mapping accumulates visibility and non-detection
+evidence for object maintenance~\cite{matezbandera2022ltc}, while SuperMap
+maintains open-vocabulary object instances, occupancy, semantic confidence, and
+temporal relations~\cite{zhao2026supermap}. GaME performs dense map revision by
+adding supported geometry and removing ray-contradicted Gaussian primitives
+~\cite{yugay2026game}. We use Khronos as the dynamic-mapping backbone and
+continue its scene state across separate mapping runs.
 
 \paragraph{Long-term map maintenance.}
 Long-term mapping methods update earlier geometry as environments change over
-repeated visits~\cite{pomerleau2014longterm,lazaro2018efficient}. Panoptic
-Multi-TSDFs maintains object and background submaps and distinguishes persistent,
-absent, and unobserved regions~\cite{schmid2022panoptic}. POCD models object-level
-change and whether objects remain stationary, while POV-SLAM couples object
-consistency with pose estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM
-transfers object landmarks between runs~\cite{adkins2024obvislam}; OASIS-Map
-associates objects across sessions and labels them static, moved, appeared,
-disappeared, or unknown~\cite{oh2026oasismap}. Living Scenes matches and
-reconstructs objects from scans acquired at different times~\cite{zhu2024livingscenes}.
-Together, these methods transfer map state, associate objects across visits, and
-preserve regions that were not observed. Our method applies these ideas to a
-dense dynamic map that updates object histories and scene geometry during every
-mapping run.
+repeated visits~\cite{pomerleau2014longterm,lazaro2018efficient}. Dynamic Pose
+Graph SLAM maintains active scan geometry together with a history of added and
+removed points~\cite{walcott2012dynamic}, while LT-Mapper separates repeated-run
+alignment, dynamic-object filtering, and map-change management
+~\cite{kim2022ltmapper}. RBIF uses probabilistic ray-bundle evidence for
+conservative occupancy updates~\cite{breitfuss2024rbif}. More recent lifelong
+methods estimate ephemerality or persistence across repeated traversals:
+ELite recursively updates point-wise ephemerality~\cite{gil2025elite},
+ProbPer-LiLo refines prior and current semantic maps after filtering non-static
+content~\cite{ali2026probperlilo}, and LT-Gaussian removes disappeared Gaussian
+centers and adds emerging geometry~\cite{cheng2025ltgaussian}.
 
-\paragraph{Spatio-temporal scene memory.}
-Recent work also represents scene history for later tasks such as question
-answering and task planning. DAAAM builds a hierarchical 4D scene graph on top
-of Khronos-style geometric reconstruction and attaches detailed semantic
-descriptions~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates
-object identities, and stores current object states together with session-level
-event histories and long-term statistics~\cite{lee2026ltmem}. These systems
-organize and query object history. Our focus is the dense map update itself:
-deciding which previously mapped object and background surfaces are still valid
-under new RGB-D measurements.
+Object- and volume-centric approaches retain richer state across visits.
+Panoptic Multi-TSDFs maintains object and background submaps and distinguishes
+persistent, absent, and unobserved regions~\cite{schmid2022panoptic}. POCD models
+object-level change and stationarity, while POV-SLAM couples object consistency
+with pose estimation~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers
+selected long-term object landmarks between runs~\cite{adkins2024obvislam};
+OASIS-Map associates objects across sessions and labels them static, moved,
+appeared, disappeared, or unknown~\cite{oh2026oasismap}. Living Scenes matches
+and reconstructs objects from scans acquired at different times
+~\cite{zhu2024livingscenes}. Together, these methods establish state transfer,
+object association, and conservative handling of unobserved regions as central
+ingredients of repeated mapping.
+
+\paragraph{Temporal persistence and scene memory.}
+A complementary line of work models how scene state evolves over longer time
+scales. Occupancy-grid HMMs learn transition probabilities
+~\cite{meyerdelius2012changinggrid}, FreMEn models periodic environmental changes
+with compact frequency representations~\cite{krajnik2017fremen}, and
+Spatio-Temporal Hilbert Maps represent continuous time-dependent occupancy
+~\cite{senanayake2016sthm}. Perpetua maintains multiple hypotheses for feature
+appearance and disappearance over time~\cite{saavedraruiz2025perpetua}.
+
+Recent systems also organize persistent scene history for downstream reasoning.
+DAAAM builds a hierarchical 4D scene graph on top of Khronos-style geometric
+reconstruction and attaches detailed semantic descriptions
+~\cite{gorlo2025daaam}. LT-Mem aligns repeated sessions, associates object
+identities, and stores current object states together with session-level event
+histories and long-term statistics~\cite{lee2026ltmem}. These systems emphasize
+organizing and querying temporal scene memory. Our focus is the dense map update
+itself: deciding which previously mapped object and background surfaces are
+still valid under new RGB-D measurements while the new run continues dynamic
+mapping.
