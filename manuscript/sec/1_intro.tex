@@ -11,14 +11,30 @@ position. During the new run, the robot should also continue handling motion and
 changes as in any dynamic-mapping run.
 
 Dense dynamic mapping already handles many changes that occur during one run.
-Systems such as Khronos reconstruct objects and background geometry, track
-observed motion, and update the scene when objects appear or disappear after
-observation gaps~\cite{schmid2024khronos}. Long-term mapping addresses another
-part of the problem: carrying information between visits and updating an older
-map when the environment changes~\cite{pomerleau2014longterm,lazaro2018efficient,
-schmid2022panoptic}. We study how to carry a rich dynamic scene state from one
-completed mapping run into the next without reducing it to either a fresh map
-or a simple union of old and new geometry.
+Object-level systems reconstruct and track moving entities with separate surface
+or volume models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion},
+while tightly coupled estimators jointly reason about camera motion, object
+motion, and scene structure~\cite{bescos2021dynaslam2,morris2025dynosam}.
+Changing-SLAM maintains object persistence across observation gaps
+~\cite{soares2023changing}, Khronos combines visible motion with global
+spatio-temporal reconciliation~\cite{schmid2024khronos}, and GaME updates dense
+Gaussian geometry after out-of-view changes~\cite{yugay2026game}. SuperMap
+extends online object maps with open-vocabulary instances and temporal
+relations~\cite{zhao2026supermap}.
+
+Long-term mapping addresses another part of the problem: carrying information
+between visits and updating an older map when the environment changes
+~\cite{pomerleau2014longterm,lazaro2018efficient}. Recent lifelong systems
+estimate ephemerality or persistence to maintain a current map across repeated
+traversals~\cite{gil2025elite,ali2026probperlilo}. Object- and volume-centric
+methods retain richer cross-run state: Panoptic Multi-TSDFs distinguishes
+persistent, absent, and unobserved submaps~\cite{schmid2022panoptic}, POCD and
+POV-SLAM reason about semi-static object changes~\cite{qian2022pocd,qian2023povslam},
+ObVi-SLAM transfers long-term object landmarks~\cite{adkins2024obvislam}, and
+OASIS-Map associates object changes across completed sessions~\cite{oh2026oasismap}.
+We study how to carry a rich dynamic scene state from one completed mapping run
+into the next without reducing it to either a fresh map or a simple union of old
+and new geometry.
 
 Our method stores successive geometric states of each object and updates them
 with later depth measurements. Each object record contains its reconstructed
