@@ -1,14 +1,14 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a method for continuing dense dynamic maps across separate mapping
-runs. The system carries object states, background geometry, and scene history
-into the next run, then uses new depth observations to refine, replace, or
-remove stored states. Repeated real-room runs show that the method can reconcile
-object changes across revisits while keeping the next run fully dynamic. In
-simulation, where the complete scene is available as ground truth, carrying
-memory strongly improves geometric recall without reducing precision; the real
-runs expose the remaining difficulty of fusing slightly misaligned background
-geometry. Public sequences provide additional repeated-visit and single-run
-checks. Together, the results support persistent scene-state updates as a
-practical extension of dense dynamic mapping to repeated robot operation.
+We formulated persistent map updating as the selection and integration of
+observations that remain temporally valid. Object-state reasoning determines
+when earlier observations stop describing the current world. Current valid
+measurements take priority where they provide evidence, and eligible memory
+preserves the remaining coverage. The TSDF realization applies these decisions
+before extracting object and background surfaces. Experiments with the current
+Khronos-based pipeline report cross-run object updates, reduced old-location
+residue, and the coverage benefit of carrying a previous map. This formulation
+places temporal evidence selection between scene-state reasoning and geometric
+integration, providing a concrete basis for extending the same update policy to
+other map representations.

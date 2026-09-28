@@ -1,111 +1,188 @@
 \section{Method}
 \label{sec:method}
 
-\subsection{Inputs and Stored Scene State}
+Our update has two parts. Temporal reasoning selects observations and inherited
+states that remain valid. The mapper then integrates this selected evidence in
+its own representation. We first define the selection and then give its TSDF
+realization.
+
+\subsection{Inputs and Temporal State}
 \label{sec:problem}
 
-For each frame, the method receives an RGB-D image, camera pose, and instance
-masks. Before a new mapping run starts, a known rigid transform places the map
-from the previous run in the current coordinate frame. Instance IDs are kept
-consistent across runs, so observations of the same physical object share one
-identity.
+A run receives RGB-D images, camera poses, and object instance masks. A supplied
+rigid transform aligns the run with the previous map. Observations of the same
+physical object use a consistent identity across runs. We write $\mathcal{O}_k(t)$
+for the depth-ray observations received in run $k$ up to time $t$.
 
-We represent each physical object as a sequence of \emph{fragments}. A fragment
-stores one reconstructed state of the object: its mesh, bounding box, time
-interval, and source observations. A fragment created while the object is
-observed moving also stores the tracked trajectory. Each object has one current
-fragment. When a new reconstruction may correspond to a moved state, it is kept
-as a temporary candidate until the update rule resolves it. Earlier fragments
-remain in the object's history.
+Each physical object has a sequence of geometric states, called \emph{fragments}.
+A fragment records its reconstructed geometry, source observations, and temporal
+interval. Observed motion additionally has a tracked trajectory. A new
+reconstruction is kept separately until the system decides whether it refines
+the current fragment or belongs to a changed state. Ending a state removes its
+geometry from the current view, not from the recorded history.
 
-The state exported after run $k$ is
-\begin{equation}
-  \mathcal{S}^{k}=(B^k,\mathcal{F}^k,\mathcal{H}^k,\Theta^k),
-  \label{eq:stored_state}
-\end{equation}
-where $B^k$ is the current background mesh, $\mathcal{F}^k$ is the object
-fragment registry, $\mathcal{H}^k$ is the recorded scene history, and $\Theta^k$
-contains the statistics used by the absence detector. The next run loads this
-state and continues updating it.
+Let $\mathcal{H}(t)$ contain these state intervals and decisions inferred from
+observations available by $t$. It supplies the temporal conditions used below.
+The backbone reconstructs surfaces and motion; our update decides which of the
+resulting observations and stored states remain eligible for current mapping.
 
-\subsection{Dynamic-Mapping Backbone}
-
-We build on Khronos~\cite{schmid2024khronos}. Its active window reconstructs
-local geometry from RGB-D input and tracks moving objects. For each object it
-provides a reconstructed segment, its observation interval, and whether the
-object was tracked as moving; moving segments also carry a trajectory. Khronos
-also maintains the global background mesh. Our method uses these outputs to
-update object states across repeated mapping runs.
-
-\subsection{Geometric Evidence for Object Absence}
+\subsection{Inferring When an Object State Changes}
+\label{sec:states}
 \label{sec:absence}
 
-To test whether a stored object state is still present, we discretize its surface
-into 5\,cm cells and project visible cells into later depth images. A cell is
-tested only when it is inside the image, within sensor range, and viewed at an
-incidence angle of at most $60^\circ$. Let $z_f$ be the expected depth of the
-stored surface and $d$ the measured depth at the same pixel. With
-$\tau_s=5$\,cm,
+We use Khronos for local reconstruction and observed-motion tracking
+~\cite{schmid2024khronos}. To test an older state, we project its surface into a
+later depth image. Let $z_f$ be its expected depth and $d$ the measured depth at
+the same pixel. Measurements close to $z_f$ support the surface. A measurement
+behind it is evidence that its old location is empty. A closer measurement
+occludes the surface; missing image coverage supplies no evidence of absence.
+
+The object-state test uses 5\,cm surface cells, a 5\,cm depth tolerance, and
+views with incidence angles no greater than $60^\circ$. A cell becomes reliable
+after at least three identity-consistent observations without a seen-through
+contradiction while that state was confirmed present. At each update, the
+fraction of tested reliable cells seen through is compared with a Beta presence
+model learned from that object's confirmed observations and pooled sensor
+statistics. A one-sided log-likelihood ratio against a uniform absence model is
+accumulated with a cumulative-sum (CUSUM) test. Absence is declared when its
+score exceeds $\ln 99$ and seen-through rays outnumber supporting rays.
+% (double check) Keep the finalized presence-model, accumulation, and sampling definitions synchronized with the implementation.
+
+A newly reconstructed object can also establish a different state. Once it has
+at least 30 reliable surface cells, we compare it with the inherited fragment.
+If most of its surface is within 10\,cm of the inherited surface, it refines
+that state; otherwise it starts a new state and ends the previous one. Objects
+configured as fixed structure instead accumulate complementary views. These
+decisions produce the validity intervals used by geometry integration. For a
+hidden transition, the interval boundary is inferred from the before-and-after
+observations; the method does not insert an unobserved motion trajectory.
+
+\subsection{Selecting Observations and Memory}
+\label{sec:validity}
+
+\paragraph{Observation validity.}
+An earlier measurement describes the current map only if the scene state it
+measured has not subsequently changed. For an observation $o$ taken at $t_o$,
+we define
 \begin{equation}
-\begin{array}{ll}
- |d-z_f|\le\tau_s & \text{supports the stored surface},\\
- d-z_f>\tau_s     & \text{passes through the stored surface},\\
- d-z_f<-\tau_s    & \text{is occluded by a closer surface}.
-\end{array}
-\label{eq:depth_test}
+ v_o(x,t)=\mathbf{1}\!\left[\begin{array}{c}
+ \text{no inferred state change at }x\\[-1pt]
+ \text{during }(t_o,t]
+ \end{array}\right].
+ \label{eq:temporal_validity}
 \end{equation}
-A measurement behind the expected surface is evidence that the old state is
-absent. Occlusion or missing coverage provides no absence evidence.
-
-Depth artifacts can also make a valid surface appear empty. A surface cell is
-therefore used by the absence detector only after the object's identity has been
-observed on that cell in at least three frames and the cell has not been seen
-through while the object was confirmed in place. At each update we compute
+This condition is evaluated from $\mathcal{H}(t)$, not from future observations.
+Let $b_o(x)$ indicate that $x$ is within the integration support of a valid
+measurement ray. Invalid depth, locations outside its image footprint, and
+unobserved space beyond its supported range do not contribute. The observation
+weight is
 \begin{equation}
- f = \frac{\text{reliable cells seen through}}
-          {\text{reliable cells tested}}.
- \label{eq:through_fraction}
+ \begin{aligned}
+ w_o(x,t)&=b_o(x)\,v_o(x,t),\\
+ A_k(x,t)&=\sum_{o\in\mathcal{O}_k(t)} w_o(x,t).
+ \end{aligned}
+ \label{eq:valid_weight}
 \end{equation}
-Confirmed observations of the object provide examples of $f$ while the state is
-present. We fit a Beta model to this history and combine it with pooled statistics
-from other objects observed by the same sensor. The absence hypothesis uses a
-uniform model over $f$. A one-sided log-likelihood ratio is accumulated with a
-CUSUM test. The fragment is marked absent when the accumulated score exceeds
-$\ln 99$ and rays passing through the old surface outnumber rays that meet it.
+Thus $A_k$ counts valid current-run measurements at $x$. If a state begins at
+$t_L$, observations from before that state cannot be fused into its current
+reconstruction. Observations of an ended state remain associated with its
+historical fragment.
 
-\subsection{Updating Object States}
-\label{sec:states}
+\paragraph{When memory remains active.}
+Let $I_k(x,t)=1$ where the current object reconstruction identifies $x$ as inside
+an observed object body, and $0$ elsewhere. Memory is selected by
+\begin{equation}
+ m_k(x,t)=\mathbf{1}[A_k(x,t)=0]\,(1-I_k(x,t)).
+ \label{eq:memory_gate}
+\end{equation}
+The first factor gives current valid measurements priority. This includes both
+surface measurements and rays that pass through an old surface: observed empty
+space is still evidence. The second factor prevents an inherited surface from
+remaining inside the body of a currently observed object.
+% (double check) Specify the implemented observed-body predicate; do not substitute a bounding-box interior or ground-truth volume for it.
 
-A moving segment ends the previous current fragment and starts a new fragment
-with the observed trajectory. For a stationary segment reconstructed during the
-same run, spatial overlap with the current fragment normally refines that state.
-If the old surface has already been observed empty, or the new reconstruction
-occupies a different location, the segment is kept as a candidate instead of
-being merged immediately.
+The prior is drawn from inherited states still eligible for the current map.
+When object reasoning retires a state, its stored geometry belongs to history
+rather than this prior. Without a valid current observation or a conflicting
+object-state decision, eligible memory remains unchanged. This avoids turning
+lack of observation into evidence of disappearance.
 
-Imported objects are handled conservatively. Their first new reconstruction is
-kept separate from the stored fragment. Once the new reconstruction contains at
-least 30 reliable surface cells, we compare it with the imported surface. If a
-majority of the new surface lies within $\tau_o=10$\,cm of the imported surface,
-the two are treated as the same state and their geometry is merged. Otherwise,
-the imported fragment ends and the candidate becomes current. The absence test
-can also end the imported fragment when later depth measurements repeatedly show
-that its old location is empty. Classes treated as fixed structure accumulate
-complementary views instead of using the replacement test.
+\subsection{TSDF Realization}
+\label{sec:tsdf}
 
-\subsection{Background Update}
+For a fixed query time, we omit $t$ to keep the notation compact. Observation
+$o$ has camera center $c_o$ and measured range $r_o$ along its ray. Its truncated
+signed ray-distance contribution is
+\begin{equation}
+ \phi_o(x)=\operatorname{clamp}\!\left(r_o-\|x-c_o\|,-T,T\right),
+ \label{eq:ray_distance}
+\end{equation}
+where $T$ is the mapper's truncation distance. The sign is positive before the
+measured surface and negative behind it within the supported truncation band.
+For depth images stored as optical-axis depth, the reading is first converted
+to range along the ray.
 
-The previous background mesh is transformed into the coordinate frame of the new
-run. Later observation rays remove old background vertices where measured free
-space contradicts them. Vertices that are not re-observed are retained, and new
-background geometry is added. This keeps earlier coverage while allowing
-directly contradicted geometry to disappear from the current map.
+Let $D_{k-1}(x)$ and $W_{k-1}(x)$ be the inherited field and its integration
+weight, after restricting the prior to eligible states. Applying the temporal
+and memory selections gives
+\begin{equation}
+ D_k(x)=\frac{
+ \displaystyle\sum_{o\in\mathcal{O}_k}w_o(x)\phi_o(x)
+ +m_k(x)W_{k-1}(x)D_{k-1}(x)}{
+ \displaystyle\sum_{o\in\mathcal{O}_k}w_o(x)
+ +m_k(x)W_{k-1}(x)}.
+ \label{eq:valid_tsdf}
+\end{equation}
+For the first run, the prior weight is zero. The denominator is the resulting
+integration weight $W_k(x)$. If it is zero,
+$x$ is unknown and contributes no surface. The current surface is extracted
+from the zero level set of $D_k$ where valid support exists.
 
-\subsection{Transfer to the Next Run}
+Equation~\eqref{eq:valid_tsdf} has two direct cases. Where $A_k(x)>0$, the
+prior is inactive and the field is determined by current valid observations.
+Where $A_k(x)=0$, eligible memory supplies the field unless the object-body
+condition excludes it. Old and new evidence are therefore not averaged merely
+because they occupy the same spatial cell.
+
+Consider an old chair location. If the current depth ray reaches the wall behind
+it, $\phi_o$ is positive at the old surface and $m_k=0$: the inherited chair
+surface no longer supplies a zero crossing there. If the location is outside
+view or hidden by a nearer surface, it has no such current evidence and eligible
+memory remains. The decision is made from the measurements before surface
+extraction, including regions where no replacement mesh is produced.
+
+\subsection{Identity and Run Handoff}
 \label{sec:contract}
 
-At the end of a run, the system exports the current background, the object
-fragment registry, recorded object histories, and the statistics used by the
-absence detector. Scene snapshots are recorded at each reconciliation update so
-that previous states remain available together with the current map. The next
-mapping run loads this state and continues the same update process.
+The object-state assignment supplies the identity $\ell_k(x)$ of reconstructed
+object geometry; geometry without an object assignment belongs to the background.
+Retained memory carries its earlier identity and follows that state's temporal
+validity. Object and background geometry use the same evidence-selection rule.
+We evaluate the TSDF expression at the fine object resolution and the coarser
+online-map resolution. Fine-grid surfaces are used where available, and coarse
+surfaces fill regions where the fine grid does not establish a surface. This is
+a resolution choice, not a second temporal update rule.
+% (double check) Apply identical temporal and memory gates to coarse fill so it cannot reintroduce a retired state.
+
+A run exports the eligible geometric state, integration weights, object-state
+history, and statistics required by the temporal inference. The next run loads
+this state, aligns new observations to the common frame, and repeats the same
+selection and integration. Historical views select their corresponding state
+intervals; the current view contains only currently eligible states.
+
+\subsection{Map-Specific Integration}
+\label{sec:representation}
+
+The shared part of the method is the validity of observations, the eligibility
+of memory, and the temporal identity of map content. Signed-distance averaging
+in Eq.~\eqref{eq:valid_tsdf} is the TSDF-specific realization. Another map
+representation must expose observation support and execute updates in its own
+geometry, while respecting the same temporal selections.
+
+For a point or surfel map, this means retaining or integrating selected surface
+measurements. For a Gaussian map, a realization would apply validity to the
+observations used for optimization and to the inherited primitives they support.
+Retiring geometry must also stop obsolete observations from recreating it during
+later optimization. These are the requirements for an adapter, rather than
+separate temporal decision rules for each representation.
+% (double check) Validate a shared-core Gaussian adapter before claiming cross-representation experimental results.

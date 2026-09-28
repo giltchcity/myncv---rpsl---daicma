@@ -1,21 +1,32 @@
 # Manuscript
 
-**Working title:** Continuing Dense Dynamic Maps Across Mapping Runs.
+**Working title:** Persistent Map Updates from Temporally Valid Observations.
 
-The canonical paper is `main.tex`. In Overleaf, select `manuscript/main.tex` as the main document. The section order is:
+The canonical paper is `main.tex`, on `codex/initial-paper-workspace`.
+Select `manuscript/main.tex` as the main document in Overleaf.
 
-1. `sec/0_abstract.tex`
-2. `sec/1_intro.tex`
-3. `sec/2_related_work.tex`
-4. `sec/4_method.tex`
-5. `sec/5_experiments.tex`
-6. `sec/6_limitations.tex`
-7. `sec/7_conclusion.tex`
+The method separates temporal evidence selection from native map integration.
+It defines observation validity and memory selection, then gives their TSDF
+realization for object and background geometry. The reported tables remain the
+existing Khronos-based pipeline results. Author-only `% (double check)` comments
+mark synchronization points for the ongoing implementation.
 
-The historical files under `../paper_sections_20260923/` are snapshots and are not used by the current manuscript.
+## Contents
+
+- `sec/0_abstract.tex`
+- `sec/1_intro.tex`
+- `sec/2_related_work.tex`
+- `sec/4_method.tex`
+- `sec/5_experiments.tex`
+- `sec/6_limitations.tex`
+- `sec/7_conclusion.tex`
+- `figures/update_overview.tex` — editable LaTeX overview diagram
 
 ## Build
 
-From this directory, run `latexmk -pdf main.tex`, or run `pdflatex main.tex`, `bibtex main`, and `pdflatex main.tex` twice.
+Run `latexmk -pdf main.tex` from this directory, or `pdflatex main.tex`,
+`bibtex main`, and `pdflatex main.tex` twice. The retained CVPR author kit is used
+without modification. Bibliography files remain `main.bib`, `gaussian.bib`,
+`landscape.bib`, `bib_additions.bib`, and `revision_context.bib`.
 
-The bibliography files used by `main.tex` are `main.bib`, `gaussian.bib`, `landscape.bib`, `bib_additions.bib`, and `revision_context.bib`.
+Historical workspace notes outside this directory are not included in the paper.

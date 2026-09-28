@@ -1,20 +1,20 @@
 \begin{abstract}
-Robots that revisit changing environments need to keep useful geometry from
-earlier runs without preserving object positions that are no longer valid.
-Starting every run from scratch loses previous coverage, while simply
-accumulating maps leaves stale geometry behind. We present a method for
-continuing a dense dynamic map across separate mapping runs. Built on Khronos,
-the method stores successive object states and background geometry, then updates
-them with new RGB-D observations. New depth measurements projected onto previous
-surfaces distinguish agreement, occlusion, and evidence that an old state is
-absent. Evidence is accumulated before removing an object state, while
-geometric comparison determines whether a new reconstruction refines the
-previous state or represents a new one. On three real-room runs, F1 for object
-changes between runs is 96.8\% and 100.0\%, compared with 64.0\% and 37.5\% for
-Panoptic Multi-TSDFs, while old-location residue falls from 57--60\% to 7--11\%.
-On controlled synthetic data, loading the previous scene raises geometry recall
-from 78.5\% to 98.1\% at similar precision and detects 29 of 32 between-run
-changes without a false event. The results show that dense dynamic scene state
-can be carried across repeated mapping runs while remaining updateable by later
-observations.
+An observation can be accurate when recorded and still be wrong for the current
+map: the object it measured may have moved since then. Repeated mapping therefore
+requires deciding which observations remain valid, as well as how to fuse them.
+We propose a persistent map-update method based on temporal validity and selective
+use of memory. Object-state reasoning identifies changes and excludes observations
+of states that have ended. Current valid measurements determine the map where
+they provide evidence; previous geometry is retained elsewhere, except where it
+conflicts with a currently observed object. This separates the temporal selection
+of evidence from the map representation used to integrate it. We give a TSDF
+formulation that applies the same selection to object and background geometry
+before surface extraction. Our current Khronos-based pipeline is evaluated on
+repeated real and synthetic recordings and three public datasets. On real-room
+revisits, change F1 is 96.8\% and 100.0\%, and old-location residue is
+6.8\% and 10.9\%, compared with 57.1\% and 60.1\% for Panoptic Multi-TSDFs.
+On synthetic data, geometry recall is 98.1\%, compared with 78.5\% for the
+from-scratch result at similar precision. The central idea is to update a map
+from observations that still describe the current world, rather than combine
+all observations regardless of when they were valid.
 \end{abstract}

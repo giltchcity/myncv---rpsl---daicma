@@ -1,72 +1,77 @@
 \section{Introduction}
 \label{sec:intro}
 
-A robot that maps the same environment repeatedly should not have to choose
-between forgetting the past and keeping every old surface forever. Suppose a
-robot maps a room, returns the next day, and finds that a chair has moved. Some
-parts of the room are observed again, while others are not visited. A useful map
-should preserve geometry that is still valid, remove the chair's old state when
-later measurements show that the space is empty, and add the chair at its new
-position. During the new run, the robot should also continue handling motion and
-changes as in any dynamic-mapping run.
+A robot maps a room and returns after a chair has moved. The earlier depth images
+were correct when they were captured, but some now describe an obsolete scene.
+Keeping all of them leaves the chair in two places. Starting over loses parts
+of the room that the robot does not revisit. A useful update must answer two
+questions: which observations still describe the current scene, and where should
+the previous map remain in use?
 
-Dense dynamic mapping already handles many changes that occur during one run.
-Object-level systems reconstruct and track moving entities with separate surface
-or volume models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion},
-while tightly coupled estimators jointly reason about camera motion, object
-motion, and scene structure~\cite{bescos2021dynaslam2,morris2025dynosam}.
+\input{figures/update_overview}
+
+Dynamic mapping already addresses motion and changes during a recording.
+Object-level systems reconstruct moving entities with separate surface or volume
+models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion}, while joint
+estimators recover camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}.
 Changing-SLAM maintains object persistence across observation gaps
-~\cite{soares2023changing}, Khronos combines visible motion with global
-spatio-temporal reconciliation~\cite{schmid2024khronos}, and GaME updates dense
-Gaussian geometry after out-of-view changes~\cite{yugay2026game}. SuperMap
-extends online object maps with open-vocabulary instances and temporal
-relations~\cite{zhao2026supermap}.
+~\cite{soares2023changing}; Khronos combines visible motion with temporal
+reconciliation~\cite{schmid2024khronos}; and GaME updates Gaussian geometry
+after out-of-view changes~\cite{yugay2026game}. SuperMap maintains online
+object maps with open-vocabulary instances and temporal relations
+~\cite{zhao2026supermap}.
 
-Long-term mapping addresses another part of the problem: carrying information
-between visits and updating an older map when the environment changes
-~\cite{pomerleau2014longterm,lazaro2018efficient}. Recent lifelong systems
-estimate ephemerality or persistence to maintain a current map across repeated
-traversals~\cite{gil2025elite,ali2026probperlilo}. Object- and volume-centric
-methods retain richer cross-run state: Panoptic Multi-TSDFs distinguishes
-persistent, absent, and unobserved submaps~\cite{schmid2022panoptic}, POCD and
-POV-SLAM reason about semi-static object changes~\cite{qian2022pocd,qian2023povslam},
-ObVi-SLAM transfers long-term object landmarks~\cite{adkins2024obvislam}, and
-OASIS-Map associates object changes across completed sessions~\cite{oh2026oasismap}.
-We study how to carry a rich dynamic scene state from one completed mapping run
-into the next without reducing it to either a fresh map or a simple union of old
-and new geometry.
+Long-term mapping carries information between visits and revises an earlier map
+~\cite{pomerleau2014longterm,lazaro2018efficient}. ELite and ProbPer-LiLo model
+which content persists over repeated traversals~\cite{gil2025elite,ali2026probperlilo}.
+Panoptic Multi-TSDFs distinguishes persistent, absent, and unobserved submaps
+~\cite{schmid2022panoptic}. POCD and POV-SLAM reason about object changes
+~\cite{qian2022pocd,qian2023povslam}, ObVi-SLAM transfers object landmarks
+~\cite{adkins2024obvislam}, and OASIS-Map associates objects across sessions
+~\cite{oh2026oasismap}. These approaches motivate a shared question beneath
+particular map representations: when should an earlier measurement continue to
+influence the current map?
 
-Our method stores successive geometric states of each object and updates them
-with later depth measurements. Each object record contains its reconstructed
-surface, the time interval in which it was observed, and the observations used
-to build it. When a new run begins, its measurements are compared with the
-stored states. Depth agreement supports an old surface, a closer measurement
-indicates occlusion, and a farther measurement indicates that the old surface
-is absent at that location. A new reconstruction is either merged with the
-stored state or kept as a new state. Background geometry is handled similarly:
-unobserved surfaces are retained, contradicted surfaces are removed, and newly
-reconstructed geometry is added.
+We address this question by separating \emph{temporal evidence selection} from
+\emph{geometric integration}. Our first rule is that an observation contributes
+to current geometry only while the scene state it measured remains valid. If an
+object moves, measurements of its previous state belong to history rather than
+to the current reconstruction. Our second rule selects between current evidence
+and memory. Where the current run has valid depth evidence, that evidence defines
+the update. Where it has none, the previous map is retained, subject to the
+current object-state assignment. A ray that passes through an old surface is
+current evidence even when it produces no replacement surface there.
 
-The next run loads more than a final mesh. It receives the object-state
-registry, current background geometry, recorded history, and accumulated
-measurement statistics used by the absence detector. The same scene history can
-therefore continue to grow while the new run reconstructs its own motion and
-changes.
+The distinction matters before geometry is converted into a mesh. A mesh records
+surfaces, whereas the depth observations used to build it also identify free
+space. Comparing two final meshes alone loses this distinction between a region
+that was observed empty and one that was not observed. We instead use temporal
+state and ray evidence to select the observations that enter reconstruction.
+For a TSDF map, the resulting field is a weighted average of currently valid
+observations and a spatially gated prior. Object and background surfaces are
+extracted after this selection, using the same update rule.
 
-We evaluate the method on repeated real-room runs, controlled synthetic data
-with exact ground truth, and public RGB-D sequences. We measure temporal object
-reconstruction, detection of changed object states, obsolete surface left at
-former object locations, and scene geometry. The geometry scores also show the
-trade-off between keeping previously observed surfaces and introducing duplicate
-background geometry under imperfect alignment.
+The temporal policy is defined independently of a particular mapper. A mapper
+supplies geometry queries and native integration operations; the policy decides
+which observations and inherited states remain eligible. We develop this
+separation through a TSDF formulation and a Khronos-based implementation. This
+preserves the backbone's motion and object-state estimates while moving the
+persistence decision into the evidence used to construct the map.
+
+Our experiments examine three consequences of persistent updates: whether old
+states are removed, whether previous coverage remains useful, and whether the
+new run continues to handle its own changes. Repeated Kinect and Isaac Sim
+recordings exercise the complete pipeline. 3RScan supplies public revisit cases,
+while Bonn and TUM test single-run object motion and moving people.
 
 Our contributions are:
 \begin{itemize}
-    \item a representation for carrying dense object states, background geometry,
-    and scene history from one dynamic-mapping run to the next;
-    \item an evidence-based update rule that uses new depth measurements to keep,
-    replace, or remove stored object states while preserving unobserved geometry;
-    \item an evaluation on real, synthetic, and public data that measures object
-    reconstruction, changed-state accuracy, obsolete-surface removal, and scene
-    geometry across repeated runs.
+    \item a temporal update formulation that selects observations according to
+    their state validity and selects prior geometry according to current
+    measurement coverage;
+    \item a TSDF realization that applies these selections before object and
+    background surface extraction, with object identities and historical states
+    maintained by the same temporal reasoning;
+    \item a repeated-mapping evaluation covering changed-state accuracy,
+    obsolete-surface removal, geometry coverage, and single-run behavior.
 \end{itemize}
