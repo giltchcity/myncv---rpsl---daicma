@@ -1,36 +1,32 @@
-# Manuscript Source
+# Manuscript
 
-This directory contains the official CVPR LaTeX author kit used for drafting.
-As of 2026-08-06, CVPR 2027 has not published an official kit, so the latest
-official `CVPR2026` release is used provisionally. Replace it with the official
-target-year kit before submission and recheck all author guidelines.
+**Working title:** Persistent Map Updates from Temporally Valid Observations.
 
-Current structure:
+The canonical paper is `main.tex`, on `codex/initial-paper-workspace`.
+Select `manuscript/main.tex` as the main document in Overleaf.
 
-```text
-main.tex
-cvpr.sty
-preamble.tex
-main.bib
-ieeenat_fullname.bst
-rebuttal.tex
-sec/
-figures/
-```
+The method separates temporal evidence selection from native map integration.
+It defines observation validity and memory selection, then gives their TSDF
+realization for object and background geometry. The reported tables remain the
+existing Khronos-based pipeline results. Author-only `% (double check)` comments
+mark synchronization points for the ongoing implementation.
 
-Source release:
+## Contents
 
-```text
-repository: https://github.com/cvpr-org/author-kit
-release:    CVPR2026-v1(latex)
-commit:     12909ae
-downloaded: 2026-08-06
-```
+- `sec/0_abstract.tex`
+- `sec/1_intro.tex`
+- `sec/2_related_work.tex`
+- `sec/4_method.tex`
+- `sec/5_experiments.tex`
+- `sec/6_limitations.tex`
+- `sec/7_conclusion.tex`
+- `figures/update_overview.tex` — editable LaTeX overview diagram
 
-The official files are currently unchanged. `OFFICIAL_AUTHOR_KIT_README.md`
-contains the upstream README. In Overleaf, set `manuscript/main.tex` as the main
-document after importing the GitHub repository.
+## Build
 
-Do not create an unofficial replacement for `cvpr.sty`. When the official
-target-year kit is released, replace the author-kit files together and review
-the formatting instructions before submission.
+Run `latexmk -pdf main.tex` from this directory, or `pdflatex main.tex`,
+`bibtex main`, and `pdflatex main.tex` twice. The retained CVPR author kit is used
+without modification. Bibliography files remain `main.bib`, `gaussian.bib`,
+`landscape.bib`, `bib_additions.bib`, and `revision_context.bib`.
+
+Historical workspace notes outside this directory are not included in the paper.

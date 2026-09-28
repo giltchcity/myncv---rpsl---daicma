@@ -1,0 +1,161 @@
+{
+  "checked_on": "2026-08-06",
+  "purpose": "Author-side full-text audit cache. PDFs are downloaded locally and are not redistributed by this repository.",
+  "papers": [
+    {
+      "key": "runz2017cofusion",
+      "title": "Co-Fusion: Real-Time Segmentation, Tracking and Fusion of Multiple Objects",
+      "status": "published",
+      "venue": "ICRA 2017",
+      "pdf_url": "https://arxiv.org/pdf/1706.06629",
+      "landing_url": "https://arxiv.org/abs/1706.06629",
+      "filename": "runz2017cofusion.pdf"
+    },
+    {
+      "key": "runz2018maskfusion",
+      "title": "MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects",
+      "status": "published",
+      "venue": "ISMAR 2018",
+      "pdf_url": "https://arxiv.org/pdf/1804.09194",
+      "landing_url": "https://arxiv.org/abs/1804.09194",
+      "filename": "runz2018maskfusion.pdf"
+    },
+    {
+      "key": "bescos2018dynaslam",
+      "title": "DynaSLAM: Tracking, Mapping, and Inpainting in Dynamic Scenes",
+      "status": "published",
+      "venue": "RA-L 2018",
+      "pdf_url": "https://arxiv.org/pdf/1806.05620",
+      "landing_url": "https://arxiv.org/abs/1806.05620",
+      "filename": "bescos2018dynaslam.pdf"
+    },
+    {
+      "key": "schmid2023dynablox",
+      "title": "Dynablox: Real-Time Detection of Diverse Dynamic Objects in Complex Environments",
+      "status": "published",
+      "venue": "RA-L 2023",
+      "pdf_url": "https://arxiv.org/pdf/2304.10049",
+      "landing_url": "https://arxiv.org/abs/2304.10049",
+      "filename": "schmid2023dynablox.pdf"
+    },
+    {
+      "key": "morris2025dynosam",
+      "title": "DynoSAM: Open-Source Smoothing and Mapping Framework for Dynamic SLAM",
+      "status": "published",
+      "venue": "IEEE T-RO 2025",
+      "pdf_url": "https://arxiv.org/pdf/2501.11893",
+      "landing_url": "https://arxiv.org/abs/2501.11893",
+      "filename": "morris2025dynosam.pdf"
+    },
+    {
+      "key": "bore2019movable",
+      "title": "Detection and Tracking of General Movable Objects in Large Three-Dimensional Maps",
+      "status": "published",
+      "venue": "IEEE T-RO 2019",
+      "pdf_url": "https://arxiv.org/pdf/1712.08409",
+      "landing_url": "https://arxiv.org/abs/1712.08409",
+      "filename": "bore2019movable.pdf"
+    },
+    {
+      "key": "pomerleau2014longterm",
+      "title": "Long-Term 3D Map Maintenance in Dynamic Environments",
+      "status": "published",
+      "venue": "ICRA 2014",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1109/ICRA.2014.6907397",
+      "filename": "pomerleau2014longterm.pdf",
+      "manual_note": "Obtain the author manuscript or institutional-access PDF and place it at this filename."
+    },
+    {
+      "key": "soares2023changing",
+      "title": "Visual Localization and Mapping in Dynamic and Changing Environments",
+      "status": "published",
+      "venue": "Journal of Intelligent & Robotic Systems 2023",
+      "pdf_url": "https://link.springer.com/content/pdf/10.1007/s10846-023-02019-6.pdf",
+      "landing_url": "https://doi.org/10.1007/s10846-023-02019-6",
+      "filename": "soares2023changing.pdf"
+    },
+    {
+      "key": "schmid2024khronos",
+      "title": "Khronos: A Unified Approach for Spatio-Temporal Metric-Semantic SLAM in Dynamic Environments",
+      "status": "published",
+      "venue": "RSS 2024",
+      "pdf_url": "https://www.roboticsproceedings.org/rss20/p081.pdf",
+      "landing_url": "https://www.roboticsproceedings.org/rss20/p081.html",
+      "filename": "schmid2024khronos.pdf"
+    },
+    {
+      "key": "schmid2022panoptic",
+      "title": "Panoptic Multi-TSDFs",
+      "status": "published",
+      "venue": "ICRA 2022",
+      "pdf_url": "https://arxiv.org/pdf/2109.10165",
+      "landing_url": "https://arxiv.org/abs/2109.10165",
+      "filename": "schmid2022panoptic.pdf"
+    },
+    {
+      "key": "lazaro2018efficient",
+      "title": "Efficient Long-Term Mapping in Dynamic Environments",
+      "status": "published",
+      "venue": "IROS 2018",
+      "pdf_url": null,
+      "landing_url": "https://doi.org/10.1109/IROS.2018.8594310",
+      "filename": "lazaro2018efficient.pdf",
+      "manual_note": "Obtain an author manuscript or institutional-access PDF and place it at this filename."
+    },
+    {
+      "key": "qian2022pocd",
+      "title": "POCD: Probabilistic Object-Level Change Detection and Volumetric Mapping in Semi-Static Scenes",
+      "status": "published",
+      "venue": "RSS 2022",
+      "pdf_url": "https://arxiv.org/pdf/2205.01202",
+      "landing_url": "https://arxiv.org/abs/2205.01202",
+      "filename": "qian2022pocd.pdf"
+    },
+    {
+      "key": "qian2023povslam",
+      "title": "POV-SLAM: Probabilistic Object-Aware Variational SLAM in Semi-Static Environments",
+      "status": "published",
+      "venue": "RSS 2023",
+      "pdf_url": "https://arxiv.org/pdf/2307.00488",
+      "landing_url": "https://arxiv.org/abs/2307.00488",
+      "filename": "qian2023povslam.pdf"
+    },
+    {
+      "key": "adkins2024obvislam",
+      "title": "ObVi-SLAM: Long-Term Object-Visual SLAM",
+      "status": "published",
+      "venue": "RA-L 2024",
+      "pdf_url": "https://arxiv.org/pdf/2309.15268",
+      "landing_url": "https://arxiv.org/abs/2309.15268",
+      "filename": "adkins2024obvislam.pdf"
+    },
+    {
+      "key": "zhu2024livingscenes",
+      "title": "Living Scenes: Multi-Object Relocalization and Reconstruction in Changing 3D Environments",
+      "status": "published",
+      "venue": "CVPR 2024",
+      "pdf_url": "https://arxiv.org/pdf/2312.09138",
+      "landing_url": "https://arxiv.org/abs/2312.09138",
+      "filename": "zhu2024livingscenes.pdf"
+    },
+    {
+      "key": "yugay2026game",
+      "title": "Gaussian Mapping for Evolving Scenes",
+      "status": "published",
+      "venue": "CVPR 2026",
+      "pdf_url": "https://arxiv.org/pdf/2506.06909",
+      "landing_url": "https://arxiv.org/abs/2506.06909",
+      "filename": "yugay2026game.pdf"
+    },
+    {
+      "key": "oh2026oasismap",
+      "title": "OASIS-Map: Object-Level Change Detection in Multi-Session Mapping Using Semantic Correspondence Matching",
+      "status": "under-review preprint as of 2026-08-06",
+      "venue": "arXiv 2026",
+      "pdf_url": "https://arxiv.org/pdf/2607.14899",
+      "landing_url": "https://arxiv.org/abs/2607.14899",
+      "filename": "oh2026oasismap.pdf"
+    }
+  ]
+}

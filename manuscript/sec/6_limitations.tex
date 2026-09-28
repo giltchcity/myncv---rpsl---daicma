@@ -1,0 +1,12 @@
+\section{Limitations}
+\label{sec:limitations}
+
+The update depends on inferred object-state changes. A missed transition leaves
+obsolete measurements eligible; a false transition can discard useful evidence.
+Partial revisits can delay an absence decision, as for the removed 3RScan chair.
+
+Temporal selection also does not correct pose misalignment. The real-room runs
+use a rigid alignment, and residual local errors can place repeated wall
+observations at different locations. The reported geometry results show the
+resulting precision loss. Small visible motions remain subject to the backbone's
+motion-extraction threshold, as in the Bonn box sequence.

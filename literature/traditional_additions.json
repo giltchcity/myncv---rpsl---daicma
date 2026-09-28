@@ -1,0 +1,61 @@
+{
+  "checked_on": "2026-08-07",
+  "purpose": "Additional traditional dynamic-SLAM and long-term map-maintenance papers found after reducing the Gaussian discussion.",
+  "papers": [
+    {
+      "key": "xu2019midfusion",
+      "title": "MID-Fusion: Octree-Based Object-Level Multi-Instance Dynamic SLAM",
+      "status": "published",
+      "venue": "ICRA 2019",
+      "pdf_url": "https://arxiv.org/pdf/1812.07976",
+      "landing_url": "https://arxiv.org/abs/1812.07976",
+      "filename": "xu2019midfusion.pdf"
+    },
+    {
+      "key": "strecke2019emfusion",
+      "title": "EM-Fusion: Dynamic Object-Level SLAM With Probabilistic Data Association",
+      "status": "published",
+      "venue": "ICCV 2019",
+      "pdf_url": "https://arxiv.org/pdf/1904.11781",
+      "landing_url": "https://openaccess.thecvf.com/content_ICCV_2019/html/Strecke_EM-Fusion_Dynamic_Object-Level_SLAM_With_Probabilistic_Data_Association_ICCV_2019_paper.html",
+      "filename": "strecke2019emfusion.pdf"
+    },
+    {
+      "key": "bescos2021dynaslam2",
+      "title": "DynaSLAM II: Tightly-Coupled Multi-Object Tracking and SLAM",
+      "status": "published",
+      "venue": "IEEE RA-L 2021",
+      "pdf_url": "https://arxiv.org/pdf/2010.07820",
+      "landing_url": "https://arxiv.org/abs/2010.07820",
+      "filename": "bescos2021dynaslam2.pdf"
+    },
+    {
+      "key": "zhang2020vdoslam",
+      "title": "VDO-SLAM: A Visual Dynamic Object-Aware SLAM System",
+      "status": "manuscript/preprint; final publication record not verified on 2026-08-07",
+      "venue": "arXiv 2020",
+      "pdf_url": "https://arxiv.org/pdf/2005.11052",
+      "landing_url": "https://arxiv.org/abs/2005.11052",
+      "filename": "zhang2020vdoslam.pdf"
+    },
+    {
+      "key": "mersch2023volumetric",
+      "title": "Building Volumetric Beliefs for Dynamic Environments Exploiting Map-Based Moving Object Segmentation",
+      "status": "published",
+      "venue": "IEEE RA-L 2023",
+      "pdf_url": "https://arxiv.org/pdf/2307.08314",
+      "landing_url": "https://arxiv.org/abs/2307.08314",
+      "filename": "mersch2023volumetric.pdf"
+    },
+    {
+      "key": "breitfuss2024rbif",
+      "title": "Long-Term Map-Maintenance in Changing Environments Using Ray-Bundle-Impact-Factor Estimation",
+      "status": "published",
+      "venue": "IROS 2024",
+      "pdf_url": null,
+      "landing_url": "https://publikationen.bibliothek.kit.edu/1000179693",
+      "filename": "breitfuss2024rbif.pdf",
+      "manual_note": "Obtain the author or institutional-access PDF and save it using this filename."
+    }
+  ]
+}

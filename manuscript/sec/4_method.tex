@@ -1,159 +1,188 @@
 \section{Method}
 \label{sec:method}
 
-\subsection{Problem and Notation}
+Our update has two parts. Temporal reasoning selects observations and inherited
+states that remain valid. The mapper then integrates this selected evidence in
+its own representation. We first define the selection and then give its TSDF
+realization.
+
+\subsection{Inputs and Temporal State}
 \label{sec:problem}
 
-A deployment $k$ observes an RGB-D stream $Z^k$ with poses and instance masks
-carrying \emph{physical identities} (one id per physical object, stable across
-deployments). Session $k$ starts from the persistent state $\mathcal{S}^{k-1}$
-exported by the previous deployment and must (i) reconcile the changes that
-happened while the robot was away (D3), (ii) track motion it observes (D1),
-(iii) reconcile changes that happen while it looks elsewhere (D2), and (iv)
-export $\mathcal{S}^k=\Phi(\mathcal{S}^{k-1},Z^k)$ for the next deployment. The
-map is queried at a time $t$ and must answer what the world was like at $t$,
-not return a union of everything ever observed.
+A run receives RGB-D images, camera poses, and object instance masks. A supplied
+rigid transform aligns the run with the previous map. Observations of the same
+physical object use a consistent identity across runs. We write $\mathcal{O}_k(t)$
+for the depth-ray observations received in run $k$ up to time $t$.
 
-The persistent state holds, for every identity $o$, an ordered list of
-\emph{temporal fragments} $F_o=\{f_1,\dots\}$; a fragment is one geometric
-state of the object: a private mesh $G_f$, its bounding box, birth and (if
-ended) death time, and provenance (dynamic trajectory, reconstruction frames,
-session). Exactly one fragment per identity is \emph{current}. The state also
-holds the current background mesh, the 4D history (one full scene snapshot per
-reconciliation round) and the sensor statistics learned while the object states
-were observed (\cref{sec:absence}). All decisions below are decisions about
-fragments; the D1/D2/D3 events reported by the system are read off the fragment
-lists (a fragment that ends is a \emph{disappeared} event, a fragment that is
-born elsewhere an \emph{appeared} event, a fragment with a trajectory an
-observed motion).
+Each physical object has a sequence of geometric states, called \emph{fragments}.
+A fragment records its reconstructed geometry, source observations, and temporal
+interval. Observed motion additionally has a tracked trajectory. A new
+reconstruction is kept separately until the system decides whether it refines
+the current fragment or belongs to a changed state. Ending a state removes its
+geometry from the current view, not from the recorded history.
 
-\subsection{Overview}
-\label{sec:overview}
+Let $\mathcal{H}(t)$ contain these state intervals and decisions inferred from
+observations available by $t$. It supplies the temporal conditions used below.
+The backbone reconstructs surfaces and motion; our update decides which of the
+resulting observations and stored states remain eligible for current mapping.
 
-We build on Khronos~\cite{schmid2024khronos}: its active window integrates
-RGB-D into a TSDF, detects and tracks moving clusters, and extracts object
-segments once they leave the window; its backend keeps the dense scene graph and
-verifies stored surfaces against later sensor rays. Everything that concerns
-identity, temporal state and persistence is ours: (1) a per-identity fragment
-registry with the ingestion, closing and hand-off rules of
-\cref{sec:states}; (2) projected physical evidence and the observed-absence test
-that decides when a stored surface has been seen empty (\cref{sec:absence});
-(3) the same-state test that decides whether a re-observed identity is the state
-that was inherited (\cref{sec:samestate}); (4) the session contract that exports
-and re-imports scene state (\cref{sec:contract}). No rule branches on the
-dataset; the same binary runs on synthetic, real, and public data.
-
-\subsection{Identity and Fragment States}
+\subsection{Inferring When an Object State Changes}
 \label{sec:states}
-
-\paragraph{Ingestion.}
-A segment $s$ extracted by the active window carries the identity $o$, its mesh,
-its observation interval $[t_0,t_1]$ and whether the tracker saw it move. If it
-moved, the current fragment of $o$ ends at $t_0$ and $s$ starts a new one with
-the trajectory attached (D1). Otherwise $s$ is compared with the current fragment
-$c$ of $o$. If $c$ was inherited from a previous session, $s$ is kept apart as
-the \emph{session copy} of $o$ until measured evidence relates the two
-(\cref{sec:samestate}). If $c$ was built in this session and $s$ shares space
-with it (some vertex of $s$ falls into an occupied $5$\,cm cell of $c$), $s$
-refines $c$ in place---\emph{unless} $c$ was observed empty while $s$ was being
-observed: every reliable sample of $c$ that was judged in that interval was seen
-through and no ray met $c$'s identity. Shared space is where an object moved by
-less than its own size lands; it is not proof that the old state still holds.
-An $s$ that shares no space, or whose $c$ was observed empty, becomes the
-\emph{candidate} of $o$: a second hypothesis that is neither merged nor deleted
-until the evidence of \cref{sec:absence} decides.
-
-\paragraph{Closing and hand-off.}
-Each reconciliation round (every fifth backend update, $\approx 2$\,s of sensor
-time) measures the current fragment and the candidate with the evidence of
-\cref{sec:absence}. The current fragment ends when it is observed absent, or when
-the candidate lies at a different site and the current fragment has no support
-at all (a moved object seen at its new site before its old site is looked at,
-D2). A candidate within the extent of the current fragment cannot end it alone.
-A candidate is absorbed into the current fragment only in a round in which the
-current fragment has support; absorbing presupposes presence. When the session
-ends, fragments whose absence is pending are closed, and for static identities
-the inherited fragment and the session copy are united.
-
-\subsection{Projected Physical Evidence and Observed Absence}
 \label{sec:absence}
 
-\paragraph{Per-sample verdicts.}
-The surface of a fragment is sampled into $5$\,cm cells. For every frame whose
-frustum contains a cell within the sensor range and at incidence $\le 60^\circ$,
-the cell receives one verdict from the depth image and the instance mask at its
-projection: \emph{on surface} (depth within the sensor tolerance $\tau_s=5$\,cm
-of the cell), \emph{identity} (on surface and the mask carries $o$),
-\emph{foreign} (on surface under another label), \emph{seen through} (measured
-depth more than $\tau_s$ behind the cell), or no verdict (occluded, out of
-range). Seen-through verdicts are the only evidence of absence; a foreign label
-is a missed detection or another surface and decides nothing.
+We use Khronos for local reconstruction and observed-motion tracking
+~\cite{schmid2024khronos}. To test an older state, we project its surface into a
+later depth image. Let $z_f$ be its expected depth and $d$ the measured depth at
+the same pixel. Measurements close to $z_f$ support the surface. A measurement
+behind it is evidence that its old location is empty. A closer measurement
+occludes the surface; missing image coverage supplies no evidence of absence.
 
-\paragraph{Reliable samples.}
-Not every stored cell is a real surface: silhouettes of depth slivers, specular
-drop-outs and grazing views produce cells that are seen through while the object
-plainly stands there (on our real sensor, $12$--$55\%$ of the cells of static
-objects). A cell is \emph{reliable} once the object's own identity has been
-measured on it in at least three frames and it has never been seen through
-while the object was identified in place; inherited surfaces are reliable by
-construction. Only reliable cells vote.
+The object-state test uses 5\,cm surface cells, a 5\,cm depth tolerance, and
+views with incidence angles no greater than $60^\circ$. A cell becomes reliable
+after at least three identity-consistent observations without a seen-through
+contradiction while that state was confirmed present. At each update, the
+fraction of tested reliable cells seen through is compared with a Beta presence
+model learned from that object's confirmed observations and pooled sensor
+statistics. A one-sided log-likelihood ratio against a uniform absence model is
+accumulated with a cumulative-sum (CUSUM) test. Absence is declared when its
+score exceeds $\ln 99$ and seen-through rays outnumber supporting rays.
+% (double check) Keep the finalized presence-model, accumulation, and sampling definitions synchronized with the implementation.
 
-\paragraph{Look-wise test.}
-One \emph{look} is one reconciliation round. For a look with $n\ge 1$ judged
-reliable cells, $f$ is the share seen through. Under ``the object stands here'',
-$f$ follows a Beta law fitted to the object's own history of looks in which it
-was identified in place (its own missed-detection behaviour), shrunk towards the
-population of objects measured under the same sensor (three pseudo-looks; the
-spread never narrower than the between-object spread); objects without history
-use the population prior. Under ``the object is gone'' $f$ is uniform. The
-one-sided log-likelihood ratio of the look (only \emph{more} seen-through than
-usual speaks for absence) is weighted by the share of the reliable surface judged
-for the first time in the current accumulation and accumulated by a CUSUM; the
-fragment is observed absent when the accumulation exceeds $\ln 99$ (a $1\%$
-error bound, the only decision constant of the system), provided the rays that
-met the surface are outnumbered by rays that passed through it. Looks in which
-the object is identified in place update the object's Beta history; the pooled
-population statistics are exported with the map and loaded by the next session
-(\cref{sec:contract}). A look with no judged cell is neither scored nor learned
-from.
+A newly reconstructed object can also establish a different state. Once it has
+at least 30 reliable surface cells, we compare it with the inherited fragment.
+If most of its surface is within 10\,cm of the inherited surface, it refines
+that state; otherwise it starts a new state and ends the previous one. Objects
+configured as fixed structure instead accumulate complementary views. These
+decisions produce the validity intervals used by geometry integration. For a
+hidden transition, the interval boundary is inferred from the before-and-after
+observations; the method does not insert an unobserved motion trajectory.
 
-\subsection{Same-State Test for Inherited Fragments}
-\label{sec:samestate}
+\subsection{Selecting Observations and Memory}
+\label{sec:validity}
 
-A movable identity (a class that can be moved by a person) whose current
-fragment was inherited may be reconstructed again by the session. Once that
-session copy is \emph{established}---at least $30$ reliable cells, the sample
-count one look needs---the inherited fragment is the same state only if the
-majority of the copy lies within $\tau_o=10$\,cm of the inherited surface;
-$\tau_o$ is the tolerance with which the evaluation protocol itself defines a
-state as represented, i.e.\ the granularity at which a state is a state, whereas
-$\tau_s$ is the sensor's. If the copy lies mostly elsewhere, one identity cannot
-be in two places: the inherited fragment ends and the copy becomes current,
-whatever the old site shows so far (a table turned on its spot ends at
-$18.7$\,s instead of $76.7$\,s on our real data). If it lies on the inherited
-surface, the copy refines it. Static classes (bed, desk, wardrobe) are excluded:
-their session copies legitimately add views that the previous session never
-saw. The test runs every round, at session end, and decides what is displayed
-(two poses are never united).
+\paragraph{Observation validity.}
+An earlier measurement describes the current map only if the scene state it
+measured has not subsequently changed. For an observation $o$ taken at $t_o$,
+we define
+\begin{equation}
+ v_o(x,t)=\mathbf{1}\!\left[\begin{array}{c}
+ \text{no inferred state change at }x\\[-1pt]
+ \text{during }(t_o,t]
+ \end{array}\right].
+ \label{eq:temporal_validity}
+\end{equation}
+This condition is evaluated from $\mathcal{H}(t)$, not from future observations.
+Let $b_o(x)$ indicate that $x$ is within the integration support of a valid
+measurement ray. Invalid depth, locations outside its image footprint, and
+unobserved space beyond its supported range do not contribute. The observation
+weight is
+\begin{equation}
+ \begin{aligned}
+ w_o(x,t)&=b_o(x)\,v_o(x,t),\\
+ A_k(x,t)&=\sum_{o\in\mathcal{O}_k(t)} w_o(x,t).
+ \end{aligned}
+ \label{eq:valid_weight}
+\end{equation}
+Thus $A_k$ counts valid current-run measurements at $x$. If a state begins at
+$t_L$, observations from before that state cannot be fused into its current
+reconstruction. Observations of an ended state remain associated with its
+historical fragment.
 
-\subsection{Background Geometry}
-\label{sec:background}
+\paragraph{When memory remains active.}
+Let $I_k(x,t)=1$ where the current object reconstruction identifies $x$ as inside
+an observed object body, and $0$ elsewhere. Memory is selected by
+\begin{equation}
+ m_k(x,t)=\mathbf{1}[A_k(x,t)=0]\,(1-I_k(x,t)).
+ \label{eq:memory_gate}
+\end{equation}
+The first factor gives current valid measurements priority. This includes both
+surface measurements and rays that pass through an old surface: observed empty
+space is still evidence. The second factor prevents an inherited surface from
+remaining inside the body of a currently observed object.
+% (double check) Specify the implemented observed-body predicate; do not substitute a bounding-box interior or ground-truth volume for it.
 
-The inherited background mesh is registered into the live mesh of the new
-session. Its vertices are deleted only where the session's rays confirm absence
-(the same seen-through evidence, at the ray verificator's depth band); vertices
-the session never re-observes stay as memory; the session's own reconstruction
-is added. This is a conservative union: it never removes unobserved memory, and
-it keeps a re-observed but slightly misaligned wall next to the session's own
-copy (\cref{sec:limitations}).
+The prior is drawn from inherited states still eligible for the current map.
+When object reasoning retires a state, its stored geometry belongs to history
+rather than this prior. Without a valid current observation or a conflicting
+object-state decision, eligible memory remains unchanged. This avoids turning
+lack of observation into evidence of disappearance.
 
-\subsection{Persistent State Contract}
+\subsection{TSDF Realization}
+\label{sec:tsdf}
+
+For a fixed query time, we omit $t$ to keep the notation compact. Observation
+$o$ has camera center $c_o$ and measured range $r_o$ along its ray. Its truncated
+signed ray-distance contribution is
+\begin{equation}
+ \phi_o(x)=\operatorname{clamp}\!\left(r_o-\|x-c_o\|,-T,T\right),
+ \label{eq:ray_distance}
+\end{equation}
+where $T$ is the mapper's truncation distance. The sign is positive before the
+measured surface and negative behind it within the supported truncation band.
+For depth images stored as optical-axis depth, the reading is first converted
+to range along the ray.
+
+Let $D_{k-1}(x)$ and $W_{k-1}(x)$ be the inherited field and its integration
+weight, after restricting the prior to eligible states. Applying the temporal
+and memory selections gives
+\begin{equation}
+ D_k(x)=\frac{
+ \displaystyle\sum_{o\in\mathcal{O}_k}w_o(x)\phi_o(x)
+ +m_k(x)W_{k-1}(x)D_{k-1}(x)}{
+ \displaystyle\sum_{o\in\mathcal{O}_k}w_o(x)
+ +m_k(x)W_{k-1}(x)}.
+ \label{eq:valid_tsdf}
+\end{equation}
+For the first run, the prior weight is zero. The denominator is the resulting
+integration weight $W_k(x)$. If it is zero,
+$x$ is unknown and contributes no surface. The current surface is extracted
+from the zero level set of $D_k$ where valid support exists.
+
+Equation~\eqref{eq:valid_tsdf} has two direct cases. Where $A_k(x)>0$, the
+prior is inactive and the field is determined by current valid observations.
+Where $A_k(x)=0$, eligible memory supplies the field unless the object-body
+condition excludes it. Old and new evidence are therefore not averaged merely
+because they occupy the same spatial cell.
+
+Consider an old chair location. If the current depth ray reaches the wall behind
+it, $\phi_o$ is positive at the old surface and $m_k=0$: the inherited chair
+surface no longer supplies a zero crossing there. If the location is outside
+view or hidden by a nearer surface, it has no such current evidence and eligible
+memory remains. The decision is made from the measurements before surface
+extraction, including regions where no replacement mesh is produced.
+
+\subsection{Identity and Run Handoff}
 \label{sec:contract}
 
-A session exports (i) the 4D map: one full scene snapshot per reconciliation
-round, so the map answers queries at any past time; (ii) the fragment registry
-with birth/death times and provenance; (iii) the pooled sensor statistics of
-\cref{sec:absence}. The next session is an independent process; it receives the
-export, a rigid transform between the two sessions' frames (from any
-registration), and nothing else. All exported maps are packed losslessly
-(delta-coded snapshots, $30\times$) and read back through the same interface.
+The object-state assignment supplies the identity $\ell_k(x)$ of reconstructed
+object geometry; geometry without an object assignment belongs to the background.
+Retained memory carries its earlier identity and follows that state's temporal
+validity. Object and background geometry use the same evidence-selection rule.
+We evaluate the TSDF expression at the fine object resolution and the coarser
+online-map resolution. Fine-grid surfaces are used where available, and coarse
+surfaces fill regions where the fine grid does not establish a surface. This is
+a resolution choice, not a second temporal update rule.
+% (double check) Apply identical temporal and memory gates to coarse fill so it cannot reintroduce a retired state.
+
+A run exports the eligible geometric state, integration weights, object-state
+history, and statistics required by the temporal inference. The next run loads
+this state, aligns new observations to the common frame, and repeats the same
+selection and integration. Historical views select their corresponding state
+intervals; the current view contains only currently eligible states.
+
+\subsection{Map-Specific Integration}
+\label{sec:representation}
+
+The shared part of the method is the validity of observations, the eligibility
+of memory, and the temporal identity of map content. Signed-distance averaging
+in Eq.~\eqref{eq:valid_tsdf} is the TSDF-specific realization. Another map
+representation must expose observation support and execute updates in its own
+geometry, while respecting the same temporal selections.
+
+For a point or surfel map, this means retaining or integrating selected surface
+measurements. For a Gaussian map, a realization would apply validity to the
+observations used for optimization and to the inherited primitives they support.
+Retiring geometry must also stop obsolete observations from recreating it during
+later optimization. These are the requirements for an adapter, rather than
+separate temporal decision rules for each representation.
+% (double check) Validate a shared-core Gaussian adapter before claiming cross-representation experimental results.

@@ -1,0 +1,23 @@
+\begin{figure*}[t]
+\centering
+\begingroup
+\setlength{\fboxsep}{6pt}
+\newcommand{\updatebox}[2]{\fbox{\begin{minipage}[c][2.1cm][c]{0.26\textwidth}
+\centering\small\textbf{#1}\par\vspace{5pt}#2\end{minipage}}}
+\updatebox{Previous map + new observations}{Stored geometry and object history\\
+Current RGB-D, poses, and identities}
+\hspace{2pt}$\longrightarrow$\hspace{2pt}
+\updatebox{Select temporally valid evidence}{Which observations still apply?\\
+Where should memory remain?}
+\hspace{2pt}$\longrightarrow$\hspace{2pt}
+\updatebox{Update the native map}{TSDF: fuse the selected evidence\\
+Extract current surfaces; retain history}
+\endgroup
+\vspace{4pt}
+\caption{\textbf{Select evidence before integrating geometry.} A state change
+ends the use of observations from the old state. Valid current measurements
+replace prior influence where they provide evidence; eligible memory supplies
+unobserved regions. Temporal selection and geometric integration have distinct
+roles, with TSDF fusion providing the concrete realization developed here.}
+\label{fig:update_overview}
+\end{figure*}

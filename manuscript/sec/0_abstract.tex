@@ -1,7 +1,20 @@
 \begin{abstract}
-The ABSTRACT is to be in fully justified italicized text, at the top of the left-hand column, below the author and affiliation information.
-Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centered relative to the column, initially capitalized.
-The abstract is to be in 10-point, single-spaced type.
-Leave two blank lines after the Abstract, then begin the main text.
-Look at previous \confName abstracts to get a feel for style and length.
+An observation can be accurate when recorded and still be wrong for the current
+map: the object it measured may have moved since then. Repeated mapping therefore
+requires deciding which observations remain valid, as well as how to fuse them.
+We propose a persistent map-update method based on temporal validity and selective
+use of memory. Object-state reasoning identifies changes and excludes observations
+of states that have ended. Current valid measurements determine the map where
+they provide evidence; previous geometry is retained elsewhere, except where it
+conflicts with a currently observed object. This separates the temporal selection
+of evidence from the map representation used to integrate it. We give a TSDF
+formulation that applies the same selection to object and background geometry
+before surface extraction. Our current Khronos-based pipeline is evaluated on
+repeated real and synthetic recordings and three public datasets. On real-room
+revisits, change F1 is 96.8\% and 100.0\%, and old-location residue is
+6.8\% and 10.9\%, compared with 57.1\% and 60.1\% for Panoptic Multi-TSDFs.
+On synthetic data, geometry recall is 98.1\%, compared with 78.5\% for the
+from-scratch result at similar precision. The central idea is to update a map
+from observations that still describe the current world, rather than combine
+all observations regardless of when they were valid.
 \end{abstract}

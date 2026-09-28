@@ -1,112 +1,77 @@
 \section{Introduction}
 \label{sec:intro}
 
-\textbf{The world does not reset when the mapper does.}
-Robots are deployed episodically: they stop, recharge, restart, and later return
-to environments that have continued to evolve in their absence. Yet robotic
-mapping largely inherits the opposite computational assumption. A dynamic mapper
-may build rich spatio-temporal understanding while a deployment is active, but
-once that session terminates, a later deployment typically inherits a map
-representation---static, current, or object-level---rather than the temporal
-scene understanding that produced it. The geometry may persist; the dynamic
-reasoning does not.
+A robot maps a room and returns after a chair has moved. The earlier depth images
+were correct when they were captured, but some now describe an obsolete scene.
+Keeping all of them leaves the chair in two places. Starting over loses parts
+of the room that the robot does not revisit. A useful update must answer two
+questions: which observations still describe the current scene, and where should
+the previous map remain in use?
 
-This exposes a separation between two mature lines of research. Dynamic mapping
-and SLAM increasingly reason about \emph{how} a scene changes while a mapping
-process remains active: moving entities can be tracked through time, and changes
-revealed after temporary observation gaps can be reconciled against previous
-scene state~\cite{runz2017cofusion,xu2019midfusion,morris2025dynosam,schmid2024khronos}.
-Lifelong and multi-session mapping address the complementary problem of carrying
-information across revisits, but typically preserve an updated current map, a
-static localization map, or selected persistent landmarks rather than the full
-temporal scene understanding that existed during the previous
-deployment~\cite{kim2022ltmapper,gil2025elite,ali2026probperlilo,schmid2022panoptic}.
-In short, dynamic mapping preserves temporal understanding within a session,
-whereas lifelong mapping preserves maps across sessions. What is missing is
-\emph{persistent mapping}: carrying enough scene-level state across deployments
-for the same dynamic reasoning to recur.
+\input{figures/update_overview}
 
-This separation is artificial from the perspective of the physical world. A
-session boundary is caused by robot operation, not by an environmental reset. If
-an object moves while the robot is watching, that observed motion remains part
-of the world's history after the robot shuts down. If another element changes
-while a region is temporarily outside the field of view, the uncertainty about
-that transition likewise does not disappear merely because the mapping process
-is restarted. Collapsing such knowledge into a single current-map snapshot
-therefore creates a temporal information bottleneck exactly where the robot
-changes deployments. This motivates a simple question: \emph{why should a
-returning robot inherit only a map snapshot rather than the scene understanding
-accumulated before it left?}
+Dynamic mapping already addresses motion and changes during a recording.
+Object-level systems reconstruct moving entities with separate surface or volume
+models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion}, while joint
+estimators recover camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}.
+Changing-SLAM maintains object persistence across observation gaps
+~\cite{soares2023changing}; Khronos combines visible motion with temporal
+reconciliation~\cite{schmid2024khronos}; and GaME updates Gaussian geometry
+after out-of-view changes~\cite{yugay2026game}. SuperMap maintains online
+object maps with open-vocabulary instances and temporal relations
+~\cite{zhao2026supermap}.
 
-Our key observation is that independently executed mapping sessions are more
-naturally viewed as interrupted observations of one continuously evolving world.
-We therefore treat a session boundary as an interruption of dynamic mapping,
-rather than a reset of the mapping problem. This view exposes a hierarchy of
-observability. Within a running session, an entity may change while its
-transition is directly observed (\emph{D1}), allowing the system to retain an
-actual trajectory and time-indexed geometry. Alternatively, the scene may change
-while the robot looks elsewhere (\emph{D2}); only the states before and after the
-observation gap are available, requiring reasoning about persistence, absence,
-lack of observation, and newly supported content. Across deployments, the
-observation gap becomes global: the complete mapping process is absent while the
-world continues to change. We call this inter-session evolution \emph{D3}. Put
-differently, D2 asks what changed while the robot looked away; D3 asks what
-changed while the robot itself was away.
+Long-term mapping carries information between visits and revises an earlier map
+~\cite{pomerleau2014longterm,lazaro2018efficient}. ELite and ProbPer-LiLo model
+which content persists over repeated traversals~\cite{gil2025elite,ali2026probperlilo}.
+Panoptic Multi-TSDFs distinguishes persistent, absent, and unobserved submaps
+~\cite{schmid2022panoptic}. POCD and POV-SLAM reason about object changes
+~\cite{qian2022pocd,qian2023povslam}, ObVi-SLAM transfers object landmarks
+~\cite{adkins2024obvislam}, and OASIS-Map associates objects across sessions
+~\cite{oh2026oasismap}. These approaches motivate a shared question beneath
+particular map representations: when should an earlier measurement continue to
+influence the current map?
 
-Crucially, D3 is not a third change detector running alongside D1 and D2. It is
-the persistent interface connecting complete dynamic-mapping sessions. Session A
-executes D1 and D2, exports sufficient scene state, and terminates. An
-independently initialized Session B then imports this state, reconciles the
-changes that occurred during the inter-session gap, and again executes its own
-D1 and D2 events before exporting the prior for Session C. The output of a
-session is therefore no longer merely a map; it is the prior state of the next
-dynamic-mapping session.
+We address this question by separating \emph{temporal evidence selection} from
+\emph{geometric integration}. Our first rule is that an observation contributes
+to current geometry only while the scene state it measured remains valid. If an
+object moves, measurements of its previous state belong to history rather than
+to the current reconstruction. Our second rule selects between current evidence
+and memory. Where the current run has valid depth evidence, that evidence defines
+the update. Where it has none, the previous map is retained, subject to the
+current object-state assignment. A ray that passes through an old surface is
+current evidence even when it produces no replacement surface there.
 
-Recent scene-memory systems make the remaining gap especially clear. Persistent
-3D memories can recognize a previously visited environment, relocalize against
-stored geometry, and refine a recalled static scene~\cite{wang2026cognimap3d}.
-Object-centric Gaussian maps can maintain persistent instances, relocalize later
-observations against an existing representation, and revise removed or newly
-observed objects~\cite{ge2026dgsgmind}. These are important advances in persistent
-scene representation, but they do not preserve the complete spatio-temporal
-mapping capability of a deployment: the former intentionally stores static
-landmarks in persistent memory, while the latter does not include an integrated
-dynamic tracking module. Conversely, dense spatio-temporal systems such as
-Khronos preserve substantially richer dynamic history within one running
-session~\cite{schmid2024khronos}, but do not define the persistent session-state
-interface above. We target precisely this missing connection: a shift from
-persistent maps to persistent mapping.
+The distinction matters before geometry is converted into a mesh. A mesh records
+surfaces, whereas the depth observations used to build it also identify free
+space. Comparing two final meshes alone loses this distinction between a region
+that was observed empty and one that was not observed. We instead use temporal
+state and ray evidence to select the observations that enter reconstruction.
+For a TSDF map, the resulting field is a weighted average of currently valid
+observations and a spatially gated prior. Object and background surfaces are
+extracted after this selection, using the same update rule.
 
-We formulate the resulting problem as \emph{Persistent Spatio-Temporal
-Metric-Semantic Mapping} (P-SMS): independent robot deployments are treated as
-successive episodes of one persistent dynamic scene memory. We instantiate this
-principle by extending dense single-session spatio-temporal mapping with a
-persistent scene-state interface and conservative inter-session reconciliation.
-A completed session exports current metric-semantic geometry together with object
-and structural state, change evidence, temporal scene information, and session
-provenance. A later independent session uses this state as a prior, retains
-inherited content that has not been sufficiently re-observed, removes old content
-only when contradicted by reliable current evidence, incorporates newly supported
-geometry, and concurrently runs within-session dynamic mapping. The interface is
-deliberately scene-level: it transfers the persistent state required for dynamic
-reasoning to recur, rather than transient implementation state tied to a
-particular backend.
+The temporal policy is defined independently of a particular mapper. A mapper
+supplies geometry queries and native integration operations; the policy decides
+which observations and inherited states remain eligible. We develop this
+separation through a TSDF formulation and a Khronos-based implementation. This
+preserves the backbone's motion and object-state estimates while moving the
+persistence decision into the evidence used to construct the map.
+
+Our experiments examine three consequences of persistent updates: whether old
+states are removed, whether previous coverage remains useful, and whether the
+new run continues to handle its own changes. Repeated Kinect and Isaac Sim
+recordings exercise the complete pipeline. 3RScan supplies public revisit cases,
+while Bonn and TUM test single-run object motion and moving people.
 
 Our contributions are:
 \begin{itemize}
-    \item We formulate \emph{persistent dynamic mapping}, in which observed
-    dynamics (D1) and hidden changes (D2) are modeled within every deployment,
-    while inter-session evolution (D3) connects independently executed sessions
-    through persistent scene state.
-
-    \item We introduce a persistent scene-memory and evidence-gated
-    reconciliation framework that carries dense current geometry, object and
-    structural state, temporal scene information, observability/change evidence,
-    and session provenance across deployment boundaries without equating
-    non-observation with absence.
-
-    \item We define a recursive evaluation protocol in which a completed session
-    initializes a later independent deployment, which must reconcile D3 while
-    again processing new D1 and D2 events and producing the scene state for
-    subsequent deployments.
+    \item a temporal update formulation that selects observations according to
+    their state validity and selects prior geometry according to current
+    measurement coverage;
+    \item a TSDF realization that applies these selections before object and
+    background surface extraction, with object identities and historical states
+    maintained by the same temporal reasoning;
+    \item a repeated-mapping evaluation covering changed-state accuracy,
+    obsolete-surface removal, geometry coverage, and single-run behavior.
 \end{itemize}
