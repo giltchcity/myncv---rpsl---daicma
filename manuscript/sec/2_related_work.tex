@@ -36,10 +36,14 @@ maintains scan geometry and a history of added and removed points
 ~\cite{walcott2012dynamic}. LT-Mapper separates alignment, filtering, and
 map-change management~\cite{kim2022ltmapper}; RBIF uses ray-bundle evidence
 for occupancy updates~\cite{breitfuss2024rbif}. ELite updates point-wise
-ephemerality~\cite{gil2025elite}, ProbPer-LiLo refines maps after filtering
-non-static content~\cite{ali2026probperlilo}, and LT-Gaussian removes
-disappeared Gaussian centers and adds emerging geometry
-~\cite{cheng2025ltgaussian}.
+ephemerality~\cite{gil2025elite}, and ProbPer-LiLo refines maps after filtering
+non-static content~\cite{ali2026probperlilo}. Gaussian-specific methods solve
+the same maintenance problem inside a different representation: LT-Gaussian
+removes disappeared Gaussians and adds emerging geometry
+~\cite{cheng2025ltgaussian}, GaussianUpdate continually revises a Gaussian field
+while retaining earlier scene information~\cite{zeng2025gaussianupdate}, and
+CL-Splats detects changed regions for local Gaussian updates while retaining
+recoverable scene states~\cite{ackermann2025clsplats}.
 
 Object-centric approaches preserve additional structure. Panoptic Multi-TSDFs
 maintains object and background volumes with persistent, absent, and unobserved
