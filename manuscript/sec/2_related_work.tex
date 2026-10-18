@@ -1,71 +1,60 @@
+% Related work, polished 2026-10-19 from GitHub main (09-28). Story: the update is defined once, on observations
+% and object states, and executed by any mapper. Every citation key exists in the manuscript's .bib files or in
+% supporting_refs_20261019.bib (fehr2017tsdfchange, looper2023vsg, hornung2013octomap, reijgwart2023wavemap added).
+% Style: Strunk and White (topic sentence first, active voice, positive form, specific words).
 \section{Related Work}
 \label{sec:related_work}
 
-\paragraph{Dynamic reconstruction and object states.}
-Co-Fusion, MID-Fusion, and EM-Fusion track and reconstruct objects with separate
-surface or volume models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion}.
-DynaSLAM~II and DynoSAM jointly estimate camera and object motion
-~\cite{bescos2021dynaslam2,morris2025dynosam}. DYNEMO-SLAM incorporates moving
-and relocated entities into a scene graph~\cite{giberna2025dynemo}, while
-Lost~\&~Found reconstructs object trajectories during human--object interactions
-~\cite{behrens2025lostfound}. Non-rigid and time-varying reconstruction extends
-these representations through dynamic surfaces in 4DTAM
-~\cite{matsuki2025fourdtam}, Gaussian primitives in 4D Gaussian Splatting SLAM
-and DynaGSLAM~\cite{li2025fourdgsslam,li2026dynagslam}, and persistent rigid
-primitives in 4D Primitive-Mache~\cite{mazur2026primitive}.
-These methods provide geometry and motion estimates on which temporal map
-maintenance can operate.
+\paragraph{Dynamic reconstruction within a run.}
+Many systems reconstruct a scene while objects move in front of the camera. Co-Fusion, MID-Fusion, and EM-Fusion track
+objects and reconstruct each in its own surface or volume model~\cite{runz2017cofusion,xu2019midfusion,
+strecke2019emfusion}. DynaSLAM~II and DynoSAM estimate camera and object motion
+jointly~\cite{bescos2021dynaslam2,morris2025dynosam}. DYNEMO-SLAM adds moving and relocated entities to a scene
+graph~\cite{giberna2025dynemo}, and Lost~\&~Found reconstructs object trajectories during human--object
+interaction~\cite{behrens2025lostfound}. 4DTAM, 4D Gaussian Splatting SLAM, DynaGSLAM, and 4D Primitive-Mache represent
+time-varying scenes with dynamic surfaces, Gaussians, or persistent rigid
+primitives~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam,mazur2026primitive}. Dynablox detects moving
+objects from points that enter observed free space~\cite{schmid2023dynablox}. These methods handle the motion that the
+camera sees. Our layer adopts the free-space cue of Dynablox for such motion and addresses the changes that happen
+between observations and between runs.
 
-\paragraph{Changes revealed by later observations.}
-Bore \etal model local object motion and larger state jumps
-~\cite{bore2019movable}. Changing-SLAM maintains a Bayesian object-persistence
-map~\cite{soares2023changing}. Khronos combines short-window motion tracking
-with fragment association and ray-based verification of appearance and
-disappearance~\cite{schmid2024khronos}. LTC-Mapping accumulates visibility and
-non-detection evidence~\cite{matezbandera2022ltc}; SuperMap maintains object
-occupancy, semantic confidence, and temporal relations~\cite{zhao2026supermap}.
-GaME adds supported geometry and removes contradicted Gaussian primitives in
-an evolving scene~\cite{yugay2026game}. Our formulation connects such temporal
-state decisions to reconstruction: a change determines which earlier
-observations remain eligible to define the current geometry.
+\paragraph{Change handling inside one representation.}
+Most methods that update a map after unobserved changes build the update into their representation. For point clouds,
+long-term mapping revises earlier scans as the environment changes~\cite{pomerleau2014longterm,lazaro2018efficient}.
+DPG-SLAM keeps a history of added and removed points~\cite{walcott2012dynamic}, LT-Mapper separates alignment,
+filtering, and change management~\cite{kim2022ltmapper}, ELite updates the ephemerality of each
+point~\cite{gil2025elite}, and ProbPer-LiLo refines the map after it removes non-static
+content~\cite{ali2026probperlilo}. For TSDFs, Fehr \etal compare reconstructions to find changed
+regions~\cite{fehr2017tsdfchange}, and Panoptic Multi-TSDFs keeps object and background submaps that become
+persistent, absent, or unobserved~\cite{schmid2022panoptic}. POCD models the change and stationarity of objects,
+POV-SLAM couples object consistency with pose estimation~\cite{qian2022pocd,qian2023povslam}, and Khronos tracks
+objects over a short window, associates their fragments, and verifies appearance and disappearance against earlier
+rays~\cite{schmid2024khronos}. For occupancy grids, OctoMap and wavemap clamp log odds so that cells can change
+state~\cite{hornung2013octomap,reijgwart2023wavemap}, and RBIF updates occupancy from bundles of
+rays~\cite{breitfuss2024rbif}. For 3D Gaussians, GaME adds supported Gaussians, removes contradicted ones, and masks
+stale keyframe regions~\cite{yugay2026game}. LT-Gaussian removes disappeared Gaussians and adds new
+geometry~\cite{cheng2025ltgaussian}, GaussianUpdate revises a Gaussian field continually as it retains earlier
+content~\cite{zeng2025gaussianupdate}, and CL-Splats updates changed regions locally and can recover earlier
+states~\cite{ackermann2025clsplats}. Each of these rules acts on its own primitives. We define the update once, on
+observations and object states, and let each mapper execute it with its own integration.
 
-\paragraph{Updating maps across visits.}
-Long-term map maintenance revises earlier geometry as an environment changes
-~\cite{pomerleau2014longterm,lazaro2018efficient}. Dynamic Pose Graph SLAM
-maintains scan geometry and a history of added and removed points
-~\cite{walcott2012dynamic}. LT-Mapper separates alignment, filtering, and
-map-change management~\cite{kim2022ltmapper}; RBIF uses ray-bundle evidence
-for occupancy updates~\cite{breitfuss2024rbif}. ELite updates point-wise
-ephemerality~\cite{gil2025elite}, and ProbPer-LiLo refines maps after filtering
-non-static content~\cite{ali2026probperlilo}. Gaussian-specific methods solve
-the same maintenance problem inside a different representation: LT-Gaussian
-removes disappeared Gaussians and adds emerging geometry
-~\cite{cheng2025ltgaussian}, GaussianUpdate continually revises a Gaussian field
-while retaining earlier scene information~\cite{zeng2025gaussianupdate}, and
-CL-Splats detects changed regions for local Gaussian updates while retaining
-recoverable scene states~\cite{ackermann2025clsplats}.
+\paragraph{Objects as the unit of change.}
+Object-level reasoning ties a change to a physical object instead of to individual points or voxels. Bore \etal model
+both local object motion and larger jumps between states~\cite{bore2019movable}. Changing-SLAM maintains a Bayesian
+map of object persistence~\cite{soares2023changing}, LTC-Mapping accumulates evidence of visibility and
+non-detection~\cite{matezbandera2022ltc}, and SuperMap maintains object occupancy, semantic confidence, and temporal
+relations~\cite{zhao2026supermap}. ObVi-SLAM transfers object landmarks between sessions~\cite{adkins2024obvislam},
+OASIS-Map associates objects across sessions~\cite{oh2026oasismap}, and Living Scenes matches and reconstructs objects
+from scans taken at different times~\cite{zhu2024livingscenes}. We also infer object states. We use them to decide
+which observations remain valid and which faces, Gaussians, or cells of the map continue.
 
-Object-centric approaches preserve additional structure. Panoptic Multi-TSDFs
-maintains object and background volumes with persistent, absent, and unobserved
-states~\cite{schmid2022panoptic}. POCD models object change and stationarity,
-and POV-SLAM couples object consistency with pose estimation
-~\cite{qian2022pocd,qian2023povslam}. ObVi-SLAM transfers object landmarks
-~\cite{adkins2024obvislam}; OASIS-Map associates objects across sessions
-~\cite{oh2026oasismap}; Living Scenes matches and reconstructs objects from
-scans acquired at different times~\cite{zhu2024livingscenes}. These works
-establish the importance of prior maps, association, and observation coverage.
-We organize the update around two explicit selections: the temporal validity of
-measurements and the spatial eligibility of memory.
-
-\paragraph{Temporal persistence and scene memory.}
-Occupancy-grid HMMs learn state-transition probabilities
-~\cite{meyerdelius2012changinggrid}, FreMEn represents periodic environmental
-changes~\cite{krajnik2017fremen}, and Spatio-Temporal Hilbert Maps model
-continuous time-dependent occupancy~\cite{senanayake2016sthm}. Perpetua
-maintains multiple hypotheses for feature appearance and disappearance
-~\cite{saavedraruiz2025perpetua}. DAAAM adds detailed semantic descriptions to
-a hierarchical 4D scene graph~\cite{gorlo2025daaam}, and LT-Mem stores current
-object states, session-level events, and long-term statistics
-~\cite{lee2026ltmem}. Our use of temporal state is directed at map construction:
-the history determines which observations may contribute to current geometry,
-while ended states remain available as history.
+\paragraph{Models of temporal persistence.}
+Another line of work models how long the content of a map persists. Hidden Markov models learn the transition
+probabilities of occupancy cells~\cite{meyerdelius2012changinggrid}, FreMEn represents periodic
+changes~\cite{krajnik2017fremen}, and Spatio-Temporal Hilbert Maps model occupancy as a continuous function of
+time~\cite{senanayake2016sthm}. Perpetua keeps several hypotheses about the appearance and disappearance of
+features~\cite{saavedraruiz2025perpetua}, and 3D VSG predicts how likely each object is to
+change~\cite{looper2023vsg}. DAAAM adds semantic descriptions to a hierarchical 4D scene graph~\cite{gorlo2025daaam},
+and LT-Mem stores current object states, session events, and long-term statistics~\cite{lee2026ltmem}. These models
+predict or summarize change. From the observations of the current run, our layer decides which earlier observations
+and map elements still describe the scene, and it keeps every ended state as history.

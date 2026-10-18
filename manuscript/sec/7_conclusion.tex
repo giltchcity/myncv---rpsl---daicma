@@ -1,14 +1,9 @@
+% Conclusion draft, 2026-10-19 (new story). Style: Strunk and White; one tense (present).
 \section{Conclusion}
 \label{sec:conclusion}
 
-We formulated persistent map updating as the selection and integration of
-observations that remain temporally valid. Object-state reasoning determines
-when earlier observations stop describing the current world. Current valid
-measurements take priority where they provide evidence, and eligible memory
-preserves the remaining coverage. The TSDF realization applies these decisions
-before extracting object and background surfaces. Experiments with the current
-Khronos-based pipeline report cross-run object updates, reduced old-location
-residue, and the coverage benefit of carrying a previous map. This formulation
-places temporal evidence selection between scene-state reasoning and geometric
-integration, providing a concrete basis for extending the same update policy to
-other map representations.
+An update layer lets an existing mapper follow a changing scene across runs. The layer decides which observations
+still describe the scene and which elements of the earlier map continue, and the mapper integrates the selected
+observations with its own rule. With the same decisions, a TSDF, a 3D Gaussian map, and an occupancy map remove
+obsolete states, keep the regions that a new run leaves unobserved, and record when each state held. Any mapper that
+provides the four operations of the interface can use the layer.

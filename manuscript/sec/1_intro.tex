@@ -1,77 +1,72 @@
+% Introduction draft, 2026-10-19. Story: a method for updating a map, independent of the representation; a TSDF
+% (Khronos), 3D Gaussians (GaME), and an occupancy map (wavemap) are three backends. Style: Strunk and White, The
+% Elements of Style (active voice, positive form, specific words, needless words omitted, topic sentence first).
+% Provisional numbers (\prov) are the best values in the experiment tables. Needs draft_macros.tex.
 \section{Introduction}
 \label{sec:intro}
 
-A robot maps a room and returns after a chair has moved. The earlier depth images
-were correct when they were captured, but some now describe an obsolete scene.
-Keeping all of them leaves the chair in two places. Starting over loses parts
-of the room that the robot does not revisit. A useful update must answer two
-questions: which observations still describe the current scene, and where should
-the previous map remain in use?
+A robot maps an apartment, leaves, and returns twelve days later. Meanwhile, someone has moved four pieces of
+furniture and taken two away, and the bathroom is as it was. Whether the robot's mapper fuses a truncated signed
+distance field (TSDF), optimizes 3D Gaussians, or accumulates occupancy, it offers two choices. It can reload the old
+map, which leaves each moved object in two places, or start over, which discards every room the robot leaves
+unobserved. A correct update removes what changed, keeps what is merely unobserved, and records when each state held.
 
-\input{figures/update_overview}
+\begin{figure}[t]
+\centering
+\fbox{\begin{minipage}[c][4.2cm][c]{0.94\linewidth}\centering\small
+\TODO{Teaser: one revisit of the real room. Columns: scratch, the mapper's own update, ours. Rows: TSDF, 3D Gaussians,
+occupancy. Mark one moved object (old site red, new site green) and one room seen only in the first run.}
+\end{minipage}}
+\caption{\textbf{One update method, three mappers.} The same temporal decisions update a TSDF, a 3D Gaussian map, and
+an occupancy map across runs. Each map removes the old site of a moved object, adds its new site, and keeps the room
+that the new run leaves unobserved.}
+\label{fig:teaser}
+\end{figure}
 
-Dynamic mapping already addresses motion and changes during a recording.
-Object-level systems reconstruct moving entities with separate surface or volume
-models~\cite{runz2017cofusion,xu2019midfusion,strecke2019emfusion}, while joint
-estimators recover camera and object motion~\cite{bescos2021dynaslam2,morris2025dynosam}.
-Changing-SLAM maintains object persistence across observation gaps
-~\cite{soares2023changing}; Khronos combines visible motion with temporal
-reconciliation~\cite{schmid2024khronos}; and GaME updates Gaussian geometry
-after out-of-view changes~\cite{yugay2026game}. SuperMap maintains online
-object maps with open-vocabulary instances and temporal relations
-~\cite{zhao2026supermap}.
+Existing systems build this update into their own representation. Volumetric methods compare TSDF reconstructions to
+find changed voxels~\cite{fehr2017tsdfchange}, keep object submaps that become persistent, absent, or
+unobserved~\cite{schmid2022panoptic}, or estimate how stationary each object is~\cite{qian2022pocd}. Khronos verifies
+object fragments against a library of earlier rays~\cite{schmid2024khronos}. GaME adds and removes Gaussians and masks
+the stale regions of its keyframes~\cite{yugay2026game}. Occupancy mappers lower the occupancy of every cell that a ray
+traverses~\cite{hornung2013octomap,reijgwart2023wavemap}. Each rule acts on its own primitives, so every new mapper
+needs a new update rule.
 
-Long-term mapping carries information between visits and revises an earlier map
-~\cite{pomerleau2014longterm,lazaro2018efficient}. ELite and ProbPer-LiLo model
-which content persists over repeated traversals~\cite{gil2025elite,ali2026probperlilo}.
-Panoptic Multi-TSDFs distinguishes persistent, absent, and unobserved submaps
-~\cite{schmid2022panoptic}. POCD and POV-SLAM reason about object changes
-~\cite{qian2022pocd,qian2023povslam}, ObVi-SLAM transfers object landmarks
-~\cite{adkins2024obvislam}, and OASIS-Map associates objects across sessions
-~\cite{oh2026oasismap}. These approaches motivate a shared question beneath
-particular map representations: when should an earlier measurement continue to
-influence the current map?
+Two questions decide every update, and neither depends on the representation. The first asks which observations still
+describe the scene. A depth image of a chair was correct when the camera took it, but once the chair moves, the image
+describes history and must stop shaping the current map. The second asks which parts of the earlier map remain. Where
+the new run sees through an old surface, the surface is gone. Where the new run never looks, the earlier map is the
+only evidence, and the old surface stays. Both questions concern observations and object states, not voxels or
+Gaussians.
 
-We address this question by separating \emph{temporal evidence selection} from
-\emph{geometric integration}. Our first rule is that an observation contributes
-to current geometry only while the scene state it measured remains valid. If an
-object moves, measurements of its previous state belong to history rather than
-to the current reconstruction. Our second rule selects between current evidence
-and memory. Where the current run has valid depth evidence, that evidence defines
-the update. Where it has none, the previous map is retained, subject to the
-current object-state assignment. A ray that passes through an old surface is
-current evidence even when it produces no replacement surface there.
+We therefore separate the temporal reasoning from the mapper. Our update layer runs beside an existing mapper and reads
+the same RGB-D frames, camera poses, and instance masks. From these it infers when each object state holds, restricts
+each observation to the space where its state still holds, and decides which elements of the previous map continue.
+The mapper joins through four operations: it reports its elements, ends the elements the layer names, accepts the
+object-state intervals, and integrates observations within their valid domains. It keeps its own integration rule. We
+connect the layer to a TSDF mapper built on Khronos~\cite{schmid2024khronos}, to the Gaussian mapper
+GaME~\cite{yugay2026game}, and to the occupancy mapper wavemap~\cite{reijgwart2023wavemap}. Because an ended element
+keeps its lifetime, every map also shows the scene as it was at any earlier time.
 
-The distinction matters before geometry is converted into a mesh. A mesh records
-surfaces, whereas the depth observations used to build it also identify free
-space. Comparing two final meshes alone loses this distinction between a region
-that was observed empty and one that was not observed. We instead use temporal
-state and ray evidence to select the observations that enter reconstruction.
-For a TSDF map, the resulting field is a weighted average of currently valid
-observations and a spatially gated prior. Object and background surfaces are
-extracted after this selection, using the same update rule.
-
-The temporal policy is defined independently of a particular mapper. A mapper
-supplies geometry queries and native integration operations; the policy decides
-which observations and inherited states remain eligible. We develop this
-separation through a TSDF formulation and a Khronos-based implementation. This
-preserves the backbone's motion and object-state estimates while moving the
-persistence decision into the evidence used to construct the map.
-
-Our experiments examine three consequences of persistent updates: whether old
-states are removed, whether previous coverage remains useful, and whether the
-new run continues to handle its own changes. Repeated Kinect and Isaac Sim
-recordings exercise the complete pipeline. 3RScan supplies public revisit cases,
-while Bonn and TUM test single-run object motion and moving people.
+With the same layer, all three mappers remove obsolete states and keep the coverage of earlier runs. On three
+recordings of a real room taken over twelve days, the TSDF and Gaussian maps detect 15 of the 16 changes between the
+first two runs and all 10 between the last two. The later runs still map their own changes: with the loaded state,
+the TSDF map reaches object F1 \prov{99.2} and \prov{98.3}, against 91.5 and 83.8 for Khronos, which starts each run
+from an empty map. After the revisits, \prov{1.6\%} and \prov{4.6\%} of the old object
+surfaces remain in the TSDF, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. In the
+Gaussian map, \prov{6.5\%} and \prov{11.5\%} remain, against 42.4\% and 61.1\% under GaME's own update. On a simulated
+apartment, where the second run observes only part of what the first run mapped, the updated maps recover \prov{98.4\%} (TSDF),
+\prov{96.8\%} (Gaussians), and \prov{88.1\%} (occupancy) of the scene surface, against \prov{78.5\%}, 80.4\%, and
+64.7\% for maps rebuilt from scratch. The Gaussian map renders the last run as well as a map rebuilt from scratch
+(\prov{22.94} against 22.97\,dB) and \prov{0.81}\,dB better than GaME's update.
+% SRC: the provisional numbers are the best values of Tables real, synthetic, and rendering (see the SRC comments in
+% 5_experiments.tex); replace them with the final runs.
 
 Our contributions are:
 \begin{itemize}
-    \item a temporal update formulation that selects observations according to
-    their state validity and selects prior geometry according to current
-    measurement coverage;
-    \item a TSDF realization that applies these selections before object and
-    background surface extraction, with object identities and historical states
-    maintained by the same temporal reasoning;
-    \item a repeated-mapping evaluation covering changed-state accuracy,
-    obsolete-surface removal, geometry coverage, and single-run behavior.
+  \item a formulation of persistent map updating that admits an observation only while the object state it measured
+  holds and keeps an element of the earlier map until current observations place its surface elsewhere;
+  \item an interface of four operations through which the same temporal decisions update a TSDF, a 3D Gaussian map,
+  and an occupancy map;
+  \item an evaluation on repeated real and simulated runs that compares, for each map, rebuilding from scratch,
+  carrying the map over, the map's own update, and our update.
 \end{itemize}

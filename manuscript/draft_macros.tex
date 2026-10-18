@@ -1,0 +1,26 @@
+% Draft markers for the Method/Experiments drafts (draft-marker-discipline).
+% \TODO       an unresolved factual or sourcing question (a number, a run, a protocol)
+% \note       editorial remark addressed to the authors
+% \directive  a change this passage must receive, and why
+% \superseded text replaced by a decision, kept visible in draft mode
+% Set \draftmodefalse to hide all four for a clean copy.
+% The manuscript preamble already defines \TODO; \providecommand keeps that definition.
+\usepackage{xcolor}
+\usepackage{multirow}
+\newif\ifdraftmode
+\draftmodetrue
+\providecommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+% \prov{x}   a provisional number: the best value available now, to be replaced by the final runs (source in the
+%            % SRC comment next to it). Draft mode prints it in brown; clean mode prints it plainly.
+\ifdraftmode
+  \newcommand{\prov}[1]{{\color{brown}#1}}
+  \newcommand{\note}[1]{{\color{blue}[Note: #1]}}
+  \newcommand{\directive}[1]{\par\noindent\fbox{\parbox{0.95\linewidth}{\small\textbf{Directive:} #1}}\par}
+  \newcommand{\superseded}[1]{{\color{gray}#1}}
+\else
+  \newcommand{\prov}[1]{#1}
+  \renewcommand{\TODO}[1]{}
+  \newcommand{\note}[1]{}
+  \newcommand{\directive}[1]{}
+  \newcommand{\superseded}[1]{}
+\fi
