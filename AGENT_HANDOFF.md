@@ -1,18 +1,18 @@
 # Agent Handoff
 
-Date: 2026-08-06
+Original context: 2026-08-06 (historical implementation snapshot)
 
 ## Your Role
 
-You are handling the paper-writing track of a larger implementation project.
-Do not redesign the mapping system unless explicitly asked. First turn the
-verified implementation and experiment history into a precise paper outline,
-method description, claim table, and figure plan.
+You are supporting the existing CVPR manuscript in `manuscript/` as part of a
+larger implementation project. Do not redesign the mapping system unless
+explicitly asked. Ground paper changes in current code, experiments, and
+primary literature.
 
 ## Canonical Storyline
 
-Read `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md` before writing. The hierarchy
-is binding:
+The D1/D2/D3 hierarchy below describes the research context. Use the current
+text in `manuscript/` as the source of truth for the submitted paper:
 
 ```text
 D1 + D2 = dynamic mapping inside every continuously running session
@@ -48,7 +48,7 @@ The method is not object-only. Objects and structural surface patches should
 share the same evidence semantics. Wall/floor labels may protect or group
 structure, but semantics alone must never command deletion.
 
-## Current Implementation Truth
+## Historical Implementation Snapshot (2026-08)
 
 - A complete Khronos-derived Office Session A and Session B can be processed.
 - Session B output reconciliation starts from Session A's saved global mesh,
@@ -90,7 +90,7 @@ Do not write any of the following as established facts:
 
 1. Keep Introduction, Related Work, problem formulation, method, and experiments
    consistent with the D1+D2 / D3 hierarchy.
-2. Draft an explicit claim/evidence table using `03_CLAIMS_AND_EVIDENCE.md`.
+2. Maintain a claim/evidence table grounded in current implementation results and primary sources.
 3. Develop a principled persistent scene-memory representation and inference
    mechanism that lets a complete D1+D2 session recur after a D3 boundary.
 4. Plan one system figure showing Session A D1+D2 -> memory -> D3 -> Session B
@@ -104,11 +104,8 @@ Do not write any of the following as established facts:
 Every technical statement about prior work must be grounded in the original
 full paper, including assumptions, method, experiments, and limitations. A
 paper's criticism of prior work is not its own capability. Future work is not an
-implemented component. Use the source ledgers in:
-
-- `06_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`
-- `07_GAUSSIAN_FULL_TEXT_EVIDENCE_AUDIT_2026-08-06.md`
-- `08_STORYLINE_TAXONOMY_REAUDIT_2026-08-06.md`
+implemented component. Use the original full texts and the source manifests under `literature/`.
+The historical August audit notes remain recoverable from Git history.
 
 ## Useful Starting Artifacts
 

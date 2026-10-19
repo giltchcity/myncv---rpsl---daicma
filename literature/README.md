@@ -18,8 +18,8 @@ Therefore:
   `broad_priority_papers.json`;
 - PDFs are downloaded to the ignored directory `literature/pdfs/`;
 - the downloader records the exact byte size and SHA-256 of each local copy;
-- technical conclusions and short source excerpts are versioned in the
-  repository evidence ledgers;
+- manuscript claims must cite the original papers; historical full-text audit
+  notes remain available in Git history;
 - unpublished and under-review work is explicitly marked until its status
   changes.
 
@@ -110,7 +110,8 @@ Before adding or changing a technical sentence in the manuscript:
 3. inspect the method section implementing the claimed capability;
 4. inspect the evaluation protocol and reported outputs;
 5. inspect limitations, discussion, and conclusion;
-6. add or update the corresponding entry in the full-text evidence audit;
+6. record the supporting source, page/section, and claim in the manuscript or
+   an appropriate research artifact;
 7. use restrained wording when the evidence is only the absence of an evaluated
    feature.
 
