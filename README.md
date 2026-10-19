@@ -1,29 +1,24 @@
-# CVPR Paper Workspace
+# CVPR Paper
 
-LaTeX manuscript and lightweight literature resources for **Persistent Map Updates from Temporally Valid Observations**.
+**Persistent Map Updates from Temporally Valid Observations**
 
-## Repository layout
+This repository contains the LaTeX manuscript and publication assets.
 
-- `manuscript/` — canonical CVPR paper, section files, bibliography, figures, and author kit. Start with `manuscript/README.md` and `manuscript/main.tex`.
-- `literature/` — paper source manifests and `download_papers.py` for reproducible local PDF acquisition. PDFs are intentionally not tracked.
-- `paper_sections_20260923/` — separate draft/exported section assets; the canonical version is in `manuscript/`.
-- `research/` — supplementary research materials.
-- `AGENT_HANDOFF.md` — historical project context and writing/claim guardrails.
-- `GITHUB_OVERLEAF_WORKFLOW.md` — GitHub/Overleaf integration notes.
+## Paper sources
 
-## Build the paper
+- `manuscript/main.tex` — main entry point
+- `manuscript/sec/` — paper sections
+- `manuscript/figures/` — figures and diagram sources
+- `manuscript/*.bib` — bibliographies
+- `manuscript/cvpr.sty`, `manuscript/ieeenat_fullname.bst` — CVPR formatting
+
+## Build
 
 ```bash
 cd manuscript
 latexmk -pdf main.tex
 ```
 
-Alternatively, set `manuscript/main.tex` as the main document in Overleaf.
-See `manuscript/README.md` for document structure and the CVPR bibliography.
+For Overleaf, select `manuscript/main.tex` as the main document.
 
-## Implementation and evidence
-
-The Khronos-based implementation lives in a separate repository:
-https://github.com/giltchcity/session_update_baseline_project
-
-Support technical statements with current implementation results and original published papers. The former root-level numbered progress and literature-audit notes (`01_*.md` through `21_*.md`) were removed to keep the writing repository focused. They remain recoverable from the repository's Git history.
+Research PDFs, literature download manifests, temporary drafts, and agent handoff notes are maintained separately from this paper repository.
