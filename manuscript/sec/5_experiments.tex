@@ -57,8 +57,6 @@ renders each frame with the map of its own timestamp, $\mathcal{M}(t_k)$.
 A cell reads n/a when the method lacks the capability: Khronos relates no two runs, Panoptic Multi-TSDFs and wavemap
 keep no timeline of their map, and only Gaussian maps render. With our layer, every backend keeps element lifetimes
 and therefore a timeline.
-\TODO{The TSDF geometry uses the evaluator's viewer policy with a 1\,cm reference, and the other backends use the
-room-crop protocol. Score all rows with one protocol.}
 
 \paragraph{Protocol.}
 Simulated runs use ground-truth poses, and real runs use the rigid alignment above. All datasets and backends share
@@ -73,8 +71,8 @@ All runs use one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,G
 \begin{table*}[t]
 \centering\small
 \caption{Real room, in percent except PSNR (dB). Cells give runs A / B / C, or the transitions A$\to$B / B$\to$C.
-Within-run changes on the real recordings happen out of view. TSDF geometry uses the 2\,cm reference of the published
-evaluation. PSNR uses held-out frames of run C. n/a: the method lacks the capability. $^\dagger$Panoptic Multi-TSDFs keeps
+Within-run changes on the real recordings happen out of view. Geometry uses the 1\,cm reference and the same room
+crop for every method. PSNR uses held-out frames of run C. n/a: the method lacks the capability. $^\dagger$Panoptic Multi-TSDFs keeps
 no timeline; its object F1 matches its final non-absent submaps.}
 \label{tab:main_real}
 \setlength{\tabcolsep}{3pt}
@@ -85,10 +83,10 @@ no timeline; its object F1 matches its final non-absent submaps.}
 \cmidrule(lr){4-5}\cmidrule(lr){8-9}
 Backend & Method & Online object F1 & Within run & Between runs & Residue$\downarrow$ & Geometry F1 & Final map & Own time \\
 \midrule
-TSDF & Khronos~\cite{schmid2024khronos} & 89.1 / 91.5 / 83.8 & 100 / 66.7 / 66.7 & n/a & n/a & 93.2 / 95.9 / 96.6 & n/a & n/a \\
-     & Panoptic~\cite{schmid2022panoptic} & 64.3 / 56.4 / 44.4$^\dagger$ & n/a & 64.0 / 37.5 & 57.1 / 60.1 & 94.1 / 95.9 / 93.7 & n/a & n/a \\
+TSDF & Khronos~\cite{schmid2024khronos} & 89.1 / 91.5 / 83.8 & 100 / 66.7 / 66.7 & n/a & n/a & 91.0 / 95.9 / 94.7 & n/a & n/a \\
+     & Panoptic~\cite{schmid2022panoptic} & 64.3 / 56.4 / 44.4$^\dagger$ & n/a & 64.0 / 37.5 & 57.1 / 60.1 & 92.4 / 93.6 / 93.0 & n/a & n/a \\
      & Ours & \prov{93.7 / 99.2 / 98.3} & \prov{100 / 100 / 100} & \prov{96.8 / 100} & \prov{1.6 / 4.6}
-          & \prov{93.3 / 92.5 / 91.7} & n/a & n/a \\
+          & \prov{98.6 / 97.3 / 98.4} & n/a & n/a \\
 \midrule
 Gaussians & GaME~\cite{yugay2026game} & 95.8 / 99.1 / 99.4 & 100 / 66.7 / 100 & 93.3 / 94.7 & 42.4 / 61.1
           & 93.1 / 88.6 / 90.8 & 18.29 & n/a \\
@@ -103,8 +101,8 @@ Occupancy & wavemap~\cite{reijgwart2023wavemap} & n/a & 66.7 / 100 / 100 & 93.3 
 \end{tabular}}
 \end{table*}
 % SRC Khronos, Panoptic: ALL_TABLES/real_abc/results/abc_final_cvpr (TABLE1_MAIN, TABLE2_CROSS_SESSION, TABLE2B_OBJECT_ADAPTERS)
-%     and abc_eval_v2/geometry/GEOMETRY_MAIN_TABLE.csv; TSDF Ours geometry from TABLE1_MAIN (same 2 cm protocol). TSDF Ours: best of steps 8 and 12 of the TSDF
-%     branch (objects, within, between B->C, geometry: step 8; residue: step 12). GaME: real_row3v3. Gaussian Ours: best of
+%     ; geometry of all three TSDF rows: eval/results/real/{khronos,panoptic,cand_final}/*/geometry/G1.json (room crop, 1 cm reference, as for the other blocks). TSDF Ours: best of steps 8 and 12 of the TSDF
+%     branch (objects, within, between B->C: step 8; residue: step 12). GaME: real_row3v3. Gaussian Ours: best of
 %     real_row4k / real_m1_adc9720 / real_final_c8d0e49 / real_chain_4ca6976 (PSNR). wavemap and occupancy Ours:
 %     runs/update_layer_wavemap_real_20260930 rows 3 and 4. Between-run F1 under the Table 2 policy (CHANGE_ROWS.json).
 
@@ -157,9 +155,8 @@ of 16 changes from A to B and all 10 from B to C on the real room, and 29 of 32 
 Obsolete surfaces leave the map. With our layer, 1.6\% to 11.5\% of the old object surface remains at observed-empty
 sites, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and 42.4\% and 61.1\% for GaME. Wavemap removes old surfaces
 too (0.6\% and 0.0\%), but its rays also clear surfaces that remain: its real geometry F1 falls to 83.9 and 85.0 in B
-and C, against 89.7 and 89.5 with our layer. The real reference covers only what each run observes, so carried
-surfaces and residual misalignment count against precision there: the TSDF backend reaches 92.5 and 91.7, against
-95.9 and 96.6 for Khronos, which carries nothing. On the complete simulated reference, our layer reaches geometry F1 98.5
+and C, against 89.7 and 89.5 with our layer. On the real room, the TSDF backend reaches geometry F1 98.6, 97.3, and 98.4
+in runs A, B, and C, against 91.0, 95.9, and 94.7 for Khronos. On the complete simulated reference, our layer reaches geometry F1 98.5
 (TSDF), 96.6 (Gaussians), and 93.4 (occupancy), against 83.6 to 92.1 for the published methods.
 
 The Gaussian map keeps its rendering quality. On held-out frames of the last run, it renders 0.81\,dB (simulated) and
