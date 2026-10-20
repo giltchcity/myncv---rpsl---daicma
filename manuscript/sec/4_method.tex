@@ -41,10 +41,21 @@ held.
 \subsection{Problem Setting}
 \label{sec:setting}
 
+We address persistent map updating. An existing mapper builds a map from one run through an indoor scene, and later
+runs revisit the scene after it has changed. The layer keeps the map correct at every time: the map at time $t$ shows
+the surfaces that held at $t$, and a region that a run leaves unobserved keeps its last observed state. We target
+surfaces that disappear, appear, or move, between two runs or out of view during a run. People and other moving agents
+never enter the static map. The mapper keeps its own integration rule.
+
 Run $k$ receives posed RGB-D frames with instance masks. An observation $o$ is the depth ray of one valid pixel, with
 camera center $c_o$, measured range $r_o$, time $t_o$, and instance label $\ell_o$, possibly none. No mapper integrates
 pixels of dynamic classes such as people. A supplied rigid transform aligns run $k$ with the previous map, and instance
-labels refer to the same physical objects across runs.
+labels refer to the same physical objects across runs. The layer takes the poses, the alignment, and the identities as
+given, and leaves the association of objects across runs to the method that supplies the identities. Identities
+sharpen its decisions but do not carry them. Without identities, every surface counts as background, and the layer
+still ends each surface that later measurements see through and keeps each surface that they leave unobserved.
+Identities add the handover of an object that appears at a new site while its old site stays unobserved, and a
+history that links the states of one object.
 
 Each physical object $\ell$ has a sequence of geometric states. A state $s$ holds its reconstructed surface $G_s$ and
 a validity interval $[b_s, e_s)$. Ending a state moves it from the current map to history. The map consists of

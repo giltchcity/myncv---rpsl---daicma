@@ -45,8 +45,10 @@ map of object persistence~\cite{soares2023changing}, LTC-Mapping accumulates evi
 non-detection~\cite{matezbandera2022ltc}, and SuperMap maintains object occupancy, semantic confidence, and temporal
 relations~\cite{zhao2026supermap}. ObVi-SLAM transfers object landmarks between sessions~\cite{adkins2024obvislam},
 OASIS-Map associates objects across sessions~\cite{oh2026oasismap}, and Living Scenes matches and reconstructs objects
-from scans taken at different times~\cite{zhu2024livingscenes}. We also infer object states. We use them to decide
-which observations remain valid and which faces, Gaussians, or cells of the map continue.
+from scans taken at different times~\cite{zhu2024livingscenes}; RIO re-localizes object instances in changing indoor
+scans~\cite{wald2019rio}. These methods associate objects across runs. We take that association as given and use it
+to decide when each object state holds, which observations remain valid, and which faces, Gaussians, or cells of the
+map continue.
 
 \paragraph{Models of temporal persistence.}
 Another line of work models how long the content of a map persists. Hidden Markov models learn the transition
