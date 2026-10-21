@@ -15,8 +15,9 @@ layer, from an empty map and with its own update where it has one.
 exported state and C from B's. Camera poses come from ORB-SLAM3~\cite{campos2021orbslam3}, and we align B and C with A by
 rigid transforms set manually in Open3D~\cite{zhou2018open3d} to minimize the alignment error between the meshes. We call
 every run after the first a revisit. The room contains 20 objects. Between A and B,
-seven moved objects, one addition, and one removal give 16 appearance or disappearance events. Between B and C, four
-moved objects and two removals give 10 events. One suitcase changes out of view once in A, twice in B, and twice in C.
+seven moved objects, one addition, and one removal give 16 appearance or disappearance events, and between B and C,
+four moved objects and two removals give 10. During each run, an object is also placed or moved while the camera maps
+another part of the room.
 Object reference surfaces come from RGB-D measurements aggregated over annotated state intervals.
 \emph{Simulated apartment.} Two Isaac Sim runs observe one furnished apartment: A with 4{,}186 frames and B with
 3{,}555 frames at 30\,Hz, with exact poses. B starts from A's exported state and
@@ -26,8 +27,8 @@ coverage.
 \emph{Flat.} The public Flat dataset~\cite{schmid2022panoptic}, which Panoptic Multi-TSDFs and GaME also use,
 has two simulated runs of one flat with 400 and 362 frames and exact poses. Between the runs, objects
 move, appear, and disappear. A point reference of each run's scene comes with the data.
-% PENDING \TODO{Re-run the simulated apartment with the final TSDF backend, and 3RScan~\cite{wald2019rio},
-% PENDING Bonn~\cite{palazzolo2019bonn}, and TUM~\cite{sturm2012tum} with the final code.}
+% PENDING \TODO{Re-run the simulated apartment with the final TSDF backend. After the current runs: 3RScan~\cite{wald2019rio}
+% PENDING with the final code.}
 
 \paragraph{Compared methods.}
 We compare against published methods on the same recordings. Khronos~\cite{schmid2024khronos} maps each run as its own
@@ -130,8 +131,7 @@ Occupancy & wavemap~\cite{reijgwart2023wavemap} & 91.7 / 86.7 & 93.3 & 90.3 / 91
 
 \paragraph{With our layer, every map detects at least 90\% of the changes within and between runs, without a false
 detection.}
-Within a run, all three backends detect all five out-of-view changes of the suitcase in the real room and reach F1 100
-and 96.3 on the simulated runs A and B. Khronos reaches 66.7 in the real runs B and C and GaME 66.7 in run B, and the
+Within a run, all three backends reach change F1 100 in every real run and 100 and 96.3 in the simulated runs A and B. Khronos reaches 66.7 in the real runs B and C and GaME 66.7 in run B, and the
 compared methods reach 67.9 to 91.7 on the simulated runs. Between runs, the TSDF and Gaussian backends detect 15 of the
 16 events from A to B and the occupancy backend all 16. Every backend detects all 10 events from B to C and 29 of the
 32 on the simulated apartment (\cref{tab:main_real,tab:main_sim}). On these three transitions, Panoptic Multi-TSDFs
@@ -293,7 +293,8 @@ current map, raises the geometry F1 of real run B by 3.1 points (supplementary m
 \subsection{Runtime}
 \label{sec:exp_runtime}
 
-With the TSDF backend, mapping the real runs A, B, and C takes 642\,s, 1{,}152\,s, and 1{,}798\,s. The occupancy
-backend takes 450\,s, 583\,s, and 1{,}292\,s. The Gaussian
-backend maps real run B in 1{,}793\,s with a peak GPU memory of 7.2\,GB.
-% PENDING \TODO{Re-time the TSDF and Gaussian backends with the final code.}
+We give mapping speed as the frames of a run divided by its mapping time. On the real runs A, B, and C, the TSDF backend
+maps \prov{2.4}, \prov{2.2}, and \prov{1.3} frames per second, the Gaussian backend 3.8, 2.4, and 1.4 with a peak GPU
+memory of at most 8.3\,GB, and the occupancy backend 8.9, 6.9, and 5.6.
+% PENDING Re-time TSDF runs B and C alone (their final runs overlapped with the simulated runs), and the occupancy
+% PENDING backend after the valid-domain runs.
