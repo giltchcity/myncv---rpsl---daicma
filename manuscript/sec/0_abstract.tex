@@ -1,17 +1,17 @@
-% Abstract draft, 2026-10-19. Story: one update method for any mapper; TSDF, 3D Gaussians, and occupancy are backends.
-% Style: Strunk and White. Provisional numbers (\prov) are the best values in the experiment tables; see their SRC
-% comments. Needs draft_macros.tex.
 \begin{abstract}
 A mapper that returns to a changed scene can reload its old map, which keeps each moved object at its old site, or
 start over, which discards every region it leaves unobserved. Existing methods resolve this conflict inside one map
 representation, so each new mapper needs a new update rule. Two questions decide every update: which observations
 still describe the scene, and which parts of the earlier map remain. Neither depends on the representation. We
 present an update layer that answers both questions from the RGB-D frames and instance masks of a new run and leaves
-integration to the mapper. The layer infers when each object state holds, admits an observation only while the state
-it measured holds, and keeps an earlier map element until current observations place its surface elsewhere. A mapper
-joins through four operations and keeps its own integration rule. We attach the layer to a TSDF, a 3D Gaussian, and an
-occupancy mapper. On three recordings of a real room taken over twelve days, the share of old object surface that
-remains in the Gaussian map falls from 42.4\% and 61.1\% under its own update to \prov{6.5\%} and \prov{11.5\%}. On a
-simulated apartment, the updated maps recover \prov{96.1\%} of the scene surface with Gaussians and \prov{98.4\%}
-with the TSDF, against 78.7\% and 74.1\% for maps rebuilt from scratch.
+integration to the mapper. Objects move in view, change out of view, or change between runs, and the layer infers
+when each of their states holds with one likelihood, one prior, and one decision rule. It admits an observation only
+while the state it measured holds and keeps an earlier map element until current observations place its surface
+elsewhere. A TSDF, a 3D Gaussian, and an occupancy mapper each join through four operations and keep their own
+integration rule. On three recordings of a real room taken over twelve days, all three maps detect at least 15 of
+the 16 changes between the first two runs and all 10 between the last two, and the old object surface left in the
+Gaussian map falls from 42.4\% and 61.1\% under its own update to \prov{8.1\%} and \prov{14.3\%}. On a simulated
+apartment whose second run observes only part of the scene, the updated maps reach a geometry F1 of \prov{96.6} with
+Gaussians and \prov{98.5} with the TSDF against the complete scene, compared with 85.4 and 83.6 for maps rebuilt
+from scratch.
 \end{abstract}

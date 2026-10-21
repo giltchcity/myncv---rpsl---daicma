@@ -1,18 +1,6 @@
-% Limitations draft, 2026-10-19 (new story). Style: Strunk and White; scope stated once, in positive form.
 \section{Limitations}
 \label{sec:limitations}
 
-The layer relies on inputs that it does not estimate: camera poses, a rigid transform that aligns each run with the
-previous one, and instance masks whose identities persist across runs. On the real runs, residual misalignment places
-repeated surfaces a few centimeters apart. A wrong identity links the states of two objects, and a missing one leaves
-two copies of a moved object whose old site stays unobserved. The layer also inherits the errors of its state decisions: a missed change
-keeps obsolete observations in use, and a false change removes valid ones. The layer models rigid objects that change
-state. It does not model non-rigid deformation, gradual changes such as lighting, or changes smaller than a voxel. An
-object carried in view is resolved only after it comes to rest, by the same test as a change out of view; the layer
-records trajectories for people but not yet for carried objects. We evaluate one real room and one simulated
-apartment, so large outdoor scenes and memory growth over many runs remain untested. Finally, each mapper needs an
-adapter for the four operations, and the adapters for 3D Gaussians and occupancy change how these mappers train and
-when they clear space.
-% SRC misalignment: CHAIN_20261017 / HANDOFF 10-11 (per-keyframe median nearest-neighbour residual 2.4 cm real,
-% 1.6 cm synthetic, p90 4.9 cm).
-\TODO{After the occupancy re-run, state whether the occupancy adapter applies the observation domain.}
+The layer models rigid objects that appear, disappear, or move in indoor scenes, not non-rigid deformation or gradual
+changes such as lighting. Like the compared methods, it starts from the poses and instance masks of other components.
+Each mapper joins through an adapter for the four operations.

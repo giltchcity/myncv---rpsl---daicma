@@ -1,0 +1,181 @@
+\clearpage
+\setcounter{page}{1}
+\maketitlesupplementary
+
+\section{Implementation Details}
+\label{sec:supp_impl}
+
+\subsection{State Intervals}
+\label{sec:supp_states}
+
+To test a state, the layer projects up to 1{,}500 surface samples of the state, placed on a 2.5\,cm grid, into each
+later depth image. A pixel without depth or outside the image gives no evidence, and readings more than $60^\circ$ from
+the sample normal do not count~\cite{nguyen2012kinect}. Thin parts, edges, and mislabeled pixels produce false
+see-through readings. A sample is reliable if its posterior of belonging to the object is at least one half under a
+two-component label model, fitted by expectation maximization at every round, and if it was never seen through while
+the object was confirmed in place. The Beta density $p_A$ of \cref{eq:absence} shrinks toward pooled sensor
+statistics, and an observation contributes only if it judges at least $\min(30, N_{\mathrm{rel}})$ samples.
+
+For the second group, with the fraction $\phi$ of $N$'s surface cells that lie farther than 10\,cm from $G_A$ and their
+effective number $n_{\mathrm{eff}}$, $B_{M:S} = 2\,P(\theta > \frac{1}{2})$ for
+$\theta \sim \mathrm{Beta}(\frac{1}{2} + n_{\mathrm{eff}}\phi,\ \frac{1}{2} + n_{\mathrm{eff}}(1-\phi))$. The
+pseudo-counts of \cref{eq:prior} come from the other objects of the same class and group, and the class mean starts
+from Jeffreys' reference value $\frac{1}{2}$, or from $\frac{3}{4}$ and $\frac{1}{4}$ for classes declared movable or
+fixed. Every action in a change-detection round reads $q$ from the history before that round, so the decisions are
+independent of the identifiers, their order, and the end of a run.
+
+A state $A$ ends without a successor when $\max(\operatorname{logit} q_A + L^{\mathrm{pre}}_t,\ L_t) > \ln 99$ and the
+same rays see through $G_A$ more often than they support it. Here $L^{\mathrm{pre}}_t$ is the sum of \cref{eq:absence}
+for a change before the state's first scored observation in the run, without the clamp at zero, and the prior term
+applies only to a state inherited from the previous run. $N$ refines $A$ when $A$ has current support and
+$1 - q \ge q\,B_{M:S}$. The map shows $G_A \cup G_N$ while $S$ is the most probable explanation and $G_A$ otherwise,
+until a handover commits. At the end of a run, the same rules apply to the evidence gathered so far, and a remaining
+$N$ that $M$ explains best goes to history. A state ended by a successor closes at the later of its last support and
+the decision, and a state ended without one closes midway between its last evidence and the decision.
+
+\subsection{Backends}
+\label{sec:supp_backends}
+
+\paragraph{TSDF.}
+When a round changes the state intervals, the backend rebuilds the affected blocks by integrating their frames again in
+their original order, which keeps the weight saturation of the native rule. Each face takes the identity of the nearest
+current object face within one voxel and is background otherwise. Where the run's frames leave gaps in the present
+surface, the backend fills them with the background faces of the active window, which it archives at every round. Fill
+faces and the background faces of the previous run's shown map pass \cref{eq:continue}, the former with
+$K_{\mathrm{prior}} = 0$ and the latter with $K_{\mathrm{prior}} = 1$. Background faces of the previous map leave
+together with a closed object state whose old site they cover, and fill faces measured no later than that state's last
+support leave as well. Object faces follow their state. A face of a continuing inherited state also leaves if it lies
+inside the object's present surface, which the backend tests by casting rays in 64 fixed directions and comparing hits
+on the inner and outer sides. The end of a run only drains the queues and saves the state, so the final map is the
+online map.
+
+\paragraph{Gaussians.}
+FlashSplat~\cite{shen2024flashsplat} assigns identities to the Gaussians, accumulated over keyframes. The continuation
+test runs at each keyframe of the current run, before GaME adds new Gaussians, with $h_e$ three standard deviations and
+$\tau_e$ at least the 5\,cm tolerance. A reading covers a Gaussian only if it comes from the side from which the
+previous run saw the Gaussian. A Gaussian that the run supports or covers is \emph{present} and is trained by the
+current run's keyframes; one that it supports but never covers is also \emph{shared} and is trained by the keyframes of
+both runs; every other Gaussian is \emph{held}: the current run leaves it unchanged, and the keyframes of its own run
+keep maintaining it. Each optimization step draws one keyframe. A keyframe of the current run has weight one. An
+earlier keyframe has as weight the fraction of the Gaussians it shows, among those the current run has decided on, that
+are shared and that the current run has observed less than a single earlier view does: their observed area $(f/z)^2$,
+summed over the views of the current run, stays below its mean over the earlier views. The earlier views of one place
+thus share that place's budget, and a distant new view does not replace close earlier detail. A step updates only the
+Gaussians its keyframe may train, and its loss counts only the pixels whose first Gaussian, where the transmittance
+along the ray first drops below one half, is one of them. GaME's opacity pruning removes only Gaussians created in the
+current run. The refinement after the last run follows the same rules and adds no Gaussians. \Cref{sec:supp_gaussian}
+switches these choices off one at a time.
+
+GaME's depth loss compares the rendered depth $D = \sum_i w_i z_i$ with the reading $d$, where $w_i$ is the blending
+weight of the $i$-th Gaussian along the ray and $z_i$ is its depth. Where the accumulated opacity $A = \sum_i w_i$ is
+below one, Gaussians behind the surface can satisfy this loss without contributing color, and other viewpoints then see
+them in front of the surface. For a map that inherits an earlier map, we separate the two requirements of the depth
+loss:
+\begin{equation}
+  \mathcal{L}_{\mathrm{depth}} = A\,\big|D/A - d\big| + \tau_0\,(1 - A),
+  \label{eq:depth}
+\end{equation}
+with $A$ held fixed in the first term and $\tau_0 = 5$\,cm. The first term places the expected depth at the reading,
+and the second asks the ray to end there.
+
+\section{GaME as a Baseline}
+\label{sec:supp_game}
+
+We run GaME~\cite{yugay2026game} from its released code with seven fixes, in its own rows and under our layer alike.
+(C1) The keyframe test uses the relative pose between the last keyframe and the current frame, instead of
+world-to-camera poses composed in an order that depends on where a dataset places its origin. (C2) The rotation test
+uses the true relative rotation, spaced by the angular radius of the calibrated image, instead of comparing Euler
+angles in radians with 50. (C3) The keyframe sampler terminates when occlusion masks cover every keyframe. (C4) The
+training loss counts only pixels with measured depth, whereas the released code trains the depth of a pixel without a
+reading toward zero. (C5) The addition test also counts only pixels with measured depth. (C6) The refinement raises the
+degree of the spherical harmonics every 1{,}000 iterations up to the declared 3, whereas the released code declares
+degree 3 but never raises it. (C7) The refinement decays the position learning rate on the schedule its arguments
+declare, from $1.6\cdot10^{-4}$ to $1.6\cdot10^{-6}$ over 30{,}000 steps, which the released code never applies. On Flat, the released
+code reaches 24.86\,dB after refinement and GaME with these fixes 26.17\,dB.
+
+\section{Design Choices of the Gaussian Backend}
+\label{sec:supp_gaussian}
+
+\Cref{tab:supp_gaussian} switches off one design choice of the Gaussian backend at a time. Within a pair, both runs
+share the code and the first-run map. Letting the layer choose the training keyframes raises
+the geometry F1 of real run B by 3.07 points and the memory tolerance by 0.64 points, and limiting the pruning keeps
+681{,}011 earlier elements that GaME's pruning deletes.
+
+\begin{table}[h]
+\centering\small
+\caption{One design choice of the Gaussian backend switched off at a time.}
+\label{tab:supp_gaussian}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llcc}
+\toprule
+Design choice & Measure & With & Without \\
+\midrule
+Pruning limited to the current run & real B, earlier elements lost & 0 & 681{,}011 \\
+                                   & real B, geometry F1 & 92.66 & 92.51 \\
+                                   & simulated B, geometry F1 & 88.86 & 88.05 \\
+Training pool of the layer, not every stored keyframe & real B, geometry F1 & 92.48 & 89.41 \\
+Memory tolerance $\max(3\sigma, 5\,\text{cm})$, not $3\sigma$ & real B, geometry F1 & 92.99 & 92.35 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Refinement after the Last Run}
+\label{sec:supp_refinement}
+
+The refinement that follows the last run applies the mapping's rules: each element is trained only by keyframes of the
+run that last measured it, ended elements stay fixed, and the refinement adds no elements. It raises PSNR on all three
+datasets, by 3.85, 1.58, and 0.93\,dB, and changes geometry by at most 0.12 points (\cref{tab:supp_refinement}). GaME
+refines one current map on every stored keyframe, including keyframes whose content has since changed, and its geometry
+falls on Flat and on the real room.
+
+\begin{table}[h]
+\centering\small
+\caption{Before $\to$ after the refinement that follows the last run.}
+\label{tab:supp_refinement}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llcc}
+\toprule
+Data & Metric & GaME & Ours \\
+\midrule
+Flat, run 2 & PSNR & 23.42 $\to$ 26.17 & 23.79 $\to$ 27.64 \\
+            & Geometry F1 & 87.71 $\to$ 84.60 & 89.78 $\to$ 89.82 \\
+Simulated B & PSNR & 22.13 $\to$ 22.09 & 23.32 $\to$ 24.90 \\
+            & Geometry F1 & \TODO{score} & 96.59 $\to$ 96.51 \\
+Real C      & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
+            & Geometry F1 & 90.75 $\to$ 89.24 & 95.04 $\to$ 95.16 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sensitivity of the State Intervals to Their Constants}
+\label{sec:supp_sensitivity}
+
+We replayed the logged evidence of the out-of-view and between-run test with each constant halved and doubled
+(\cref{tab:supp_sensitivity}). The cold-start moments, the clamps, and the floors change at most two decisions. The
+number of samples required in view, the sample cap, and the history gate change 4 to 12 decisions, with corrections
+and new errors in both directions.
+
+\begin{table}[h]
+\centering\small
+\caption{Decisions of the state test that change when one constant is halved or doubled (real B and C, simulated A
+and B, replayed from the logs).}
+\label{tab:supp_sensitivity}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc}
+\toprule
+Constant & Value & $\times 0.5$ & $\times 2$ \\
+\midrule
+Samples required in view & 30 & 9 & 12 \\
+Sample cap & 1{,}500 & 12 & -- \\
+History gate & 3 & 4 & 11 \\
+Pseudo-observations of the population & 3 & 1 & 2 \\
+Cold-start mean and variance & 0.05, 0.09 & 0 & 0 \\
+Concentration floor & 2 & 0 & 2 \\
+Clamps of the present fraction & 0.005, 0.995 & 0 & 0--1 \\
+Clamps of the mean & 0.001, 0.999 & 0 & 0 \\
+Variance floor & $10^{-4}$ & 0 & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\TODO{Total number of decisions in the replay.}
+
