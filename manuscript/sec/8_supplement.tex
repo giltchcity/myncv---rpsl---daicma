@@ -93,7 +93,7 @@ Ending only by continuation & earlier Gaussians lost, real B & $+681{,}011$ \\
 
 The refinement that follows the last run applies the mapping's rules: each element is trained only by the keyframes that
 may train it during mapping, ended elements stay fixed, and the refinement adds no elements. It raises PSNR on all three
-datasets, by 3.85, 1.58, and 0.93\,dB, and changes geometry by at most 0.12 points (\cref{tab:supp_refinement}). GaME
+datasets, by 3.85, 1.74, and 0.93\,dB, and changes geometry by at most 0.12 points (\cref{tab:supp_refinement}). GaME
 refines its final map on its keyframes outside their stale masks, and its geometry falls on Flat and on the real room.
 
 \begin{table}[h]
@@ -108,8 +108,8 @@ Data & Metric & GaME & Ours \\
 \midrule
 Flat, run 2 & PSNR & 23.42 $\to$ 26.17 & 23.79 $\to$ 27.64 \\
             & Geometry F1 & 87.71 $\to$ 84.60 & 89.78 $\to$ 89.82 \\
-Simulated B & PSNR & 22.13 $\to$ 22.09 & 23.32 $\to$ 24.90 \\
-% PENDING             & Geometry F1 & \TODO{score} & 96.59 $\to$ 96.51 \\
+Simulated B & PSNR & 22.13 $\to$ 22.09 & 23.44 $\to$ 25.18 \\
+% PENDING             & Geometry F1 & \TODO{score} & 96.72 $\to$ 96.61 \\
 Real C      & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
             & Geometry F1 & 90.75 $\to$ 89.24 & 95.04 $\to$ 95.16 \\
 \bottomrule

@@ -21,8 +21,9 @@ another part of the room.
 Object reference surfaces come from RGB-D measurements aggregated over annotated state intervals.
 \emph{Simulated apartment.} Two Isaac Sim runs observe one furnished apartment: A with 4{,}186 frames and B with
 3{,}555 frames at 30\,Hz, with exact poses. B starts from A's exported state and
-observes only part of what A mapped. Run A contains 26 appearance or disappearance events and run B 14, in view or out of view,
-and 32 events happen between the runs. The complete scene mesh is the reference inside and outside the current camera
+observes only part of what A mapped. Run A contains 28 appearance or disappearance events and run B 16, in view or out of view,
+and 34 events happen between the runs.
+% PENDING TSDF and occupancy simulated rows: rerun on the grouped inputs (events 28 / 16 / 34). The complete scene mesh is the reference inside and outside the current camera
 coverage.
 \emph{Flat.} The public Flat dataset~\cite{schmid2022panoptic}, which Panoptic Multi-TSDFs and GaME also use,
 has two simulated runs of one flat with 400 and 362 frames and exact poses. Between the runs, objects
@@ -121,7 +122,7 @@ TSDF & Khronos~\cite{schmid2024khronos} & 67.9 / 88.0 & n/a & 91.4 / 83.6 & n/a 
      & Ours & \prov{100 / 96.3} & \prov{95.1} & \prov{98.0 / 98.5} & n/a & n/a \\
 \midrule
 Gaussians & GaME~\cite{yugay2026game} & 84.4 / 88.0 & 81.5 & 94.7 / 92.0 & 22.09 & n/a \\
-          & Ours & \prov{100 / 96.3} & \prov{95.1} & \prov{97.9 / 96.6} & \prov{24.90} & \prov{26.54} \\
+          & Ours & \prov{100 / 93.3} & \prov{95.4} & \prov{97.9 / 96.7} & \prov{25.18} & \prov{26.81} \\
 \midrule
 Occupancy & wavemap~\cite{reijgwart2023wavemap} & 91.7 / 86.7 & 93.3 & 90.3 / 91.2 & n/a & n/a \\
           & Ours & \prov{100 / 96.3} & \prov{95.1} & \prov{94.6 / 94.9} & n/a & n/a \\
@@ -129,12 +130,13 @@ Occupancy & wavemap~\cite{reijgwart2023wavemap} & 91.7 / 86.7 & 93.3 & 90.3 / 91
 \end{tabular}
 \end{table*}
 
-\paragraph{With our layer, every map detects at least 90\% of the changes within and between runs, without a false
+\paragraph{With our layer, every map reaches change F1 of at least 93 within and between runs, without a false
 detection.}
-Within a run, all three backends reach change F1 100 in every real run and 100 and 96.3 in the simulated runs A and B. Khronos reaches 66.7 in the real runs B and C and GaME 66.7 in run B, and the
+Within a run, all three backends reach change F1 100 in every real run and in the simulated run A, and 93.3 to 96.3 in
+the simulated run B. Khronos reaches 66.7 in the real runs B and C and GaME 66.7 in run B, and the
 compared methods reach 67.9 to 91.7 on the simulated runs. Between runs, the TSDF and Gaussian backends detect 15 of the
-16 events from A to B and the occupancy backend all 16. Every backend detects all 10 events from B to C and 29 of the
-32 on the simulated apartment (\cref{tab:main_real,tab:main_sim}). On these three transitions, Panoptic Multi-TSDFs
+16 events from A to B and the occupancy backend all 16. Every backend detects all 10 events from B to C and reaches change F1 95.1 to 95.4 between the simulated runs
+(\cref{tab:main_real,tab:main_sim}). On these three transitions, Panoptic Multi-TSDFs
 reaches change F1 64.0, 37.5, and 91.8, GaME 93.3, 94.7, and 81.5, and wavemap 93.3, 100, and 93.3.
 
 \paragraph{Obsolete surfaces leave the map.}
@@ -151,7 +153,7 @@ with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main_real}). The TSDF map als
 run from an empty map, on every revisit (\cref{tab:main_real,tab:main_sim,tab:flat}).
 
 \paragraph{The memory of earlier runs completes every map.}
-On the complete simulated scene, the updated maps of run B reach geometry F1 98.5 (TSDF), 96.6 (Gaussians), and 94.9
+On the complete simulated scene, the updated maps of run B reach geometry F1 98.5 (TSDF), 96.7 (Gaussians), and 94.9
 (occupancy). Maps of run B alone reach 83.6, 85.4, and 84.2, and the compared methods that carry a map reach 92.1
 (Panoptic Multi-TSDFs), 92.0 (GaME), and 91.2 (wavemap) (\cref{tab:main_sim,tab:ablation_variants}).
 
@@ -222,8 +224,8 @@ Data & Method & PSNR$\uparrow$ & SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downar
 \midrule
 Sim.~B & GaME~\cite{yugay2026game} & 22.09 & 0.753 & 0.334 & 22.0 \\
        & Scratch & 23.36 & 0.788 & 0.276 & 22.7 \\
-       & Ours, final & \prov{24.90} & \prov{0.824} & \prov{0.215} & \prov{15.3} \\
-       & Ours, own time & \prov{26.54} & \prov{0.883} & \prov{0.173} & \prov{4.8} \\
+       & Ours, final & \prov{25.18} & \prov{0.825} & \prov{0.214} & \prov{15.3} \\
+       & Ours, own time & \prov{26.81} & \prov{0.896} & \prov{0.168} & \prov{3.5} \\
 \midrule
 Real~C & GaME~\cite{yugay2026game} & 18.94 & 0.788 & 0.410 & 5.3 \\
        & Scratch & 19.93 & 0.819 & 0.363 & 4.5 \\
@@ -237,11 +239,11 @@ Flat~2 & GaME~\cite{yugay2026game} & 26.17 & 0.922 & 0.159 & 1.2 \\
 \end{table}
 
 Our layer also renders better than GaME's update (\cref{tab:rendering}). On held-out frames of the last run,
-our final map renders 2.81\,dB better than GaME's update on the simulated apartment, 0.96\,dB better on the real room,
+our final map renders 3.09\,dB better than GaME's update on the simulated apartment, 0.96\,dB better on the real room,
 and 1.47\,dB better on Flat, and it is better on every metric. GaME's update renders 1.27 and 0.99\,dB below a map rebuilt from scratch, whereas our
-final map renders 1.54\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier runs. Because objects
+final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier runs. Because objects
 also change during the last run,
-rendering each frame with our map of its own time raises PSNR further, by 1.64 and 0.51\,dB on the simulated apartment and
+rendering each frame with our map of its own time raises PSNR further, by 1.63 and 0.51\,dB on the simulated apartment and
 the real room, and improves every metric of our final map. GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 87.7 to 84.6 on Flat and
 from 90.8 to 89.2 on the real room and changes ours by at most 0.12 points.
 
@@ -270,7 +272,7 @@ TSDF & Scratch & n/a & 95.9 / 94.7 & 83.6 \\
 \midrule
 Gaussians & Scratch & n/a & 93.6 / 95.3 & 85.4 \\
           & Own & 42.4 / 61.1 & 88.6 / 90.8 & 92.0 \\
-          & Ours & \prov{8.1 / 14.3} & \prov{93.4 / 95.0} & \prov{96.6} \\
+          & Ours & \prov{8.1 / 14.3} & \prov{93.4 / 95.0} & \prov{96.7} \\
 \midrule
 Occupancy & Scratch & n/a & 96.4 / 95.8 & 84.2 \\
           & Carry-over & 99.6 / 99.6 & 85.2 / 82.2 & 90.6 \\

@@ -10,12 +10,15 @@ unobserved. A correct update removes what changed, keeps what is merely unobserv
 % PENDING \begin{figure}[t]
 % PENDING \centering
 % PENDING \fbox{\begin{minipage}[c][4.2cm][c]{0.94\linewidth}\centering\small
-% PENDING \TODO{Teaser: one revisit of the real room. Columns: scratch, the mapper's own update, ours. Rows: TSDF, 3D Gaussians,
-% PENDING occupancy. Mark one moved object (old site red, new site green) and one region seen only in the first run.}
+% PENDING \TODO{Teaser: the real room over its three runs. Top: our Gaussian map after run A (day 0), run B (+6 h), and
+% PENDING run C (+12 days), one fixed oblique view. Green marks the states that begin in the run, red outlines the old sites
+% PENDING the run clears, and gray the regions kept from earlier runs that the run does not observe. Bottom: the TSDF and
+% PENDING occupancy maps after run C from the same view, with the same marks. Inset: the final map queried at a time in run A.}
 % PENDING \end{minipage}}
-% PENDING \caption{\textbf{One update method, three mappers.} The same temporal decisions update a TSDF, a 3D Gaussian map, and
-% PENDING an occupancy map across runs. Each map removes the old site of a moved object, adds its new site, and keeps the region
-% PENDING that the new run leaves unobserved.}
+% PENDING \caption{\textbf{One update layer across runs and representations.} Over three runs of a real room that span twelve
+% PENDING days, the layer removes the old sites of moved objects, adds their new sites, and keeps what each run leaves
+% PENDING unobserved. The same decisions update a 3D Gaussian map (top), a TSDF, and an occupancy map (bottom), and the final
+% PENDING map still returns the room as it was during an earlier run (inset).}
 % PENDING \label{fig:teaser}
 % PENDING \end{figure}
 
@@ -53,10 +56,10 @@ surfaces remain in the TSDF, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs~
 Gaussian map, \prov{8.1\%} and \prov{14.3\%} remain, against 42.4\% and 61.1\% under GaME's own update. Where the later runs observe, all three maps reach a higher geometry F1 than under the published
 update of their representation. Where they do not, the memory of earlier runs completes the map. On a simulated apartment whose
 second run observes only part of what the first run mapped, the updated maps reach a geometry F1 of \prov{98.5}
-(TSDF), \prov{96.6} (Gaussians), and \prov{94.9} (occupancy) against the complete scene, compared with 92.1, 92.0,
+(TSDF), \prov{96.7} (Gaussians), and \prov{94.9} (occupancy) against the complete scene, compared with 92.1, 92.0,
 and 91.2 under Panoptic Multi-TSDFs, GaME, and wavemap and 83.6 to 85.4 for maps rebuilt from scratch. On held-out frames of the last run, the Gaussian map renders
-\prov{2.81}, \prov{0.96}, and \prov{1.47}\,dB better than GaME's update on the simulated apartment, the real room, and
-Flat, and rendering each frame with the map of its own time adds 1.64 and 0.51\,dB on the simulated apartment and the real
+\prov{3.09}, \prov{0.96}, and \prov{1.47}\,dB better than GaME's update on the simulated apartment, the real room, and
+Flat, and rendering each frame with the map of its own time adds 1.63 and 0.51\,dB on the simulated apartment and the real
 room.
 
 Our contributions are:
