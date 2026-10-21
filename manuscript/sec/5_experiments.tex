@@ -219,7 +219,7 @@ room, and 1.47\,dB better on Flat, and it is better on every metric. It renders 
 and matches that map on the real room (19.90 against 19.93\,dB). Because objects also change during the last run,
 rendering each frame with our map of its own time raises PSNR further, to 26.54 and 20.41\,dB, and improves every
 metric on both datasets. GaME keeps only its final map. The refinement that follows the last run lowers GaME's
-geometry F1 on Flat and on the real room and keeps ours (\cref{sec:supp_refinement}).
+geometry F1 on Flat and on the real room and keeps ours (supplementary material).
 
 \subsection{Restart, Carry-Over, or Update}
 \label{sec:exp_ablation}
@@ -262,7 +262,7 @@ real geometry F1 falls to 85.2 and 82.2. The backends' own updates sit between: 
 of the old surface, and wavemap's update removes most of it but loses accuracy on the real revisits. With our layer,
 every backend reaches its highest geometry F1 against the complete simulated scene, with 0.9\% to 14.3\% of the old
 surface left. Valid domains add accuracy: training the Gaussians only with the keyframes that the layer admits, instead of every
-stored keyframe, raises the geometry F1 of real run B by 3.1 points (\cref{sec:supp_gaussian}).
+stored keyframe, raises the geometry F1 of real run B by 3.1 points (supplementary material).
 
 \subsection{Runtime}
 \label{sec:exp_runtime}

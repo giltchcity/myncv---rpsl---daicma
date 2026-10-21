@@ -72,7 +72,7 @@ The layer reconstructs object states from the instance-masked depth, masks movin
 Dynablox~\cite{schmid2023dynablox} as Khronos does~\cite{schmid2024khronos}, and tests each state against later depth
 images. A surface sample of the state is \emph{supported} if the reading at its pixel lies within 5\,cm of its depth,
 \emph{seen through} if the reading lies farther, and \emph{occluded} if it lies closer. Only reliable samples vote,
-which excludes thin parts, edges, and mislabeled pixels (\cref{sec:supp_states}).
+which excludes thin parts, edges, and mislabeled pixels (supplementary material).
 
 \paragraph{Three explanations.}
 Let $A$ be the current state of object $\ell$ and $N$ the observations of $\ell$ in the current run that the layer has
@@ -92,7 +92,7 @@ statistic~\cite{page1954cusum} maximizes the evidence over the change time $s$:
 where $N_i(s)$ counts the reliable samples that observation $i$ judges for the first time since $s$ and
 $N_{\mathrm{rel}}$ counts all reliable samples, so repeated looks at a small patch cannot add up to a whole object. The
 second group, the \emph{displacement evidence}, holds the position of $N$ relative to $G_A$: the share of $N$'s surface that lies farther than 10\,cm from
-$G_A$ gives a Bayes factor $B_{M:S} \in [0, 2]$ (\cref{sec:supp_states}). The third group, the \emph{new-site evidence}, holds the observations
+$G_A$ gives a Bayes factor $B_{M:S} \in [0, 2]$ (supplementary material). The third group, the \emph{new-site evidence}, holds the observations
 of $N$'s own surface, whose absence likelihood ratios multiply to $L_{U:N}$. Visible motion, flagged by the layer's object
 tracker as in Khronos~\cite{schmid2024khronos}, ends a state with certainty.
 
@@ -118,7 +118,7 @@ three explanations have posteriors
 $A$ ends without a successor when its log odds of absence exceed $\ln 99$ and the majority of the same rays sees
 through $G_A$, the boundary that the symmetric-difference loss sets. $N$ replaces $A$ when $P(M) > P(S) + P(U)$, that is,
 $q\,B_{M:S} > (1-q) + \frac{1-v}{v}\,L_{U:N}$. Merging, display, and the end of a run follow from the same posteriors
-(\cref{sec:supp_states}), and every posterior threshold comes from the two losses. \Cref{tab:decisions} lists the evidence of each kind of
+(supplementary material), and every posterior threshold comes from the two losses. \Cref{tab:decisions} lists the evidence of each kind of
 change: between runs, the absence log odds start at the prior $\operatorname{logit} q_A$ of the inherited state.
 
 \begin{table}[t]
@@ -190,7 +190,7 @@ The update interface has four operations: the mapper reports its elements, ends 
 the state intervals, and integrates observations within their valid domains. The mapper supplies the half-size $h_e$
 of its elements, its truncation band $T$, and its test $C(e)$, and the layer makes every other decision with the same
 code for all three mappers. Each mapper keeps its own integration: the TSDF its weighted average, GaME its photometric
-and depth optimization, and wavemap its log-odds integration of occupied space. \Cref{sec:supp_backends} gives the
+and depth optimization, and wavemap its log-odds integration of occupied space. The supplementary material gives the
 details of each backend.
 
 \paragraph{TSDF backend.}
@@ -210,7 +210,7 @@ $T$ and both face the same way. The current map is the present surface with the 
 \paragraph{Gaussian backend.}
 Our Gaussian backend is GaME~\cite{yugay2026game}, which optimizes 3D Gaussians~\cite{kerbl2023gaussians} over
 keyframes with photometric and depth losses. Corrections of GaME's released code, used in its rows and ours, raise its
-own Flat PSNR from 24.86 to 26.17\,dB (\cref{sec:supp_game}). Each Gaussian carries a lifetime, and a keyframe at time $t_k$ renders and trains only
+own Flat PSNR from 24.86 to 26.17\,dB (supplementary material). Each Gaussian carries a lifetime, and a keyframe at time $t_k$ renders and trains only
 $\mathcal{M}(t_k)$, so the observations of an ended state train only the Gaussians of their time. At each keyframe of
 the current run, the backend tests every live Gaussian of the previous map at the Gaussian's own pixel. A reading within
 $T = 10$\,cm in front of the Gaussian \emph{covers} it, and $C(e)$ holds if the run neither supports nor sees through
