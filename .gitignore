@@ -1,4 +1,4 @@
-# LaTeX build products
+# LaTeX build output
 *.aux
 *.bbl
 *.bcf
@@ -11,21 +11,41 @@
 *.synctex.gz
 *.toc
 *.xdv
-
-# Local build and editor state
+*.nav
+*.snm
+*.vrb
+*.synctex
+*.lof
+*.lot
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
 _build/
+latex.out/
+manuscript/main.pdf
+
+# Editor and OS artifacts
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
 
-# Local literature audit cache. Source URLs and hashes are versioned, but
-# third-party PDFs are not redistributed in this public repository.
-literature/pdfs/
-literature/download_manifest.generated.json
-literature/gaussian_download_manifest.generated.json
+# Local research/workspace files (not part of the paper project)
+/research/
+/literature/
+/paper_sections_*/
+/AGENT_HANDOFF.md
+/GITHUB_OVERLEAF_WORKFLOW.md
+/[0-9][0-9]_*.md
 
-# Keep large experiment artifacts outside this paper repository.
+# Large local experiment artifacts
 *.4dmap
 *.panmap
 *.bag
@@ -33,10 +53,6 @@ literature/gaussian_download_manifest.generated.json
 *.mcap
 *.ply
 
-# Baseline build/run products if the source snapshot is used locally
-code/session_update_baseline/build/
-code/session_update_baseline/runs/
-code/session_update_baseline/rounds/
-code/session_update_baseline/visual_compare/
+# Local script output
 **/__pycache__/
 *.pyc
