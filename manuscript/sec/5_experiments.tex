@@ -12,11 +12,13 @@ mapper also runs without our layer, from an empty map and with its own update wh
 \paragraph{Datasets.}
 \emph{Real room.} We record one room three times with a Kinect: run A (133\,s, 4{,}003 frames), run B (135\,s,
 4{,}041 frames) about six hours later, and run C (241\,s, 7{,}216 frames) twelve days after B. B starts from A's
-exported state and C from B's, and rigid transforms align B and C with A. The room holds 20 objects. Between A and B,
+exported state and C from B's. Camera poses come from ORB-SLAM3~\cite{campos2021orbslam3}, and rigid transforms,
+set manually against the alignment error of the meshes in Open3D~\cite{zhou2018open3d}, align B and C with A. The room holds 20 objects. Between A and B,
 seven moved objects, one addition, and one removal give 16 appearance or disappearance events. Between B and C, four
 moved objects and two removals give 10 events. One cabinet changes out of view once in A, twice in B, and twice in C.
-Object reference surfaces come from RGB-D measurements aggregated over annotated presence intervals.
-Instance masks come from SAM~\cite{kirillov2023sam}, as in GaME~\cite{yugay2026game}.
+Object reference surfaces come from RGB-D measurements aggregated over annotated state intervals.
+Instance masks come from SAM~\cite{kirillov2023sam}, as in GaME~\cite{yugay2026game}, and annotated identities link
+them across frames and runs.
 \emph{Simulated apartment.} Two Isaac Sim runs observe one furnished apartment: A with 4{,}186 frames and B with
 3{,}555 frames at 30\,Hz, with exact poses, semantics, and instance labels. B starts from A's final state and
 observes only part of what A mapped. Run A holds 26 changes and run B 14, in view or out of view, and 32 changes
@@ -59,7 +61,7 @@ A cell reads n/a when the method lacks the capability: Khronos maps each run fro
 timeline, and only Gaussian maps render.
 
 \paragraph{Protocol.}
-Simulated runs use ground-truth poses, and real runs use the rigid alignment above. All datasets and backends use
+Simulated runs use ground-truth poses, and real runs use the estimated poses and the alignment above. All datasets and backends use
 the same constants (\cref{sec:handoff}).
 All runs use one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,GB of memory.
 
@@ -146,7 +148,8 @@ every run, and the Gaussian backend stays within 0.3 points of a Gaussian map re
 
 The state intervals register the changes within and between runs on every backend. Within a run, all three backends
 detect every change on the real room and reach F1 100 and 96.3 on the simulated runs A and B. Khronos reaches 66.7 in
-the real runs B and C and GaME 66.7 in run B, and the compared methods reach 67.9 to 91.7 on the simulated runs.
+the real runs B and C and GaME 66.7 in run B, and the compared methods reach 67.9 to 91.7 on the simulated runs. Because its object states follow these changes, the
+TSDF backend already leads Khronos in the first simulated run, with geometry F1 98.0 against 91.4.
 Between runs, the TSDF and Gaussian backends detect 15 of the 16 changes from A to B and the occupancy backend all 16.
 Every backend detects all 10 changes from B to C and 29 of the 32 on the simulated apartment. On these three
 transitions, Panoptic Multi-TSDFs reaches change F1 64.0, 37.5, and 91.8, GaME 93.3, 94.7, and 81.5, and wavemap
@@ -179,7 +182,8 @@ Gaussians & GaME~\cite{yugay2026game} & 86.5 & 87.7 & 26.17 \\
 \end{table}
 
 On the public Flat dataset, the methods differ only after the scene has changed (\cref{tab:flat}). In the
-first run, every method starts from an empty map, and the geometry F1 agrees within 0.2 points. In the second run, our
+first run, which holds no changes, every method starts from an empty map, and the geometry F1 agrees within 0.2
+points. In the second run, our
 layer reaches 90.2 with the TSDF, against 85.8 for Khronos, which maps the run alone, and 89.5 for Panoptic
 Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for GaME, which also keeps the first run's map.
 
