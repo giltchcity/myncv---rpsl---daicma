@@ -11,7 +11,7 @@ interaction~\cite{behrens2025lostfound}. 4DTAM, 4D Gaussian Splatting SLAM, Dyna
 time-varying scenes with dynamic surfaces, Gaussians, or persistent rigid
 primitives~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam,mazur2026primitive}. Dynablox detects moving
 objects from points that enter observed free space~\cite{schmid2023dynablox}. These methods handle the motion that the
-camera sees. Our layer adopts the free-space cue of Dynablox for such motion and addresses the changes that happen
+camera sees. Our layer uses the free-space cue of Dynablox to mask moving people and addresses the changes that happen
 between observations and between runs.
 
 \paragraph{Change handling inside one representation.}
@@ -42,7 +42,7 @@ non-detection~\cite{matezbandera2022ltc}, and SuperMap maintains object occupanc
 relations~\cite{zhao2026supermap}. ObVi-SLAM transfers object landmarks between sessions~\cite{adkins2024obvislam},
 OASIS-Map associates objects across sessions~\cite{oh2026oasismap}, and Living Scenes matches and reconstructs objects
 from scans taken at different times~\cite{zhu2024livingscenes}; RIO re-localizes object instances in changing indoor
-scans~\cite{wald2019rio}. These methods associate objects across runs. Given instance masks, our layer decides when each object state holds,
+scans~\cite{wald2019rio}. These methods associate objects across runs. Our layer decides when each object state holds,
 which observations remain valid, and which faces, Gaussians, or cells of the map continue.
 
 \paragraph{Models of temporal persistence.}

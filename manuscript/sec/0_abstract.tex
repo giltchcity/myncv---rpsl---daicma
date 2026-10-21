@@ -2,14 +2,14 @@
 A mapper that returns to a changed scene can reload its old map, which keeps each moved object at its old site, or
 start over, which discards every region it leaves unobserved. Existing methods resolve this conflict inside one map
 representation, so each new mapper needs a new update rule. Two questions decide every update: which observations
-still describe the scene, and which parts of the earlier map remain. Neither depends on the representation. We
-present an update layer that answers both questions from the RGB-D frames and instance masks of a new run and leaves
-integration to the mapper. Objects move in view, change out of view, or change between runs, and the layer infers
+still describe the scene, and which parts of the earlier map remain. Both concern observations and object states, not
+voxels or Gaussians. We present an update layer that answers both questions and leaves integration to
+the mapper. Objects move in view, change out of view, or change between runs, and the layer infers
 when each of their states holds with one likelihood, one prior, and one decision rule. It admits an observation only
 while the state it measured holds and keeps an earlier map element until current observations place its surface
-elsewhere. A TSDF, a 3D Gaussian, and an occupancy mapper each join through four operations and keep their own
-integration rule. On three recordings of a real room taken over twelve days, all three maps detect at least 15 of
-the 16 changes between the first two runs and all 10 between the last two, and the old object surface left in the
+elsewhere. A TSDF, a 3D Gaussian, and an occupancy mapper each join through four
+operations. On three recordings of a real room taken over twelve days, all three maps detect at least 15 of
+the 16 change events between the first two runs and all 10 between the last two, and the old object surface left in the
 Gaussian map falls from 42.4\% and 61.1\% under its own update to \prov{8.1\%} and \prov{14.3\%}. On a simulated
 apartment whose second run observes only part of the scene, the updated maps reach a geometry F1 of \prov{96.6} with
 Gaussians and \prov{98.5} with the TSDF against the complete scene, compared with 85.4 and 83.6 for maps rebuilt

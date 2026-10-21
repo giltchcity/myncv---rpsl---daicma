@@ -13,20 +13,19 @@ the object was confirmed in place. The Beta density $p_A$ of the absence statist
 sensor statistics, and an observation contributes only if it judges at least $\min(30, N_{\mathrm{rel}})$ samples.
 
 For the second group, with the fraction $\phi$ of $N$'s surface cells that lie farther than 10\,cm from $G_A$ and their
-effective number $n_{\mathrm{eff}}$, $B_{M:S} = 2\,P(\theta > \frac{1}{2})$ for
+effective number $n_{\mathrm{eff}}$, the evidence ratio is $B_{M:S} = P(\theta > \frac{1}{2} \mid N) / P(\theta > \frac{1}{2}) = 2\,P(\theta > \frac{1}{2} \mid N)$ for
 $\theta \sim \mathrm{Beta}(\frac{1}{2} + n_{\mathrm{eff}}\phi,\ \frac{1}{2} + n_{\mathrm{eff}}(1-\phi))$. The
-pseudo-counts $a_c, b_c$ of the prior $q_\ell$ come from the other objects of the same class and group, and the class mean starts
+pseudo-counts $\alpha_c, \beta_c$ of the prior $q_\ell$ come from the other objects of the same class and group, and the class mean starts
 from Jeffreys' reference value $\frac{1}{2}$, or from $\frac{3}{4}$ and $\frac{1}{4}$ for classes declared movable or
 fixed. Every action in a change-detection round reads $q$ from the history before that round, so the decisions are
 independent of the identifiers, their order, and the end of a run.
 
-A state $A$ ends without a successor when $\max(\operatorname{logit} q_A + L^{\mathrm{pre}}_t,\ L_t) > \ln 99$ and the
+A state $A$ ends without a successor when $\max(\operatorname{logit} q + L^{\mathrm{pre}}_t,\ L_t) > \ln 99$ and the
 majority of the same rays sees through $G_A$. Here $L^{\mathrm{pre}}_t$ is the sum in $L_t$ for a change before the state's first scored observation in the run, without the clamp at zero, and the prior term
 applies only to a state inherited from the previous run. $N$ refines $A$ when $A$ has current support and
 $1 - q \ge q\,B_{M:S}$. The map shows $G_A \cup G_N$ while $S$ is the most probable explanation and $G_A$ otherwise,
 until a handover commits. At the end of a run, the same rules apply to the evidence gathered so far, and a remaining
-$N$ that $M$ explains best goes to history. A state ended by a successor closes at the later of its last support and
-the decision, and a state ended without one closes midway between its last evidence and the decision.
+$N$ that $M$ explains best goes to history.
 
 \subsection{Backends}
 \label{sec:supp_backends}
@@ -92,8 +91,8 @@ code reaches 24.86\,dB after refinement and GaME with these fixes 26.17\,dB.
 \label{sec:supp_gaussian}
 
 \Cref{tab:supp_gaussian} switches off one design choice of the Gaussian backend at a time and leaves the rest
-unchanged. Training only with the keyframes that the layer admits adds 3.07 points of geometry F1 on real run B, the
-tolerance $\max(3\sigma, 5\,\text{cm})$ of the continuation test adds 0.64 points, and ending earlier Gaussians only
+unchanged. Letting each keyframe train only the Gaussians in its valid domain adds 3.07 points of geometry F1 on real run B, the 5\,cm
+floor of the tolerance $\tau_e$ adds 0.64 points, and ending earlier Gaussians only
 through the continuation test keeps 681{,}011 Gaussians that GaME's pruning deletes.
 
 \begin{table}[h]
@@ -107,8 +106,8 @@ when the choice is switched off.}
 \toprule
 Design choice & Measure & Change \\
 \midrule
-Keyframes admitted by the layer, not every stored keyframe & geometry F1, real B & $-3.07$ \\
-Tolerance $\max(3\sigma, 5\,\text{cm})$, not $3\sigma$ & geometry F1, real B & $-0.64$ \\
+Each keyframe trains its valid domain, not the current map & geometry F1, real B & $-3.07$ \\
+Tolerance $\tau_e$ at least 5\,cm, not without this floor & geometry F1, real B & $-0.64$ \\
 Earlier Gaussians end only by the continuation test, not by pruning & earlier Gaussians lost, real B & $+681{,}011$ \\
  & geometry F1, real B / simulated B & $-0.15$ / $-0.81$ \\
 \bottomrule
@@ -118,8 +117,8 @@ Earlier Gaussians end only by the continuation test, not by pruning & earlier Ga
 \section{Refinement after the Last Run}
 \label{sec:supp_refinement}
 
-The refinement that follows the last run applies the mapping's rules: each element is trained only by keyframes of the
-run that last measured it, ended elements stay fixed, and the refinement adds no elements. It raises PSNR on all three
+The refinement that follows the last run applies the mapping's rules: each element is trained only by the keyframes that
+may train it during mapping, ended elements stay fixed, and the refinement adds no elements. It raises PSNR on all three
 datasets, by 3.85, 1.58, and 0.93\,dB, and changes geometry by at most 0.12 points (\cref{tab:supp_refinement}). GaME
 refines one current map on every stored keyframe, including keyframes whose content has since changed, and its geometry
 falls on Flat and on the real room.
@@ -137,7 +136,7 @@ Data & Metric & GaME & Ours \\
 Flat, run 2 & PSNR & 23.42 $\to$ 26.17 & 23.79 $\to$ 27.64 \\
             & Geometry F1 & 87.71 $\to$ 84.60 & 89.78 $\to$ 89.82 \\
 Simulated B & PSNR & 22.13 $\to$ 22.09 & 23.32 $\to$ 24.90 \\
-            & Geometry F1 & \TODO{score} & 96.59 $\to$ 96.51 \\
+% PENDING             & Geometry F1 & \TODO{score} & 96.59 $\to$ 96.51 \\
 Real C      & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
             & Geometry F1 & 90.75 $\to$ 89.24 & 95.04 $\to$ 95.16 \\
 \bottomrule
