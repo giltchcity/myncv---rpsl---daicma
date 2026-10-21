@@ -289,13 +289,3 @@ against the complete simulated scene.
 \paragraph{Valid domains add accuracy to the Gaussian map.}
 Letting each keyframe train only the Gaussians in its valid domain, instead of every stored keyframe training the
 current map, raises the geometry F1 of real run B by 3.1 points (supplementary material).
-
-\subsection{Runtime}
-\label{sec:exp_runtime}
-
-We give mapping speed as the frames of a run per second of mapping, which excludes exporting the map. On the real runs
-A, B, and C, the TSDF backend maps 3.1, 3.5, and 2.1 frames per second, the Gaussian backend 3.8, 2.4, and 1.4 with a peak GPU
-memory of at most 8.3\,GB, and the occupancy backend 8.9, 6.9, and 5.6.
-% PENDING TSDF: mapper time per frame (publish to ack, player timing probe); A from the final run, B and C from the
-% PENDING preceding stockfloor runs, which ran alone (its run A takes 1663 s against 1665 s).
-% PENDING Re-time the occupancy backend after the valid-domain runs.
