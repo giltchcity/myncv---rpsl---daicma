@@ -11,8 +11,8 @@ interaction~\cite{behrens2025lostfound}. 4DTAM, 4D Gaussian Splatting SLAM, Dyna
 time-varying scenes with dynamic surfaces, Gaussians, or persistent rigid
 primitives~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam,mazur2026primitive}. Dynablox detects moving
 objects from points that enter observed free space~\cite{schmid2023dynablox}. These methods handle the motion that the
-camera sees. Our layer uses the free-space cue of Dynablox to mask moving people and addresses the changes that happen
-between observations and between runs.
+camera sees. Our layer uses the free-space cue of Dynablox to keep moving people out of the map and decides changes in view,
+between observations, and between runs with one rule.
 
 \paragraph{Change handling inside one representation.}
 Most methods that update a map after unobserved changes build the update into their representation. For point clouds,
@@ -24,11 +24,11 @@ content~\cite{ali2026probperlilo}. For TSDFs, Fehr \etal compare reconstructions
 regions~\cite{fehr2017tsdfchange}, and Panoptic Multi-TSDFs keeps object and background submaps that become
 persistent, absent, or unobserved~\cite{schmid2022panoptic}. POCD models the change and stationarity of objects,
 POV-SLAM couples object consistency with pose estimation~\cite{qian2022pocd,qian2023povslam}, and Khronos tracks
-objects over a short window, associates their fragments, and verifies appearance and disappearance against earlier
-rays~\cite{schmid2024khronos}. For occupancy grids, OctoMap and wavemap clamp log odds so that cells can change
+objects over a short window, associates their fragments, and dates appearance and disappearance from the rays it stores
+over a session, so its map can be queried at earlier times within that session~\cite{schmid2024khronos}. For occupancy grids, OctoMap and wavemap clamp log odds so that cells can change
 state~\cite{hornung2013octomap,reijgwart2023wavemap}, and RBIF updates occupancy from bundles of
-rays~\cite{breitfuss2024rbif}. For 3D Gaussians, GaME adds supported Gaussians, removes contradicted ones, and masks
-stale keyframe regions~\cite{yugay2026game}. LT-Gaussian removes disappeared Gaussians and adds new
+rays~\cite{breitfuss2024rbif}. For 3D Gaussians, GaME adds Gaussians where readings lie in front of the rendered
+surface, removes the segments that observations see through, and masks stale keyframe regions~\cite{yugay2026game}. LT-Gaussian removes disappeared Gaussians and adds new
 geometry~\cite{cheng2025ltgaussian}, GaussianUpdate revises a Gaussian field continually as it retains earlier
 content~\cite{zeng2025gaussianupdate}, and CL-Splats updates changed regions locally and can recover earlier
 states~\cite{ackermann2025clsplats}. Each of these rules acts on its own primitives. We define the update once, on

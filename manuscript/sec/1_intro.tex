@@ -2,8 +2,8 @@
 \label{sec:intro}
 
 A robot maps an apartment, leaves, and returns twelve days later. Meanwhile, someone has moved four pieces of
-furniture and taken two away, and the bathroom is as it was. Whether the robot's mapper fuses a truncated signed
-distance field (TSDF), optimizes 3D Gaussians, or accumulates occupancy, it offers two choices. It can reload the old
+furniture and taken two away, and the bathroom is as it was. Whether it fuses a truncated signed distance field (TSDF),
+optimizes 3D Gaussians, or accumulates occupancy, a mapper without change handling has two choices. It can reload the old
 map, which leaves each moved object in two places, or start over, which discards every room the robot leaves
 unobserved. A correct update removes what changed, keeps what is merely unobserved, and records when each state held.
 
@@ -22,7 +22,7 @@ unobserved. A correct update removes what changed, keeps what is merely unobserv
 Existing systems build this update into their own representation. Volumetric methods compare TSDF reconstructions to
 find changed voxels~\cite{fehr2017tsdfchange}, keep object submaps that become persistent, absent, or
 unobserved~\cite{schmid2022panoptic}, or estimate how stationary each object is~\cite{qian2022pocd}. Khronos verifies
-object fragments against a library of earlier rays~\cite{schmid2024khronos}. GaME adds and removes Gaussians and masks
+object fragments against the rays it stores over a session~\cite{schmid2024khronos}. GaME adds and removes Gaussians and masks
 the stale regions of its keyframes~\cite{yugay2026game}. Occupancy mappers lower the occupancy of every cell that a ray
 traverses~\cite{hornung2013octomap,reijgwart2023wavemap}. Each rule acts on its own primitives, so every new mapper
 needs a new update rule.
@@ -36,26 +36,28 @@ Gaussians.
 
 We therefore separate the temporal reasoning from the mapper. Our update layer runs beside an existing mapper on the
 same frames. From these it infers the \emph{state interval} of each object state,
-restricts each observation to its \emph{valid domain}, the space where its state still holds, and decides with a
+restricts each observation to its \emph{valid domain} (the space where its state still holds), and decides with a
 \emph{continuation test} which elements of the previous map remain.
 Objects move in view, change out of view while the robot maps elsewhere, and change between runs. The layer decides
 all three with one likelihood, one prior, and one decision rule, and they differ only in their evidence and in the odds they start from.
-The mapper joins through an \emph{update interface} of four operations: it reports its elements, ends the elements the layer names, accepts the
-state intervals, and integrates observations within their valid domains. It keeps its own integration rule. We
+The mapper connects to the layer through an \emph{update interface} of four operations: it reports its elements, ends the elements the layer names, accepts the
+state intervals, and integrates observations within their valid domains. It keeps its own way of integrating measured surfaces. We
 connect the layer to a TSDF mapper built on Khronos~\cite{schmid2024khronos}, to the Gaussian mapper
-GaME~\cite{yugay2026game}, and to the occupancy mapper wavemap~\cite{reijgwart2023wavemap}. Because an ended element
-keeps its lifetime, every map can also be queried at any earlier time.
+GaME~\cite{yugay2026game}, and to the occupancy mapper wavemap~\cite{reijgwart2023wavemap}. Because the layer ends an element by
+closing its \emph{lifetime} instead of deleting it, every map can also be queried at any earlier time, across runs.
 
 With the same layer, all three mappers remove obsolete states and keep the coverage of earlier runs. On three
 recordings of a real room taken over twelve days, the three maps detect at least 15 of the 16 change events between the
 first two runs and all 10 between the last two. After the revisits, \prov{0.9\%} and \prov{7.0\%} of the old object
 surfaces remain in the TSDF, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. In the
-Gaussian map, \prov{8.1\%} and \prov{14.3\%} remain, against 42.4\% and 61.1\% under GaME's own update. Where the later runs observe, the TSDF and Gaussian maps are as accurate as maps of those
-runs alone. Where they do not, the memory of earlier runs completes the map: on a simulated apartment, where the
+Gaussian map, \prov{8.1\%} and \prov{14.3\%} remain, against 42.4\% and 61.1\% under GaME's own update. Where the later runs observe, all three maps reach a higher geometry F1 than under the published
+update of their representation. Where they do not, the memory of earlier runs completes the map. On a simulated apartment whose
 second run observes only part of what the first run mapped, the updated maps reach a geometry F1 of \prov{98.5}
-(TSDF), \prov{96.6} (Gaussians), and \prov{94.9} (occupancy) against the complete scene, compared with 83.6, 85.4,
-and 84.2 for maps rebuilt from scratch. The Gaussian map renders the last simulated run better than a map rebuilt from scratch
-(\prov{24.90} against 23.36\,dB) and \prov{2.81}\,dB better than GaME's update.
+(TSDF), \prov{96.6} (Gaussians), and \prov{94.9} (occupancy) against the complete scene, compared with 92.1, 92.0,
+and 91.2 under Panoptic Multi-TSDFs, GaME, and wavemap and 83.6 to 85.4 for maps rebuilt from scratch. On held-out frames of the last run, the Gaussian map renders
+\prov{2.81}, \prov{0.96}, and \prov{1.47}\,dB better than GaME's update on the simulated apartment, the real room, and
+Flat, and rendering each frame with the map of its own time adds 1.64 and 0.51\,dB on the simulated apartment and the real
+room.
 
 Our contributions are:
 \begin{itemize}
@@ -65,6 +67,8 @@ Our contributions are:
   until current observations place its surface elsewhere;
   \item an update interface of four operations through which the same temporal decisions update a TSDF, a 3D Gaussian map,
   and an occupancy map;
-  \item an evaluation on repeated real and simulated runs and on the public Flat dataset that compares our update, on
-  each mapper, with rebuilding from scratch and with published update methods.
+  \item an evaluation on a real room and a simulated apartment, in which every mapper with our layer detects at least 15
+  of the 16 real change events between the first two runs and all 10 between the last two and reaches a higher geometry
+  F1 on the revisits than the published update of its representation, and on the public Flat dataset, where, after the
+  scene changes, the TSDF and Gaussian maps reach a higher geometry F1 than Panoptic Multi-TSDFs and GaME.
 \end{itemize}
