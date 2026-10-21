@@ -35,22 +35,21 @@ session with dynamic and change reasoning. Panoptic Multi-TSDFs~\cite{schmid2022
 become persistent, absent, or unobserved across runs. GaME~\cite{yugay2026game} updates a Gaussian map after changes out
 of view, and wavemap~\cite{reijgwart2023wavemap} lowers the occupancy of the cells that rays traverse. We run our layer on
 three backends: a Khronos TSDF pipeline, GaME, and wavemap. Each backend keeps its inputs and resolution, and our rows
-connect it to the layer through the update interface of \cref{sec:representations}. We run GaME with seven changes
-to its released code, in keyframe selection, the losses on pixels without depth, and the refinement schedule, in its rows
-and ours. They raise its Flat PSNR from 24.86 to 26.17\,dB.
+connect it to the layer through the update interface of \cref{sec:representations}.
+% PENDING Run Khronos on the aligned runs joined into one sequence (A, B, C), with the same inputs, and replace its
+% PENDING per-run rows and the n/a cells it leaves.
 
 \paragraph{Metrics.}
 \emph{Khronos' object F1} scores the objects of a TSDF map at every moment against the objects present at that
 moment, weighted by the duration of each state, with the object evaluator released with Khronos~\cite{schmid2024khronos}: objects
 are associated by surface, must share the class, and match within 2\,m.
 % PENDING 4D object F1: per object and moment, the map surface of the object against its true surface at 5 cm.
-\emph{Change F1} counts appearance and disappearance events. A state is represented in a map when at least half of
-its reference surface samples lie within 10\,cm of the predicted surface, of the same class where the map carries object
-labels. An event counts as detected
-when the map represents its outcome: it no longer represents a state that disappeared, or newly represents one that
-appeared, and a change of the map that matches
-no reference event is a false positive. A moved object gives two events, its old state disappearing and its new state appearing. We report
-changes within a run, which happen in view or out of view, and changes between runs.
+\emph{Change F1} is the change metric of Khronos~\cite{schmid2024khronos}. A moved object gives two events, the
+disappearance of its old state and the appearance of its new one, and a change of the map that matches no reference event
+is a false positive. A state is represented in a map when at least half of its reference surface samples lie within
+10\,cm of the predicted surface, of the same class where the map carries object labels, and an event is detected when the
+map no longer represents a state that disappeared or newly represents one that appeared. We report changes within a run,
+which happen in view or out of view, and changes between runs.
 \emph{Old-site residue} is the fraction of the reference surface of object states that ended before a run began,
 among the parts that the run observes as free space, that the run's final map still shows. Lower is better.
 \emph{Geometry} is the F1 at 5\,cm between surface samples of the map and the reference. The real reference is
@@ -59,8 +58,8 @@ simulated reference is the complete scene mesh, including surfaces that the last
 tests completeness. We score each map on its own surface: the TSDF mesh,
 the occupied cells, and a TSDF fused from depth rendered from the Gaussians~\cite{huang20242dgs}.
 \emph{Rendering} of the Gaussian maps is evaluated, as in GaME~\cite{yugay2026game}, on every tenth frame of the last
-run, held out from mapping, with PSNR, MS-SSIM~\cite{wang2003msssim}, LPIPS~\cite{zhang2018lpips}, and depth L1 after
-the refinement that follows the last run. \emph{Own time}
+run, held out from mapping, with PSNR, SSIM, LPIPS~\cite{zhang2018lpips}, and depth L1 as GaME's evaluation computes them, SSIM
+in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last run. \emph{Own time}
 renders each frame with the map of its own timestamp, $\mathcal{M}(t_k)$.
 In the tables, n/a marks a quantity the method does not produce: Khronos maps each run as its own session, and only
 Gaussian maps render. A dash marks a quantity not evaluated.
@@ -219,7 +218,7 @@ Gaussians. Scratch rebuilds the last run from an empty map with GaME.}
 \setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
-Data & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+Data & Method & PSNR$\uparrow$ & SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
 \midrule
 Sim.~B & GaME~\cite{yugay2026game} & 22.09 & 0.753 & 0.334 & 22.0 \\
        & Scratch & 23.36 & 0.788 & 0.276 & 22.7 \\

@@ -211,8 +211,7 @@ The update interface has four operations: the mapper reports its elements, ends 
 the state intervals, and integrates observations within their valid domains. The mapper supplies the half-size $h_e$
 of its elements, the floor $\tau_{\min}$, its truncation band $T$, and its test $C(e)$, and the layer makes the state
 decisions and runs the continuation test with the same code for all three mappers. Each mapper keeps its own integration
-of measured surfaces: the TSDF its weighted average, GaME its photometric and depth optimization, with the depth term
-below for an inherited map, and wavemap its log-odds integration of occupied space. We call a mapper connected through
+of measured surfaces: the TSDF its weighted average, GaME its photometric and depth optimization, and wavemap its log-odds integration of occupied space. We call a mapper connected through
 this interface a \emph{backend}. The supplementary material details each backend.
 
 \paragraph{TSDF backend.}
@@ -241,10 +240,7 @@ $T = 10$\,cm in front of the Gaussian, from the side from which the previous run
 sees through the Gaussian and covering readings outnumber the readings farther in front. Each keyframe $k$ trains only its
 valid domain $V_k \subseteq \mathcal{M}(t_k)$: for a keyframe of the current run, the Gaussians that the run created,
 supports, or covers, and for an earlier keyframe, those that the current run never covers. An earlier Gaussian leaves
-the map only by \cref{eq:continue} or with its ended object state. For an inherited map, the depth term is
-$O\,|D/O - \hat{z}| + \tau_0\,(1 - O)$, with $D$ the opacity-weighted sum of Gaussian depths along the ray, $\hat{z}$ the reading, $O$ the accumulated opacity
-held fixed in the first term, and $\tau_0 = 5$\,cm, so that Gaussians behind the surface cannot satisfy it without
-contributing color. The refinement after the last run trains each Gaussian only with the keyframes whose valid domain
+the map only by \cref{eq:continue} or with its ended object state. The refinement after the last run trains each Gaussian only with the keyframes whose valid domain
 contains it and adds no Gaussians.
 
 \paragraph{Occupancy backend.}
