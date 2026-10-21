@@ -96,27 +96,28 @@ code reaches 24.86\,dB after refinement and GaME with these fixes 26.17\,dB.
 \section{Design Choices of the Gaussian Backend}
 \label{sec:supp_gaussian}
 
-\Cref{tab:supp_gaussian} switches off one design choice of the Gaussian backend at a time. Within a pair, both runs
-share the code and the first-run map. Letting the layer choose the training keyframes raises
-the geometry F1 of real run B by 3.07 points and the memory tolerance by 0.64 points, and limiting the pruning keeps
-681{,}011 earlier elements that GaME's pruning deletes.
+\Cref{tab:supp_gaussian} switches off one design choice of the Gaussian backend at a time and leaves the rest
+unchanged. Training only with the keyframes that the layer admits adds 3.07 points of geometry F1 on real run B, the
+tolerance $\max(3\sigma, 5\,\text{cm})$ of the continuation test adds 0.64 points, and ending earlier Gaussians only
+through the continuation test keeps 681{,}011 Gaussians that GaME's pruning deletes.
 
 \begin{table}[h]
 \centering\small
-\caption{One design choice of the Gaussian backend switched off at a time.}
+\caption{Each design choice of the Gaussian backend adds geometry F1 or keeps earlier Gaussians. Values give the change
+when the choice is switched off.}
 \label{tab:supp_gaussian}
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{llcc}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llc}
 \toprule
-Design choice & Measure & With & Without \\
+Design choice & Measure & Change \\
 \midrule
-Pruning limited to the current run & real B, earlier elements lost & 0 & 681{,}011 \\
-                                   & real B, geometry F1 & 92.66 & 92.51 \\
-                                   & simulated B, geometry F1 & 88.86 & 88.05 \\
-Training pool of the layer, not every stored keyframe & real B, geometry F1 & 92.48 & 89.41 \\
-Memory tolerance $\max(3\sigma, 5\,\text{cm})$, not $3\sigma$ & real B, geometry F1 & 92.99 & 92.35 \\
+Keyframes admitted by the layer, not every stored keyframe & geometry F1, real B & $-3.07$ \\
+Tolerance $\max(3\sigma, 5\,\text{cm})$, not $3\sigma$ & geometry F1, real B & $-0.64$ \\
+Earlier Gaussians end only by \cref{eq:continue}, not by pruning & earlier Gaussians lost, real B & $+681{,}011$ \\
+ & geometry F1, real B / simulated B & $-0.15$ / $-0.81$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \section{Refinement after the Last Run}
@@ -130,7 +131,8 @@ falls on Flat and on the real room.
 
 \begin{table}[h]
 \centering\small
-\caption{Before $\to$ after the refinement that follows the last run.}
+\caption{Our refinement raises PSNR and keeps geometry F1, while GaME's refinement lowers its geometry F1 on Flat and the
+real room. Before $\to$ after the refinement that follows the last run.}
 \label{tab:supp_refinement}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{llcc}
@@ -146,36 +148,3 @@ Real C      & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\section{Sensitivity of the State Intervals to Their Constants}
-\label{sec:supp_sensitivity}
-
-We replayed the logged evidence of the out-of-view and between-run test with each constant halved and doubled
-(\cref{tab:supp_sensitivity}). The cold-start moments, the clamps, and the floors change at most two decisions. The
-number of samples required in view, the sample cap, and the history gate change 4 to 12 decisions, with corrections
-and new errors in both directions.
-
-\begin{table}[h]
-\centering\small
-\caption{Decisions of the state test that change when one constant is halved or doubled (real B and C, simulated A
-and B, replayed from the logs).}
-\label{tab:supp_sensitivity}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{lccc}
-\toprule
-Constant & Value & $\times 0.5$ & $\times 2$ \\
-\midrule
-Samples required in view & 30 & 9 & 12 \\
-Sample cap & 1{,}500 & 12 & -- \\
-History gate & 3 & 4 & 11 \\
-Pseudo-observations of the population & 3 & 1 & 2 \\
-Cold-start mean and variance & 0.05, 0.09 & 0 & 0 \\
-Concentration floor & 2 & 0 & 2 \\
-Clamps of the present fraction & 0.005, 0.995 & 0 & 0--1 \\
-Clamps of the mean & 0.001, 0.999 & 0 & 0 \\
-Variance floor & $10^{-4}$ & 0 & 2 \\
-\bottomrule
-\end{tabular}
-\end{table}
-\TODO{Total number of decisions in the replay.}
-

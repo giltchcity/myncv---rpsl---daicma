@@ -12,10 +12,10 @@ unobserved. A correct update removes what changed, keeps what is merely unobserv
 \centering
 \fbox{\begin{minipage}[c][4.2cm][c]{0.94\linewidth}\centering\small
 \TODO{Teaser: one revisit of the real room. Columns: scratch, the mapper's own update, ours. Rows: TSDF, 3D Gaussians,
-occupancy. Mark one moved object (old site red, new site green) and one room seen only in the first run.}
+occupancy. Mark one moved object (old site red, new site green) and one region seen only in the first run.}
 \end{minipage}}
 \caption{\textbf{One update method, three mappers.} The same temporal decisions update a TSDF, a 3D Gaussian map, and
-an occupancy map across runs. Each map removes the old site of a moved object, adds its new site, and keeps the room
+an occupancy map across runs. Each map removes the old site of a moved object, adds its new site, and keeps the region
 that the new run leaves unobserved.}
 \label{fig:teaser}
 \end{figure}
@@ -49,8 +49,8 @@ keeps its lifetime, every map also shows the scene as it was at any earlier time
 
 With the same layer, all three mappers remove obsolete states and keep the coverage of earlier runs. On three
 recordings of a real room taken over twelve days, the three maps detect at least 15 of the 16 changes between the
-first two runs and all 10 between the last two. The map stays correct at every moment: with the loaded state, the
-TSDF map reaches online object F1 \prov{99.7} and \prov{98.4}, against 91.5 and 83.8 for Khronos, which starts each run
+first two runs and all 10 between the last two. The loaded state carries every object into the revisit: on Khronos' object
+metric, the TSDF map reaches \prov{99.7} and \prov{98.4}, against 91.5 and 83.8 for Khronos, which starts each run
 from an empty map. After the revisits, \prov{0.9\%} and \prov{7.0\%} of the old object
 surfaces remain in the TSDF, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. In the
 Gaussian map, \prov{8.1\%} and \prov{14.3\%} remain, against 42.4\% and 61.1\% under GaME's own update. Where the later runs observe, the TSDF and Gaussian maps are as accurate as maps of those
