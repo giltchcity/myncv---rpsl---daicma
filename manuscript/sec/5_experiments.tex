@@ -98,7 +98,7 @@ Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\upar
 \midrule
 \tgroup{8}{TSDF}
 Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & 86.9 \\
-Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
+Panoptic~\cite{schmid2022panoptic} & 52.4$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
 \tgroup{8}{3D Gaussians}
@@ -115,8 +115,8 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING visit 45.28; geometry with the 1 cm reference 88.69 under the export rule of 10-23, which only keeps objects
 % PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat: one sequence
 % PENDING (eval/khronos_cont_flat_{a,b}: 85.99, 86.87; per-run 86.39, 85.83).
-% PENDING Panoptic change F1 covers the events between visits. Real: 16/9/9 and 3/5/5 on its submaps (25 and 8 events
-% PENDING against 18 and 12 for the other rows): rescore on the same events. Simulated: 28/1/4, same protocol, 28 units.
+% SRC Panoptic change F1 covers the events between visits. Real, same event scorer and the same 18 + 12 events
+% SRC (eval/panoptic_events_{b,c}): 8/0/10 and 3/1/9 -> 11/1/19. Simulated: 28/1/4, same protocol, 28 units.
 % PENDING Panoptic on Flat: rerun of 10-23 scored with the same flat_eval (eval/panoptic_flat_{a,b}: 85.06, 88.93). TESSE rows other than Khronos and our TSDF: not run.
 % PENDING TESSE object F1: online needs every snapshot scored (Khronos has 44 at 5 m, ours only the final one). Final
 % PENDING object F1 at 5 m: ours 97.9, Khronos 92.8. Online object F1, last visit: real per-visit Khronos, simulated
