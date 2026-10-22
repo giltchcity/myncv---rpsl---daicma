@@ -85,29 +85,29 @@ the constants of \cref{sec:handoff}. Every experiment runs on one NVIDIA RTX 507
 to the next; Khronos maps them as one sequence, and ours adds our layer to the mapper of its group. Change F1 counts all
 appearances and disappearances of a dataset, within and between visits. Object F1 is the online object F1 of Khronos
 over the last visit, evaluated on the TSDF maps. Geometry F1 at 5\,cm uses the map after the last visit, against a
-reference reconstructed from that visit (real room), the complete scene mesh (simulated apartment), the point reference
-of the data (Flat, scored for geometry only), or the background of Khronos' evaluation (TESSE). $^\dagger$Events between
+reference reconstructed from that visit (real room), the complete scene mesh (simulated apartment), or the point reference
+of the data (Flat, scored for geometry only). $^\dagger$Events between
 visits only. $^\ddagger$Each visit mapped from an empty map. --: not evaluated.}
 \label{tab:main}
-\setlength{\tabcolsep}{3.6pt}
-\begin{tabular}{@{}lcccccccccc@{}}
+\setlength{\tabcolsep}{5.5pt}
+\begin{tabular}{@{}lccccccc@{}}
 \toprule
- & \multicolumn{3}{c}{Real room} & \multicolumn{3}{c}{Sim.\ apartment} & Flat & \multicolumn{3}{c}{TESSE} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-8}\cmidrule(l){9-11}
-Method & Change$\uparrow$ & Object$\uparrow$ & Geom.$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geom.$\uparrow$ & Geom.$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geom.$\uparrow$ \\
+ & \multicolumn{3}{c}{Real room} & \multicolumn{3}{c}{Sim.\ apartment} & Flat \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(l){8-8}
+Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
-\tgroup{11}{TSDF}
-Khronos~\cite{schmid2024khronos} & \pend & \prov{83.8}$^\ddagger$ & \prov{94.7}$^\ddagger$ & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ & 63.2 & \pend & 75.6 \\
-Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 89.5 & \pend & \nev & \pend \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \prov{98.4} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} & \prov{66.7} & \pend & \prov{94.5} \\
+\tgroup{8}{TSDF}
+Khronos~\cite{schmid2024khronos} & \pend & \prov{83.8}$^\ddagger$ & \prov{94.7}$^\ddagger$ & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
+Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 89.5 \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \prov{98.4} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
-\tgroup{11}{3D Gaussians}
-GaME~\cite{yugay2026game} & 92.3 & \nev & 90.8 & 83.9 & \nev & 92.0 & 87.7 & \pend & \nev & \pend \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \nev & \prov{95.0} & \prov{97.1} & \nev & \prov{96.7} & \prov{89.8} & \pend & \nev & \pend \\
+\tgroup{8}{3D Gaussians}
+GaME~\cite{yugay2026game} & 92.3 & \nev & 90.8 & 83.9 & \nev & 92.0 & 87.7 \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \nev & \prov{95.0} & \prov{97.1} & \nev & \prov{96.7} & \prov{89.8} \\
 \midrule
-\tgroup{11}{Occupancy}
-wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & \pend & \pend & \nev & \pend \\
-\rowcolor{oursbg} Ours & \prov{100} & \nev & \prov{91.6} & \prov{97.1} & \nev & \prov{94.9} & \pend & \pend & \nev & \pend \\
+\tgroup{8}{Occupancy}
+wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & \pend \\
+\rowcolor{oursbg} Ours & \prov{100} & \nev & \prov{91.6} & \prov{97.1} & \nev & \prov{94.9} & \pend \\
 \bottomrule
 \end{tabular}
 % PENDING Khronos as one sequence: simulated done (khronos_cont_synthetic, 58/4/20, mesh F1 90.2); the real room exceeds
@@ -130,9 +130,15 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 \Cref{tab:main} compares every mapper with our layer against the published update of the same representation. Our
 TSDF, Gaussian, and occupancy maps reach a higher geometry F1 than Panoptic Multi-TSDFs, GaME, and wavemap on every
 dataset where both run. Khronos, run over the visits as one sequence, stays below our TSDF map in change, object, and
-geometry F1 on the simulated apartment, and in change and geometry F1 on TESSE, the data released with it. Maps rebuilt from scratch at every visit are not listed. They hold only the current visit and reach
+geometry F1 on the simulated apartment. Maps rebuilt from scratch at every visit are not listed. They hold only the current visit and reach
 geometry F1 of 83.6, 85.4, and 84.2 against the complete simulated scene with the TSDF, the Gaussians, and occupancy,
 against \prov{99.2}, \prov{96.7}, and \prov{94.9} with our layer (\cref{tab:ablation_variants}).
+
+\paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
+TESSE, released with Khronos, is one visit to a simulated office in which objects disappear and appear while the
+camera is elsewhere. At the depth range of 5\,m that Khronos uses there, our TSDF map reaches an object F1 of
+\prov{97.9} on its final map against 92.8, a geometry F1 of \prov{94.5} against 75.6, and a change F1 of \prov{66.7}
+against 63.2.
 
 \begin{figure*}[t]
 \centering
