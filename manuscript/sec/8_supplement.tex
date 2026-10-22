@@ -18,13 +18,13 @@ number. The
 pseudo-counts $\alpha_c, \beta_c$ of the prior $q_\ell$ come from the other objects of the same class and group, and the class mean starts
 from Jeffreys' reference value $\frac{1}{2}$, or from $\frac{3}{4}$ and $\frac{1}{4}$ for classes declared movable or
 fixed. Every action in a change-detection round reads $q$ from the history before that round, so the decisions are
-independent of the identifiers, their order, and the end of a run.
+independent of the identifiers, their order, and the end of a visit.
 
 A state $A$ ends without a successor when $\max(\operatorname{logit} q + L^{\mathrm{pre}}_t,\ L_t) > \ln 99$ and the
 same images see through $G_A$ more often than they support it. The prior term applies only to a state inherited from the
-previous run. The observations $N$ merge into $A$ when $A$ has current support and
+previous visit. The observations $N$ merge into $A$ when $A$ has current support and
 $1 - q \ge q\,B_{M:S}$. The map shows $G_A \cup G_N$ while $S$ is the most probable explanation and $G_A$ otherwise,
-until a handover commits. At the end of a run, the same rules apply to the evidence gathered so far, and a remaining
+until a handover commits. At the end of a visit, the same rules apply to the evidence gathered so far, and a remaining
 $N$ that $M$ explains best goes to history.
 
 \subsection{Backends}
@@ -33,31 +33,31 @@ $N$ that $M$ explains best goes to history.
 \paragraph{TSDF.}
 When a round changes the state intervals, the backend rebuilds the affected blocks by integrating their frames again in
 their original order, which keeps the weight saturation of the native rule. Each face takes the identity of the nearest
-current object face within one voxel and is background otherwise. Where the run's frames leave gaps in the present
+current object face within one voxel and is background otherwise. Where the visit's frames leave gaps in the present
 surface, the backend fills them with the background faces of the active window, which it archives at every round. Fill
-faces and the background faces of the previous run's shown map pass the continuation test, the former with
+faces and the background faces of the previous visit's shown map pass the continuation test, the former with
 $K_{\mathrm{prior}} = 0$ and the latter with $K_{\mathrm{prior}} = 1$. Background faces of the previous map leave
 together with a closed object state whose old site they cover, and fill faces measured no later than that state's last
 support leave as well. Object faces follow their state. A face of a continuing inherited state also leaves if it lies
 inside the object's present surface, which the backend tests by casting rays in 64 fixed directions and comparing hits
-on the inner and outer sides. The end of a run only drains the queues and saves the state, so the final map is the
+on the inner and outer sides. The end of a visit only drains the queues and saves the state, so the final map is the
 online map.
 
 \paragraph{Gaussians.}
 FlashSplat~\cite{shen2024flashsplat} assigns identities to the Gaussians, accumulated over keyframes. The continuation
-test runs at each keyframe of the current run, before GaME adds new Gaussians, with $h_e$ three standard deviations and
+test runs at each keyframe of the current visit, before GaME adds new Gaussians, with $h_e$ three standard deviations and
 $\tau_{\min} = 5$\,cm. A reading covers a Gaussian only if it comes from the side from which the
-previous run saw the Gaussian. A Gaussian that the run supports or covers is \emph{present} and is trained by the
-current run's keyframes; one that it supports but never covers is also \emph{shared} and is trained by the keyframes of
-both runs; every other Gaussian is \emph{held}: the current run leaves it unchanged, and the keyframes of its own run
-keep maintaining it. Each optimization step draws one keyframe. A keyframe of the current run has weight one. An
-earlier keyframe has as weight the fraction of the Gaussians it shows, among those the current run has decided on, that
-are shared and that the current run has observed less than a single earlier view does: their observed area $(f/z)^2$,
-summed over the views of the current run, stays below its mean over the earlier views. The earlier views of one place
+previous visit saw the Gaussian. A Gaussian that the visit supports or covers is \emph{present} and is trained by the
+current visit's keyframes; one that it supports but never covers is also \emph{shared} and is trained by the keyframes of
+both visits; every other Gaussian is \emph{held}: the current visit leaves it unchanged, and the keyframes of its own visit
+keep maintaining it. Each optimization step draws one keyframe. A keyframe of the current visit has weight one. An
+earlier keyframe has as weight the fraction of the Gaussians it shows, among those the current visit has decided on, that
+are shared and that the current visit has observed less than a single earlier view does: their observed area $(f/z)^2$,
+summed over the views of the current visit, stays below its mean over the earlier views. The earlier views of one place
 thus share that place's budget, and a distant new view does not replace close earlier detail. A step updates only the
 Gaussians its keyframe may train, and its loss counts only the pixels whose first Gaussian, where the transmittance
 along the ray first drops below one half, is one of them. GaME's opacity pruning removes only Gaussians created in the
-current run. The refinement after the last run follows the same rules and adds no Gaussians. \Cref{sec:supp_gaussian}
+current visit. The refinement after the last visit follows the same rules and adds no Gaussians. \Cref{sec:supp_gaussian}
 switches these choices off one at a time.
 
 
@@ -65,7 +65,7 @@ switches these choices off one at a time.
 \label{sec:supp_gaussian}
 
 \Cref{tab:supp_gaussian} switches off one design choice of the Gaussian backend at a time and leaves the rest
-unchanged. Letting each keyframe train only the Gaussians in its valid domain adds 3.07 points of geometry F1 on real run B, the 5\,cm
+unchanged. Letting each keyframe train only the Gaussians in its valid domain adds 3.07 points of geometry F1 on the second real visit, the 5\,cm
 floor of the tolerance $\tau_e$ adds 0.64 points, and ending earlier Gaussians only
 through the continuation test keeps 681{,}011 Gaussians that GaME's pruning deletes.
 
@@ -80,49 +80,137 @@ its 5\,cm floor, and GaME's opacity pruning also removes earlier Gaussians.}
 \toprule
 Design choice & Measure & Change \\
 \midrule
-Valid-domain training & geometry F1, real B & $-3.07$ \\
-5\,cm floor of $\tau_e$ & geometry F1, real B & $-0.64$ \\
-Ending only by continuation & earlier Gaussians lost, real B & $+681{,}011$ \\
- & geometry F1, real B / sim.\ B & $-0.15$ / $-0.81$ \\
+Valid-domain training & geometry F1, 2nd real visit & $-3.07$ \\
+5\,cm floor of $\tau_e$ & geometry F1, 2nd real visit & $-0.64$ \\
+Ending only by continuation & earlier Gaussians lost, 2nd real visit & $+681{,}011$ \\
+ & geometry F1, 2nd real / sim.\ visit & $-0.15$ / $-0.81$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Refinement after the Last Run}
+\section{Refinement after the Last Visit}
 \label{sec:supp_refinement}
 
-The refinement that follows the last run applies the mapping's rules: each element is trained only by the keyframes that
+The refinement that follows the last visit applies the mapping's rules: each element is trained only by the keyframes that
 may train it during mapping, ended elements stay fixed, and the refinement adds no elements. It raises PSNR on all three
 datasets, by 3.85, 1.74, and 0.93\,dB, and changes geometry by at most 0.12 points (\cref{tab:supp_refinement}). GaME
-refines its final map on its keyframes outside their stale masks, and its geometry falls on Flat and on the real room.
+refines its final map on its keyframes outside their stale masks, and its geometry falls on all three datasets.
 
 \begin{table}[h]
 \centering\small
-\caption{Our refinement raises PSNR and keeps geometry F1, while GaME's refinement lowers its geometry F1 on Flat and the
-real room. Before $\to$ after the refinement that follows the last run.}
+\caption{Our refinement raises PSNR and keeps geometry F1, while GaME's refinement lowers its geometry F1 on every
+dataset. Before $\to$ after the refinement that follows the last visit.}
 \label{tab:supp_refinement}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{llcc}
 \toprule
 Data & Metric & GaME & Ours \\
 \midrule
-Flat, run 2 & PSNR & 23.42 $\to$ 26.17 & 23.79 $\to$ 27.64 \\
+Flat, 2nd visit & PSNR & 23.42 $\to$ 26.17 & 23.79 $\to$ 27.64 \\
             & Geometry F1 & 87.71 $\to$ 84.60 & 89.78 $\to$ 89.82 \\
-Simulated B & PSNR & 22.13 $\to$ 22.09 & 23.44 $\to$ 25.18 \\
-% PENDING             & Geometry F1 & \TODO{score} & 96.72 $\to$ 96.61 \\
-Real C      & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
+Simulated, 2nd visit & PSNR & 22.13 $\to$ 22.09 & 23.44 $\to$ 25.18 \\
+            & Geometry F1 & 92.04 $\to$ 78.43 & 96.72 $\to$ 96.61 \\
+Real, 3rd visit & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
             & Geometry F1 & 90.75 $\to$ 89.24 & 95.04 $\to$ 95.16 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\section{Full Results on the Simulated Apartment and Flat}
+\label{sec:supp_full}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Full results on the simulated apartment, in percent except PSNR (dB). Within-visit changes include changes in view and out of view.
+Geometry compares with the complete scene mesh, including surfaces that the last visit leaves unobserved. PSNR uses
+held-out frames of the second visit after the refinement that follows the last visit, and every other metric uses the unrefined
+maps. n/a: not produced by the method; --: not evaluated.}
+\label{tab:supp_sim}
+\setlength{\tabcolsep}{2.6pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Within visit$\uparrow$} & Between$\uparrow$ & \multicolumn{2}{c}{Geometry F1$\uparrow$} &
+ \multicolumn{2}{c}{PSNR$\uparrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-6}\cmidrule(l){7-8}
+Method & 1st & 2nd & & 1st & 2nd & final & own \\
+\midrule
+\tgroup{8}{TSDF}
+Khronos~\cite{schmid2024khronos} & 67.9 & 88.0 & \na & 91.4 & 83.6 & \na & \na \\
+Panoptic~\cite{schmid2022panoptic} & \nev & \nev & 91.8 & 93.8 & 92.1 & \na & \na \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{98.0} & \prov{98.5} & \na & \na \\
+\midrule
+\tgroup{8}{3D Gaussians}
+GaME~\cite{yugay2026game} & 84.4 & 88.0 & 81.5 & 94.7 & 92.0 & 22.09 & \na \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{93.3} & \prov{95.4} & \prov{97.9} & \prov{96.7} & \prov{25.18} & \prov{26.81} \\
+\midrule
+\tgroup{8}{Occupancy}
+wavemap~\cite{reijgwart2023wavemap} & 91.7 & 86.7 & 93.3 & 90.3 & 91.2 & \na & \na \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{94.6} & \prov{94.9} & \na & \na \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Full results on Flat~\cite{schmid2022panoptic}. Geometry F1 at 5\,cm against the point reference of each visit (unrefined maps)
+and PSNR on held-out frames of the second visit after refinement. n/a: not produced by the method; --: not evaluated.}
+\label{tab:supp_flat}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Geometry F1$\uparrow$} & PSNR$\uparrow$ \\
+\cmidrule(lr){2-3}\cmidrule(l){4-4}
+Method & 1st & 2nd & 2nd \\
+\midrule
+\tgroup{4}{TSDF}
+Panoptic~\cite{schmid2022panoptic} & \nev & 89.5 & \na \\
+Khronos~\cite{schmid2024khronos} & 86.4 & 85.8 & \na \\
+\rowcolor{oursbg} Ours & \prov{86.5} & \prov{90.2} & \na \\
+\midrule
+\tgroup{4}{3D Gaussians}
+GaME~\cite{yugay2026game} & 86.5 & 87.7 & 26.17 \\
+\rowcolor{oursbg} Ours & \prov{86.3} & \prov{89.8} & \prov{27.64} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Khronos' Object F1}
+\label{sec:supp_khronos_obj}
+
+Khronos' object F1 scores the objects of a TSDF map at every moment against the objects present at that moment,
+weighted by the duration of each state, with the object evaluator released with Khronos~\cite{schmid2024khronos}:
+objects are associated by surface, must share the class, and match within 2\,m.
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{Khronos' object F1 of the TSDF maps, in percent, with the object evaluator released with
+Khronos~\cite{schmid2024khronos}.}
+\label{tab:khronos_obj}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & \multicolumn{3}{c}{Real room} & \multicolumn{2}{c}{Sim.\ apartment} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-6}
+Method & 1st & 2nd & 3rd & 1st & 2nd \\
+\midrule
+Khronos & 89.1 & 91.5 & 83.8 & 71.4 & 66.8 \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{98.4} & \prov{85.0} & \prov{91.3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The TSDF backend leads Khronos by 4.5 and 13.6 points in the first visits, which start from an empty map, and by 8.2,
+14.6, and 24.5 points in the second and third real visits and the second simulated visit, which start from the loaded state
+(\cref{tab:khronos_obj}).
+
 \section{Runtime}
 \label{sec:supp_runtime}
 
-All runs use one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X. We give mapping speed as the frames of a run
-per second of mapping, which excludes exporting the map. On the real runs
-A, B, and C, the TSDF backend maps 3.1, 3.5, and 2.1 frames per second, the Gaussian backend 3.8, 2.4, and 1.4 with a peak GPU
+All timings use one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X. We give mapping speed as the frames of a visit
+per second of mapping, which excludes exporting the map. On the three real
+visits, the TSDF backend maps \prov{3.1}, \prov{3.5}, and \prov{2.1} frames per second, the Gaussian backend 3.8, 2.4, and 1.4 with a peak GPU
 memory of at most 8.3\,GB, and the occupancy backend 8.9, 6.9, and 5.6.
 % PENDING TSDF: mapper time per frame (publish to ack, player timing probe); A from the final run, B and C from the
 % PENDING preceding stockfloor runs, which ran alone (its run A takes 1663 s against 1665 s).
 % PENDING Re-time the occupancy backend after the valid-domain runs.
+% PENDING Re-time the TSDF backend after its speed-up (reference version 3a6cddd).

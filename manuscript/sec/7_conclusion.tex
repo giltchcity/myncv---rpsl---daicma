@@ -1,9 +1,9 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-An update layer lets an existing mapper follow a changing scene across runs. The layer decides which observations
-still describe the scene and which elements of the earlier map continue, and the mapper integrates the selected
-observations with its own rule. With the same decisions for changes in view, out of view, and between runs, a TSDF, a 3D Gaussian map, and an occupancy map remove
-obsolete states, keep the regions that a new run leaves unobserved, and record when each state held. A mapper joins by
+A visit ends when the robot stops, but the scene keeps changing. An update layer lets an existing mapper continue across
+visits: it decides which observations still describe the scene and which elements of the earlier map continue, hands its
+state to the next visit as a prior, and leaves the integration of the selected observations to the mapper. With the same decisions for changes in view, out of view, and between visits, a TSDF, a 3D Gaussian map, and an occupancy map remove
+obsolete states, keep the regions that a new visit leaves unobserved, and record when each state held. A mapper joins by
 exposing the four operations and supplying its element half-size, floor $\tau_{\min}$, truncation band $T$, and test $C(e)$,
 as the three mappers here do.

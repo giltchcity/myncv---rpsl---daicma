@@ -1,18 +1,14 @@
 \begin{abstract}
-A mapper that returns to a changed scene can reload its old map, which keeps each moved object at its old site, or
-start over, which discards every region it leaves unobserved. Existing methods resolve this conflict inside one map
-representation, so each new mapper needs a new update rule. Two questions decide every update: which observations
-still describe the scene, and which parts of the earlier map remain. Both concern observations and object states, not
-voxels or Gaussians. We present an update layer that answers both questions and leaves integration to the mapper. The
-layer uses one likelihood, one prior, and one decision rule to infer when each object state holds, for objects that
-move in view, change out of view, or change between runs. It admits an observation only while the state it measured
-holds and keeps an earlier map element until current observations place its surface elsewhere. A TSDF, a 3D Gaussian,
-and an occupancy mapper each connect to the layer through the four operations of an update interface. On three
-recordings of a real room taken over twelve days, \prov{0.9\%} and \prov{7.0\%} of the old object surface remain in the
-TSDF and \prov{8.1\%} and \prov{14.3\%} in the Gaussian map, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and
-42.4\% and 61.1\% for GaME, and all three maps detect at least 15 of the 16 change events between the first two runs
-and all 10 between the last two. On a simulated apartment whose second run observes only part of the scene, the updated
-TSDF, Gaussian, and occupancy maps reach a geometry F1 of \prov{98.5}, \prov{96.7}, and \prov{94.9} against the complete
-scene, compared with 92.1, 92.0, and 91.2 under Panoptic Multi-TSDFs, GaME, and wavemap and 83.6 to 85.4 for maps
-rebuilt from scratch.
+The world does not reset when a mapper does. A robot that returns to a room may find the chair moved and the suitcase
+gone. Reloading the old map keeps both at their old sites, and starting over discards every room the robot does not
+revisit. Existing updates reason within one visit or carry a map without its reasoning, each for one representation. We
+treat visits as interrupted observations of one evolving scene: a change made while the robot is away is decided like one
+made while it looks away. One update layer infers when each object state holds, with one likelihood, one prior, and one
+decision rule, admits an observation only while its state holds, keeps an earlier map element until current observations
+place its surface elsewhere, and passes its state to the next visit. A TSDF, a 3D Gaussian, and an occupancy mapper join
+it through four operations. Over three visits to a real room, the TSDF keeps \prov{0.9\%} and \prov{7.0\%} of the surface
+of departed objects, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs, and all three maps detect at least 25 of the 26
+changes between visits. When the second visit to a simulated apartment sees only part of it, the three maps reach a
+geometry F1 of \prov{98.5}, \prov{96.7}, and \prov{94.9}, against 92.1, 92.0, and 91.2 under the published updates and at
+most 85.4 when rebuilt from scratch.
 \end{abstract}

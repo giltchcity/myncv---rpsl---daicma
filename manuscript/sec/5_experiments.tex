@@ -2,292 +2,254 @@
 \label{sec:experiments}
 
 We attach the same update layer to a TSDF, a 3D Gaussian, and an occupancy mapper. With every mapper, the layer detects
-the changes within and between runs, removes obsolete surfaces, reaches a higher geometry F1 on the revisits than
-the published update of its representation, and completes the map from the memory of earlier runs. Each mapper also runs without our
+the changes within and between visits, removes obsolete surfaces, reaches a higher geometry F1 on the revisits than
+the published update of its representation, and completes the map from the memory of earlier visits. Each mapper also runs without our
 layer, from an empty map and with its own update where it has one.
 
 \subsection{Setup}
 \label{sec:setup}
 
 \paragraph{Datasets.}
-\emph{Real room.} We record one room three times with a Kinect: run A (133\,s, 4{,}003 frames), run B (135\,s,
-4{,}041 frames) about six hours later, and run C (241\,s, 7{,}216 frames) twelve days after B. B starts from A's
-exported state and C from B's. Camera poses come from ORB-SLAM3~\cite{campos2021orbslam3}, and we align B and C with A by
+\emph{Real room.} We record one room three times with a Kinect: the first visit has 4{,}003 frames (133\,s), the second
+4{,}041 (135\,s), and the third 7{,}216 (241\,s). Each visit starts from the state that the previous one exported. Camera
+poses come from ORB-SLAM3~\cite{campos2021orbslam3}, and we align the second and third visits with the first by
 rigid transforms set manually in Open3D~\cite{zhou2018open3d} to minimize the alignment error between the meshes. We call
-every run after the first a revisit. The room contains 20 objects. Between A and B,
-seven moved objects, one addition, and one removal give 16 appearance or disappearance events, and between B and C,
-four moved objects and two removals give 10. During each run, an object is also placed or moved while the camera maps
+every visit after the first a revisit. The room contains 20 objects. Between the first and second
+visits, seven moved objects, one addition, and one removal give 16 appearance or disappearance events, and between the
+second and third, four moved objects and two removals give 10. During each visit, an object is also placed or moved while the camera maps
 another part of the room.
 Object reference surfaces come from RGB-D measurements aggregated over annotated state intervals.
-\emph{Simulated apartment.} Two Isaac Sim runs observe one furnished apartment: A with 4{,}186 frames and B with
-3{,}555 frames at 30\,Hz, with exact poses. B starts from A's exported state and
-observes only part of what A mapped. Run A contains 28 appearance or disappearance events and run B 16, in view or out of view,
-and 34 events happen between the runs.
+\emph{Simulated apartment.} Two visits in Isaac Sim observe one furnished apartment, with 4{,}186 and 3{,}555 frames at
+30\,Hz and exact poses. The second visit starts from the state that the first exported and observes only part of what
+the first mapped. The first visit contains 28 appearance or disappearance events and the second 16, in view or out of view,
+and 34 events happen between the visits.
 % PENDING TSDF and occupancy simulated rows: rerun on the grouped inputs (events 28 / 16 / 34). The complete scene mesh is the reference inside and outside the current camera
 coverage.
 \emph{Flat.} The public Flat dataset~\cite{schmid2022panoptic}, which Panoptic Multi-TSDFs and GaME also use,
-has two simulated runs of one flat with 400 and 362 frames and exact poses. Between the runs, objects
-move, appear, and disappear. A point reference of each run's scene comes with the data.
-% PENDING \TODO{Re-run the simulated apartment with the final TSDF backend. After the current runs: 3RScan~\cite{wald2019rio}
+has two simulated visits of one flat with 400 and 362 frames and exact poses. Between the visits, objects
+move, appear, and disappear. A point reference of each visit's scene comes with the data.
+% PENDING \TODO{Re-run the simulated apartment with the final TSDF backend. After the current visits: 3RScan~\cite{wald2019rio}
 % PENDING with the final code.}
 
 \paragraph{Compared methods.}
-We compare against published methods on the same recordings. Khronos~\cite{schmid2024khronos} maps each run as its own
+We compare against published methods on the same recordings. Khronos~\cite{schmid2024khronos} maps each visit as its own
 session with dynamic and change reasoning. Panoptic Multi-TSDFs~\cite{schmid2022panoptic} keeps object submaps that
-become persistent, absent, or unobserved across runs. GaME~\cite{yugay2026game} updates a Gaussian map after changes out
+become persistent, absent, or unobserved across visits. GaME~\cite{yugay2026game} updates a Gaussian map after changes out
 of view, and wavemap~\cite{reijgwart2023wavemap} lowers the occupancy of the cells that rays traverse. We run our layer on
 three backends: a Khronos TSDF pipeline, GaME, and wavemap. Each backend keeps its inputs and resolution, and our rows
 connect it to the layer through the update interface of \cref{sec:representations}.
-% PENDING Run Khronos on the aligned runs joined into one sequence (A, B, C), with the same inputs, and replace its
-% PENDING per-run rows and the n/a cells it leaves.
+% PENDING Run Khronos on the aligned visits joined into one sequence (A, B, C), with the same inputs, and replace its
+% PENDING per-visit rows and the n/a cells it leaves.
 
 \paragraph{Metrics.}
-\emph{Khronos' object F1} scores the objects of a TSDF map at every moment against the objects present at that
-moment, weighted by the duration of each state, with the object evaluator released with Khronos~\cite{schmid2024khronos}: objects
-are associated by surface, must share the class, and match within 2\,m.
 % PENDING 4D object F1: per object and moment, the map surface of the object against its true surface at 5 cm.
 \emph{Change F1} is the change metric of Khronos~\cite{schmid2024khronos}. A moved object gives two events, the
 disappearance of its old state and the appearance of its new one, and a change of the map that matches no reference event
 is a false positive. A state is represented in a map when at least half of its reference surface samples lie within
 10\,cm of the predicted surface, of the same class where the map carries object labels, and an event is detected when the
-map no longer represents a state that disappeared or newly represents one that appeared. We report changes within a run,
-which happen in view or out of view, and changes between runs.
-\emph{Old-site residue} is the fraction of the reference surface of object states that ended before a run began,
-among the parts that the run observes as free space, that the run's final map still shows. Lower is better.
+map no longer represents a state that disappeared or newly represents one that appeared. We report changes within a visit,
+which happen in view or out of view, and changes between visits.
+\emph{Old-site residue} is the fraction of the reference surface of object states that ended before a visit began,
+among the parts that the visit observes as free space, that the visit's final map still shows. Lower is better.
 \emph{Geometry} is the F1 at 5\,cm between surface samples of the map and the reference. The real reference is
-reconstructed from each run's own RGB-D data and covers what that run observes, so it tests accuracy there. The
-simulated reference is the complete scene mesh, including surfaces that the last run leaves unobserved, so it also
+reconstructed from each visit's own RGB-D data and covers what that visit observes, so it tests accuracy there. The
+simulated reference is the complete scene mesh, including surfaces that the last visit leaves unobserved, so it also
 tests completeness. We score each map on its own surface: the TSDF mesh,
 the occupied cells, and a TSDF fused from depth rendered from the Gaussians~\cite{huang20242dgs}.
 \emph{Rendering} of the Gaussian maps is evaluated, as in GaME~\cite{yugay2026game}, on every tenth frame of the last
-run, held out from mapping, with PSNR, SSIM, LPIPS~\cite{zhang2018lpips}, and depth L1 as GaME's evaluation computes them, SSIM
-in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last run. \emph{Own time}
+visit, held out from mapping, with PSNR, SSIM, LPIPS~\cite{zhang2018lpips}, and depth L1 as GaME's evaluation computes them, SSIM
+in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last visit. \emph{Own time}
 renders each frame with the map of its own timestamp, $\mathcal{M}(t_k)$.
-In the tables, n/a marks a quantity the method does not produce: Khronos maps each run as its own session, and only
+In the tables, n/a marks a quantity the method does not produce: Khronos maps each visit as its own session, and only
 Gaussian maps render. A dash marks a quantity not evaluated.
 
 \paragraph{Protocol.}
-Simulated runs use ground-truth poses, and real runs use the estimated poses and the alignment above. Segmentation is
-ground truth in all runs, annotated on SAM~\cite{kirillov2023sam} masks for the real room. Datasets and backends share
+Simulated visits use ground-truth poses, and real visits use the estimated poses and the alignment above. Segmentation is
+ground truth in all visits, annotated on SAM~\cite{kirillov2023sam} masks for the real room. Datasets and backends share
 the constants of \cref{sec:handoff}. Every experiment runs on one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,GB of memory.
 
 \subsection{Main Results}
 \label{sec:exp_main}
 
 \begin{table*}[t]
-\centering\small
-\caption{Real room, in percent except PSNR (dB). Cells give runs A / B / C, runs B / C for residue, or the transitions A$\to$B / B$\to$C. Within-run changes on the real recordings happen out of view. Geometry uses a
-reference sampled at 1\,cm and the same room crop for every method. PSNR uses held-out frames of run C after the refinement that
-follows the last run, and every other metric uses the unrefined maps. n/a: not produced by the method. --: not evaluated.}
+\centering\footnotesize
+\caption{Real room over three visits, in percent. Within-visit changes on the real recordings happen out of view. Residue is
+the share of the surface of departed objects that the map still shows. Geometry F1 on the revisits uses a reference
+sampled at 1\,cm and the same room crop for every method. n/a: not produced by the method; --: not evaluated.}
 % PENDING 4D object F1 column for every row once scored; it replaces the residue column.
 \label{tab:main_real}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{llcccccc}
+\setlength{\tabcolsep}{4.6pt}
+\begin{tabular}{@{}lccccccccc@{}}
 \toprule
- & & \multicolumn{2}{c}{Change F1} & & & \multicolumn{2}{c}{PSNR} \\
-\cmidrule(lr){3-4}\cmidrule(lr){7-8}
-Map & Method & Within run & Between runs & Residue$\downarrow$ & Geometry F1 & Final map & Own time \\
+ & \multicolumn{3}{c}{Change F1 within visit$\uparrow$} & \multicolumn{2}{c}{Change F1 between$\uparrow$} &
+ \multicolumn{2}{c}{Residue$\downarrow$} & \multicolumn{2}{c}{Geometry F1$\uparrow$} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(l){9-10}
+Method & 1st & 2nd & 3rd & 1st$\to$2nd & 2nd$\to$3rd & 2nd & 3rd & 2nd & 3rd \\
 \midrule
-TSDF & Khronos~\cite{schmid2024khronos} & 100 / 66.7 / 66.7 & n/a & n/a & 91.0 / 95.9 / 94.7 & n/a & n/a \\
-     & Panoptic~\cite{schmid2022panoptic} & -- & 64.0 / 37.5 & 57.1 / 60.1 & 92.4 / 93.6 / 93.0 & n/a & n/a \\
-     & Ours & \prov{100 / 100 / 100} & \prov{96.8 / 100} & \prov{0.9 / 7.0} & \prov{94.3 / 96.0 / 95.3} & n/a & n/a \\
+\tgroup{10}{TSDF}
+Khronos~\cite{schmid2024khronos} & 100 & 66.7 & 66.7 & \na & \na & \na & \na & 95.9 & 94.7 \\
+Panoptic~\cite{schmid2022panoptic} & \nev & \nev & \nev & 64.0 & 37.5 & 57.1 & 60.1 & 93.6 & 93.0 \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{96.8} & \prov{100} & \prov{0.9} & \prov{7.0} & \prov{96.0} & \prov{95.3} \\
 \midrule
-Gaussians & GaME~\cite{yugay2026game} & 100 / 66.7 / 100 & 93.3 / 94.7 & 42.4 / 61.1 & 93.1 / 88.6 / 90.8 & 18.94 & n/a \\
-          & Ours & \prov{100 / 100 / 100} & \prov{96.8 / 100} & \prov{8.1 / 14.3} & \prov{93.2 / 93.4 / 95.0} & \prov{19.90}
-          & \prov{20.41} \\
+\tgroup{10}{3D Gaussians}
+GaME~\cite{yugay2026game} & 100 & 66.7 & 100 & 93.3 & 94.7 & 42.4 & 61.1 & 88.6 & 90.8 \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{96.8} & \prov{100} & \prov{8.1} & \prov{14.3} & \prov{93.4} & \prov{95.0} \\
 \midrule
-Occupancy & wavemap~\cite{reijgwart2023wavemap} & 100 / 100 / 100 & 93.3 / 100 & 1.3 / 4.4 & 94.8 / 88.9 / 89.0 & n/a & n/a \\
-          & Ours & \prov{100 / 100 / 100} & \prov{100 / 100} & \prov{5.8 / 12.2} & \prov{92.7 / 92.0 / 91.6} & n/a & n/a \\
+\tgroup{10}{Occupancy}
+wavemap~\cite{reijgwart2023wavemap} & 100 & 100 & 100 & 93.3 & 100 & 1.3 & 4.4 & 88.9 & 89.0 \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{100} & \prov{100} & \prov{5.8} & \prov{12.2} & \prov{92.0} & \prov{91.6} \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-\begin{table*}[t]
-\centering\small
-\caption{Simulated apartment, in percent except PSNR (dB). Cells give runs A / B, or the transition A$\to$B for
-between-run changes. Within-run
-changes include changes in view and out of view. Geometry compares with the complete scene mesh, including surfaces
-that the last run leaves unobserved. PSNR uses held-out frames of run B after the refinement that follows the last
-run, and every other metric uses the unrefined maps. n/a: not produced by the method. --: not evaluated.}
-\label{tab:main_sim}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{llccccc}
-\toprule
- & & \multicolumn{2}{c}{Change F1} & & \multicolumn{2}{c}{PSNR} \\
-\cmidrule(lr){3-4}\cmidrule(lr){6-7}
-Map & Method & Within run & Between runs & Geometry F1 & Final map & Own time \\
-\midrule
-TSDF & Khronos~\cite{schmid2024khronos} & 67.9 / 88.0 & n/a & 91.4 / 83.6 & n/a & n/a \\
-     & Panoptic~\cite{schmid2022panoptic} & -- & 91.8 & 93.8 / 92.1 & n/a & n/a \\
-     & Ours & \prov{100 / 96.3} & \prov{95.1} & \prov{98.0 / 98.5} & n/a & n/a \\
-\midrule
-Gaussians & GaME~\cite{yugay2026game} & 84.4 / 88.0 & 81.5 & 94.7 / 92.0 & 22.09 & n/a \\
-          & Ours & \prov{100 / 93.3} & \prov{95.4} & \prov{97.9 / 96.7} & \prov{25.18} & \prov{26.81} \\
-\midrule
-Occupancy & wavemap~\cite{reijgwart2023wavemap} & 91.7 / 86.7 & 93.3 & 90.3 / 91.2 & n/a & n/a \\
-          & Ours & \prov{100 / 96.3} & \prov{95.1} & \prov{94.6 / 94.9} & n/a & n/a \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-\paragraph{With our layer, every map reaches change F1 of at least 93 within and between runs, without a false
+\paragraph{With our layer, every map reaches change F1 of at least 93 within and between visits, without a false
 detection.}
-Within a run, all three backends reach change F1 100 in every real run and in the simulated run A, and 93.3 to 96.3 in
-the simulated run B. Khronos reaches 66.7 in the real runs B and C and GaME 66.7 in run B, and the
-compared methods reach 67.9 to 91.7 on the simulated runs. Between runs, the TSDF and Gaussian backends detect 15 of the
-16 events from A to B and the occupancy backend all 16. Every backend detects all 10 events from B to C and reaches change F1 95.1 to 95.4 between the simulated runs
-(\cref{tab:main_real,tab:main_sim}). On these three transitions, Panoptic Multi-TSDFs
+Within a visit, all three backends reach change F1 100 in every real visit and in the first simulated visit, and 93.3 to
+96.3 in the second. Khronos reaches 66.7 in the second and third real visits and GaME 66.7 in the second, and the
+compared methods reach 67.9 to 91.7 on the simulated visits. Between visits, the TSDF and Gaussian backends detect 15 of the
+16 events between the first and second visits and the occupancy backend all 16. Every backend detects all 10 events
+between the second and third visits and reaches change F1 95.1 to 95.4 between the simulated visits
+(\cref{tab:main_real}; the simulated results are in the supplementary material). On these three transitions, Panoptic Multi-TSDFs
 reaches change F1 64.0, 37.5, and 91.8, GaME 93.3, 94.7, and 81.5, and wavemap 93.3, 100, and 93.3.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/qualitative.pdf}
+\caption{\textbf{Final maps of the real room after the third visit.} Left: our maps, with the two enlarged regions.
+Where objects moved between the second and third visits (gray box), Panoptic Multi-TSDFs and GaME keep surfaces of objects that have left (dashed
+gray), wavemap's update clears parts of the floor (dashed purple), and our maps match the reference. Where the third
+visit did not look (purple box), maps built from the third visit alone miss the wall that the first visit observed, and our
+maps keep it. The reference of the real room covers what each visit observes, so this region is compared with the
+reference of the first visit.}
+\label{fig:qualitative}
+\end{figure*}
 
 \paragraph{Obsolete surfaces leave the map.}
 After the revisits of the real room, 0.9\% and 7.0\% of the old object surface remain in the TSDF and 8.1\% and 14.3\%
 in the Gaussian map, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and 42.4\% and 61.1\% under GaME's update
-(\cref{tab:main_real}). Without change handling, an occupancy map keeps 99.6\% of the old surface, and with our layer
+(\cref{tab:main_real,fig:qualitative,fig:testview}). Without change handling, an occupancy map keeps 99.6\% of the old surface, and with our layer
 5.8\% and 12.2\% remain, at geometry F1 92.0 and 91.6 (\cref{tab:ablation_variants}). Wavemap's update, which lowers the
 occupancy of every cell that a ray traverses, leaves 1.3\% and 4.4\% at 88.9 and 89.0.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/testview.pdf}
+\caption{\textbf{Final maps at held-out views of the last visit.} The maps after the last visit, rendered at camera poses
+of that visit that mapping did not use, next to the real image. TSDF and occupancy surfaces take the color of the nearest
+reference surface. In the living room of the simulated apartment, where the sofas and their pillows moved during the
+visit, Khronos keeps the sofas at their earlier places, wavemap keeps fragments of the pillows on the floor, and GaME
+scatters fragments over the floor. In the real room, Panoptic Multi-TSDFs keeps the suitcase in front of the chair,
+where it stood in the second visit, and GaME renders the chair as a translucent shape mixed with fragments of the suitcase. GaME also
+smears the bed in the simulated bedroom and blurs the coffee table next to the moved sofa in Flat. Our maps show the
+scene of the image in all three representations. Occupancy maps cover the simulated apartment and the real room.
+Numbers give PSNR over the whole frame.}
+\label{fig:testview}
+\end{figure*}
+
 \paragraph{On the revisits, every map reaches a higher geometry F1 than the published update of its representation.}
-On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in runs B and C is 96.0 and 95.3 with the
+On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in the second and third visits is 96.0 and 95.3 with the
 TSDF (Panoptic Multi-TSDFs: 93.6 and 93.0), 93.4 and 95.0 with the Gaussians (GaME: 88.6 and 90.8), and 92.0 and 91.6
 with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main_real}). The TSDF map also exceeds Khronos, which starts each
-run from an empty map, on every revisit (\cref{tab:main_real,tab:main_sim,tab:flat}).
+visit from an empty map, on every revisit, and it leads Khronos on Khronos' own object F1 in every visit (supplementary
+material).
 
-\paragraph{The memory of earlier runs completes every map.}
-On the complete simulated scene, the updated maps of run B reach geometry F1 98.5 (TSDF), 96.7 (Gaussians), and 94.9
-(occupancy). Maps of run B alone reach 83.6, 85.4, and 84.2, and the compared methods that carry a map reach 92.1
-(Panoptic Multi-TSDFs), 92.0 (GaME), and 91.2 (wavemap) (\cref{tab:main_sim,tab:ablation_variants}).
-
-\begin{table}[t]
-\centering\small
-\caption{Khronos' object F1 of the TSDF maps, in percent, with the object evaluator released with
-Khronos~\cite{schmid2024khronos}.}
-\label{tab:khronos_obj}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lccccc@{}}
-\toprule
- & \multicolumn{3}{c}{Real room} & \multicolumn{2}{c}{Sim. apartment} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-6}
-Method & A & B & C & A & B \\
-\midrule
-Khronos & 89.1 & 91.5 & 83.8 & 71.4 & 66.8 \\
-Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{98.4} & \prov{85.0} & \prov{91.3} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{On Khronos' own object F1, the TSDF backend leads in every run.}
-The TSDF backend leads Khronos by 4.5 and 13.6 points in the first runs, which start from an empty map, and by 8.2,
-14.6, and 24.5 points in the real runs B and C and the simulated run B, which start from the loaded state
-(\cref{tab:khronos_obj}).
-
-\begin{table}[t]
-\centering\small
-\caption{Flat~\cite{schmid2022panoptic}. Geometry F1 at 5\,cm against the point reference of each run (unrefined maps)
-and PSNR on held-out frames of run 2 after refinement. n/a: not produced by the method. --: not evaluated.}
-\label{tab:flat}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llccc@{}}
-\toprule
- & & \multicolumn{2}{c}{Geometry F1} & PSNR \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-5}
-Map & Method & Run 1 & Run 2 & Run 2 \\
-\midrule
-TSDF & Panoptic~\cite{schmid2022panoptic} & -- & 89.5 & n/a \\
-     & Khronos~\cite{schmid2024khronos} & 86.4 & 85.8 & n/a \\
-     & Ours & \prov{86.5} & \prov{90.2} & n/a \\
-\midrule
-Gaussians & GaME~\cite{yugay2026game} & 86.5 & 87.7 & 26.17 \\
-          & Ours & \prov{86.3} & \prov{89.8} & \prov{27.64} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{The memory of earlier visits completes every map.}
+On the complete simulated scene, the updated maps of the second visit reach geometry F1 98.5 (TSDF), 96.7 (Gaussians), and 94.9
+(occupancy). Maps of the second visit alone reach 83.6, 85.4, and 84.2, and the compared methods that carry a map reach 92.1
+(Panoptic Multi-TSDFs), 92.0 (GaME), and 91.2 (wavemap) (\cref{tab:ablation_variants}).
 
 \paragraph{On Flat, the methods differ only after the scene has changed.}
-In the first run, which contains no changes, every evaluated method starts from an empty map, and the geometry F1 agrees
-within 0.2 points (\cref{tab:flat}). In the second run, our layer reaches 90.2 with the TSDF, against 85.8 for Khronos,
-which maps the run alone, and 89.5 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
-GaME, which also keeps the first run's map.
+In the first visit, which contains no changes, every evaluated method starts from an empty map, and the geometry F1 agrees
+within 0.2 points (86.3 to 86.5; supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 85.8 for Khronos,
+which maps the visit alone, and 89.5 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
+GaME, which also keeps the first visit's map.
 
 \subsection{Rendering of the Gaussian Map}
 \label{sec:exp_rendering}
 
 \begin{table}[t]
-\centering\small
-\caption{Rendering of the Gaussian maps on held-out frames of the last run; depth L1 in cm. All maps are refined after
-the last run, and ours trains each Gaussian only with the keyframes whose valid domain contains it and adds no
-Gaussians. Scratch rebuilds the last run from an empty map with GaME.}
+\centering\footnotesize
+\caption{Rendering of the Gaussian maps on held-out frames of the last visit; depth L1 in cm. All maps are refined after
+the last visit, and ours trains each Gaussian only with the keyframes whose valid domain contains it and adds no
+Gaussians. Scratch rebuilds the last visit from an empty map with GaME.}
 \label{tab:rendering}
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{@{}llcccc@{}}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Data & Method & PSNR$\uparrow$ & SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+Method & PSNR$\uparrow$ & SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
 \midrule
-Sim.~B & GaME~\cite{yugay2026game} & 22.09 & 0.753 & 0.334 & 22.0 \\
-       & Scratch & 23.36 & 0.788 & 0.276 & 22.7 \\
-       & Ours, final & \prov{25.18} & \prov{0.825} & \prov{0.214} & \prov{15.3} \\
-       & Ours, own time & \prov{26.81} & \prov{0.896} & \prov{0.168} & \prov{3.5} \\
+\tgroup{5}{Simulated apartment, 2nd visit}
+GaME~\cite{yugay2026game} & 22.09 & 0.753 & 0.334 & 22.0 \\
+Scratch & 23.36 & 0.788 & 0.276 & 22.7 \\
+\rowcolor{oursbg} Ours, final map & \prov{25.18} & \prov{0.825} & \prov{0.214} & \prov{15.3} \\
+\rowcolor{oursbg} Ours, own time & \prov{26.81} & \prov{0.896} & \prov{0.168} & \prov{3.5} \\
 \midrule
-Real~C & GaME~\cite{yugay2026game} & 18.94 & 0.788 & 0.410 & 5.3 \\
-       & Scratch & 19.93 & 0.819 & 0.363 & 4.5 \\
-       & Ours, final & \prov{19.90} & \prov{0.811} & \prov{0.370} & \prov{5.0} \\
-       & Ours, own time & \prov{20.41} & \prov{0.819} & \prov{0.365} & \prov{2.7} \\
+\tgroup{5}{Real room, 3rd visit}
+GaME~\cite{yugay2026game} & 18.94 & 0.788 & 0.410 & 5.3 \\
+Scratch & 19.93 & 0.819 & 0.363 & 4.5 \\
+\rowcolor{oursbg} Ours, final map & \prov{19.90} & \prov{0.811} & \prov{0.370} & \prov{5.0} \\
+\rowcolor{oursbg} Ours, own time & \prov{20.41} & \prov{0.819} & \prov{0.365} & \prov{2.7} \\
+% PENDING Real own-time rendering: rerender after the lifetime fix (Gaussians of visit C attached to visit-A states).
 \midrule
-Flat~2 & GaME~\cite{yugay2026game} & 26.17 & 0.922 & 0.159 & 1.2 \\
-       & Ours, final & \prov{27.64} & \prov{0.947} & \prov{0.117} & \prov{0.5} \\
+\tgroup{5}{Flat, 2nd visit}
+GaME~\cite{yugay2026game} & 26.17 & 0.922 & 0.159 & 1.2 \\
+\rowcolor{oursbg} Ours, final map & \prov{27.64} & \prov{0.947} & \prov{0.117} & \prov{0.5} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Our layer also renders better than GaME's update (\cref{tab:rendering}). On held-out frames of the last run,
+Our layer also renders better than GaME's update (\cref{tab:rendering,fig:testview}). On held-out frames of the last visit,
 our final map renders 3.09\,dB better than GaME's update on the simulated apartment, 0.96\,dB better on the real room,
 and 1.47\,dB better on Flat, and it is better on every metric. GaME's update renders 1.27 and 0.99\,dB below a map rebuilt from scratch, whereas our
-final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier runs. Because objects
-also change during the last run,
-rendering each frame with our map of its own time raises PSNR further, by 1.63 and 0.51\,dB on the simulated apartment and
-the real room, and improves every metric of our final map. GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 87.7 to 84.6 on Flat and
-from 90.8 to 89.2 on the real room and changes ours by at most 0.12 points.
+final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier visits. Because objects
+also change during the last visit,
+rendering each frame with our map of its own time raises PSNR further, by 1.63 and \prov{0.51}\,dB on the simulated apartment and
+the real room, and improves every metric of our final map. GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 92.0 to 78.4 on the simulated apartment, from 87.7 to 84.6 on Flat, and
+from 90.8 to 89.2 on the real room, and changes ours by at most 0.12 points.
 
 \subsection{Restart, Carry-Over, or Update}
 \label{sec:exp_ablation}
 
 \begin{table}[t]
-\centering\small
-\caption{Restart, carry-over, or update. Scratch starts every run from an empty map (Khronos for the TSDF), carry-over
-loads the previous map without change handling, own is the published update of the representation (Panoptic Multi-TSDFs, GaME,
-wavemap),
-and ours adds our layer. Residue and geometry F1 on the real runs B / C, and geometry F1 against the complete simulated
-scene after run B. n/a: the map holds no
-surface of an earlier run.}
+\centering\footnotesize
+\caption{Restart, carry-over, or update. Scratch starts every visit from an empty map (Khronos for the TSDF), carry-over
+loads the previous map without change handling, own is the published update of the representation (Panoptic
+Multi-TSDFs, GaME, wavemap), and ours adds our layer. Residue after the second and third real visits; geometry F1 against
+the complete simulated scene after the second visit, including the surfaces that this visit leaves unobserved. n/a: the
+map holds no surface of an earlier visit.}
 \label{tab:ablation_variants}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llccc@{}}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}lccc@{}}
 \toprule
- & & \multicolumn{2}{c}{Real B / C} & Sim.\ B \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-5}
-Map & Variant & Residue$\downarrow$ & F1 & F1 \\
+ & \multicolumn{2}{c}{Residue, real$\downarrow$} & Complete F1, sim.$\uparrow$ \\
+\cmidrule(lr){2-3}\cmidrule(l){4-4}
+Variant & 2nd & 3rd & 2nd \\
 \midrule
-TSDF & Scratch & n/a & 95.9 / 94.7 & 83.6 \\
-     & Own & 57.1 / 60.1 & 93.6 / 93.0 & 92.1 \\
-     & Ours & \prov{0.9 / 7.0} & \prov{96.0 / 95.3} & \prov{98.5} \\
+\tgroup{4}{TSDF}
+Scratch & \na & \na & 83.6 \\
+Own & 57.1 & 60.1 & 92.1 \\
+\rowcolor{oursbg} Ours & \prov{0.9} & \prov{7.0} & \prov{98.5} \\
 \midrule
-Gaussians & Scratch & n/a & 93.6 / 95.3 & 85.4 \\
-          & Own & 42.4 / 61.1 & 88.6 / 90.8 & 92.0 \\
-          & Ours & \prov{8.1 / 14.3} & \prov{93.4 / 95.0} & \prov{96.7} \\
+\tgroup{4}{3D Gaussians}
+Scratch & \na & \na & 85.4 \\
+Own & 42.4 & 61.1 & 92.0 \\
+\rowcolor{oursbg} Ours & \prov{8.1} & \prov{14.3} & \prov{96.7} \\
 \midrule
-Occupancy & Scratch & n/a & 96.4 / 95.8 & 84.2 \\
-          & Carry-over & 99.6 / 99.6 & 85.2 / 82.2 & 90.6 \\
-          & Own & 1.3 / 4.4 & 88.9 / 89.0 & 91.2 \\
-          & Ours & \prov{5.8 / 12.2} & \prov{92.0 / 91.6} & \prov{94.9} \\
+\tgroup{4}{Occupancy}
+Scratch & \na & \na & 84.2 \\
+Carry-over & 99.6 & 99.6 & 90.6 \\
+Own & 1.3 & 4.4 & 91.2 \\
+\rowcolor{oursbg} Ours & \prov{5.8} & \prov{12.2} & \prov{94.9} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{A restarted map is incomplete, and a carried-over map is stale.}
 Maps rebuilt from scratch reach geometry F1 83.6 to 85.4 against the complete simulated scene, and a carried-over
-occupancy map keeps 99.6\% of the old object surface, with real geometry F1 85.2 and 82.2 (\cref{tab:ablation_variants}).
+occupancy map keeps 99.6\% of the old object surface (\cref{tab:ablation_variants}).
 GaME's update keeps 42.4\% and 61.1\% of the old surface. With our layer, every backend reaches its highest geometry F1
 against the complete simulated scene.
 
 \paragraph{Valid domains add accuracy to the Gaussian map.}
 Letting each keyframe train only the Gaussians in its valid domain, instead of every stored keyframe training the
-current map, raises the geometry F1 of real run B by 3.1 points (supplementary material).
+current map, raises the geometry F1 of the second real visit by 3.1 points (supplementary material).

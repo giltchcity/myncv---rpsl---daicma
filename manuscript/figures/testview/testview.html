@@ -1,0 +1,68 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Held-out views</title>
+<style>
+  @page { size: 6.875in 2.792in; margin: 0; }
+  :root { --ink:#000000; --gray:#7F7F7F; --rule:#A5A5A5; --ours:#BF9000; --blue:#2E75B6; --memory:#7030A0; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#fff; }
+  body { width:6.875in; height:2.792in; font-family: "Times New Roman", Times, serif; color:var(--ink);
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .fig { display:grid; padding:6px; column-gap:3px; row-gap:4px; justify-content:center;
+         grid-template-columns: 86px 5px 86px 86px 5px 86px 86px 5px 86px 86px; grid-template-rows: 13px repeat(4, 57px); }
+  .head { font-size:7.4pt; font-weight:700; display:flex; align-items:center; justify-content:center; white-space:nowrap;
+          border-bottom: 0.65pt solid var(--rule); margin-bottom:2px; }
+  .head.group { grid-column: span 2; }
+  .card { position:relative; border-radius:2px; overflow:hidden; background:#000; outline: 0.5px solid #BFBFBF; }
+  .card img { display:block; width:100%; height:100%; object-fit:cover; }
+  .card.now { outline: 1.2px solid var(--ours); }
+  .chip { position:absolute; left:2px; top:2px; font-size:5.8pt; line-height:1; color:var(--ink); border-radius:1px;
+          padding:1.2px 2.4px 1.4px; white-space:nowrap; background:rgba(255,255,255,.9); }
+  .chip.ours { color: var(--ours); font-weight:700; }
+  .chip.light { font-style: italic; }
+  .psnr { position:absolute; right:2px; bottom:2px; font-size:5.8pt; line-height:1; color:var(--ink);
+          background:rgba(255,255,255,.9); border-radius:1px; padding:1.2px 2.4px 1.4px; }
+  .now .psnr { color: var(--ours); font-weight:700; }
+</style></head>
+<body><div class="fig">
+<div class="head">Real image</div><div></div><div class="head group">3D Gaussians</div><div></div><div class="head group">TSDF</div><div></div><div class="head group">Occupancy</div>
+<div class="card"><img src="assets/sim02090_photo.jpg"><span class="chip light">Simulated apartment</span></div>
+<div></div>
+<div class="card"><img src="assets/sim02090_gs_game.jpg"><span class="chip ">GaME</span><span class="psnr">21.07 dB</span></div>
+<div class="card now"><img src="assets/sim02090_gs_ours.jpg"><span class="chip ours">Ours</span><span class="psnr">34.16 dB</span></div>
+<div></div>
+<div class="card"><img src="assets/sim02090_tsdf_base.jpg"><span class="chip ">Khronos</span></div>
+<div class="card now"><img src="assets/sim02090_tsdf_ours.jpg"><span class="chip ours">Ours</span></div>
+<div></div>
+<div class="card"><img src="assets/sim02090_occ_base.jpg"><span class="chip ">wavemap</span></div>
+<div class="card now"><img src="assets/sim02090_occ_ours.jpg"><span class="chip ours">Ours</span></div>
+<div class="card"><img src="assets/sim03080_photo.jpg"><span class="chip light">Simulated apartment</span></div>
+<div></div>
+<div class="card"><img src="assets/sim03080_gs_game.jpg"><span class="chip ">GaME</span><span class="psnr">21.66 dB</span></div>
+<div class="card now"><img src="assets/sim03080_gs_ours.jpg"><span class="chip ours">Ours</span><span class="psnr">31.87 dB</span></div>
+<div></div>
+<div class="card"><img src="assets/sim03080_tsdf_base.jpg"><span class="chip ">Khronos</span></div>
+<div class="card now"><img src="assets/sim03080_tsdf_ours.jpg"><span class="chip ours">Ours</span></div>
+<div></div>
+<div class="card"><img src="assets/sim03080_occ_base.jpg"><span class="chip ">wavemap</span></div>
+<div class="card now"><img src="assets/sim03080_occ_ours.jpg"><span class="chip ours">Ours</span></div>
+<div class="card"><img src="assets/real04940_photo.jpg"><span class="chip light">Real room</span></div>
+<div></div>
+<div class="card"><img src="assets/real04940_gs_game.jpg"><span class="chip ">GaME</span><span class="psnr">22.88 dB</span></div>
+<div class="card now"><img src="assets/real04940_gs_ours.jpg"><span class="chip ours">Ours</span><span class="psnr">25.12 dB</span></div>
+<div></div>
+<div class="card"><img src="assets/real04940_tsdf_base.jpg"><span class="chip ">Panoptic</span></div>
+<div class="card now"><img src="assets/real04940_tsdf_ours.jpg"><span class="chip ours">Ours</span></div>
+<div></div>
+<div class="card"><img src="assets/real04940_occ_base.jpg"><span class="chip ">wavemap</span></div>
+<div class="card now"><img src="assets/real04940_occ_ours.jpg"><span class="chip ours">Ours</span></div>
+<div class="card"><img src="assets/flat00229_photo.jpg"><span class="chip light">Flat</span></div>
+<div></div>
+<div class="card"><img src="assets/flat00229_gs_game.jpg"><span class="chip ">GaME</span><span class="psnr">21.38 dB</span></div>
+<div class="card now"><img src="assets/flat00229_gs_ours.jpg"><span class="chip ours">Ours</span><span class="psnr">24.94 dB</span></div>
+<div></div>
+<div class="card"><img src="assets/flat00229_tsdf_base.jpg"><span class="chip ">Khronos</span></div>
+<div class="card now"><img src="assets/flat00229_tsdf_ours.jpg"><span class="chip ours">Ours</span></div>
+<div></div>
+<div></div>
+<div></div>
+</div></body></html>

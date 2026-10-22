@@ -1,7 +1,7 @@
 \section{Related Work}
 \label{sec:related_work}
 
-\paragraph{Dynamic reconstruction within a run.}
+\paragraph{Dynamic reconstruction within a visit.}
 Many systems reconstruct a scene while objects move in front of the camera. Co-Fusion, MID-Fusion, and EM-Fusion track
 objects and reconstruct each in its own surface or volume model~\cite{runz2017cofusion,xu2019midfusion,
 strecke2019emfusion}. DynaSLAM~II and DynoSAM estimate camera and object motion
@@ -12,7 +12,7 @@ time-varying scenes with dynamic surfaces, Gaussians, or persistent rigid
 primitives~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam,mazur2026primitive}. Dynablox detects moving
 objects from points that enter observed free space~\cite{schmid2023dynablox}. These methods handle the motion that the
 camera sees. Our layer uses the free-space cue of Dynablox to keep moving people out of the map and decides changes in view,
-between observations, and between runs with one rule.
+between observations, and between visits with one rule.
 
 \paragraph{Change handling inside one representation.}
 Most methods that update a map after unobserved changes build the update into their representation. For point clouds,
@@ -31,8 +31,15 @@ rays~\cite{breitfuss2024rbif}. For 3D Gaussians, GaME adds Gaussians where readi
 surface, removes the segments that observations see through, and masks stale keyframe regions~\cite{yugay2026game}. LT-Gaussian removes disappeared Gaussians and adds new
 geometry~\cite{cheng2025ltgaussian}, GaussianUpdate revises a Gaussian field continually as it retains earlier
 content~\cite{zeng2025gaussianupdate}, and CL-Splats updates changed regions locally and can recover earlier
-states~\cite{ackermann2025clsplats}. Each of these rules acts on its own primitives. We define the update once, on
-observations and object states, and let each mapper execute it with its own integration.
+states~\cite{ackermann2025clsplats}. Each of these rules acts on its own primitives.
+
+Khronos and GaME, the methods closest to our layer, also check observations against the map, but they check different
+things. Khronos settles each object fragment against the rays of one session, thoroughly but only until the session ends:
+the next visit starts from an empty map. GaME tests its Gaussians against each new keyframe and prunes those that
+disagree, and after two revisits of our real room, 42\% and 61\% of the old object surface remain in its map
+(\cref{tab:main_real}). We do not ask whether a primitive conflicts with an observation, but when an object state holds.
+Once that is known, it decides which observations still count and which elements remain, it carries over to the next
+visit, and any mapper can use it.
 
 \paragraph{Objects as the unit of change.}
 Object-level reasoning ties a change to a physical object instead of to individual points or voxels. Bore \etal model
@@ -42,7 +49,7 @@ non-detection~\cite{matezbandera2022ltc}, and SuperMap maintains object occupanc
 relations~\cite{zhao2026supermap}. ObVi-SLAM transfers object landmarks between sessions~\cite{adkins2024obvislam},
 OASIS-Map associates objects across sessions~\cite{oh2026oasismap}, and Living Scenes matches and reconstructs objects
 from scans taken at different times~\cite{zhu2024livingscenes}; RIO re-localizes object instances in changing indoor
-scans~\cite{wald2019rio}. These methods associate objects across runs. Our layer decides when each object state holds,
+scans~\cite{wald2019rio}. These methods associate objects across visits. Our layer decides when each object state holds,
 which observations remain valid, and which faces, Gaussians, or cells of the map continue.
 
 \paragraph{Models of temporal persistence.}
@@ -53,5 +60,5 @@ time~\cite{senanayake2016sthm}. Perpetua keeps several hypotheses about the appe
 features~\cite{saavedraruiz2025perpetua}, and 3D VSG predicts how likely each object is to
 change~\cite{looper2023vsg}. DAAAM adds semantic descriptions to a hierarchical 4D scene graph~\cite{gorlo2025daaam},
 and LT-Mem stores current object states, session events, and long-term statistics~\cite{lee2026ltmem}. These models
-predict or summarize change. From the observations of the current run, our layer decides which earlier observations
+predict or summarize change. From the observations of the current visit, our layer decides which earlier observations
 and map elements still describe the scene, and it keeps every ended state as history.

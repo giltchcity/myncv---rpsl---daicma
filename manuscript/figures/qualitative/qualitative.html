@@ -1,0 +1,60 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Qualitative results</title>
+<style>
+  @page { size: 6.875in 2.42in; margin: 0; }
+  :root { --ink:#000000; --rule:#A5A5A5; --teal:#BF9000; --red:#404040; --blue:#7030A0; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#fff; }
+  body { width:6.875in; height:2.42in; font-family: "Times New Roman", Times, serif; color: var(--ink);
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .fig { display:grid; padding:6px 6px; row-gap:6px; column-gap:4px; align-items:stretch;
+         grid-template-columns: 14px 79px repeat(3, 108px) 6px repeat(3, 62px);
+         grid-template-rows: 13px repeat(3, 62px); }
+  .group { font-size:7.4pt; font-weight:700; display:flex; align-items:center; white-space:nowrap;
+           border-bottom: 0.65pt solid var(--rule); margin-bottom:2px; }
+  .rowlabel { display:flex; align-items:center; justify-content:center; }
+  .rowlabel span { transform: rotate(-90deg); white-space:nowrap; font-size:7.2pt; font-weight:700; }
+  .card { position:relative; border-radius:2px; overflow:hidden; background:#fff; outline: 0.5px solid #BFBFBF; }
+  .card img { display:block; width:100%; height:100%; object-fit:cover; }
+  .card.now { outline: 1.2px solid var(--teal); }
+  .chip { position:absolute; left:2px; top:2px; font-size:5.8pt; line-height:1; color:var(--ink);
+          background:rgba(255,255,255,.9); border-radius:1px; padding:1.2px 2.4px 1.4px; white-space:nowrap; }
+  .now .chip { color: var(--teal); font-weight:700; }
+  .chip.light { font-style: italic; }
+  .mark { position:absolute; border-radius:50%; border:1.2px dashed; }
+  .mark.red { border-color: var(--red); }  .mark.blue { border-color: var(--blue); }
+  .box { position:absolute; border:1px solid; border-radius:1px; }
+  .box.floor { border-color: var(--red); }  .box.kept { border-color: var(--blue); }
+</style></head>
+<body><div class="fig">
+<div></div><div class="group">Final map</div>
+<div class="group" style="grid-column: span 3; color: var(--red)">Where objects moved</div><div></div>
+<div class="group" style="grid-column: span 3; color: var(--blue)">Not observed in the 3rd visit</div>
+<div class="rowlabel"><span>TSDF</span></div>
+<div class="card ov"><img src="assets/tsdf_overview.png"><span class="box floor" style="left:12.5%;top:36.2%;width:45.0%;height:33.0%"></span><span class="box kept" style="left:63.3%;top:0.0%;width:21.7%;height:27.7%"></span></div>
+<div class="card fl"><img src="assets/tsdf_update_floor.png"><span class="mark red" style="left:73.1%;top:12.9%;width:19.4%;height:43.9%"></span><span class="chip">Panoptic Multi-TSDFs</span></div>
+<div class="card fl now"><img src="assets/tsdf_ours_floor.png"><span class="chip">Ours</span></div>
+<div class="card fl"><img src="assets/tsdf_ref_floor.png"><span class="chip light">Reference</span></div>
+<div></div>
+<div class="card kp"><img src="assets/tsdf_scratch_kept.png"><span class="mark blue" style="left:1.9%;top:1.9%;width:85.4%;height:90.4%"></span><span class="chip">Khronos</span></div>
+<div class="card kp now"><img src="assets/tsdf_ours_kept.png"><span class="chip">Ours</span></div>
+<div class="card kp"><img src="assets/tsdf_refa_kept.png"><span class="chip light">1st-visit ref.</span></div>
+<div class="rowlabel"><span>3D Gaussians</span></div>
+<div class="card ov"><img src="assets/gs_overview.png"><span class="box floor" style="left:12.5%;top:36.2%;width:45.0%;height:33.0%"></span><span class="box kept" style="left:63.3%;top:0.0%;width:21.7%;height:27.7%"></span></div>
+<div class="card fl"><img src="assets/gs_update_floor.png"><span class="mark red" style="left:6.3%;top:68.4%;width:19.3%;height:24.5%"></span><span class="chip">GaME</span></div>
+<div class="card fl now"><img src="assets/gs_ours_floor.png"><span class="chip">Ours</span></div>
+<div class="card fl"><img src="assets/gs_ref_floor.png"><span class="chip light">Reference</span></div>
+<div></div>
+<div class="card kp"><img src="assets/gs_scratch_kept.png"><span class="mark blue" style="left:35.4%;top:0.0%;width:64.6%;height:86.9%"></span><span class="chip">GaME</span></div>
+<div class="card kp now"><img src="assets/gs_ours_kept.png"><span class="chip">Ours</span></div>
+<div class="card kp"><img src="assets/gs_refa_kept.png"><span class="chip light">1st-visit ref.</span></div>
+<div class="rowlabel"><span>Occupancy</span></div>
+<div class="card ov"><img src="assets/occupancy_overview.png"><span class="box floor" style="left:12.5%;top:36.2%;width:45.0%;height:33.0%"></span><span class="box kept" style="left:63.3%;top:0.0%;width:21.7%;height:27.7%"></span></div>
+<div class="card fl"><img src="assets/occupancy_update_floor.png"><span class="mark blue" style="left:73.3%;top:8.4%;width:17.6%;height:24.8%"></span><span class="chip">wavemap</span></div>
+<div class="card fl now"><img src="assets/occupancy_ours_floor.png"><span class="chip">Ours</span></div>
+<div class="card fl"><img src="assets/occupancy_ref_floor.png"><span class="chip light">Reference</span></div>
+<div></div>
+<div class="card kp"><img src="assets/occupancy_scratch_kept.png"><span class="mark blue" style="left:9.2%;top:8.1%;width:76.9%;height:74.6%"></span><span class="chip">wavemap</span></div>
+<div class="card kp now"><img src="assets/occupancy_ours_kept.png"><span class="chip">Ours</span></div>
+<div class="card kp"><img src="assets/occupancy_refa_kept.png"><span class="chip light">1st-visit ref.</span></div>
+</div></body></html>
