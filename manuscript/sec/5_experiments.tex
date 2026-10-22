@@ -150,10 +150,9 @@ against 63.2.
 apartment after its second (bottom rows), next to the real image. Top: the suitcase stood here in the second visit and the
 chair stands here now; Panoptic Multi-TSDFs keeps the suitcase, and GaME renders the chair as a translucent shape mixed with
 fragments of it. Second row: the suitcase stood in front of the basket earlier in the visit and left at 100\,s; Panoptic
-Multi-TSDFs and GaME keep fragments of it, and wavemap's update clears the wardrobe door that the image shows. Third row: the sofa and its pillows moved during the visit; Khronos, run over both visits as one sequence, keeps a fragment
-in the foreground and removes patches of the floor, wavemap keeps cells of the pillows on the floor, and GaME scatters
-fragments over the floor. Bottom: the large
-sofa moved from the middle of the room to the window during the visit; Khronos removes patches of the floor where it stood, GaME smears the
+Multi-TSDFs and GaME keep fragments of it, and wavemap's update clears the wardrobe door that the image shows. Third row: the sofa and its pillows moved during the visit; Khronos, which maps the visit from an empty map, keeps the sofa
+at its earlier place, wavemap keeps cells of the pillows on the floor, and GaME scatters fragments over the floor. Bottom: the large
+sofa moved from the middle of the room to the window during the visit; Khronos keeps it at its earlier place, GaME smears the
 side table and the wall, and wavemap's update removes parts of the sofa and of the slatted panel. TSDF and occupancy
 surfaces take the color of the nearest reference surface.}
 \label{fig:qualitative}
