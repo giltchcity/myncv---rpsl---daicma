@@ -161,25 +161,25 @@ held-out frames of the second visit after the refinement that follows the last v
 maps. n/a: not produced by the method; --: not evaluated.}
 \label{tab:supp_sim}
 \setlength{\tabcolsep}{2.6pt}
-\begin{tabular}{@{}lccccccc@{}}
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
  & \multicolumn{2}{c}{Within visit$\uparrow$} & Between$\uparrow$ & \multicolumn{2}{c}{Geometry F1$\uparrow$} &
- \multicolumn{2}{c}{PSNR$\uparrow$} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-6}\cmidrule(l){7-8}
-Method & 1st & 2nd & & 1st & 2nd & final & own \\
+ PSNR$\uparrow$ \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-6}\cmidrule(l){7-7}
+Method & 1st & 2nd & & 1st & 2nd & \\
 \midrule
-\tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & 74.5 & 89.7 & 86.7 & 91.6 & 90.2 & \na & \na \\
-Panoptic~\cite{schmid2022panoptic} & \nev & \nev & 91.8 & 93.8 & 92.1 & \na & \na \\
-\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{99.2} & \prov{99.2} & \na & \na \\
+\tgroup{7}{TSDF}
+Khronos~\cite{schmid2024khronos} & 74.5 & 89.7 & 86.7 & 91.6 & 90.2 & \na \\
+Panoptic~\cite{schmid2022panoptic} & \nev & \nev & 91.8 & 93.8 & 92.1 & \na \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{99.2} & \prov{99.2} & \na \\
 \midrule
-\tgroup{8}{3D Gaussians}
-GaME~\cite{yugay2026game} & 84.4 & 88.0 & 81.5 & 94.7 & 92.0 & 22.09 & \na \\
-\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{97.9} & \prov{96.7} & \prov{25.18} & \prov{26.81} \\
+\tgroup{7}{3D Gaussians}
+GaME~\cite{yugay2026game} & 84.4 & 88.0 & 81.5 & 94.7 & 92.0 & 22.09 \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{97.9} & \prov{96.7} & \prov{25.18} \\
 \midrule
-\tgroup{8}{Occupancy}
-wavemap~\cite{reijgwart2023wavemap} & 91.7 & 86.7 & 93.3 & 90.3 & 91.2 & \na & \na \\
-\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{94.6} & \prov{94.9} & \na & \na \\
+\tgroup{7}{Occupancy}
+wavemap~\cite{reijgwart2023wavemap} & 91.7 & 86.7 & 93.3 & 90.3 & 91.2 & \na \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{96.3} & \prov{95.1} & \prov{94.6} & \prov{94.9} & \na \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -218,7 +218,7 @@ objects are associated by surface, must share the class, and match within 2\,m.
 \begin{table}[t]
 \centering\footnotesize
 \caption{Khronos' object F1 of the TSDF maps, in percent, with the object evaluator released with
-Khronos~\cite{schmid2024khronos}.}
+Khronos~\cite{schmid2024khronos}. Khronos maps each real visit as its own session and the two simulated visits as one sequence.}
 \label{tab:khronos_obj}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{@{}lccccc@{}}
@@ -227,14 +227,14 @@ Khronos~\cite{schmid2024khronos}.}
 \cmidrule(lr){2-4}\cmidrule(l){5-6}
 Method & 1st & 2nd & 3rd & 1st & 2nd \\
 \midrule
-Khronos & 89.1 & 91.5 & 83.8 & 71.4 & 66.8 \\
-\rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{98.4} & \prov{85.0} & \prov{91.3} \\
+Khronos & 89.1 & 91.5 & 83.8 & 71.2 & 62.9 \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{98.4} & \prov{84.9} & \prov{90.8} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The TSDF backend leads Khronos by 4.5 and 13.6 points in the first visits, which start from an empty map, and by 8.2,
-14.6, and 24.5 points in the second and third real visits and the second simulated visit, which start from the loaded state
+The TSDF backend leads Khronos by 4.5 and 13.7 points in the first visits, which start from an empty map, and by 8.2,
+14.6, and 27.9 points in the second and third real visits and the second simulated visit, which start from the loaded state
 (\cref{tab:khronos_obj}).
 
 \section{Runtime}

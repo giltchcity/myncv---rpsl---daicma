@@ -64,8 +64,7 @@ tests completeness. We score each map on its own surface: the TSDF mesh,
 the occupied cells, and a TSDF fused from depth rendered from the Gaussians~\cite{huang20242dgs}.
 \emph{Rendering} of the Gaussian maps is evaluated, as in GaME~\cite{yugay2026game}, on every tenth frame of the last
 visit, held out from mapping, with PSNR, SSIM, LPIPS~\cite{zhang2018lpips}, and depth L1 as GaME's evaluation computes them, SSIM
-in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last visit. \emph{Own time}
-renders each frame with the map of its own timestamp, $\mathcal{M}(t_k)$.
+in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last visit.
 In the tables, n/a marks a quantity the method does not produce: only Gaussian maps render, and Khronos run per visit
 carries no map between visits. A dash marks a quantity not evaluated.
 
@@ -201,10 +200,9 @@ GaME~\cite{yugay2026game} & 26.17 & 0.922 & 0.159 & 1.2 \\
 Our layer also renders better than GaME's update (\cref{tab:rendering,fig:qualitative}). On held-out frames of the last visit,
 our final map renders 3.09\,dB better than GaME's update on the simulated apartment, 0.96\,dB better on the real room,
 and 1.47\,dB better on Flat, and it is better on every metric. GaME's update renders 1.27 and 0.99\,dB below a map rebuilt from scratch, whereas our
-final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier visits. Because objects
-also change during the last visit,
-rendering each frame with our map of its own time raises PSNR further, by 1.63 and \prov{0.51}\,dB on the simulated apartment and
-the real room, and improves every metric of our final map (\cref{fig:fourd}). GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 92.0 to 78.4 on the simulated apartment, from 87.7 to 84.6 on Flat, and
+final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier visits. Because the layer closes lifetimes
+instead of deleting elements, our map can also be queried at earlier times (\cref{fig:fourd}), whereas GaME keeps only its
+final map. The refinement lowers GaME's geometry F1 from 92.0 to 78.4 on the simulated apartment, from 87.7 to 84.6 on Flat, and
 from 90.8 to 89.2 on the real room, and changes ours by at most 0.12 points.
 
 \begin{figure*}[t]
