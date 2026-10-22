@@ -81,7 +81,7 @@ lowers the occupancy of every cell that a ray traverses, also clears surfaces th
 three, the update was never a property of the representation (\cref{fig:teaser}).
 
 With the same layer, all three maps follow the scene across visits. Objects that have left leave the map: after the
-second and third visits to the real room, \prov{0.9\%} and \prov{7.0\%} of their surface remain in the TSDF, about sixty
+second and third visits to the real room, \prov{0.9\%} and \prov{6.9\%} of their surface remain in the TSDF, about sixty
 and nine times less than under Panoptic Multi-TSDFs~\cite{schmid2022panoptic}, and \prov{8.1\%} and \prov{14.3\%} remain
 in the Gaussian map, against 42.4\% and 61.1\% under GaME's update. What a visit does not see is kept: when the second visit to a simulated apartment observes only
 part of it, the three maps reach a geometry F1 of \prov{99.2} (TSDF), \prov{96.7} (Gaussians), and \prov{94.9}

@@ -99,7 +99,7 @@ Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\upar
 \tgroup{8}{TSDF}
 Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
 Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 89.5 \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \prov{98.4} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
 \tgroup{8}{3D Gaussians}
 GaME~\cite{yugay2026game} & 92.3 & \nev & 90.8 & 83.9 & \nev & 92.0 & 87.7 \\
@@ -119,7 +119,7 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING Panoptic on Flat: rerun started 01:58 on 10-23. TESSE rows other than Khronos and our TSDF: not run.
 % PENDING TESSE object F1: online needs every snapshot scored (Khronos has 44 at 5 m, ours only the final one). Final
 % PENDING object F1 at 5 m: ours 97.9, Khronos 92.8. Online object F1, last visit: real per-visit Khronos, simulated
-% PENDING Khronos as one sequence (62.94), ours 290e110 (98.4 real third visit, 90.82 simulated second visit).
+% PENDING Khronos as one sequence (62.94), ours (97.84 real third visit: tk_real_c_closedfix, the closest run to 290e110; 90.82 simulated second visit, 290e110).
 % PENDING Occupancy row 4 at 88c3ac9 (real): geometry 91.5 / 91.7, residue 1.3 / 4.5, between visits without the
 % PENDING suitcase 15/0/1 and 10/0/0; its simulated rerun is paused.
 % SRC change F1, all events. Real (with the suitcase): ours TSDF and Gaussians 34/0/1, occupancy 35/0/0, GaME 30/0/5,
@@ -158,7 +158,7 @@ surfaces take the color of the nearest reference surface.}
 \end{figure*}
 
 \paragraph{Obsolete surfaces leave the map.}
-After the revisits of the real room, 0.9\% and 7.0\% of the old object surface remain in the TSDF and 8.1\% and 14.3\%
+After the revisits of the real room, 0.9\% and 6.9\% of the old object surface remain in the TSDF and 8.1\% and 14.3\%
 in the Gaussian map, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and 42.4\% and 61.1\% under GaME's update
 (\cref{tab:ablation_variants,fig:qualitative}). Without change handling, an occupancy map keeps 99.6\% of the old surface, and with our layer
 5.8\% and 12.2\% remain, at geometry F1 92.0 and 91.6 (\cref{tab:ablation_variants}). Wavemap's update, which lowers the
@@ -252,7 +252,7 @@ Variant & 2nd & 3rd & 2nd \\
 \tgroup{4}{TSDF}
 Scratch & \na & \na & 83.6 \\
 Own & 57.1 & 60.1 & 92.1 \\
-\rowcolor{oursbg} Ours & \prov{0.9} & \prov{7.0} & \prov{99.2} \\
+\rowcolor{oursbg} Ours & \prov{0.9} & \prov{6.9} & \prov{99.2} \\
 \midrule
 \tgroup{4}{3D Gaussians}
 Scratch & \na & \na & 85.4 \\

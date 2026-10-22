@@ -138,7 +138,7 @@ Method & 1st & 2nd & 3rd & 1st$\to$2nd & 2nd$\to$3rd & 2nd & 3rd & 2nd & 3rd \\
 \tgroup{10}{TSDF}
 Khronos~\cite{schmid2024khronos} & 100 & 66.7 & 66.7 & \na & \na & \na & \na & 95.9 & 94.7 \\
 Panoptic~\cite{schmid2022panoptic} & \nev & \nev & \nev & \pend & \pend & 57.1 & 60.1 & 93.6 & 93.0 \\
-\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{97.1} & \prov{100} & \prov{0.9} & \prov{7.0} & \prov{96.0} & \prov{95.3} \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{97.1} & \prov{100} & \prov{0.9} & \prov{6.9} & \prov{96.0} & \prov{95.3} \\
 \midrule
 \tgroup{10}{3D Gaussians}
 GaME~\cite{yugay2026game} & 100 & 66.7 & 100 & 94.1 & 90.9 & 42.4 & 61.1 & 88.6 & 90.8 \\
@@ -228,13 +228,13 @@ Khronos~\cite{schmid2024khronos}. Khronos maps each real visit as its own sessio
 Method & 1st & 2nd & 3rd & 1st & 2nd \\
 \midrule
 Khronos & 89.1 & 91.5 & 83.8 & 71.2 & 62.9 \\
-\rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{98.4} & \prov{84.9} & \prov{90.8} \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{97.8} & \prov{84.9} & \prov{90.8} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The TSDF backend leads Khronos by 4.5 and 13.7 points in the first visits, which start from an empty map, and by 8.2,
-14.6, and 27.9 points in the second and third real visits and the second simulated visit, which start from the loaded state
+14.1, and 27.9 points in the second and third real visits and the second simulated visit, which start from the loaded state
 (\cref{tab:khronos_obj}).
 
 \section{Runtime}
