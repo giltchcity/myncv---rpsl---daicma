@@ -1,0 +1,105 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Qualitative comparison</title>
+<style>
+  @page { size: 6.875in 3.208in; margin: 0; }
+  :root { --ours:#BF9000; --rule:#A5A5A5; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#fff; }
+  body { width:6.875in; height:3.208in; font-family: "Times New Roman", Times, serif; color:#000;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .fig { display:grid; justify-content:center; padding:6px 6px 3px; column-gap:2px; row-gap:3px;
+         grid-template-columns: 14px 86px 6px 86px 86px 6px 86px 86px 6px 86px 86px; grid-auto-rows: auto; }
+  .grp { font-size:7.4pt; font-style:italic; text-align:center; border-bottom:0.6pt solid var(--rule); line-height:11px; }
+  .head { font-size:7.4pt; text-align:center; line-height:12px; }
+  .head.ours { font-weight:700; color:var(--ours); }
+  .img { position:relative; height:57px; overflow:hidden; background:#000; }
+  .img img { display:block; width:100%; height:100%; object-fit:cover; }
+  .img.ours { outline: 1.3px solid var(--ours); outline-offset: -1.3px; }
+  .blk { position:relative; }
+  .blk span { position:absolute; left:50%; top:59px; transform: translate(-50%, -50%) rotate(-90deg); white-space:nowrap;
+              font-size:7.4pt; font-weight:700; }
+</style></head>
+<body><div class="fig">
+<div></div>
+<div></div>
+<div></div>
+<div class="grp" style="grid-column: span 2">TSDF</div>
+<div></div>
+<div class="grp" style="grid-column: span 2">3D Gaussians</div>
+<div></div>
+<div class="grp" style="grid-column: span 2">Occupancy</div>
+<div></div>
+<div class="head">Real image</div>
+<div></div>
+<div class="head">Panoptic</div>
+<div class="head ours">Ours</div>
+<div></div>
+<div class="head">GaME</div>
+<div class="head ours">Ours</div>
+<div></div>
+<div class="head">wavemap</div>
+<div class="head ours">Ours</div>
+<div class="blk" style="grid-row: span 1"><span>Real room</span></div>
+<div class="img"><img src="assets/real4940_0.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real4940_1.jpg"></div>
+<div class="img ours"><img src="assets/real4940_2.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real4940_3.jpg"></div>
+<div class="img ours"><img src="assets/real4940_4.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real4940_5.jpg"></div>
+<div class="img ours"><img src="assets/real4940_6.jpg"></div>
+<div class="blk" style="grid-row: span 1"></div>
+<div class="img"><img src="assets/real5320_0.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real5320_1.jpg"></div>
+<div class="img ours"><img src="assets/real5320_2.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real5320_3.jpg"></div>
+<div class="img ours"><img src="assets/real5320_4.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/real5320_5.jpg"></div>
+<div class="img ours"><img src="assets/real5320_6.jpg"></div>
+<div></div>
+<div></div>
+<div></div>
+<div class="grp" style="grid-column: span 2">TSDF</div>
+<div></div>
+<div class="grp" style="grid-column: span 2">3D Gaussians</div>
+<div></div>
+<div class="grp" style="grid-column: span 2">Occupancy</div>
+<div></div>
+<div class="head">Real image</div>
+<div></div>
+<div class="head">Khronos</div>
+<div class="head ours">Ours</div>
+<div></div>
+<div class="head">GaME</div>
+<div class="head ours">Ours</div>
+<div></div>
+<div class="head">wavemap</div>
+<div class="head ours">Ours</div>
+<div class="blk" style="grid-row: span 1"><span>Sim. apartment</span></div>
+<div class="img"><img src="assets/sim3080_0.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3080_1.jpg"></div>
+<div class="img ours"><img src="assets/sim3080_2.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3080_3.jpg"></div>
+<div class="img ours"><img src="assets/sim3080_4.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3080_5.jpg"></div>
+<div class="img ours"><img src="assets/sim3080_6.jpg"></div>
+<div class="blk" style="grid-row: span 1"></div>
+<div class="img"><img src="assets/sim3200_0.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3200_1.jpg"></div>
+<div class="img ours"><img src="assets/sim3200_2.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3200_3.jpg"></div>
+<div class="img ours"><img src="assets/sim3200_4.jpg"></div>
+<div></div>
+<div class="img"><img src="assets/sim3200_5.jpg"></div>
+<div class="img ours"><img src="assets/sim3200_6.jpg"></div>
+</div></body></html>
