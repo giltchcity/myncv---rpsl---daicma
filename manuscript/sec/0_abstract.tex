@@ -6,8 +6,8 @@ treat visits as interrupted observations of one evolving scene: a change made wh
 made while it looks away. One update layer infers when each object state holds, with one likelihood, one prior, and one
 decision rule, admits an observation only while its state holds, keeps an earlier map element until current observations
 place its surface elsewhere, and passes its state to the next visit. A TSDF, a 3D Gaussian, and an occupancy mapper join
-it through four operations. Over three visits to a real room, the TSDF keeps \prov{0.9\%} and \prov{6.9\%} of the surface
-of departed objects, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs. When the second visit to a simulated apartment sees only part of it, the three maps reach a
-geometry F1 of \prov{99.2}, \prov{96.7}, and \prov{94.9}, against 92.1, 92.0, and 91.2 under the published updates and at
-most 85.4 when rebuilt from scratch.
+it through four operations. Over three visits to a real room, the TSDF keeps under \prov{7\%} of the surface of departed
+objects, against about 60\% for Panoptic Multi-TSDFs. When the second visit to a simulated apartment sees only part of
+it, all three maps stay more complete than under their published updates and far more complete than when rebuilt from
+scratch.
 \end{abstract}

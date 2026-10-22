@@ -80,15 +80,14 @@ that errs in its own direction. Panoptic Multi-TSDFs and GaME keep too much of t
 lowers the occupancy of every cell that a ray traverses, also clears surfaces that still exist. If one layer corrects all
 three, the update was never a property of the representation (\cref{fig:teaser}).
 
-With the same layer, all three maps follow the scene across visits. Objects that have left leave the map: after the
-second and third visits to the real room, \prov{0.9\%} and \prov{6.9\%} of their surface remain in the TSDF, about sixty
-and nine times less than under Panoptic Multi-TSDFs~\cite{schmid2022panoptic}, and \prov{8.1\%} and \prov{14.3\%} remain
-in the Gaussian map, against 42.4\% and 61.1\% under GaME's update. What a visit does not see is kept: when the second visit to a simulated apartment observes only
-part of it, the three maps reach a geometry F1 of \prov{99.2} (TSDF), \prov{96.7} (Gaussians), and \prov{94.9}
-(occupancy) against the complete scene, compared with 92.1, 92.0, and 91.2 under Panoptic Multi-TSDFs, GaME, and wavemap
-and 83.6 to 85.4 for maps rebuilt from scratch. The renders show the difference: on held-out frames of the last visit, the
-Gaussian map renders \prov{3.09}, \prov{0.96}, and \prov{1.47}\,dB better than GaME's update on the simulated apartment,
-the real room, and Flat.
+With the same layer, all three maps follow the scene across visits (\cref{tab:main}). Objects that have left leave the
+map: after two revisits of the real room, under \prov{7\%} of their surface remains in our TSDF map, where Panoptic
+Multi-TSDFs~\cite{schmid2022panoptic} keeps about 60\%. What a visit does not see is kept: when the second visit to a
+simulated apartment observes only part of it, each of our maps stays more complete than under the published update of
+its representation and far more complete than a map rebuilt from scratch. Each mapper with our layer detects more of the
+changes and reaches a higher geometry F1 than the published update of its representation, our TSDF map also exceeds
+Khronos, both when Khronos maps the visits as one sequence and on Khronos' own data, and the Gaussian map renders held-out
+views better than GaME's update.
 
 Our contributions are:
 \begin{itemize}
