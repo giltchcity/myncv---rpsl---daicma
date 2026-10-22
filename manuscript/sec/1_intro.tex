@@ -12,12 +12,13 @@ leaves unobserved (\cref{fig:problem}).
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/teaser.pdf}
-\caption{\textbf{Persistent mapping across visits.} Each visit updates one scene memory, which serves the present and
-earlier times alike. (a)~Our Gaussian map of the simulated apartment at the current time, and (b)~the same map queried
-at an earlier time. Bottom: the memory left by one visit is the prior of the next. Right: a sofa that moved during the
-second visit remains at its earlier place in the map of Khronos, which starts the visit from an empty map, and leaves
-our TSDF map; both are rendered from the same pose and crop, and their surfaces take the color of the nearest reference
-surface. The thumbnails show our TSDF, Gaussian, and occupancy maps of one view, connected through the same interface.}
+\caption{\textbf{Persistent mapping within and across visits.} Left: one scene memory continues across visits and keeps
+the states that have ended. The large panel is our Gaussian map of the simulated apartment at the current time, and the
+inset queries it at an earlier time. Bottom: changes within the first visit, between the visits, and within the second
+visit update the same memory (schematic). Right: one held-out view of the second visit, rendered from each baseline and
+from the same representation with our layer: Khronos, which starts the visit from an empty map, and our TSDF map; GaME
+and our Gaussian map; wavemap and our occupancy map. TSDF and occupancy surfaces take the color of the nearest reference
+surface.}
 \label{fig:teaser}
 \end{figure*}
 
