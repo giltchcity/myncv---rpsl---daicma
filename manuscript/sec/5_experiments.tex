@@ -97,7 +97,7 @@ visits only. $^\ddagger$Each visit mapped from an empty map. --: not evaluated.}
 Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
 \tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & \pend & \prov{83.8}$^\ddagger$ & \prov{94.7}$^\ddagger$ & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
+Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
 Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 89.5 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{98.4} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
@@ -110,8 +110,10 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 \rowcolor{oursbg} Ours & \prov{100} & \nev & \prov{91.6} & \prov{97.1} & \nev & \prov{94.9} & \pend \\
 \bottomrule
 \end{tabular}
-% PENDING Khronos as one sequence: simulated done (khronos_cont_synthetic, 58/4/20, mesh F1 90.2); the real room exceeds
-% PENDING 44 GB (more memory, or keep its per-visit geometry, marked); Flat not run (per-run 85.8, marked).
+% PENDING Khronos as one sequence: simulated done (58/4/20, mesh F1 90.2); real room done (eval/khronos_cont_real_{a,b,c}:
+% PENDING within 1/0/0, 1/0/1, 0/0/2, between with the suitcase 6/0/12, 5/0/7 -> 13/0/22; online object F1 of the third
+% PENDING visit 45.28; geometry with the 1 cm reference 88.69 under the export rule of 10-23, which only keeps objects
+% PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat not run (per-run 85.8).
 % PENDING Panoptic change F1 covers the events between visits. Real: 16/9/9 and 3/5/5 on its submaps (25 and 8 events
 % PENDING against 18 and 12 for the other rows): rescore on the same events. Simulated: 28/1/4, same protocol, 28 units.
 % PENDING Panoptic on Flat: rerun started 01:58 on 10-23. TESSE rows other than Khronos and our TSDF: not run.
