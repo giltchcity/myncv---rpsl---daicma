@@ -21,11 +21,9 @@ another part of the room.
 Object reference surfaces come from RGB-D measurements aggregated over annotated state intervals.
 \emph{Simulated apartment.} Two visits in Isaac Sim observe one furnished apartment, with 4{,}186 and 3{,}555 frames at
 30\,Hz and exact poses. The second visit starts from the state that the first exported and observes only part of what
-the first mapped. The first visit contains 28 appearance or disappearance events and the second 16, in view or out of view,
-and 34 events happen between the visits. The complete scene mesh is the reference inside and outside the current camera
+the first mapped. The first visit contains 26 appearance or disappearance events and the second 14, in view or out of view,
+and 32 events happen between the visits. The complete scene mesh is the reference inside and outside the current camera
 coverage.
-% PENDING Occupancy simulated rows: rerun on the grouped inputs (events 28 / 16 / 34) running. GaME, wavemap, Panoptic:
-% PENDING rescore their existing maps on the 29 units.
 \emph{Flat.} The public Flat dataset~\cite{schmid2022panoptic}, which Panoptic Multi-TSDFs and GaME also use,
 has two simulated visits of one flat with 400 and 362 frames and exact poses. Between the visits, objects
 move, appear, and disappear. A point reference of each visit's scene comes with the data.
@@ -97,15 +95,15 @@ Method & Change$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Geometry$\up
 \midrule
 \tgroup{8}{TSDF}
 Khronos~\cite{schmid2024khronos} & \pend & \prov{94.7}$^\ddagger$ & 82.9 & 90.2 & \prov{85.8}$^\ddagger$ & 63.2 & 75.6 \\
-Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & 93.0 & \prov{91.8}$^\dagger$ & 92.1 & 89.5 & \pend & \pend \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \prov{95.3} & \prov{97.4} & \prov{99.2} & \prov{90.2} & \prov{66.7} & \prov{94.5} \\
+Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & 93.0 & 91.8$^\dagger$ & 92.1 & 89.5 & \pend & \pend \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \prov{95.3} & \prov{97.1} & \prov{99.2} & \prov{90.2} & \prov{66.7} & \prov{94.5} \\
 \midrule
 \tgroup{8}{3D Gaussians}
-GaME~\cite{yugay2026game} & 92.3 & 90.8 & \prov{83.9} & 92.0 & 87.7 & \pend & \pend \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \prov{95.0} & \prov{96.7} & \prov{96.7} & \prov{89.8} & \pend & \pend \\
+GaME~\cite{yugay2026game} & 92.3 & 90.8 & 83.9 & 92.0 & 87.7 & \pend & \pend \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \prov{95.0} & \prov{97.1} & \prov{96.7} & \prov{89.8} & \pend & \pend \\
 \midrule
 \tgroup{8}{Occupancy}
-wavemap~\cite{reijgwart2023wavemap} & 97.1 & 89.0 & \prov{91.3} & 91.2 & \pend & \pend & \pend \\
+wavemap~\cite{reijgwart2023wavemap} & 97.1 & 89.0 & 91.3 & 91.2 & \pend & \pend & \pend \\
 \rowcolor{oursbg} Ours & \prov{100} & \prov{91.6} & \prov{97.1} & \prov{94.9} & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}
@@ -116,11 +114,9 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & 89.0 & \prov{91.3} & 91.2 & \pend &
 % PENDING Panoptic on Flat: rerun started 01:58 on 10-23. TESSE rows other than Khronos and our TSDF: not run.
 % PENDING Occupancy row 4 at 88c3ac9 (real): geometry 91.5 / 91.7, residue 1.3 / 4.5, between visits without the
 % PENDING suitcase 15/0/1 and 10/0/0; its simulated rerun is paused.
-% PENDING Simulated change F1 of GaME (83.9), wavemap (91.3), and our occupancy map (97.1) uses the 28 units; ours TSDF and
-% PENDING Gaussians use the 29 units. Rescore the existing maps; the occupancy rows are being rerun.
 % SRC change F1, all events. Real (with the suitcase): ours TSDF and Gaussians 34/0/1, occupancy 35/0/0, GaME 30/0/5,
-% SRC wavemap 33/0/2. Simulated: ours TSDF 74/0/4 (290e110), Gaussians 73/0/5 (grouped run), GaME 52/0/20, wavemap
-% SRC 63/3/9, our occupancy 68/0/4, Khronos as one sequence 58/4/20. TESSE (5 m, Khronos' evaluator, appeared + disappeared): ours 2/0/2, Khronos 6/6/1;
+% SRC wavemap 33/0/2. Simulated, 28 units: ours TSDF, Gaussians, and occupancy 68/0/4, GaME 52/0/20, wavemap 63/3/9,
+% SRC Panoptic 28/1/4 (between visits); Khronos as one sequence 58/4/20 (29 units). TESSE (5 m, Khronos' evaluator, appeared + disappeared): ours 2/0/2, Khronos 6/6/1;
 % SRC background accuracy / completeness at 5 cm: ours 0.971 / 0.921, Khronos 0.904 / 0.649.
 \end{table*}
 

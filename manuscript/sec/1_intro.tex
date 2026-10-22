@@ -12,12 +12,12 @@ leaves unobserved (\cref{fig:problem}).
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/teaser.pdf}
-\caption{\textbf{One update layer removes stale geometry from three map representations.} (a)~In a held-out view of
-the third visit to the real room, the suitcase is gone. Panoptic Multi-TSDFs keeps its surface among other earlier
-surfaces, and our TSDF shows the room as the image does. (b)~In a held-out view of the simulated apartment, GaME's update
-keeps fragments where objects stood, and our Gaussian map does not. (c)~In the same view, wavemap keeps cells of objects
-that have left, and our occupancy map clears them. Each pair shares the camera and the crop, and corner marks select the
-same region. Blue marks the real image and gold our maps.}
+\caption{\textbf{Persistent mapping across visits.} Each visit updates one scene memory, which serves the present and
+earlier times alike. (a)~Our Gaussian map of the simulated apartment at the current time, and (b)~the same map queried
+at an earlier time. Bottom: the memory left by one visit is the prior of the next. Right: a sofa that moved during the
+second visit remains at its earlier place in the map of Khronos, which starts the visit from an empty map, and leaves
+our TSDF map; both are rendered from the same pose and crop, and their surfaces take the color of the nearest reference
+surface. The thumbnails show our TSDF, Gaussian, and occupancy maps of one view, connected through the same interface.}
 \label{fig:teaser}
 \end{figure*}
 
