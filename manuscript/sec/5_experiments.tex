@@ -87,7 +87,7 @@ appearances and disappearances of a dataset, within and between visits. Object F
 over the last visit, evaluated on the TSDF maps. Geometry F1 at 5\,cm uses the map after the last visit, against a
 reference reconstructed from that visit (real room), the complete scene mesh (simulated apartment), or the point reference
 of the data (Flat, scored for geometry only). $^\dagger$Events between
-visits only. $^\ddagger$Each visit mapped from an empty map. --: not evaluated.}
+visits only. --: not evaluated.}
 \label{tab:main}
 \setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{@{}lccccccc@{}}
@@ -97,7 +97,7 @@ visits only. $^\ddagger$Each visit mapped from an empty map. --: not evaluated.}
 Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
 \tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
+Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & 86.9 \\
 Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
@@ -113,7 +113,8 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING Khronos as one sequence: simulated done (58/4/20, mesh F1 90.2); real room done (eval/khronos_cont_real_{a,b,c}:
 % PENDING within 1/0/0, 1/0/1, 0/0/2, between with the suitcase 6/0/12, 5/0/7 -> 13/0/22; online object F1 of the third
 % PENDING visit 45.28; geometry with the 1 cm reference 88.69 under the export rule of 10-23, which only keeps objects
-% PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat not run (per-run 85.8).
+% PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat: one sequence
+% PENDING (eval/khronos_cont_flat_{a,b}: 85.99, 86.87; per-run 86.39, 85.83).
 % PENDING Panoptic change F1 covers the events between visits. Real: 16/9/9 and 3/5/5 on its submaps (25 and 8 events
 % PENDING against 18 and 12 for the other rows): rescore on the same events. Simulated: 28/1/4, same protocol, 28 units.
 % PENDING Panoptic on Flat: rerun of 10-23 scored with the same flat_eval (eval/panoptic_flat_{a,b}: 85.06, 88.93). TESSE rows other than Khronos and our TSDF: not run.
@@ -177,9 +178,9 @@ On the complete simulated scene, the updated maps of the second visit reach geom
 
 \paragraph{On Flat, the methods differ only after the scene has changed.}
 In the first visit, which contains no changes, every evaluated method starts from an empty map. The geometry F1 of
-Khronos, GaME, and our maps agrees within 0.2 points (86.3 to 86.5), and Panoptic Multi-TSDFs reaches 85.1
-(supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 85.8 for Khronos,
-which maps the visit alone, and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
+GaME and our maps agrees within 0.2 points (86.3 to 86.5), and Khronos and Panoptic Multi-TSDFs reach 86.0 and 85.1
+(supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 86.9 for Khronos, which
+maps both visits as one sequence, and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
 GaME, which also keeps the first visit's map.
 
 \subsection{Rendering of the Gaussian Map}
