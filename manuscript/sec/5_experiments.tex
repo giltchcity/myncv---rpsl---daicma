@@ -97,9 +97,9 @@ visits only. --: not evaluated.}
 Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
 \tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & 86.9 \\
+Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 87.7 & 82.9 & 62.9 & 90.2 & 86.9 \\
 Panoptic~\cite{schmid2022panoptic} & 52.4$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
-\rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
+\rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{94.6} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
 \tgroup{8}{3D Gaussians}
 GaME~\cite{yugay2026game} & 92.3 & \nev & 90.8 & 83.9 & \nev & 92.0 & 87.7 \\
@@ -113,7 +113,7 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING Khronos as one sequence: simulated done (58/4/20, mesh F1 90.2); real room done (eval/khronos_cont_real_{a,b,c}:
 % PENDING within 1/0/0, 1/0/1, 0/0/2, between with the suitcase 6/0/12, 5/0/7 -> 13/0/22; online object F1 of the third
 % PENDING visit 45.28; geometry with the 1 cm reference 88.69 under the export rule of 10-23, which only keeps objects
-% PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat: one sequence
+% PENDING present at the final time). Our TSDF geometry is the same under that rule (G1 95.96, 94.63). Flat: one sequence
 % PENDING (eval/khronos_cont_flat_{a,b}: 85.99, 86.87; per-run 86.39, 85.83).
 % SRC Panoptic change F1 covers the events between visits. Real, same event scorer and the same 18 + 12 events
 % SRC (eval/panoptic_events_{b,c}): 8/0/10 and 3/1/9 -> 11/1/19. Simulated: 28/1/4, same protocol, 28 units.
@@ -165,10 +165,10 @@ in the Gaussian map, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and 42.4
 5.8\% and 12.2\% remain, at geometry F1 92.0 and 91.6 (\cref{tab:ablation_variants}). Wavemap's update, which lowers the
 occupancy of every cell that a ray traverses, leaves 1.3\% and 4.4\% at 88.9 and 89.0.
 \paragraph{On the revisits, every map reaches a higher geometry F1 than the published update of its representation.}
-On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in the second and third visits is 96.0 and 95.3 with the
+On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in the second and third visits is 96.0 and 94.6 with the
 TSDF (Panoptic Multi-TSDFs: 93.6 and 93.0), 93.4 and 95.0 with the Gaussians (GaME: 88.6 and 90.8), and 92.0 and 91.6
-with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main}; per visit in the supplementary material). The TSDF map also exceeds Khronos, which starts each
-visit from an empty map, on every revisit, and it leads Khronos on Khronos' own object F1 in every visit (supplementary
+with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main}; per visit in the supplementary material). The TSDF map also exceeds Khronos, run over the
+visits as one sequence, on every revisit, and it leads Khronos on Khronos' own object F1 in every visit (supplementary
 material).
 
 \paragraph{The memory of earlier visits completes every map.}

@@ -124,7 +124,7 @@ Real, 3rd visit & PSNR & 18.29 $\to$ 18.94 & 18.97 $\to$ 19.90 \\
 \caption{Real room per visit, in percent. Within-visit changes on the real recordings happen out of view, and changes
 between visits run from the end of one visit to the end of the next. Residue is the share of the surface of departed
 objects that the map still shows. Geometry F1 on the revisits uses a reference sampled at 1\,cm and the same room crop
-for every method. Khronos maps each visit as its own session. n/a: not produced by the method; --: not evaluated.}
+for every method. Khronos maps the three visits as one sequence. n/a: not produced by the method; --: not evaluated.}
 % PENDING 4D object F1 column for every row once scored; it replaces the residue column.
 \label{tab:supp_real}
 \setlength{\tabcolsep}{4.6pt}
@@ -136,9 +136,9 @@ for every method. Khronos maps each visit as its own session. n/a: not produced 
 Method & 1st & 2nd & 3rd & 1st$\to$2nd & 2nd$\to$3rd & 2nd & 3rd & 2nd & 3rd \\
 \midrule
 \tgroup{10}{TSDF}
-Khronos~\cite{schmid2024khronos} & 100 & 66.7 & 66.7 & \na & \na & \na & \na & 95.9 & 94.7 \\
+Khronos~\cite{schmid2024khronos} & 100 & 66.7 & 0.0 & 50.0 & 58.8 & 97.2 & 97.0 & 88.8 & 87.7 \\
 Panoptic~\cite{schmid2022panoptic} & \nev & \nev & \nev & 61.5 & 37.5 & 57.1 & 60.1 & 93.6 & 93.0 \\
-\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{97.1} & \prov{100} & \prov{0.9} & \prov{6.9} & \prov{96.0} & \prov{95.3} \\
+\rowcolor{oursbg} Ours & \prov{100} & \prov{100} & \prov{100} & \prov{97.1} & \prov{100} & \prov{0.9} & \prov{6.9} & \prov{96.0} & \prov{94.6} \\
 \midrule
 \tgroup{10}{3D Gaussians}
 GaME~\cite{yugay2026game} & 100 & 66.7 & 100 & 94.1 & 90.9 & 42.4 & 61.1 & 88.6 & 90.8 \\
@@ -219,7 +219,7 @@ objects are associated by surface, must share the class, and match within 2\,m.
 \begin{table}[t]
 \centering\footnotesize
 \caption{Khronos' object F1 of the TSDF maps, in percent, with the object evaluator released with
-Khronos~\cite{schmid2024khronos}. Khronos maps each real visit as its own session and the two simulated visits as one sequence.}
+Khronos~\cite{schmid2024khronos}. Khronos maps the visits of each dataset as one sequence.}
 \label{tab:khronos_obj}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{@{}lccccc@{}}
@@ -228,15 +228,14 @@ Khronos~\cite{schmid2024khronos}. Khronos maps each real visit as its own sessio
 \cmidrule(lr){2-4}\cmidrule(l){5-6}
 Method & 1st & 2nd & 3rd & 1st & 2nd \\
 \midrule
-Khronos & 89.1 & 91.5 & 83.8 & 71.2 & 62.9 \\
+Khronos & 88.8 & 77.8 & 45.3 & 71.2 & 62.9 \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{93.6} & \prov{99.7} & \prov{97.8} & \prov{84.9} & \prov{90.8} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The TSDF backend leads Khronos by 4.5 and 13.7 points in the first visits, which start from an empty map, and by 8.2,
-14.1, and 27.9 points in the second and third real visits and the second simulated visit, which start from the loaded state
-(\cref{tab:khronos_obj}).
+The TSDF backend leads Khronos by 4.8 and 13.7 points in the first visits and by 21.9, 52.6, and 27.9 points in the
+second and third real visits and the second simulated visit (\cref{tab:khronos_obj}).
 
 \section{Runtime}
 \label{sec:supp_runtime}
