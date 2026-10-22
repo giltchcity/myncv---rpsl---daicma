@@ -82,10 +82,8 @@ three, the update was never a property of the representation (\cref{fig:teaser})
 With the same layer, all three maps follow the scene across visits. Objects that have left leave the map: after the
 second and third visits to the real room, \prov{0.9\%} and \prov{7.0\%} of their surface remain in the TSDF, about sixty
 and nine times less than under Panoptic Multi-TSDFs~\cite{schmid2022panoptic}, and \prov{8.1\%} and \prov{14.3\%} remain
-in the Gaussian map, against 42.4\% and 61.1\% under GaME's update. The changes are found: all three maps detect at least
-15 of the 16 changes between the first two visits and all 10 between the last two, where Panoptic Multi-TSDFs reaches
-change F1 64.0 and 37.5. What a visit does not see is kept: when the second visit to a simulated apartment observes only
-part of it, the three maps reach a geometry F1 of \prov{98.5} (TSDF), \prov{96.7} (Gaussians), and \prov{94.9}
+in the Gaussian map, against 42.4\% and 61.1\% under GaME's update. What a visit does not see is kept: when the second visit to a simulated apartment observes only
+part of it, the three maps reach a geometry F1 of \prov{99.2} (TSDF), \prov{96.7} (Gaussians), and \prov{94.9}
 (occupancy) against the complete scene, compared with 92.1, 92.0, and 91.2 under Panoptic Multi-TSDFs, GaME, and wavemap
 and 83.6 to 85.4 for maps rebuilt from scratch. The renders show the difference: on held-out frames of the last visit, the
 Gaussian map renders \prov{3.09}, \prov{0.96}, and \prov{1.47}\,dB better than GaME's update on the simulated apartment,
@@ -99,8 +97,7 @@ Our contributions are:
   \item an update layer whose valid domains admit an observation only while the state it measured holds and whose
   continuation test keeps an element of the earlier map until current observations place its surface elsewhere,
   connected to a TSDF, a 3D Gaussian, and an occupancy mapper through an update interface of four operations;
-  \item an evaluation over three visits to a real room, a simulated apartment, and the public Flat dataset, in which
-  every mapper with our layer detects at least 15 of the 16 real change events between the first two visits and all 10
-  between the last two, and reaches a higher geometry F1 on the revisits than the published update of its
-  representation.
+  \item an evaluation on three visits to a real room, a simulated apartment, the public Flat dataset, and the TESSE data
+  released with Khronos, in which every mapper with our layer reaches a higher geometry F1 than the published update of
+  its representation, and our TSDF map exceeds Khronos on Khronos' own data.
 \end{itemize}

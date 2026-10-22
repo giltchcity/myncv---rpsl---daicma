@@ -12,13 +12,16 @@
 \providecommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
 % \prov{x}   a provisional number: the best value available now, to be replaced by the final runs (source in the
 %            % SRC comment next to it). Draft mode prints it in brown; clean mode prints it plainly.
+% \pend      a table cell whose run or scoring is still pending: a red dash in draft mode, -- in the clean copy.
 \ifdraftmode
   \newcommand{\prov}[1]{{\color{brown}#1}}
+  \newcommand{\pend}{{\color{red}--}}
   \newcommand{\note}[1]{{\color{blue}[Note: #1]}}
   \newcommand{\directive}[1]{\par\noindent\fbox{\parbox{0.95\linewidth}{\small\textbf{Directive:} #1}}\par}
   \newcommand{\superseded}[1]{{\color{gray}#1}}
 \else
   \newcommand{\prov}[1]{#1}
+  \newcommand{\pend}{\nev}
   \renewcommand{\TODO}[1]{}
   \newcommand{\note}[1]{}
   \newcommand{\directive}[1]{}

@@ -37,7 +37,7 @@ Khronos and GaME, the methods closest to our layer, also check observations agai
 things. Khronos settles each object fragment against the rays of one session, thoroughly but only until the session ends:
 the next visit starts from an empty map. GaME tests its Gaussians against each new keyframe and prunes those that
 disagree, and after two revisits of our real room, 42\% and 61\% of the old object surface remain in its map
-(\cref{tab:main_real}). We do not ask whether a primitive conflicts with an observation, but when an object state holds.
+(\cref{tab:ablation_variants}). We do not ask whether a primitive conflicts with an observation, but when an object state holds.
 Once that is known, it decides which observations still count and which elements remain, it carries over to the next
 visit, and any mapper can use it.
 
