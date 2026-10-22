@@ -43,7 +43,7 @@ become persistent, absent, or unobserved across visits. GaME~\cite{yugay2026game
 of view, and wavemap~\cite{reijgwart2023wavemap} lowers the occupancy of the cells that rays traverse. We run our layer on
 three backends: a Khronos TSDF pipeline, GaME, and wavemap. Each backend keeps its inputs and resolution, and our rows
 connect it to the layer through the update interface of \cref{sec:representations}.
-% PENDING Khronos as one sequence: simulated apartment running since 01:29 on 10-23; the real room does not fit in 44 GB
+% PENDING Khronos as one sequence: simulated apartment done; the real room does not fit in 44 GB
 % PENDING (Khronos keeps every snapshot in memory, 22 GB after the first two visits); Flat not run. Its per-visit rows
 % PENDING stay in the supplement until then.
 
@@ -86,7 +86,7 @@ to the next; Khronos maps them as one sequence, and ours adds our layer to the m
 appearances and disappearances of a dataset, within and between visits. Geometry F1 at 5\,cm uses the map after the
 last visit, against a reference reconstructed from that visit (real room), the complete scene mesh (simulated
 apartment), the point reference of the data (Flat, scored for geometry only), or the background of Khronos' evaluation
-(TESSE). --: not evaluated.}
+(TESSE). $^\dagger$Events between visits only. $^\ddagger$Each visit mapped from an empty map. --: not evaluated.}
 \label{tab:main}
 \setlength{\tabcolsep}{7pt}
 \begin{tabular}{@{}lccccccc@{}}
@@ -96,8 +96,8 @@ apartment), the point reference of the data (Flat, scored for geometry only), or
 Method & Change$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Geometry$\uparrow$ & Geometry$\uparrow$ & Change$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
 \tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & \pend & \pend & \pend & \pend & \pend & 63.2 & 75.6 \\
-Panoptic~\cite{schmid2022panoptic} & \pend & 93.0 & \pend & 92.1 & 89.5 & \pend & \pend \\
+Khronos~\cite{schmid2024khronos} & \pend & \prov{94.7}$^\ddagger$ & 82.9 & 90.2 & \prov{85.8}$^\ddagger$ & 63.2 & 75.6 \\
+Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & 93.0 & \prov{91.8}$^\dagger$ & 92.1 & 89.5 & \pend & \pend \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{95.3} & \prov{97.4} & \prov{99.2} & \prov{90.2} & \prov{66.7} & \prov{94.5} \\
 \midrule
 \tgroup{8}{3D Gaussians}
@@ -109,23 +109,26 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & 89.0 & \prov{91.3} & 91.2 & \pend &
 \rowcolor{oursbg} Ours & \prov{100} & \prov{91.6} & \prov{97.1} & \prov{94.9} & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}
-% PENDING Khronos as one sequence: simulated running, real room over 44 GB (more memory, or its per-visit rows), Flat not
-% PENDING run. Per visit, its last-visit geometry is 94.7 (real), 83.6 (simulated), 85.8 (Flat).
-% PENDING Panoptic change F1: score its maps with the event scorer of the other rows (its earlier 64.0, 37.5, 91.8 are a
-% PENDING submap state F1). TESSE rows other than Khronos and our TSDF: not run.
+% PENDING Khronos as one sequence: simulated done (khronos_cont_synthetic, 58/4/20, mesh F1 90.2); the real room exceeds
+% PENDING 44 GB (more memory, or keep its per-visit geometry, marked); Flat not run (per-run 85.8, marked).
+% PENDING Panoptic change F1 covers the events between visits. Real: 16/9/9 and 3/5/5 on its submaps (25 and 8 events
+% PENDING against 18 and 12 for the other rows): rescore on the same events. Simulated: 28/1/4, same protocol, 28 units.
+% PENDING Panoptic on Flat: rerun started 01:58 on 10-23. TESSE rows other than Khronos and our TSDF: not run.
+% PENDING Occupancy row 4 at 88c3ac9 (real): geometry 91.5 / 91.7, residue 1.3 / 4.5, between visits without the
+% PENDING suitcase 15/0/1 and 10/0/0; its simulated rerun is paused.
 % PENDING Simulated change F1 of GaME (83.9), wavemap (91.3), and our occupancy map (97.1) uses the 28 units; ours TSDF and
 % PENDING Gaussians use the 29 units. Rescore the existing maps; the occupancy rows are being rerun.
 % SRC change F1, all events. Real (with the suitcase): ours TSDF and Gaussians 34/0/1, occupancy 35/0/0, GaME 30/0/5,
 % SRC wavemap 33/0/2. Simulated: ours TSDF 74/0/4 (290e110), Gaussians 73/0/5 (grouped run), GaME 52/0/20, wavemap
-% SRC 63/3/9, our occupancy 68/0/4. TESSE (5 m, Khronos' evaluator, appeared + disappeared): ours 2/0/2, Khronos 6/6/1;
+% SRC 63/3/9, our occupancy 68/0/4, Khronos as one sequence 58/4/20. TESSE (5 m, Khronos' evaluator, appeared + disappeared): ours 2/0/2, Khronos 6/6/1;
 % SRC background accuracy / completeness at 5 cm: ours 0.971 / 0.921, Khronos 0.904 / 0.649.
 \end{table*}
 
 \paragraph{With our layer, each mapper surpasses the published update of its representation.}
 \Cref{tab:main} compares every mapper with our layer against the published update of the same representation. Our
 TSDF, Gaussian, and occupancy maps reach a higher geometry F1 than Panoptic Multi-TSDFs, GaME, and wavemap on every
-dataset where both run, and on TESSE, the data released with Khronos, our TSDF map also exceeds Khronos in change and
-geometry F1. Maps rebuilt from scratch at every visit are not listed. They hold only the current visit and reach
+dataset where both run. Khronos, run over the visits as one sequence, stays below our TSDF map in change and geometry
+F1 on the simulated apartment, and so does Khronos on TESSE, the data released with it. Maps rebuilt from scratch at every visit are not listed. They hold only the current visit and reach
 geometry F1 of 83.6, 85.4, and 84.2 against the complete simulated scene with the TSDF, the Gaussians, and occupancy,
 against \prov{99.2}, \prov{96.7}, and \prov{94.9} with our layer (\cref{tab:ablation_variants}).
 

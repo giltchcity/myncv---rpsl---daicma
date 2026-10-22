@@ -155,7 +155,7 @@ wavemap~\cite{reijgwart2023wavemap} & 100 & 100 & 100 & 94.1 & 100 & 1.3 & 4.4 &
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Full results on the simulated apartment, in percent except PSNR (dB). Within-visit changes include changes in view and out of view.
+\caption{Full results on the simulated apartment, in percent except PSNR (dB). Within-visit changes include changes in view and out of view. Khronos maps both visits as one sequence.
 Geometry compares with the complete scene mesh, including surfaces that the last visit leaves unobserved. PSNR uses
 held-out frames of the second visit after the refinement that follows the last visit, and every other metric uses the unrefined
 maps. n/a: not produced by the method; --: not evaluated.}
@@ -169,7 +169,7 @@ maps. n/a: not produced by the method; --: not evaluated.}
 Method & 1st & 2nd & & 1st & 2nd & final & own \\
 \midrule
 \tgroup{8}{TSDF}
-Khronos~\cite{schmid2024khronos} & 67.9 & 88.0 & \na & 91.4 & 83.6 & \na & \na \\
+Khronos~\cite{schmid2024khronos} & 74.5 & 89.7 & 86.7 & 91.6 & 90.2 & \na & \na \\
 Panoptic~\cite{schmid2022panoptic} & \nev & \nev & 91.8 & 93.8 & 92.1 & \na & \na \\
 \rowcolor{oursbg} Ours & \prov{100} & \prov{96.8} & \prov{95.4} & \prov{99.2} & \prov{99.2} & \na & \na \\
 \midrule
