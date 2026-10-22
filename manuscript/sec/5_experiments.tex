@@ -98,7 +98,7 @@ Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\upar
 \midrule
 \tgroup{8}{TSDF}
 Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 88.7 & 82.9 & 62.9 & 90.2 & \prov{85.8}$^\ddagger$ \\
-Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 89.5 \\
+Panoptic~\cite{schmid2022panoptic} & \prov{57.6}$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{95.3} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
 \tgroup{8}{3D Gaussians}
@@ -116,7 +116,7 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING present at the final time). Our TSDF geometry (95.3) predates that rule: rescore it. Flat not run (per-run 85.8).
 % PENDING Panoptic change F1 covers the events between visits. Real: 16/9/9 and 3/5/5 on its submaps (25 and 8 events
 % PENDING against 18 and 12 for the other rows): rescore on the same events. Simulated: 28/1/4, same protocol, 28 units.
-% PENDING Panoptic on Flat: rerun started 01:58 on 10-23. TESSE rows other than Khronos and our TSDF: not run.
+% PENDING Panoptic on Flat: rerun of 10-23 scored with the same flat_eval (eval/panoptic_flat_{a,b}: 85.06, 88.93). TESSE rows other than Khronos and our TSDF: not run.
 % PENDING TESSE object F1: online needs every snapshot scored (Khronos has 44 at 5 m, ours only the final one). Final
 % PENDING object F1 at 5 m: ours 97.9, Khronos 92.8. Online object F1, last visit: real per-visit Khronos, simulated
 % PENDING Khronos as one sequence (62.94), ours (97.84 real third visit: tk_real_c_closedfix, the closest run to 290e110; 90.82 simulated second visit, 290e110).
@@ -176,9 +176,10 @@ On the complete simulated scene, the updated maps of the second visit reach geom
 (Panoptic Multi-TSDFs), 92.0 (GaME), and 91.2 (wavemap) (\cref{tab:ablation_variants}).
 
 \paragraph{On Flat, the methods differ only after the scene has changed.}
-In the first visit, which contains no changes, every evaluated method starts from an empty map, and the geometry F1 agrees
-within 0.2 points (86.3 to 86.5; supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 85.8 for Khronos,
-which maps the visit alone, and 89.5 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
+In the first visit, which contains no changes, every evaluated method starts from an empty map. The geometry F1 of
+Khronos, GaME, and our maps agrees within 0.2 points (86.3 to 86.5), and Panoptic Multi-TSDFs reaches 85.1
+(supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 85.8 for Khronos,
+which maps the visit alone, and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
 GaME, which also keeps the first visit's map.
 
 \subsection{Rendering of the Gaussian Map}
