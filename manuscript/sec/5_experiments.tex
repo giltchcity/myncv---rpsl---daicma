@@ -114,38 +114,25 @@ reaches change F1 64.0, 37.5, and 91.8, GaME 93.3, 94.7, and 81.5, and wavemap 9
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/qualitative.pdf}
-\caption{\textbf{Final maps of the real room after the third visit.} Left: our maps, with the two enlarged regions.
-Where objects moved between the second and third visits (gray box), Panoptic Multi-TSDFs and GaME keep surfaces of objects that have left (dashed
-gray), wavemap's update clears parts of the floor (dashed purple), and our maps match the reference. Where the third
-visit did not look (purple box), maps built from the third visit alone miss the wall that the first visit observed, and our
-maps keep it. The reference of the real room covers what each visit observes, so this region is compared with the
-reference of the first visit.}
+\includegraphics[width=\textwidth]{figures/qual_rows.pdf}
+\caption{\textbf{Final maps at held-out views of the last visit.} Real room after its third visit (top rows) and simulated
+apartment after its second (bottom rows), next to the real image. Top: the suitcase stood here in the second visit and the
+chair stands here now; Panoptic Multi-TSDFs keeps the suitcase, and GaME renders the chair as a translucent shape mixed with
+fragments of it. Second row: the suitcase stood in front of the basket earlier in the visit and left at 100\,s; Panoptic
+Multi-TSDFs and GaME keep fragments of it, and wavemap's update clears the wardrobe door that the image shows. Third row: the sofa and its pillows moved during the visit; Khronos keeps the sofa
+at its earlier place, wavemap keeps cells of the pillows on the floor, and GaME scatters fragments over the floor. Bottom: the large
+sofa moved from the middle of the room to the window during the visit; Khronos keeps it at its earlier place, GaME smears the
+side table and the wall, and wavemap's update removes parts of the sofa and of the slatted panel. TSDF and occupancy
+surfaces take the color of the nearest reference surface.}
 \label{fig:qualitative}
 \end{figure*}
 
 \paragraph{Obsolete surfaces leave the map.}
 After the revisits of the real room, 0.9\% and 7.0\% of the old object surface remain in the TSDF and 8.1\% and 14.3\%
 in the Gaussian map, against 57.1\% and 60.1\% for Panoptic Multi-TSDFs and 42.4\% and 61.1\% under GaME's update
-(\cref{tab:main_real,fig:qualitative,fig:testview}). Without change handling, an occupancy map keeps 99.6\% of the old surface, and with our layer
+(\cref{tab:main_real,fig:qualitative}). Without change handling, an occupancy map keeps 99.6\% of the old surface, and with our layer
 5.8\% and 12.2\% remain, at geometry F1 92.0 and 91.6 (\cref{tab:ablation_variants}). Wavemap's update, which lowers the
 occupancy of every cell that a ray traverses, leaves 1.3\% and 4.4\% at 88.9 and 89.0.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/testview.pdf}
-\caption{\textbf{Final maps at held-out views of the last visit.} The maps after the last visit, rendered at camera poses
-of that visit that mapping did not use, next to the real image. TSDF and occupancy surfaces take the color of the nearest
-reference surface. In the living room of the simulated apartment, where the sofas and their pillows moved during the
-visit, Khronos keeps the sofas at their earlier places, wavemap keeps fragments of the pillows on the floor, and GaME
-scatters fragments over the floor. In the real room, Panoptic Multi-TSDFs keeps the suitcase in front of the chair,
-where it stood in the second visit, and GaME renders the chair as a translucent shape mixed with fragments of the suitcase. GaME also
-smears the bed in the simulated bedroom and blurs the coffee table next to the moved sofa in Flat. Our maps show the
-scene of the image in all three representations. Occupancy maps cover the simulated apartment and the real room.
-Numbers give PSNR over the whole frame.}
-\label{fig:testview}
-\end{figure*}
-
 \paragraph{On the revisits, every map reaches a higher geometry F1 than the published update of its representation.}
 On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in the second and third visits is 96.0 and 95.3 with the
 TSDF (Panoptic Multi-TSDFs: 93.6 and 93.0), 93.4 and 95.0 with the Gaussians (GaME: 88.6 and 90.8), and 92.0 and 91.6
@@ -198,14 +185,25 @@ GaME~\cite{yugay2026game} & 26.17 & 0.922 & 0.159 & 1.2 \\
 \end{tabular}
 \end{table}
 
-Our layer also renders better than GaME's update (\cref{tab:rendering,fig:testview}). On held-out frames of the last visit,
+Our layer also renders better than GaME's update (\cref{tab:rendering,fig:qualitative}). On held-out frames of the last visit,
 our final map renders 3.09\,dB better than GaME's update on the simulated apartment, 0.96\,dB better on the real room,
 and 1.47\,dB better on Flat, and it is better on every metric. GaME's update renders 1.27 and 0.99\,dB below a map rebuilt from scratch, whereas our
 final map renders 1.82\,dB above it on the simulated apartment and within 0.03\,dB of it on the real room while keeping the earlier visits. Because objects
 also change during the last visit,
 rendering each frame with our map of its own time raises PSNR further, by 1.63 and \prov{0.51}\,dB on the simulated apartment and
-the real room, and improves every metric of our final map. GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 92.0 to 78.4 on the simulated apartment, from 87.7 to 84.6 on Flat, and
+the real room, and improves every metric of our final map (\cref{fig:fourd}). GaME keeps only its final map. The refinement lowers GaME's geometry F1 from 92.0 to 78.4 on the simulated apartment, from 87.7 to 84.6 on Flat, and
 from 90.8 to 89.2 on the real room, and changes ours by at most 0.12 points.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fourd.pdf}
+\caption{\textbf{The map of any time.} Our Gaussian map of the simulated apartment queried at a moment $t$, next to the
+ground truth rendered at the same pose and moment, at poses that the camera revisited. (a)~The bed moved between the
+visits, and the map of each visit shows it where it stood then. (b)~During the second visit, the sofa replaced the lounge
+chair at the window while the camera looked elsewhere: the map of 43\,s shows the chair and the map of 108\,s the sofa.
+The maps are those kept at the change-detection rounds, before the refinement. Numbers give PSNR over the whole frame.}
+\label{fig:fourd}
+\end{figure*}
 
 \subsection{Restart, Carry-Over, or Update}
 \label{sec:exp_ablation}
@@ -246,7 +244,7 @@ Own & 1.3 & 4.4 & 91.2 \\
 
 \paragraph{A restarted map is incomplete, and a carried-over map is stale.}
 Maps rebuilt from scratch reach geometry F1 83.6 to 85.4 against the complete simulated scene, and a carried-over
-occupancy map keeps 99.6\% of the old object surface (\cref{tab:ablation_variants}).
+occupancy map keeps 99.6\% of the old object surface (\cref{tab:ablation_variants,fig:problem}).
 GaME's update keeps 42.4\% and 61.1\% of the old surface. With our layer, every backend reaches its highest geometry F1
 against the complete simulated scene.
 

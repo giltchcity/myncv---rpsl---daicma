@@ -13,14 +13,14 @@ so the map of any earlier time remains available, and each visit hands its state
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/method_overview.pdf}
-\caption{\textbf{Persistent scene memory across visits.}
-(a) Each visit receives the scene memory $S^{k-1}$, updates it, and exports $S^k$ for the next visit.
-Memory contains current surfaces, object states and intervals, element lifetimes, and accumulated evidence.
-(b) State inference separates ending an old state from handing over to a successor.
-The intervals determine observation validity; valid observations feed both native integration and map continuation.
-The four interface operations connect this reasoning to the mapper without replacing its integration rule.
-Ended elements retain their lifetimes for queries at earlier times.
-Blue denotes observations, gold decisions, and purple time and memory.}
+\caption{\textbf{Persistent updating beside native mappers.} Each visit imports the scene memory of the previous visit
+and exports its own for the next. State inference separates ending an old state from handing it over to a successor: old-site
+evidence and tracked motion end a state, the learned prior $q$ also enters the end of an inherited state, and displacement,
+new-site evidence, and the prior decide a handover. The state intervals expire the pixels of ended states, stop free
+space a band before current objects, and keep the measured surface band. The valid observations feed both the native
+integration and the continuation test, which compares support and see-through votes; occluded readings cast no direct
+vote, and ties use $C(e)$ or the prior. Object elements end with their states. Numbered ports mark the four operations of
+the update interface. Ending an element sets its lifetime instead of erasing it.}
 \label{fig:method}
 \end{figure*}
 

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Reload and restart</title>
+<style>
+  @page { size: 6.875in 2.250in; margin: 0; }
+  :root { --real:#2E75B6; --naive:#262626; --ours:#BF9000; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:#fff; }
+  body { width:6.875in; height:2.250in; font-family: "Times New Roman", Times, serif; color:#000;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .fig { display:flex; justify-content:center; gap:16px; padding:6px 6px 4px; }
+  .group { display:grid; grid-template-columns: repeat(3, 103px); grid-template-rows: 12px 69px 103px 12px;
+           column-gap:3px; row-gap:3px; }
+  .head { font-size:7.6pt; text-align:center; align-self:end; }
+  .head.ours { font-weight:700; color:var(--ours); }
+  .img { position:relative; overflow:hidden; background:#000; }
+  .img img { display:block; width:100%; height:100%; object-fit:cover; }
+  .box { position:absolute; border:1.3px solid; }
+  .box.real { border-color:var(--real); } .box.naive { border-color:var(--naive); } .box.ours { border-color:var(--ours); }
+  .zoom { border:1.6px solid; }
+  .zoom.real { border-color:var(--real); } .zoom.naive { border-color:var(--naive); } .zoom.ours { border-color:var(--ours); }
+  .label { grid-column: span 3; font-size:7.4pt; font-style:italic; text-align:center; align-self:start; }
+</style></head>
+<body><div class="fig">
+<div class="group"><div class="head real">Real image</div><div class="head naive">Reload</div><div class="head ours">Ours</div><div class="img"><img src="assets/a0_full.png"><span class="box real" style="left:22.06%;top:20.53%;width:41.18%;height:61.81%"></span></div><div class="img"><img src="assets/a1_full.png"><span class="box naive" style="left:22.06%;top:20.53%;width:41.18%;height:61.81%"></span></div><div class="img"><img src="assets/a2_full.png"><span class="box ours" style="left:22.06%;top:20.53%;width:41.18%;height:61.81%"></span></div><div class="img zoom real"><img src="assets/a0_zoom.png"></div><div class="img zoom naive"><img src="assets/a1_zoom.png"></div><div class="img zoom ours"><img src="assets/a2_zoom.png"></div><div class="label">(a) Gone, but reloading keeps it.</div></div>
+<div class="group"><div class="head real">Real image</div><div class="head naive">Restart</div><div class="head ours">Ours</div><div class="img"><img src="assets/b0_full.png"><span class="box real" style="left:30.88%;top:0.00%;width:41.18%;height:61.81%"></span></div><div class="img"><img src="assets/b1_full.png"><span class="box naive" style="left:30.88%;top:0.00%;width:41.18%;height:61.81%"></span></div><div class="img"><img src="assets/b2_full.png"><span class="box ours" style="left:30.88%;top:0.00%;width:41.18%;height:61.81%"></span></div><div class="img zoom real"><img src="assets/b0_zoom.png"></div><div class="img zoom naive"><img src="assets/b1_zoom.png"></div><div class="img zoom ours"><img src="assets/b2_zoom.png"></div><div class="label">(b) Merely unseen, but restarting drops it.</div></div>
+</div></body></html>

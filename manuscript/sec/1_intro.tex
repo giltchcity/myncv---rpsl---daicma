@@ -7,7 +7,7 @@ and objects change while the camera looks elsewhere. Whether it fuses a truncate
 optimizes 3D Gaussians, or accumulates occupancy, the robot needs a map that removes what changed, keeps what is merely
 unobserved, and keeps following the changes of the present visit. A mapper without change handling has two choices. It
 can reload the old map, which leaves each moved object in two places, or start over, which discards every room the robot
-leaves unobserved.
+leaves unobserved (\cref{fig:problem}).
 
 \begin{figure*}[t]
 \centering
@@ -21,6 +21,18 @@ same region. Blue marks the real image and gold our maps.}
 \label{fig:teaser}
 \end{figure*}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/problem.pdf}
+\caption{\textbf{Gone or merely unseen?} A new visit leaves two kinds of earlier surfaces without support: surfaces that
+are gone and surfaces it does not look at. Gaussian maps of the simulated apartment after its second visit. (a)~At a
+held-out pose of the second visit, a reloaded map, which keeps every element of the first visit, shows the moved sofa and
+side table at both places. (b)~At a pose of the first visit: the second visit looks down and almost never sees the
+ceiling, so a map restarted in it lacks the ceiling and the upper walls; the furniture has moved since. Our map ends the
+first kind and keeps the second. Boxes mark the enlarged regions.}
+\label{fig:problem}
+\end{figure*}
+
 Dynamic mapping follows change while a mapper runs. Object-level systems track and reconstruct moving
 objects~\cite{runz2017cofusion,xu2019midfusion}, Dynablox detects moving points~\cite{schmid2023dynablox}, and Khronos
 verifies object fragments against the rays it stores over a session~\cite{schmid2024khronos}. Long-term mapping carries
@@ -32,7 +44,7 @@ occupancy of every cell that a ray traverses~\cite{hornung2013octomap,reijgwart2
 persists, but the reasoning that produced it does not, and the old scene stays in the map: after two revisits of a real
 room, Panoptic Multi-TSDFs still shows 57\% and 60\% of the surface of objects that have left, and GaME 42\% and 61\%
 (\cref{sec:exp_main}). In both maps, the suitcase that was taken away still appears in front of the chair
-(\cref{fig:testview}). Each rule also acts on its own primitives, so every new mapper needs a new update rule.
+(\cref{fig:qualitative}). Each rule also acts on its own primitives, so every new mapper needs a new update rule.
 
 A visit ends because the robot stops, not because the world does. We therefore treat visits as interrupted observations
 of one evolving scene. Within a visit, an object moves either in view or while the robot looks away. Between visits, it

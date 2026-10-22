@@ -17,7 +17,23 @@ FRAMES = [("sim02090", "synthetic", "b", 2090), ("sim02990", "synthetic", "b", 2
           ("sim01870", "synthetic", "b", 1870), ("sim00390", "synthetic", "b", 390),
           ("flat00229", "flat", "b", 229), ("real04940", "real", "c", 4940), ("real04740", "real", "c", 4740),
           ("real04850", "real", "c", 4850), ("realb02790", "real", "b", 2790), ("realb03000", "real", "b", 3000),
-          ("realb01830", "real", "b", 1830), ("reala01380", "real", "a", 1380), ("reala01410", "real", "a", 1410)]
+          ("realb01830", "real", "b", 1830), ("reala01380", "real", "a", 1380), ("reala01410", "real", "a", 1410),
+          ("sima02460", "synthetic", "a", 2460), ("sima01680", "synthetic", "a", 1680), ("sima02490", "synthetic", "a", 2490),
+          ("sima00030", "synthetic", "a", 30), ("sima00390", "synthetic", "a", 390), ("sima02250", "synthetic", "a", 2250),
+          ("sima03120", "synthetic", "a", 3120), ("sima01860", "synthetic", "a", 1860), ("sima01740", "synthetic", "a", 1740),
+          ("sima02550", "synthetic", "a", 2550), ("real04470", "real", "c", 4470), ("real05310", "real", "c", 5310),
+          ("real03580", "real", "c", 3580), ("real04230", "real", "c", 4230), ("real06060", "real", "c", 6060),
+          ("real05010", "real", "c", 5010), ("real06150", "real", "c", 6150), ("sim02420", "synthetic", "b", 2420),
+          ("sim02430", "synthetic", "b", 2430), ("real05370", "real", "c", 5370), ("real01890", "real", "c", 1890),
+          ("sim02760", "synthetic", "b", 2760), ("sim00660", "synthetic", "b", 660), ("sim02440", "synthetic", "b", 2440),
+          ("realb01150", "real", "b", 1150), ("realb01140", "real", "b", 1140), ("real05320", "real", "c", 5320),
+          ("real05330", "real", "c", 5330), ("real03850", "real", "c", 3850), ("real05670", "real", "c", 5670),
+          ("sim02810", "synthetic", "b", 2810), ("sim02820", "synthetic", "b", 2820), ("sim02830", "synthetic", "b", 2830),
+          ("sim02800", "synthetic", "b", 2800), ("sim02900", "synthetic", "b", 2900), ("sim02910", "synthetic", "b", 2910),
+          ("sim02870", "synthetic", "b", 2870), ("sim02700", "synthetic", "b", 2700), ("sim02730", "synthetic", "b", 2730),
+          ("sim00720", "synthetic", "b", 720), ("sim02370", "synthetic", "b", 2370), ("sim00640", "synthetic", "b", 640),
+          ("sim02690", "synthetic", "b", 2690), ("sim03180", "synthetic", "b", 3180), ("sim03200", "synthetic", "b", 3200),
+          ("sim00400", "synthetic", "b", 400), ("sim01830", "synthetic", "b", 1830), ("sim02850", "synthetic", "b", 2850)]
 PHOTOS = "/home/jixian/Desktop/FT/notes/paper_method_experiments_20261019/renders_views/photos"   # the frame, cropped as above
 
 

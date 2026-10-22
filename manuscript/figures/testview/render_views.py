@@ -31,7 +31,13 @@ GEO = {
              "occ_wavemap": (f"{DATA}/occ/real_row3.npz", 0.02, 0.02), "occ_ours": (f"{DATA}/occ/real_row4.npz", 0.02, 0.02),
              "occ_restart": (f"{DATA}/occ/real_row1.npz", 0.02, 0.02), "occ_reload": (f"{DATA}/occ/real_row2.npz", 0.02, 0.02)},
 }
-REFS = {"sim": [f"{DATA}/refs/synthetic_b.npz", f"{DATA}/refs/synthetic_a.npz"],
+GEO["realb"] = {   # the maps at the end of the second visit to the real room
+    "tsdf_khronos": f"{FT}/eval/results/real/khronos/b/geometry/mesh_viewer.ply",
+    "tsdf_panoptic": f"{FT}/eval/results/real/panoptic/b/geometry/mesh_viewer.ply",
+    "tsdf_ours": f"{WT}/superseded/d1/eval/tk_real_b/real_abc/exports/takeover_b/geometry_viewer.ply",
+    "occ_wavemap": (f"{DATA}/occ/realb_row3.npz", 0.02, 0.02), "occ_ours": (f"{DATA}/occ/realb_row4.npz", 0.02, 0.02)}
+REFS = {"realb": [f"{FT}/results/abc_eval_v2/geometry/{s}_reference_1cm.ply" for s in "BA"],
+        "sim": [f"{DATA}/refs/synthetic_b.npz", f"{DATA}/refs/synthetic_a.npz"],
         "flat": [f"{DATA}/refs/flat_b.npz", f"{DATA}/refs/flat_a.npz"],
         "real": [f"{FT}/results/abc_eval_v2/geometry/{s}_reference_1cm.ply" for s in "CBA"]}
 RADIUS, FAR, GRAY = 0.10, 0.30, np.array([0.80, 0.80, 0.80])   # FAR: last, this run's reference only
@@ -120,7 +126,7 @@ def render(V, F, albedo_of, cam, lit=0.55, bg=0.0):
 
 
 scene = sys.argv[1]
-dataset = next(k for k in GEO if scene.startswith(k))
+dataset = max((k for k in GEO if scene.startswith(k)), key=len)
 cam = json.load(open(f"{HERE}/cameras.json"))[scene]
 items = sys.argv[2:] or list(GEO[dataset])
 refs = load_refs(dataset)
