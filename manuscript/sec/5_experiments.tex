@@ -74,8 +74,7 @@ the occupied cells, and a TSDF fused from depth rendered from the Gaussians~\cit
 \emph{Rendering} of the Gaussian maps is evaluated, as in GaME~\cite{yugay2026game}, on every tenth frame of the last
 visit, held out from mapping, with PSNR, SSIM, LPIPS~\cite{zhang2018lpips}, and depth L1 as GaME's evaluation computes them, SSIM
 in its multi-scale form~\cite{wang2003msssim}, after the refinement that follows the last visit.
-In the tables, n/a marks a quantity the method does not produce: only Gaussian maps render, and Khronos run per visit
-carries no map between visits. A dash marks a quantity not evaluated.
+In the tables, n/a marks a quantity the method does not produce, and a dash marks a quantity not evaluated.
 
 \paragraph{Protocol.}
 Simulated visits use ground-truth poses, and real visits use the estimated poses and the alignment above. Segmentation is
@@ -91,7 +90,7 @@ Datasets and backends share the constants of \cref{sec:handoff}. Every experimen
 \begin{table*}[t]
 \centering\footnotesize
 \caption{Main results, in percent. Each method maps the visits of a dataset in order and carries its map from one visit
-to the next; Khronos maps them as one sequence, and ours adds our layer to the mapper of its group. Change F1 counts all
+to the next, and ours adds our layer to the mapper of its group. Change F1 counts all
 appearances and disappearances of a dataset, within and between visits. Object F1 is the online object F1 of Khronos
 over the last visit, evaluated on the TSDF maps. Geometry F1 at 5\,cm uses the map after the last visit, against a
 reference reconstructed from that visit (real room), the complete scene mesh (simulated apartment), or the point reference
@@ -143,7 +142,7 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 \paragraph{With our layer, each mapper surpasses the published update of its representation.}
 \Cref{tab:main} compares every mapper with our layer against the published update of the same representation. Our
 TSDF, Gaussian, and occupancy maps reach a higher geometry F1 than Panoptic Multi-TSDFs, GaME, and wavemap on every
-dataset where both run. Khronos, run over the visits as one sequence, stays below our TSDF map in change, object, and
+dataset where both run. Khronos stays below our TSDF map in change, object, and
 geometry F1 on the real room and the simulated apartment. Maps rebuilt from scratch at every visit are not listed; \cref{sec:exp_ablation} compares them.
 
 \begin{table}[t]
@@ -194,7 +193,7 @@ in order; per room in the supplementary material. $^\dagger$Over the 5 rooms in 
 \toprule
 Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
-Khronos~\cite{schmid2024khronos} & 62.2 & 45.6$^\dagger$ & 38.7$^\dagger$ & \pend \\
+Khronos~\cite{schmid2024khronos} & 62.2 & 45.6$^\dagger$ & 38.7$^\dagger$ & 88.3 \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{76.5} & \prov{53.9} & \prov{51.5} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
@@ -204,13 +203,14 @@ Khronos~\cite{schmid2024khronos} & 62.2 & 45.6$^\dagger$ & 38.7$^\dagger$ & \pen
 % SRC with class 1. Geometry of ours: P3_SUMMARY.md (G1 5 cm, mean over visits).
 % SRC Superseded: P3_OFFICIAL.md (chain_fill, 76.8 / 55.2 / 52.2) and the event scoring (80.5 / 64.2).
 % SRC Khronos: P3_OFFICIAL_KHRONOS_INST.md (official build, InstanceForwarding with the same GT instances, MaxIoUTracker);
-% SRC change scores over 5 rooms (0cac766c, 6bde6070, ad408c8f have none). PENDING its geometry (G1 5 cm, mean over visits).
+% SRC change scores over 5 rooms (0cac766c, 6bde6070, ad408c8f have none). Geometry 88.3 from P3_SUMMARY: G1 is the mesh,
+% SRC unaffected by the instance input (0958220d checked: 94.5 / 93.9 / 76.6 with instances, 94.5 / 93.8 / 76.7 without).
 % SRC Earlier Khronos run with class labels only: 56.3 / 51.2 / 37.0 / 88.3 (P3_OFFICIAL.md), not used.
 \end{table}
 
 \paragraph{The gains hold on public rescans.}
-On 3RScan, under Khronos' 4D metric, our TSDF map reaches a higher object and change F1 than Khronos, run over the scans
-of each room as one sequence, and a higher geometry F1 (\cref{tab:3rscan}).
+On 3RScan, under Khronos' 4D metric, our TSDF map reaches a higher object and change F1 than Khronos
+and a higher geometry F1 (\cref{tab:3rscan}).
 
 \begin{figure*}[t]
 \centering
@@ -236,8 +236,8 @@ occupancy of every cell that a ray traverses, leaves 1.3\% and 4.4\% at 88.9 and
 \paragraph{On the revisits, every map reaches a higher geometry F1 than the published update of its representation.}
 On the real room, with camera poses estimated by ORB-SLAM3, our geometry F1 in the second and third visits is 96.0 and 94.6 with the
 TSDF (Panoptic Multi-TSDFs: 93.6 and 93.0), 93.4 and 95.0 with the Gaussians (GaME: 88.6 and 90.8), and 92.0 and 91.6
-with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main}; per visit in the supplementary material). The TSDF map also exceeds Khronos, run over the
-visits as one sequence, on every revisit, and it leads Khronos on Khronos' own object F1 in every visit (supplementary
+with occupancy (wavemap: 88.9 and 89.0) (\cref{tab:main}; per visit in the supplementary material). The TSDF map also exceeds Khronos
+on every revisit, and it leads Khronos on Khronos' own object F1 in every visit (supplementary
 material).
 
 \paragraph{The memory of earlier visits completes every map.}
@@ -248,9 +248,9 @@ On the complete simulated scene, the updated maps of the second visit reach geom
 \paragraph{On Flat, the methods differ only after the scene has changed.}
 In the first visit, which contains no changes, every evaluated method starts from an empty map. The geometry F1 of
 GaME and our maps agrees within 0.2 points (86.3 to 86.5), and Khronos and Panoptic Multi-TSDFs reach 86.0 and 85.1
-(supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 86.9 for Khronos, which
-maps both visits as one sequence, and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
-GaME, which also keeps the first visit's map, and with occupancy \prov{80.3}, against 78.6 for wavemap.
+(supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 86.9 for Khronos
+and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
+GaME, and with occupancy \prov{80.3}, against 78.6 for wavemap.
 
 \subsection{Rendering of the Gaussian Map}
 \label{sec:exp_rendering}
