@@ -110,8 +110,8 @@ GaME~\cite{yugay2026game} & 92.3 & \nev & 90.8 & 83.9 & \nev & 92.0 & 87.7 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \nev & \prov{95.0} & \prov{97.1} & \nev & \prov{96.7} & \prov{89.8} \\
 \midrule
 \tgroup{8}{Occupancy}
-wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & \pend \\
-\rowcolor{oursbg} Ours & \prov{100} & \nev & \prov{91.6} & \prov{97.1} & \nev & \prov{94.9} & \pend \\
+wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 78.6 \\
+\rowcolor{oursbg} Ours & \prov{100} & \nev & \prov{91.6} & \prov{97.1} & \nev & \prov{94.9} & \prov{80.3} \\
 \bottomrule
 \end{tabular}
 % PENDING Khronos as one sequence: simulated done (58/4/20, mesh F1 90.2); real room done (eval/khronos_cont_real_{a,b,c}:
@@ -125,6 +125,8 @@ wavemap~\cite{reijgwart2023wavemap} & 97.1 & \nev & 89.0 & 91.3 & \nev & 91.2 & 
 % PENDING TESSE object F1: online needs every snapshot scored (Khronos has 44 at 5 m, ours only the final one). Final
 % PENDING object F1 at 5 m: ours 97.9, Khronos 92.8. Online object F1, last visit: real per-visit Khronos, simulated
 % PENDING Khronos as one sequence (62.94), ours (97.84 real third visit: tk_real_c_closedfix, the closest run to 290e110; 90.82 simulated second visit, 290e110).
+% PENDING Flat occupancy: wavemap row 3 at 59dc445 (78.57), ours row 4 at 84afc26 (80.28), runs/.../wm_flat_row{3_59dc445,4_84afc26}.
+% PENDING Real and simulated occupancy cells are still 59dc445: 84afc26 has real A, B only (B 94.84, residue 1.24).
 % PENDING Occupancy row 4 at 88c3ac9 (real): geometry 91.5 / 91.7, residue 1.3 / 4.5, between visits without the
 % PENDING suitcase 15/0/1 and 10/0/0; its simulated rerun is paused.
 % SRC change F1, all events. Real (with the suitcase): ours TSDF and Gaussians 34/0/1, occupancy 35/0/0, GaME 30/0/5,
@@ -234,7 +236,7 @@ In the first visit, which contains no changes, every evaluated method starts fro
 GaME and our maps agrees within 0.2 points (86.3 to 86.5), and Khronos and Panoptic Multi-TSDFs reach 86.0 and 85.1
 (supplementary material). In the second visit, our layer reaches 90.2 with the TSDF, against 86.9 for Khronos, which
 maps both visits as one sequence, and 88.9 for Panoptic Multi-TSDFs. With the Gaussians, it reaches 89.8, against 87.7 for
-GaME, which also keeps the first visit's map.
+GaME, which also keeps the first visit's map, and with occupancy \prov{80.3}, against 78.6 for wavemap.
 
 \subsection{Rendering of the Gaussian Map}
 \label{sec:exp_rendering}
