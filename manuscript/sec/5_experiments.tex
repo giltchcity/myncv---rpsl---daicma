@@ -35,7 +35,7 @@ backend map both with Khronos' default depth range of 5\,m.
 annotated~\cite{wald2019rio}. We take 8 rooms with three or four scans each (27 visits) in which every rescan moves an
 object by at least 0.3\,m or removes one. Each scan is a short RGB-D sequence, aligned to the first scan of its room by
 the transforms of the dataset.
-% PENDING 3RScan Panoptic row (needs Docker Desktop); Gaussian and occupancy backends not run on 3RScan.
+% PENDING 3RScan: Panoptic (needs Docker Desktop), Gaussian and occupancy backends not run; the table has Khronos and our TSDF map.
 
 \paragraph{Compared methods.}
 We compare against published methods on the same recordings. Every method maps the visits of a dataset in order and
@@ -186,7 +186,6 @@ supplementary material.}
 Method & Change$\uparrow$ & Geometry$\uparrow$ \\
 \midrule
 Khronos~\cite{schmid2024khronos} & 64.2 & 88.3 \\
-Panoptic~\cite{schmid2022panoptic} & \pend & \pend \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{80.5} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
@@ -196,7 +195,7 @@ Panoptic~\cite{schmid2022panoptic} & \pend & \pend \\
 
 \paragraph{The gains hold on public rescans.}
 On 3RScan, our TSDF map detects the changes between scans more reliably than Khronos, run over the scans of each room as
-one sequence, and reaches a higher geometry F1 (\cref{tab:3rscan}). It leads in six of the eight rooms.
+one sequence, and reaches a higher geometry F1 (\cref{tab:3rscan}). Its change F1 is higher in six of the eight rooms.
 
 \begin{figure*}[t]
 \centering
