@@ -89,7 +89,7 @@ Datasets and backends share the constants of \cref{sec:handoff}. Every experimen
 
 \begin{table*}[t]
 \centering\footnotesize
-\caption{Main results, in percent. $^\dagger$Events between visits only.}
+\caption{Main results, in percent.}
 \label{tab:main}
 \setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{@{}lccccccc@{}}
@@ -100,7 +100,7 @@ Method & Change$\uparrow$ & Object$\uparrow$ & Geometry$\uparrow$ & Change$\upar
 \midrule
 \tgroup{8}{TSDF}
 Khronos~\cite{schmid2024khronos} & 54.2 & 45.3 & 87.7 & 82.9 & 62.9 & 90.2 & 86.9 \\
-Panoptic~\cite{schmid2022panoptic} & 52.4$^\dagger$ & \nev & 93.0 & 91.8$^\dagger$ & \nev & 92.1 & 88.9 \\
+Panoptic~\cite{schmid2022panoptic} & 52.4 & \nev & 93.0 & 91.8 & \nev & 92.1 & 88.9 \\
 \rowcolor{oursbg} Ours & \prov{98.6} & \prov{97.8} & \prov{94.6} & \prov{97.1} & \prov{90.8} & \prov{99.2} & \prov{90.2} \\
 \midrule
 \tgroup{8}{3D Gaussians}
@@ -175,15 +175,14 @@ On both TESSE scenes, our TSDF map reaches a higher background, object, change, 
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{3RScan, F1 in percent; per room in the supplementary material. $^\dagger$Over the 5 rooms in which Khronos
-associates a change.}
+\caption{3RScan, F1 in percent; per room in the supplementary material.}
 \label{tab:3rscan}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
-Khronos~\cite{schmid2024khronos} & 62.2 & 45.6$^\dagger$ & 38.7$^\dagger$ & 88.3 \\
+Khronos~\cite{schmid2024khronos} & 62.2 & 45.6 & 38.7 & 88.3 \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{76.5} & \prov{53.9} & \prov{51.5} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
