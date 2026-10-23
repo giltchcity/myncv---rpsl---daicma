@@ -152,9 +152,9 @@ our TSDF map are evaluated at the same times, with change detection every 5 fram
 Scene & Metric & Reported & Khronos & Ours \\
 \midrule
 Office & Background & 80.6 & 80.6 & \prov{81.0} \\
- & Objects & 74.2 & 70.8 & \prov{71.4} \\
- & Dynamics & 73.2 & 85.4 & \prov{83.0} \\
- & Changes & 66.2 & 52.0 & \prov{62.6} \\
+ & Objects & 74.2 & 70.8 & \prov{71.5} \\
+ & Dynamics & 73.2 & 85.4 & \prov{82.9} \\
+ & Changes & 66.2 & 52.0 & \prov{63.3} \\
 \midrule
 Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
  & Objects & 75.3 & 63.0 & \prov{70.7} \\
@@ -165,8 +165,8 @@ Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
 % SRC wt_takeover_runs/eval/tesse_paper_qj/DENSE_RESULT.md (office), eval/tesse_apt_qj/RESULT.md (apartment); tables.py with
 % SRC the query time of Eq. (20), compared at Khronos' snapshot times (96 office, 39 apartment).
 % SRC Apartment: the clean 290e110 build gives the same numbers as the build with the uncommitted 4D-history change.
-% PENDING Office: our row is from the build with the uncommitted 4D-history change; on the clean 290e110 build the mapper
-% PENDING stalled at frame 3722 (PresentSurface), second run in progress (user decision if it stalls again).
+% SRC Office: clean 290e110 build, second run (the first stalled once at frame 3722 and did not recur):
+% SRC eval/tesse_paper_qj/ours_290e110_*; results with the 4D-history build differ by at most 0.8 and are not used.
 \end{table}
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
