@@ -82,8 +82,8 @@ Simulated visits use ground-truth poses, and real visits use the estimated poses
 ground truth in all visits, annotated on SAM~\cite{kirillov2023sam} masks for the real room.
 % SRC Khronos input (TSDF session, 10-23): semantic only on 3RScan, real and TESSE (label_protocol: semantic_only;
 % SRC ConnectedSemantics + MaxIouTracker); packed semantic+instance on synthetic (PackedSemanticInstanceForwarding).
-% PENDING control: Khronos with instance input on 3RScan done (tab:3rscan), real (after), TESSE (not planned yet). Datasets and backends share
-the constants of \cref{sec:handoff}. Every experiment runs on one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,GB of memory.
+% PENDING control: Khronos with instance input on 3RScan done (tab:3rscan), real (running), TESSE (running).
+Datasets and backends share the constants of \cref{sec:handoff}. Every experiment runs on one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,GB of memory.
 
 \subsection{Main Results}
 \label{sec:exp_main}
