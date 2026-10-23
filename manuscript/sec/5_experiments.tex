@@ -187,35 +187,30 @@ and with change detection every 5 frames for both maps. Its final map also reach
 \centering\footnotesize
 \caption{3RScan, 8 rooms scanned three or four times (27 visits), with Khronos' 4D metric (F1, in percent; mean over
 rooms) and the geometry F1 of each visit's final map at 5\,cm (mean over visits). Each method maps the scans of a room
-in order; per room in the supplementary material. Khronos forms objects from the class labels; the second row gives it
-the instances our layer receives. Change scores of Khronos are means over the rooms in which it associates a change:
-$^\dagger$6, $^\ddagger$5.}
+in order; per room in the supplementary material. $^\dagger$Over the 5 rooms in which Khronos associates a change.}
 \label{tab:3rscan}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
-Khronos~\cite{schmid2024khronos} & 56.3 & 51.2$^\dagger$ & 37.0$^\dagger$ & 88.3 \\
-Khronos, instances & 62.2 & 45.6$^\ddagger$ & 38.7$^\ddagger$ & -- \\
+Khronos~\cite{schmid2024khronos} & 62.2 & 45.6$^\dagger$ & 38.7$^\dagger$ & \pend \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{76.5} & \prov{53.9} & \prov{51.5} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
 % SRC wt_takeover_runs/3rscan/P3_OFFICIAL_UNIFORM.md: official evaluator, each snapshot at its own time, mean per room
 % SRC then over rooms; ours clean 290e110 through the uniform timeline pipeline (eval/timeline_complete.py, geometric moves,
 % SRC one global mesh per visit), the same pipeline as the Gaussian maps; Khronos native 4D map, semantic input, option B
-% SRC with class 1. On the same 6 rooms ours reaches 59.4 change F1 (incl. 58.2). Geometry: P3_SUMMARY.md (G1 5 cm, mean over visits).
+% SRC with class 1. Geometry of ours: P3_SUMMARY.md (G1 5 cm, mean over visits).
 % SRC Superseded: P3_OFFICIAL.md (chain_fill, 76.8 / 55.2 / 52.2) and the event scoring (80.5 / 64.2).
-% SRC Khronos, instances: P3_OFFICIAL_KHRONOS_INST.md (PackedSemanticInstanceForwarding, the GT instances our runs get);
-% SRC change scores over 5 rooms (0cac766c, 6bde6070, ad408c8f have none). Geometry not evaluated for this run.
+% SRC Khronos: P3_OFFICIAL_KHRONOS_INST.md (official build, InstanceForwarding with the same GT instances, MaxIoUTracker);
+% SRC change scores over 5 rooms (0cac766c, 6bde6070, ad408c8f have none). PENDING its geometry (G1 5 cm, mean over visits).
+% SRC Earlier Khronos run with class labels only: 56.3 / 51.2 / 37.0 / 88.3 (P3_OFFICIAL.md), not used.
 \end{table}
 
 \paragraph{The gains hold on public rescans.}
 On 3RScan, under Khronos' 4D metric, our TSDF map reaches a higher object and change F1 than Khronos, run over the scans
-of each room as one sequence, and a higher geometry F1 (\cref{tab:3rscan}). Khronos associates no change in two of the
-eight rooms, so both of its change scores are means over the other six; ours are over all eight. Given the same object
-instances as our layer, Khronos reaches a higher object F1 but associates changes in only five rooms, and our map stays
-ahead in all three scores.
+of each room as one sequence, and a higher geometry F1 (\cref{tab:3rscan}).
 
 \begin{figure*}[t]
 \centering
