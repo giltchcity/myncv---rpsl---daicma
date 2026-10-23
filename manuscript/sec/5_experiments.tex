@@ -293,42 +293,47 @@ The maps are those kept at the change-detection rounds, before the refinement. N
 \centering\footnotesize
 \caption{Restart, carry-over, or update. Scratch starts every visit from an empty map (Khronos for the TSDF), carry-over
 loads the previous map without change handling, own is the published update of the representation (Panoptic
-Multi-TSDFs, GaME, wavemap), and ours adds our layer. Residue after the second and third real visits; geometry F1 (G1) of the third real visit against
-a reference reconstructed from that visit's own frames; geometry F1 against the complete simulated scene after the second
-visit, including the surfaces that this visit leaves unobserved. n/a: the
+Multi-TSDFs, GaME, wavemap), and ours adds our layer. Residue after the second and third real visits; geometry F1 (G1) on the real room against a reference
+reconstructed from each visit's own frames, averaged over the three visits; geometry F1 against the complete simulated
+scene, including the surfaces that a visit leaves unobserved, averaged over the two visits. n/a: the
 map holds no surface of an earlier visit.}
 \label{tab:ablation_variants}
+% SRC means: real G1 per visit (1st/2nd/3rd) scratch TSDF (Khronos per visit, final-map rule) 90.90/95.94/94.83, GaME row 1
+% SRC 93.21/93.62/95.33, wavemap row 1 94.80/96.37/95.84; Panoptic 92.40/93.58/92.95, GaME 93.09/88.64/90.75, wavemap
+% SRC 94.77/88.94/88.99, carry-over 92.06/85.20/82.17; ours 94.33/95.96/94.63, 93.24/93.43/95.04, 92.73/91.96/91.58.
+% SRC Sim complete (1st/2nd): scratch 91.41/83.64, 94.92/85.39, 90.29/84.17; Panoptic 93.8/92.1, GaME 94.68/92.04,
+% SRC wavemap 90.28/91.24, carry-over 93.47/90.62; ours 99.18/99.23, 97.9/96.72, 94.56/94.88.
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
  & \multicolumn{2}{c}{Residue, real$\downarrow$} & Geometry, real$\uparrow$ & Complete, sim.$\uparrow$ \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(l){5-5}
-Variant & 2nd & 3rd & 3rd & 2nd \\
+Variant & 2nd & 3rd & mean & mean \\
 \midrule
 \tgroup{5}{TSDF}
-Scratch & \na & \na & 94.8 & 83.6 \\
-Own & 57.1 & 60.1 & 93.0 & 92.1 \\
-\rowcolor{oursbg} Ours & \prov{0.9} & \prov{6.9} & \prov{94.6} & \prov{99.2} \\
+Scratch & \na & \na & 93.9 & 87.5 \\
+Own & 57.1 & 60.1 & 93.0 & 93.0 \\
+\rowcolor{oursbg} Ours & \prov{0.9} & \prov{6.9} & \prov{95.0} & \prov{99.2} \\
 \midrule
 \tgroup{5}{3D Gaussians}
-Scratch & \na & \na & 95.3 & 85.4 \\
-Own & 42.4 & 61.1 & 90.8 & 92.0 \\
-\rowcolor{oursbg} Ours & \prov{8.1} & \prov{14.3} & \prov{95.0} & \prov{96.7} \\
+Scratch & \na & \na & 94.1 & 90.2 \\
+Own & 42.4 & 61.1 & 90.8 & 93.4 \\
+\rowcolor{oursbg} Ours & \prov{8.1} & \prov{14.3} & \prov{93.9} & \prov{97.3} \\
 \midrule
 \tgroup{5}{Occupancy}
-Scratch & \na & \na & 95.8 & 84.2 \\
-Carry-over & 99.6 & 99.6 & 82.2 & 90.6 \\
-Own & 1.3 & 4.4 & 89.0 & 91.2 \\
-\rowcolor{oursbg} Ours & \prov{5.8} & \prov{12.2} & \prov{91.6} & \prov{94.9} \\
+Scratch & \na & \na & 95.7 & 87.2 \\
+Carry-over & 99.6 & 99.6 & 86.5 & 92.0 \\
+Own & 1.3 & 4.4 & 90.9 & 90.8 \\
+\rowcolor{oursbg} Ours & \prov{5.8} & \prov{12.2} & \prov{92.1} & \prov{94.7} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{A restarted map is incomplete, and a carried-over map is stale.}
-Maps rebuilt from scratch hold only the current visit: against the complete simulated scene, they reach geometry F1
-of 83.6 to 85.4. On the real room, whose reference is reconstructed from each visit's own frames, a map rebuilt from the
-third visit alone fits that reference best; ours stays close to it with the TSDF and the Gaussians (94.6 and 95.0 against
-94.8 and 95.3) while keeping the earlier visits, and 4.2 points below it with occupancy. A carried-over occupancy map keeps
+Maps rebuilt from scratch hold only the current visit. Averaged over the visits, they reach geometry F1 of 87.2 to 90.2
+against the complete simulated scene, where our maps reach 94.7 to 99.2. On the real room, whose reference is
+reconstructed from each visit's own frames and so suits a map built from that visit alone, they reach 93.9 to 95.7, and
+our maps, which keep the earlier visits, reach 92.1 to 95.0. A carried-over occupancy map keeps
 99.6\% of the old object surface (\cref{tab:ablation_variants,fig:problem}).
 GaME's update keeps 42.4\% and 61.1\% of the old surface. With our layer, every backend reaches its highest geometry F1
 against the complete simulated scene.
