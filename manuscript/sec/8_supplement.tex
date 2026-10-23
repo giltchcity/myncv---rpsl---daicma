@@ -251,6 +251,39 @@ Khronos saves 9 maps on the office and 3 on the 87\,s apartment. On the office, 
 \prov{83.9}, and \prov{62.7}. On the apartment, Khronos reaches 91.1, 57.5, 77.7, and 36.3, and our map \prov{92.3},
 \prov{70.8}, \prov{86.6}, and \prov{77.8}.
 
+\section{3RScan per Room}
+\label{sec:supp_3rscan}
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{3RScan per room: change F1 over the events between scans and geometry F1 at 5\,cm averaged over visits, in
+percent. Two armchairs whose identities the dataset marks as ambiguous are left out of the first room.}
+\label{tab:supp_3rscan}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & & \multicolumn{2}{c}{Change F1$\uparrow$} & \multicolumn{2}{c}{Geometry F1$\uparrow$} \\
+\cmidrule(lr){3-4}\cmidrule(l){5-6}
+Room & Visits & Khronos & Ours & Khronos & Ours \\
+\midrule
+0958220d & 3 & 46.2 & \prov{88.9} & 88.3 & \prov{95.1} \\
+0cac766c & 3 & 42.9 & \prov{76.9} & 86.4 & \prov{86.3} \\
+6bde6070 & 3 & 66.7 & \prov{84.2} & 92.5 & \prov{95.9} \\
+752cc57f & 4 & 50.0 & \prov{100} & 84.5 & \prov{88.3} \\
+bf9a3de7 & 4 & 86.7 & \prov{64.9} & 84.3 & \prov{86.9} \\
+ad408c8f & 4 & 0.0 & \prov{77.8} & 87.8 & \prov{89.2} \\
+e48c48f4 & 3 & 93.8 & \prov{87.5} & 91.6 & \prov{95.6} \\
+4a9a43d6 & 3 & 75.0 & \prov{80.0} & 94.4 & \prov{96.9} \\
+\midrule
+All & 27 & 64.2 & \prov{80.5} & 88.3 & \prov{91.4} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In the room with four scans of 6 to 9\,s each, Khronos keeps one object over the whole sequence and detects none of the
+changes. In the room where Khronos leads, our map never forms the sofa as an object and covers only part of an armchair,
+so both appear to leave the scene.
+
 \section{Runtime}
 \label{sec:supp_runtime}
 

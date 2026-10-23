@@ -31,8 +31,11 @@ move, appear, and disappear. A point reference of each visit's scene comes with 
 each one visit with exact poses: an office of 4{,}346 frames (217\,s), during which five objects disappear and three
 appear, and an apartment of 1{,}745 frames (87\,s), during which four disappear and two appear. Khronos and our TSDF
 backend map both with Khronos' default depth range of 5\,m.
-% PENDING TESSE: Panoptic Multi-TSDFs, GaME, wavemap, and our Gaussian and occupancy backends (the update layer has no
-% PENDING TESSE reader yet). After the current datasets: 3RScan~\cite{wald2019rio} with the final code.
+\emph{3RScan.} Indoor rooms scanned repeatedly months apart, with the changed objects
+annotated~\cite{wald2019rio}. We take 8 rooms with three or four scans each (27 visits) in which every rescan moves an
+object by at least 0.3\,m or removes one. Each scan is a short RGB-D sequence, aligned to the first scan of its room by
+the transforms of the dataset.
+% PENDING 3RScan Panoptic row (needs Docker Desktop); Gaussian and occupancy backends not run on 3RScan.
 
 \paragraph{Compared methods.}
 We compare against published methods on the same recordings. Every method maps the visits of a dataset in order and
@@ -171,6 +174,30 @@ On both TESSE scenes, our TSDF map reaches a higher background, object, and chan
 metric, at the depth range of 5\,m that Khronos uses and with change detection every 5 frames for both maps
 (\cref{tab:tesse}; supplementary material). Our Khronos runs match the background F1 that Khronos reports and stay below
 its reported object and change F1.
+
+\begin{table}[t]
+\centering\footnotesize
+\caption{3RScan, 8 rooms scanned three or four times (27 visits). Change F1 over the events between scans and geometry
+F1 at 5\,cm averaged over visits, in percent. Each method maps the scans of a room in order; per room in the
+supplementary material.}
+\label{tab:3rscan}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Method & Change$\uparrow$ & Geometry$\uparrow$ \\
+\midrule
+Khronos~\cite{schmid2024khronos} & 64.2 & 88.3 \\
+Panoptic~\cite{schmid2022panoptic} & \pend & \pend \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{80.5} & \prov{91.4} \\
+\bottomrule
+\end{tabular}
+% SRC wt_takeover_runs/3rscan/P3_SUMMARY.md: ours clean 290e110 66/21/11; Khronos one sequence per room, the room's thing
+% SRC classes as object classes, 51/31/26.
+\end{table}
+
+\paragraph{The gains hold on public rescans.}
+On 3RScan, our TSDF map detects the changes between scans more reliably than Khronos, run over the scans of each room as
+one sequence, and reaches a higher geometry F1 (\cref{tab:3rscan}). It leads in six of the eight rooms.
 
 \begin{figure*}[t]
 \centering
