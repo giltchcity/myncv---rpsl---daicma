@@ -164,9 +164,9 @@ Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
 \end{tabular}
 % SRC wt_takeover_runs/eval/tesse_paper_qj/DENSE_RESULT.md (office), eval/tesse_apt_qj/RESULT.md (apartment); tables.py with
 % SRC the query time of Eq. (20), compared at Khronos' snapshot times (96 office, 39 apartment).
-% PENDING Our TESSE maps (tesse_a_5m_tk, tesse_apt_5m_tk) were built with wt_takeover_build, i.e. 290e110 plus the
-% PENDING uncommitted 4D-history change, not pure 290e110: rerun on a clean build, or commit the change and rerun the
-% PENDING other TSDF rows with it (user decision).
+% SRC Apartment: the clean 290e110 build gives the same numbers as the build with the uncommitted 4D-history change.
+% PENDING Office: our row is from the build with the uncommitted 4D-history change; on the clean 290e110 build the mapper
+% PENDING stalled at frame 3722 (PresentSurface), second run in progress (user decision if it stalls again).
 \end{table}
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
