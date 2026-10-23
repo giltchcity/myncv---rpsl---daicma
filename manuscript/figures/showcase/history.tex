@@ -1,0 +1,18 @@
+\providecolor{oursgold}{HTML}{BF9000}\providecolor{gtblue}{HTML}{2E75B6}\providecolor{timepurple}{HTML}{7030A0}
+\ifdefined\shw\else\newlength{\shw}\newlength{\shh}\fi
+
+\begin{figure*}[t]
+\centering\footnotesize
+\setlength{\shw}{0.29\textwidth}
+\setlength{\tabcolsep}{0.8pt}\renewcommand{\arraystretch}{0}
+\begin{tabular}{@{}r@{\hspace{4pt}}ccc@{}}
+ & \shortstack{\textcolor{timepurple}{1st visit, 118.8\,s}\\[1pt]\textit{\color{gray}before the change}} & \shortstack{\textcolor{timepurple}{1st visit, 139.5\,s}\\[1pt]\textit{\color{gray}a chair moved out of view}} & \shortstack{\textcolor{timepurple}{2nd visit, 108.0\,s}\\[1pt]\textit{\color{gray}after the changes between visits}} \\[4pt]
+\raisebox{0.5\dimexpr0.5\shw\relax}{\textcolor{gtblue}{Ground truth}} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t1_gt.jpg} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t2_gt.jpg} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t3_gt.jpg} \\[1.5pt]
+\raisebox{0.5\dimexpr0.5\shw\relax}{\textcolor{black}{Khronos}} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t1_khronos_snapshot.jpg} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t2_khronos_snapshot.jpg} & \includegraphics[width=\shw]{figures/showcase/cells/hist_t3_khronos_snapshot.jpg} \\[1.5pt]
+\raisebox{0.5\dimexpr0.5\shw\relax}{\textcolor{oursgold}{\textbf{Ours (TSDF)}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t1_ours_tsdf.jpg}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t2_ours_tsdf.jpg}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t3_ours_tsdf.jpg}}} \\[1.5pt]
+\raisebox{0.5\dimexpr0.5\shw\relax}{\textcolor{oursgold}{\textbf{Ours (Gaussians)}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t1_ours_gs_round.jpg}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t2_ours_gs_round.jpg}}} & {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.8pt}\fcolorbox{oursgold}{white}{\includegraphics[width=\dimexpr\shw-1.6pt\relax]{figures/showcase/cells/hist_t3_ours_gs_round.jpg}}} \\
+\end{tabular}
+\caption{The map of three moments at one pose of the simulated apartment: ground truth, Khronos, and our TSDF and
+Gaussian maps.}
+\label{fig:supp_history}
+\end{figure*}
