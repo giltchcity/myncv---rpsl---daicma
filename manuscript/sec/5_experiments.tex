@@ -89,13 +89,8 @@ Datasets and backends share the constants of \cref{sec:handoff}. Every experimen
 
 \begin{table*}[t]
 \centering\footnotesize
-\caption{Main results, in percent. Each method maps the visits of a dataset in order and carries its map from one visit
-to the next, and ours adds our layer to the mapper of its group. Change F1 counts all
-appearances and disappearances of a dataset, within and between visits. Object F1 is the online object F1 of Khronos
-over the last visit, evaluated on the TSDF maps. Geometry F1 at 5\,cm uses the map after the last visit, against a
-reference reconstructed from that visit (real room), the complete scene mesh (simulated apartment), or the point reference
-of the data (Flat, scored for geometry only). $^\dagger$Events between
-visits only. --: not evaluated.}
+\caption{Main results, in percent. Object F1 covers the last visit, and geometry F1 the map after it. $^\dagger$Events
+between visits only.}
 \label{tab:main}
 \setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{@{}lccccccc@{}}
@@ -147,8 +142,8 @@ geometry F1 on the real room and the simulated apartment. Maps rebuilt from scra
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{TESSE, with Khronos' 4D metric (F1, in percent), at the 96 (office) and 39 (apartment) times at which Khronos
-saves its map, with change detection every 5 frames for both. Geometry: F1 of the final map at 5\,cm.}
+\caption{TESSE, F1 in percent, at the 96 (office) and 39 (apartment) times at which Khronos saves its map, with change
+detection every 5 frames. Geometry uses the final map.}
 \label{tab:tesse}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}llcc@{}}
@@ -177,16 +172,14 @@ Apartment & Background & 92.0 & \prov{93.1} \\
 \end{table}
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
-On both TESSE scenes, our TSDF map reaches a higher background, object, and change F1 than Khronos under Khronos' own 4D
-metric, evaluated at the 96 and 39 times at which Khronos saves its map, at the depth range of 5\,m that Khronos uses,
-and with change detection every 5 frames for both maps. Its final map also reaches a higher geometry F1
+On both TESSE scenes, our TSDF map reaches a higher background, object, change, and geometry F1 than Khronos
 (\cref{tab:tesse}; supplementary material).
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{3RScan, 8 rooms scanned three or four times (27 visits), with Khronos' 4D metric (F1, in percent; mean over
-rooms) and the geometry F1 of each visit's final map at 5\,cm (mean over visits). Each method maps the scans of a room
-in order; per room in the supplementary material. $^\dagger$Over the 5 rooms in which Khronos associates a change.}
+\caption{3RScan, 8 rooms scanned three or four times (27 visits), F1 in percent: Khronos' 4D metric (mean over rooms)
+and the geometry of each visit's final map (mean over visits); per room in the supplementary material. $^\dagger$Over the
+5 rooms in which Khronos associates a change.}
 \label{tab:3rscan}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lcccc@{}}
