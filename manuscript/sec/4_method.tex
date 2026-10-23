@@ -235,9 +235,9 @@ contains it and adds no Gaussians.
 \paragraph{Occupancy backend.}
 Our occupancy backend is wavemap~\cite{reijgwart2023wavemap}, which accumulates log-odds occupancy in a
 wavelet-compressed octree with clamping~\cite{hornung2013octomap}. Its elements are the occupied cells that contain a
-measured surface point. Wavemap integrates every frame of the current visit with its own update, and the layer takes over the cells that
-earlier visits left: such a cell leaves the current map only through \cref{eq:continue} or with its ended object state,
-and an ended cell keeps its lifetime for the maps of earlier times. Cells carry no orientation, so $C(e)$ never holds and a tie keeps
+measured surface point. Wavemap integrates the occupied space of every frame, and the layer takes over the clearing of
+occupied cells: a cell leaves the current map only through \cref{eq:continue} or with its ended object state, and an ended
+cell keeps its lifetime for the maps of earlier times. Cells carry no orientation, so $C(e)$ never holds and a tie keeps
 the prior.
 % PENDING \TODO{Integrate the occupancy map within the valid domains of \cref{eq:domain}.}
 
