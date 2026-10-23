@@ -141,23 +141,23 @@ geometry F1 on the real room and the simulated apartment. Maps rebuilt from scra
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{TESSE, with Khronos' 4D metric (F1, in percent). Reported: the values in~\cite{schmid2024khronos}. Khronos and
-our TSDF map are evaluated at the same times, with change detection every 5 frames for both.}
+\caption{TESSE, with Khronos' 4D metric (F1, in percent), at the 96 (office) and 39 (apartment) times at which Khronos
+saves its map, with change detection every 5 frames for both.}
 \label{tab:tesse}
 \setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{}llccc@{}}
+\begin{tabular}{@{}llcc@{}}
 \toprule
-Scene & Metric & Reported & Khronos & Ours \\
+Scene & Metric & Khronos & Ours \\
 \midrule
-Office & Background & 80.6 & 80.6 & \prov{81.0} \\
- & Objects & 74.2 & 70.8 & \prov{71.5} \\
- & Dynamics & 73.2 & 85.4 & \prov{82.9} \\
- & Changes & 66.2 & 52.0 & \prov{63.3} \\
+Office & Background & 80.6 & \prov{81.0} \\
+ & Objects & 70.8 & \prov{71.5} \\
+ & Dynamics & 85.4 & \prov{82.9} \\
+ & Changes & 52.0 & \prov{63.3} \\
 \midrule
-Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
- & Objects & 75.3 & 63.0 & \prov{70.7} \\
- & Dynamics & 84.1 & 85.8 & \prov{95.1} \\
- & Changes & 64.6 & 40.8 & \prov{93.3} \\
+Apartment & Background & 92.0 & \prov{93.1} \\
+ & Objects & 63.0 & \prov{70.7} \\
+ & Dynamics & 85.8 & \prov{95.1} \\
+ & Changes & 40.8 & \prov{93.3} \\
 \bottomrule
 \end{tabular}
 % SRC wt_takeover_runs/eval/tesse_paper_qj/DENSE_RESULT.md (office), eval/tesse_apt_qj/RESULT.md (apartment); tables.py with
@@ -169,9 +169,8 @@ Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
 On both TESSE scenes, our TSDF map reaches a higher background, object, and change F1 than Khronos under Khronos' own 4D
-metric, at the depth range of 5\,m that Khronos uses and with change detection every 5 frames for both maps
-(\cref{tab:tesse}; supplementary material). Our Khronos runs match the background F1 that Khronos reports and stay below
-its reported object and change F1.
+metric, evaluated at the 96 and 39 times at which Khronos saves its map, at the depth range of 5\,m that Khronos uses,
+and with change detection every 5 frames for both maps (\cref{tab:tesse}; supplementary material).
 
 \begin{table}[t]
 \centering\footnotesize
