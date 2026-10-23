@@ -27,9 +27,10 @@ coverage.
 \emph{Flat.} The public Flat dataset~\cite{schmid2022panoptic}, which Panoptic Multi-TSDFs and GaME also use,
 has two simulated visits of one flat with 400 and 362 frames and exact poses. Between the visits, objects
 move, appear, and disappear. A point reference of each visit's scene comes with the data.
-\emph{TESSE.} The office sequence of the TESSE change-detection data released with Khronos~\cite{schmid2024khronos} is
-one simulated visit of 4{,}346 frames (217\,s) with exact poses, during which five objects disappear and three appear.
-Khronos and our TSDF backend map it with Khronos' default depth range of 5\,m.
+\emph{TESSE.} The TESSE change-detection data released with Khronos~\cite{schmid2024khronos} has two simulated scenes,
+each one visit with exact poses: an office of 4{,}346 frames (217\,s), during which five objects disappear and three
+appear, and an apartment of 1{,}745 frames (87\,s), during which four disappear and two appear. Khronos and our TSDF
+backend map both with Khronos' default depth range of 5\,m.
 % PENDING TESSE: Panoptic Multi-TSDFs, GaME, wavemap, and our Gaussian and occupancy backends (the update layer has no
 % PENDING TESSE reader yet). After the current datasets: 3RScan~\cite{wald2019rio} with the final code.
 
@@ -137,12 +138,36 @@ geometry F1 on the real room and the simulated apartment. Maps rebuilt from scra
 geometry F1 of 83.6, 85.4, and 84.2 against the complete simulated scene with the TSDF, the Gaussians, and occupancy,
 against \prov{99.2}, \prov{96.7}, and \prov{94.9} with our layer (\cref{tab:ablation_variants}).
 
+\begin{table}[t]
+\centering\footnotesize
+\caption{TESSE, with Khronos' 4D metric (F1, in percent). Reported: the values in~\cite{schmid2024khronos}. Khronos and
+our TSDF map are evaluated at the same times, with change detection every 5 frames for both.}
+\label{tab:tesse}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Scene & Metric & Reported & Khronos & Ours \\
+\midrule
+Office & Background & 80.6 & 80.6 & \prov{81.0} \\
+ & Objects & 74.2 & 70.8 & \prov{71.4} \\
+ & Dynamics & 73.2 & 85.4 & \prov{83.0} \\
+ & Changes & 66.2 & 52.0 & \prov{62.6} \\
+\midrule
+Apartment & Background & 91.2 & 92.0 & \prov{93.1} \\
+ & Objects & 75.3 & 63.0 & \prov{70.7} \\
+ & Dynamics & 84.1 & 85.8 & \prov{95.1} \\
+ & Changes & 64.6 & 40.8 & \prov{93.3} \\
+\bottomrule
+\end{tabular}
+% SRC wt_takeover_runs/eval/tesse_paper_qj/DENSE_RESULT.md (office), eval/tesse_apt_qj/RESULT.md (apartment); tables.py with
+% SRC the query time of Eq. (20), compared at Khronos' snapshot times (96 office, 39 apartment).
+\end{table}
+
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
-TESSE, released with Khronos, is one visit to a simulated office in which objects disappear and appear while the camera
-is elsewhere. Both maps are evaluated with Khronos' 4D metric at the depth range of 5\,m that Khronos uses, and Khronos
-runs its change detection every 5 frames, as our TSDF map does (supplementary material). Khronos then reaches background,
-object, dynamic, and change F1 of 80.6, 70.8, 85.4, and 52.0, against 80.6, 74.2, 73.2, and 66.2 in its report, and at
-the same times our TSDF map reaches \prov{81.0}, \prov{71.4}, \prov{83.0}, and \prov{62.6}.
+On both TESSE scenes, our TSDF map reaches a higher background, object, and change F1 than Khronos under Khronos' own 4D
+metric, at the depth range of 5\,m that Khronos uses and with change detection every 5 frames for both maps
+(\cref{tab:tesse}; supplementary material). Our Khronos runs match the background F1 that Khronos reports and stay below
+its reported object and change F1.
 
 \begin{figure*}[t]
 \centering

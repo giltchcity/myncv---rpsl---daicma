@@ -244,10 +244,12 @@ Khronos' 4D metric averages each score over every saved map and every earlier ti
 (Eq.~(20) of~\cite{schmid2024khronos}). The released evaluation queries each map only at its own time and repeats that
 row once per earlier time; we query every map at each earlier saved time, with the same evaluation for both maps.
 Khronos saves a map at each change-detection round, which we run every 5 backend frames instead of 50, as our TSDF
-backend does; this gives 96 maps, and our TSDF map saves 90. Both are compared at Khronos' 96 times, each with its map
-nearest to each time. With change detection every 50 frames, Khronos saves 9 maps and reaches 80.3, 69.1, 84.0, and 36.8
-(background, objects, dynamics, changes), and our TSDF map, at the same 9 times, \prov{80.7}, \prov{70.1}, \prov{83.9},
-and \prov{62.7}.
+backend does. On the office, this gives 96 maps for Khronos and 90 for our TSDF map; on the apartment, 39 and 40. Both
+methods are compared at Khronos' times, each with its map nearest to each time. With change detection every 50 frames,
+Khronos saves 9 maps on the office and 3 on the 87\,s apartment. On the office, it then reaches 80.3, 69.1, 84.0, and 36.8
+(background, objects, dynamics, changes), and our TSDF map, at the same times, reaches \prov{80.7}, \prov{70.1},
+\prov{83.9}, and \prov{62.7}. On the apartment, Khronos reaches 91.1, 57.5, 77.7, and 36.3, and our map \prov{92.3},
+\prov{70.8}, \prov{86.6}, and \prov{77.8}.
 
 \section{Runtime}
 \label{sec:supp_runtime}
