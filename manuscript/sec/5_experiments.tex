@@ -34,8 +34,9 @@ backend map both with Khronos' default depth range of 5\,m.
 \emph{3RScan.} Indoor rooms scanned repeatedly months apart, with the changed objects
 annotated~\cite{wald2019rio}. We take 8 rooms with three or four scans each (27 visits) in which every rescan moves an
 object by at least 0.3\,m or removes one. Each scan is a short RGB-D sequence, aligned to the first scan of its room by
-the transforms of the dataset.
-% PENDING 3RScan: Panoptic (needs Docker Desktop), Gaussian and occupancy backends not run; the table has Khronos and our TSDF map.
+the transforms of the dataset. The reference holds every annotated object, with one state per position and each change
+at the start of the scan that shows it.
+% PENDING 3RScan: Panoptic (needs Docker Desktop); Gaussian backend running (3rscan_v4_84f609f), occupancy not run.
 
 \paragraph{Compared methods.}
 We compare against published methods on the same recordings. Every method maps the visits of a dataset in order and
@@ -56,9 +57,10 @@ disappearance of its old state and the appearance of its new one, and a change o
 is a false positive. A state is represented in a map when at least half of its reference surface samples lie within
 10\,cm of the predicted surface, of the same class where the map carries object labels, and an event is detected when the
 map no longer represents a state that disappeared or newly represents one that appeared. The main results count all
-events of a dataset, within and between visits, and the supplementary material reports them per visit. On TESSE, we use
-Khronos' 4D metric: each score is averaged over the times at which a map is saved and the earlier times about which it is
-queried, with the background scored at 20\,cm as in Khronos.
+events of a dataset, within and between visits, and the supplementary material reports them per visit. On TESSE and
+3RScan, we use Khronos' 4D metric: each score is averaged over the times at which a map is saved and the earlier times
+about which it is queried, with the background scored at 20\,cm as in Khronos. Its change F1 counts the objects that
+are associated with a reference object; the inclusive change F1 also counts the missed and the spurious ones.
 \emph{Object F1} is the online object F1 of Khronos: at every moment, the objects of the map are matched to the objects
 present then, by surface, of the same class and within 2\,m, and the F1 is averaged over the visit with the duration of
 each map state as weight.
@@ -144,7 +146,7 @@ geometry F1 on the real room and the simulated apartment. Maps rebuilt from scra
 \begin{table}[t]
 \centering\footnotesize
 \caption{TESSE, with Khronos' 4D metric (F1, in percent), at the 96 (office) and 39 (apartment) times at which Khronos
-saves its map, with change detection every 5 frames for both.}
+saves its map, with change detection every 5 frames for both. Geometry: F1 of the final map at 5\,cm.}
 \label{tab:tesse}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}llcc@{}}
@@ -155,11 +157,13 @@ Office & Background & 80.6 & \prov{81.0} \\
  & Objects & 70.8 & \prov{71.5} \\
  & Dynamics & 85.4 & \prov{82.9} \\
  & Changes & 52.0 & \prov{63.3} \\
+ & Geometry & 84.5 & \prov{87.3} \\
 \midrule
 Apartment & Background & 92.0 & \prov{93.1} \\
  & Objects & 63.0 & \prov{70.7} \\
  & Dynamics & 85.8 & \prov{95.1} \\
  & Changes & 40.8 & \prov{93.3} \\
+ & Geometry & 79.3 & \prov{84.1} \\
 \bottomrule
 \end{tabular}
 % SRC wt_takeover_runs/eval/tesse_paper_qj/DENSE_RESULT.md (office), eval/tesse_apt_qj/RESULT.md (apartment); tables.py with
@@ -167,35 +171,40 @@ Apartment & Background & 92.0 & \prov{93.1} \\
 % SRC Apartment: the clean 290e110 build gives the same numbers as the build with the uncommitted 4D-history change.
 % SRC Office: clean 290e110 build, second run (the first stalled once at frame 3722 and did not recur):
 % SRC eval/tesse_paper_qj/ours_290e110_*; results with the 4D-history build differ by at most 0.8 and are not used.
+% SRC Geometry: wt_takeover_runs/eval/tesse_g1/*.json, G1 at 5 cm of the final map (cd5 Khronos, 290e110 ours).
 \end{table}
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
 On both TESSE scenes, our TSDF map reaches a higher background, object, and change F1 than Khronos under Khronos' own 4D
 metric, evaluated at the 96 and 39 times at which Khronos saves its map, at the depth range of 5\,m that Khronos uses,
-and with change detection every 5 frames for both maps (\cref{tab:tesse}; supplementary material).
+and with change detection every 5 frames for both maps. Its final map also reaches a higher geometry F1
+(\cref{tab:tesse}; supplementary material).
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{3RScan, 8 rooms scanned three or four times (27 visits). Change F1 over the events between scans and geometry
-F1 at 5\,cm averaged over visits, in percent. Each method maps the scans of a room in order; per room in the
-supplementary material.}
+\caption{3RScan, 8 rooms scanned three or four times (27 visits), with Khronos' 4D metric (F1, in percent; mean over
+rooms) and the geometry F1 of each visit's final map at 5\,cm (mean over visits). Each method maps the scans of a room
+in order; per room in the supplementary material. $^\dagger$Over the 6 rooms in which Khronos associates a change.}
 \label{tab:3rscan}
-\setlength{\tabcolsep}{8pt}
-\begin{tabular}{@{}lcc@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Method & Change$\uparrow$ & Geometry$\uparrow$ \\
+Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
-Khronos~\cite{schmid2024khronos} & 64.2 & 88.3 \\
-\rowcolor{oursbg} Ours (TSDF) & \prov{80.5} & \prov{91.4} \\
+Khronos~\cite{schmid2024khronos} & 56.3 & 51.2$^\dagger$ & 37.0$^\dagger$ & 88.3 \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{76.8} & \prov{55.2} & \prov{52.2} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
-% SRC wt_takeover_runs/3rscan/P3_SUMMARY.md: ours clean 290e110 66/21/11; Khronos one sequence per room, the room's thing
-% SRC classes as object classes, 51/31/26.
+% SRC wt_takeover_runs/3rscan/P3_OFFICIAL.md: official evaluator, each snapshot at its own time, mean per room then over
+% SRC rooms; ours clean 290e110 joined by eval/chain_fill from the run's own snapshots; Khronos continuous, option B with
+% SRC class 1. On the same 6 rooms ours reaches 62.1 change F1. Geometry: P3_SUMMARY.md (G1 5 cm, mean over visits).
+% SRC The event-scoring version (80.5 / 64.2) is superseded.
 \end{table}
 
 \paragraph{The gains hold on public rescans.}
-On 3RScan, our TSDF map detects the changes between scans more reliably than Khronos, run over the scans of each room as
-one sequence, and reaches a higher geometry F1 (\cref{tab:3rscan}). Its change F1 is higher in six of the eight rooms.
+On 3RScan, under Khronos' 4D metric, our TSDF map reaches a higher object and change F1 than Khronos, run over the scans
+of each room as one sequence, and a higher geometry F1 (\cref{tab:3rscan}). Khronos associates no change in two of the
+eight rooms, so both of its change scores are means over the other six; ours are over all eight.
 
 \begin{figure*}[t]
 \centering

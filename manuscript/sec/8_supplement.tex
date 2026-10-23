@@ -258,35 +258,38 @@ Khronos saves 9 maps on the office and 3 on the 87\,s apartment. On the office, 
 \section{3RScan per Room}
 \label{sec:supp_3rscan}
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering\footnotesize
-\caption{3RScan per room: change F1 over the events between scans and geometry F1 at 5\,cm averaged over visits, in
-percent. Two armchairs whose identities the dataset marks as ambiguous are left out of the first room.}
+\caption{3RScan per room, with Khronos' 4D metric (F1, in percent; each map at its own time, mean over a room's maps) and
+the geometry F1 of each visit's final map at 5\,cm (mean over visits). The last row averages the 4D scores over rooms and
+the geometry over all 27 visits. A dash marks a room in which Khronos associates no change; its change means leave these
+rooms out.}
 \label{tab:supp_3rscan}
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lccccc@{}}
+\begin{tabular}{@{}lccccccccc@{}}
 \toprule
- & & \multicolumn{2}{c}{Change F1$\uparrow$} & \multicolumn{2}{c}{Geometry F1$\uparrow$} \\
-\cmidrule(lr){3-4}\cmidrule(l){5-6}
-Room & Visits & Khronos & Ours & Khronos & Ours \\
+ & & \multicolumn{2}{c}{Objects} & \multicolumn{2}{c}{Changes} & \multicolumn{2}{c}{Changes (incl.)} & \multicolumn{2}{c}{Geometry} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(l){9-10}
+Room & Visits & Khronos & Ours & Khronos & Ours & Khronos & Ours & Khronos & Ours \\
 \midrule
-0958220d & 3 & 46.2 & \prov{88.9} & 88.3 & \prov{95.1} \\
-0cac766c & 3 & 42.9 & \prov{76.9} & 86.4 & \prov{86.3} \\
-6bde6070 & 3 & 66.7 & \prov{84.2} & 92.5 & \prov{95.9} \\
-752cc57f & 4 & 50.0 & \prov{100} & 84.5 & \prov{88.3} \\
-bf9a3de7 & 4 & 86.7 & \prov{64.9} & 84.3 & \prov{86.9} \\
-ad408c8f & 4 & 0.0 & \prov{77.8} & 87.8 & \prov{89.2} \\
-e48c48f4 & 3 & 93.8 & \prov{87.5} & 91.6 & \prov{95.6} \\
-4a9a43d6 & 3 & 75.0 & \prov{80.0} & 94.4 & \prov{96.9} \\
+0958220d & 3 & 51.8 & \prov{68.8} & 55.8 & \prov{67.9} & 39.7 & \prov{66.2} & 88.3 & \prov{95.1} \\
+0cac766c & 3 & 56.2 & \prov{67.6} & -- & \prov{49.9} & -- & \prov{39.6} & 86.4 & \prov{86.3} \\
+6bde6070 & 3 & 48.4 & \prov{67.0} & 69.7 & \prov{69.2} & 18.9 & \prov{65.4} & 92.5 & \prov{95.9} \\
+752cc57f & 4 & 67.0 & \prov{89.4} & 59.9 & \prov{58.8} & 57.9 & \prov{58.8} & 84.5 & \prov{88.3} \\
+bf9a3de7 & 4 & 69.0 & \prov{80.0} & 25.0 & \prov{34.0} & 14.3 & \prov{30.9} & 84.3 & \prov{86.9} \\
+ad408c8f & 4 & 17.8 & \prov{80.0} & -- & \prov{18.8} & -- & \prov{16.2} & 87.8 & \prov{89.2} \\
+e48c48f4 & 3 & 75.1 & \prov{85.1} & 53.8 & \prov{82.2} & 49.5 & \prov{82.2} & 91.6 & \prov{95.6} \\
+4a9a43d6 & 3 & 64.8 & \prov{76.5} & 43.0 & \prov{60.6} & 41.6 & \prov{58.6} & 94.4 & \prov{96.9} \\
 \midrule
-All & 27 & 64.2 & \prov{80.5} & 88.3 & \prov{91.4} \\
+Mean & 27 & 56.3 & \prov{76.8} & 51.2 & \prov{55.2} & 37.0 & \prov{52.2} & 88.3 & \prov{91.4} \\
 \bottomrule
 \end{tabular}
-\end{table}
+% SRC wt_takeover_runs/3rscan/P3_OFFICIAL.md (4D metric), P3_SUMMARY.md (geometry, mean over the 27 visits).
+\end{table*}
 
-In the room with four scans of 6 to 9\,s each, Khronos keeps one object over the whole sequence and detects none of the
-changes. In the room where Khronos leads, our map never forms the sofa as an object and covers only part of an armchair,
-so both appear to leave the scene.
+In the room with four scans of 6 to 9\,s each, Khronos keeps one object over the whole sequence and associates none of
+the changes. Khronos leads in the change F1 of two rooms, by at most 1.1 points. In room bf9a3de7, our map never forms the
+sofa as an object and covers only part of an armchair, so both appear to leave the scene.
 
 \section{Runtime}
 \label{sec:supp_runtime}
