@@ -62,11 +62,11 @@ events of a dataset, within and between visits, and the supplementary material r
 about which it is queried, with the background scored at 20\,cm as in Khronos. Its change F1 counts the objects that
 are associated with a reference object; the inclusive change F1 also counts the missed and the spurious ones.
 \emph{Object F1} is the online object F1 of Khronos: at every moment, the objects of the map are matched to the objects
-present then, by surface, of the same class and within 2\,m, and the F1 is averaged over the visit with the duration of
-each map state as weight.
+present then, by surface, of the same class and within 2\,m, and the F1 is averaged over the last visit with the duration
+of each map state as weight.
 \emph{Old-site residue} is the fraction of the reference surface of object states that ended before a visit began,
 among the parts that the visit observes as free space, that the visit's final map still shows. Lower is better.
-\emph{Geometry} is the F1 at 5\,cm between surface samples of the map and the reference. The real reference is
+\emph{Geometry} is the F1 at 5\,cm between surface samples of the map after the last visit and the reference. The real reference is
 reconstructed from each visit's own RGB-D data and covers what that visit observes, so it tests accuracy there. The
 simulated reference is the complete scene mesh, including surfaces that the last visit leaves unobserved, so it also
 tests completeness. We score each map on its own surface: the TSDF mesh,
@@ -89,8 +89,7 @@ Datasets and backends share the constants of \cref{sec:handoff}. Every experimen
 
 \begin{table*}[t]
 \centering\footnotesize
-\caption{Main results, in percent. Object F1 covers the last visit, and geometry F1 the map after it. $^\dagger$Events
-between visits only.}
+\caption{Main results, in percent. $^\dagger$Events between visits only.}
 \label{tab:main}
 \setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{@{}lccccccc@{}}
@@ -142,8 +141,7 @@ geometry F1 on the real room and the simulated apartment. Maps rebuilt from scra
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{TESSE, F1 in percent, at the 96 (office) and 39 (apartment) times at which Khronos saves its map, with change
-detection every 5 frames. Geometry uses the final map.}
+\caption{TESSE, F1 in percent.}
 \label{tab:tesse}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}llcc@{}}
@@ -177,9 +175,8 @@ On both TESSE scenes, our TSDF map reaches a higher background, object, change, 
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{3RScan, 8 rooms scanned three or four times (27 visits), F1 in percent: Khronos' 4D metric (mean over rooms)
-and the geometry of each visit's final map (mean over visits); per room in the supplementary material. $^\dagger$Over the
-5 rooms in which Khronos associates a change.}
+\caption{3RScan, F1 in percent; per room in the supplementary material. $^\dagger$Over the 5 rooms in which Khronos
+associates a change.}
 \label{tab:3rscan}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lcccc@{}}
@@ -250,9 +247,8 @@ GaME, and with occupancy \prov{80.3}, against 78.6 for wavemap.
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Rendering of the Gaussian maps on held-out frames of the last visit; depth L1 in cm. All maps are refined after
-the last visit, and ours trains each Gaussian only with the keyframes whose valid domain contains it and adds no
-Gaussians. Scratch rebuilds the last visit from an empty map with GaME.}
+\caption{Rendering on held-out frames of the last visit; depth L1 in cm. Scratch rebuilds the last visit from an empty
+map.}
 \label{tab:rendering}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{@{}lcccc@{}}
@@ -300,11 +296,8 @@ The maps are those kept at the change-detection rounds, before the refinement. N
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Restart or update. Scratch starts every visit from an empty map (Khronos for the TSDF), own is the published
-update of the representation (Panoptic Multi-TSDFs, GaME, wavemap), and ours adds our layer. Residue after the second and third real visits; geometry F1 of the final map on the real room against a reference
-reconstructed from each visit's own frames, averaged over the three visits; geometry F1 against the complete simulated
-scene, including the surfaces that a visit leaves unobserved, averaged over the two visits. n/a: the
-map holds no surface of an earlier visit.}
+\caption{Restart or update, in percent. Scratch starts every visit from an empty map, own is the published update of
+the representation, and ours adds our layer.}
 \label{tab:ablation_variants}
 % SRC means: real G1 per visit (1st/2nd/3rd) scratch TSDF (Khronos per visit, final-map rule) 90.90/95.94/94.83, GaME row 1
 % SRC 93.21/93.62/95.33, wavemap row 1 94.80/96.37/95.84; Panoptic 92.40/93.58/92.95, GaME 93.09/88.64/90.75, wavemap
