@@ -79,7 +79,12 @@ carries no map between visits. A dash marks a quantity not evaluated.
 
 \paragraph{Protocol.}
 Simulated visits use ground-truth poses, and real visits use the estimated poses and the alignment above. Segmentation is
-ground truth in all visits, annotated on SAM~\cite{kirillov2023sam} masks for the real room. Datasets and backends share
+ground truth in all visits, annotated on SAM~\cite{kirillov2023sam} masks for the real room. Our layer and Panoptic
+Multi-TSDFs receive the object instances. Khronos receives the class labels and forms objects with its own segmentation,
+as in its release; on the simulated apartment, it receives the same instances.
+% SRC Khronos input (TSDF session, 10-23): semantic only on 3RScan, real and TESSE (label_protocol: semantic_only;
+% SRC ConnectedSemantics + MaxIouTracker); packed semantic+instance on synthetic (PackedSemanticInstanceForwarding).
+% PENDING control: Khronos with instance input on 3RScan (running), real (after), TESSE (not planned yet). Datasets and backends share
 the constants of \cref{sec:handoff}. Every experiment runs on one NVIDIA RTX 5070 Ti (16\,GB) and an AMD Ryzen 7 9700X with 44\,GB of memory.
 
 \subsection{Main Results}
