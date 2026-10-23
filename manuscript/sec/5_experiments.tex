@@ -197,13 +197,14 @@ in order; per room in the supplementary material. $^\dagger$Over the 6 rooms in 
 Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
 Khronos~\cite{schmid2024khronos} & 56.3 & 51.2$^\dagger$ & 37.0$^\dagger$ & 88.3 \\
-\rowcolor{oursbg} Ours (TSDF) & \prov{76.8} & \prov{55.2} & \prov{52.2} & \prov{91.4} \\
+\rowcolor{oursbg} Ours (TSDF) & \prov{76.5} & \prov{53.9} & \prov{51.5} & \prov{91.4} \\
 \bottomrule
 \end{tabular}
-% SRC wt_takeover_runs/3rscan/P3_OFFICIAL.md: official evaluator, each snapshot at its own time, mean per room then over
-% SRC rooms; ours clean 290e110 joined by eval/chain_fill from the run's own snapshots; Khronos continuous, option B with
-% SRC class 1. On the same 6 rooms ours reaches 62.1 change F1. Geometry: P3_SUMMARY.md (G1 5 cm, mean over visits).
-% SRC The event-scoring version (80.5 / 64.2) is superseded.
+% SRC wt_takeover_runs/3rscan/P3_OFFICIAL_UNIFORM.md: official evaluator, each snapshot at its own time, mean per room
+% SRC then over rooms; ours clean 290e110 through the uniform timeline pipeline (eval/timeline_complete.py, geometric moves,
+% SRC one global mesh per visit), the same pipeline as the Gaussian maps; Khronos native 4D map, semantic input, option B
+% SRC with class 1. On the same 6 rooms ours reaches 59.4 change F1 (incl. 58.2). Geometry: P3_SUMMARY.md (G1 5 cm, mean over visits).
+% SRC Superseded: P3_OFFICIAL.md (chain_fill, 76.8 / 55.2 / 52.2) and the event scoring (80.5 / 64.2).
 \end{table}
 
 \paragraph{The gains hold on public rescans.}
