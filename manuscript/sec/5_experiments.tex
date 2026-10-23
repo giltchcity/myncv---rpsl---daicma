@@ -53,8 +53,8 @@ is a false positive. A state is represented in a map when at least half of its r
 10\,cm of the predicted surface, of the same class where the map carries object labels, and an event is detected when the
 map no longer represents a state that disappeared or newly represents one that appeared. The main results count all
 events of a dataset, within and between visits, and the supplementary material reports them per visit. On TESSE, we use
-the evaluation released with Khronos: its counts of appearances and disappearances give the change F1, and the accuracy
-and completeness of the background at 5\,cm give the geometry F1.
+Khronos' 4D metric: each score is averaged over the times at which a map is saved and the earlier times about which it is
+queried, with the background scored at 20\,cm as in Khronos.
 \emph{Object F1} is the online object F1 of Khronos: at every moment, the objects of the map are matched to the objects
 present then, by surface, of the same class and within 2\,m, and the F1 is averaged over the visit with the duration of
 each map state as weight.
@@ -138,10 +138,11 @@ geometry F1 of 83.6, 85.4, and 84.2 against the complete simulated scene with th
 against \prov{99.2}, \prov{96.7}, and \prov{94.9} with our layer (\cref{tab:ablation_variants}).
 
 \paragraph{On Khronos' own data, our TSDF map also exceeds Khronos.}
-TESSE, released with Khronos, is one visit to a simulated office in which objects disappear and appear while the
-camera is elsewhere. At the depth range of 5\,m that Khronos uses there, our TSDF map reaches an object F1 of
-\prov{97.9} on its final map against 92.8, a geometry F1 of \prov{94.5} against 75.6, and a change F1 of \prov{66.7}
-against 63.2.
+TESSE, released with Khronos, is one visit to a simulated office in which objects disappear and appear while the camera
+is elsewhere. Both maps are evaluated with Khronos' 4D metric at the depth range of 5\,m that Khronos uses, and Khronos
+runs its change detection every 5 frames, as our TSDF map does (supplementary material). Khronos then reaches background,
+object, dynamic, and change F1 of 80.6, 70.8, 85.4, and 52.0, against 80.6, 74.2, 73.2, and 66.2 in its report, and at
+the same times our TSDF map reaches \prov{81.0}, \prov{71.4}, \prov{83.0}, and \prov{62.6}.
 
 \begin{figure*}[t]
 \centering
