@@ -288,6 +288,33 @@ Mean & 27 & 62.2 & \prov{76.5} & 45.6 & \prov{53.9} & 38.7 & \prov{51.5} & 88.3 
 % SRC Khronos: P3_OFFICIAL_KHRONOS_INST.md (same GT instances); geometry from P3_SUMMARY (mesh, unaffected by the instance input).
 \end{table*}
 
+\begin{table}[t]
+\centering\footnotesize
+\caption{3RScan per room for the occupancy maps, with the metrics of \cref{tab:supp_3rscan}.}
+\label{tab:supp_3rscan_occ}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+ & & \multicolumn{2}{c}{Objects} & \multicolumn{2}{c}{Changes} & \multicolumn{2}{c}{Geometry} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(l){7-8}
+Room & Visits & wavemap & Ours & wavemap & Ours & wavemap & Ours \\
+\midrule
+0958220d & 3 & 85.2 & \prov{89.6} & 34.3 & \prov{50.6} & 85.7 & \prov{86.4} \\
+0cac766c & 3 & 87.6 & \prov{86.1} & 37.7 & \prov{50.3} & 70.5 & \prov{70.8} \\
+6bde6070 & 3 & 82.6 & \prov{85.3} & 25.9 & \prov{81.7} & 77.0 & \prov{78.6} \\
+752cc57f & 4 & 92.9 & \prov{91.2} & -- & \prov{72.9} & 70.0 & \prov{72.6} \\
+bf9a3de7 & 4 & 92.8 & \prov{91.1} & 50.8 & \prov{62.4} & 72.6 & \prov{73.0} \\
+ad408c8f & 4 & 91.2 & \prov{90.5} & 51.4 & \prov{80.3} & 72.9 & \prov{75.4} \\
+e48c48f4 & 3 & 85.3 & \prov{86.9} & -- & \prov{64.0} & 77.8 & \prov{82.7} \\
+4a9a43d6 & 3 & 80.0 & \prov{82.7} & 40.4 & \prov{58.3} & 78.1 & \prov{81.7} \\
+\midrule
+Mean & 27 & 87.2 & \prov{87.9} & 40.1 & \prov{65.1} & 75.2 & \prov{77.2} \\
+\bottomrule
+\end{tabular}
+% SRC runs/update_layer_game_T1_20261006/wm_3rscan_cca6ccc/row{3,4}/<room>/eval_khronos_identity/khronos_metrics/METRICS.json
+% SRC (ObjectF1 / ChangeF1 "mean") and CHAIN_EVAL.json (geometry 5 cm, mean over visits; Mean row over the 27 visits).
+\end{table}
+
 In room bf9a3de7, our map never forms the
 sofa as an object and covers only part of an armchair, so both appear to leave the scene.
 

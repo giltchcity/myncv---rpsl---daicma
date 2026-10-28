@@ -184,6 +184,9 @@ Method & Objects & Changes & Changes (incl.) & Geometry \\
 \midrule
 Khronos~\cite{schmid2024khronos} & 62.2 & 45.6 & 38.7 & 88.3 \\
 \rowcolor{oursbg} Ours (TSDF) & \prov{76.5} & \prov{53.9} & \prov{51.5} & \prov{91.4} \\
+\midrule
+wavemap~\cite{reijgwart2023wavemap} & 87.2 & 40.1 & \nev & 75.2 \\
+\rowcolor{oursbg} Ours (occupancy) & \prov{87.9} & \prov{65.1} & \nev & \prov{77.2} \\
 \bottomrule
 \end{tabular}
 % SRC wt_takeover_runs/3rscan/P3_OFFICIAL_UNIFORM.md: official evaluator, each snapshot at its own time, mean per room
@@ -191,6 +194,8 @@ Khronos~\cite{schmid2024khronos} & 62.2 & 45.6 & 38.7 & 88.3 \\
 % SRC one global mesh per visit), the same pipeline as the Gaussian maps; Khronos native 4D map, semantic input, option B
 % SRC with class 1. Geometry of ours: P3_SUMMARY.md (G1 5 cm, mean over visits).
 % SRC Superseded: P3_OFFICIAL.md (chain_fill, 76.8 / 55.2 / 52.2) and the event scoring (80.5 / 64.2).
+% SRC Occupancy: runs/update_layer_game_T1_20261006/wm_3rscan_cca6ccc/row{3,4}/<room>/eval_khronos_identity (4D metric,
+% SRC timeline by identity as the Gaussian maps) and CHAIN_EVAL.json (geometry 5 cm, mean over the 27 visits); code cca6ccc.
 % SRC Khronos: P3_OFFICIAL_KHRONOS_INST.md (official build, InstanceForwarding with the same GT instances, MaxIoUTracker);
 % SRC change scores over 5 rooms (0cac766c, 6bde6070, ad408c8f have none). Geometry 88.3 from P3_SUMMARY: G1 is the mesh,
 % SRC unaffected by the instance input (0958220d checked: 94.5 / 93.9 / 76.6 with instances, 94.5 / 93.8 / 76.7 without).
@@ -199,7 +204,7 @@ Khronos~\cite{schmid2024khronos} & 62.2 & 45.6 & 38.7 & 88.3 \\
 
 \paragraph{The gains hold on public rescans.}
 On 3RScan, under Khronos' 4D metric, our TSDF map reaches a higher object and change F1 than Khronos
-and a higher geometry F1 (\cref{tab:3rscan}).
+and a higher geometry F1, and our occupancy map a higher object, change, and geometry F1 than wavemap (\cref{tab:3rscan}).
 
 \begin{figure*}[t]
 \centering
