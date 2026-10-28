@@ -58,46 +58,48 @@ describe the scene. A depth image of a chair is correct when the camera takes it
 describes history and must stop shaping the current map. The second asks which parts of the earlier map remain. Where
 the new visit sees through an old surface, the surface is gone. Where it never looks, the earlier map is the only
 evidence, and the old surface stays: a missing observation is not evidence of absence. Both questions concern
-observations and object states, not voxels or Gaussians. The map records where surfaces are, and the layer decides when
+observations and object states, not voxels or Gaussians. The map records where surfaces are, and the update decides when
 they hold.
 
-We therefore separate the temporal reasoning from the mapper. Our update layer runs beside an existing mapper on the
-same frames. It infers the \emph{state interval} of each object state, restricts each observation to its \emph{valid
-domain} (the space where its state still holds), and decides with a \emph{continuation test} which elements of the
-previous map remain. Objects that move in view, change out of view, or change between visits are decided with one
-likelihood, one prior, and one decision rule, and they differ only in their evidence and in the odds they start from. The
-layer ends an element by closing its \emph{lifetime} instead of deleting it, so every map can be queried at any earlier
-time, and at the end of a visit it exports its state as the prior of the next. The mapper connects through an
+We therefore shift the update from a rule of each representation to a decision about when each surface holds. We
+introduce \ours, a unified method for persistent mapping that runs beside an existing mapper on the same frames
+(\cref{fig:method}). It infers the \emph{state interval} of each object state, restricts each observation to its
+\emph{valid domain} (the space where its state still holds), and decides with a \emph{continuation test} which elements
+of the previous map remain. Objects that move in view, change out of view, or change between visits go through the same
+decision, which differs only in its evidence and in the odds it starts from. \ours ends an element by closing its
+\emph{lifetime} instead of deleting it, so every map can be queried at any earlier time, and at the end of a visit it
+exports its state as the prior of the next. The mapper connects through an
 \emph{update interface} of four operations: it reports its elements, ends the elements the layer names, accepts the
 state intervals, and integrates observations within their valid domains. It keeps its own way of integrating measured
 surfaces.
 
-We connect the layer to three mappers that share nothing but the scene. A TSDF mapper built on
+We connect \ours to three mappers that share nothing but the scene. A TSDF mapper built on
 Khronos~\cite{schmid2024khronos} averages signed distances, the Gaussian mapper GaME~\cite{yugay2026game} trains 3D
 Gaussians by gradient descent, and the occupancy mapper wavemap~\cite{reijgwart2023wavemap} accumulates log odds. They
 hold the surfaces, the appearance, and the free space that a robot uses a map for, and each comes with a published update
 that errs in its own direction. Panoptic Multi-TSDFs and GaME keep too much of the old scene, and wavemap's update, which
-lowers the occupancy of every cell that a ray traverses, also clears surfaces that still exist. If one layer corrects all
+lowers the occupancy of every cell that a ray traverses, also clears surfaces that still exist. If one method corrects all
 three, the update was never a property of the representation (\cref{fig:teaser}).
 
-With the same layer, all three maps follow the scene across visits (\cref{tab:main}). Objects that have left leave the
+With \ours, all three maps follow the scene across visits (\cref{tab:main}). Objects that have left leave the
 map: after two revisits of the real room, under \prov{7\%} of their surface remains in our TSDF map, where Panoptic
 Multi-TSDFs~\cite{schmid2022panoptic} keeps about 60\%. What a visit does not see is kept: when the second visit to a
 simulated apartment observes only part of it, each of our maps stays more complete than under the published update of
-its representation and far more complete than a map rebuilt from scratch. Each mapper with our layer detects more of the
+its representation and far more complete than a map rebuilt from scratch. Each mapper with \ours detects more of the
 changes and reaches a higher geometry F1 than the published update of its representation, our TSDF map also exceeds
 Khronos, including on Khronos' own data, and the Gaussian map renders held-out
 views better than GaME's update.
 
 Our contributions are:
 \begin{itemize}
-  \item a formulation of persistent mapping in which visits are interrupted observations of one evolving scene: changes
-  in view, out of view, and between visits are decided by one likelihood, one prior, and one decision rule, and each
-  visit hands its state to the next as a prior;
-  \item an update layer whose valid domains admit an observation only while the state it measured holds and whose
-  continuation test keeps an element of the earlier map until current observations place its surface elsewhere,
-  connected to a TSDF, a 3D Gaussian, and an occupancy mapper through an update interface of four operations;
-  \item an evaluation on three visits to a real room, a simulated apartment, the public Flat and 3RScan rescans, and the
-  TESSE data released with Khronos, in which every mapper with our layer reaches a higher geometry F1 than the published update of
-  its representation, and our TSDF map exceeds Khronos on Khronos' own data.
+  \item We propose \ours, a unified method for persistent mapping in which visits are interrupted observations of one
+  evolving scene: changes in view, out of view, and between visits go through the same decision, and each visit hands
+  its state to the next.
+  \item We show that \ours connects to a TSDF, a 3D Gaussian, and an occupancy mapper through four operations. Its valid
+  domains admit an observation only while the state it measured holds, and its continuation test keeps an element of the
+  earlier map until current observations place its surface elsewhere, which corrects each published update in its own
+  direction.
+  \item On three visits to a real room, a simulated apartment, the public Flat and 3RScan rescans, and the TESSE data
+  released with Khronos, every mapper with \ours reaches a higher geometry F1 than the published update of its
+  representation, and our TSDF map exceeds Khronos on Khronos' own data.
 \end{itemize}

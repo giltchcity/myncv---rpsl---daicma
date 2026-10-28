@@ -1,7 +1,7 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-A visit ends when the robot stops, but the scene keeps changing. An update layer lets an existing mapper continue across
+A visit ends when the robot stops, but the scene keeps changing. \ours lets an existing mapper continue across
 visits: it decides which observations still describe the scene and which elements of the earlier map continue, hands its
 state to the next visit as a prior, and leaves the integration of the selected observations to the mapper. With the same decisions for changes in view, out of view, and between visits, a TSDF, a 3D Gaussian map, and an occupancy map remove
 obsolete states, keep the regions that a new visit leaves unobserved, and record when each state held. A mapper joins by

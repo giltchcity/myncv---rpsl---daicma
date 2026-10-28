@@ -1,14 +1,17 @@
 \section{Method}
 \label{sec:method}
 
-A map update must decide which observations still describe the scene and which elements of the earlier map remain.
-Both are questions about rays and object states, so our update layer answers them beside an existing mapper
-(\cref{fig:method}) with three decisions. \emph{State intervals} record when each object
+\ours answers two questions beside an existing mapper (\cref{fig:method}): which observations still describe the
+scene, and which elements of the earlier map remain. Both are questions about rays and object states, and \ours answers
+them with three decisions. \emph{State intervals} record when each object
 state holds (\cref{sec:states}). \emph{Valid domains} restrict each observation to the space where the state it
 measured still holds (\cref{sec:validity}). The \emph{continuation test} keeps an element of the previous map until
-current observations place its surface elsewhere (\cref{sec:memory}). A mapper connects to the layer through the
-\emph{update interface} and keeps its own integration of measured surfaces (\cref{sec:representations}). Every element keeps its \emph{lifetime},
-so the map of any earlier time remains available, and each visit hands its state to the next (\cref{sec:handoff}).
+current observations place its surface elsewhere (\cref{sec:memory}). A mapper connects to \ours through the
+\emph{update interface} (\cref{sec:representations}). Every element keeps its \emph{lifetime}, and each visit hands
+its state to the next (\cref{sec:handoff}). This formulation has three properties. First, changes in view, out of view,
+and between visits go through the same decision. Second, the mapper keeps its own integration of measured surfaces, so a
+TSDF, a 3D Gaussian, and an occupancy mapper join through the same four operations. Third, ending an element sets its
+lifetime instead of erasing it, so every map can be queried at any earlier time.
 
 \begin{figure*}[t]
 \centering
@@ -51,12 +54,12 @@ An element lives from the change-detection round (\cref{sec:states}) that first 
 $d_e$, and an object element of
 state $s$ has $d_e = d_s$. Ending an element sets $d_e$ instead of deleting it, so the map of any earlier time remains available.
 
-\subsection{State Intervals: One Likelihood, One Prior, One Decision}
+\subsection{State Intervals}
 \label{sec:states}
 
 Objects change in three ways: they move in view, change out of view during a visit, or change between visits. The layer
-decides all three with one likelihood, one prior, and one decision rule, and the three differ only in their evidence
-and in the odds they start from. The decisions run in periodic change-detection rounds and yield the interval $[b_s, d_s)$ of every
+decides all three with the same likelihood and decision rule, and the three differ only in their evidence and in the
+odds they start from. The decisions run in periodic change-detection rounds and yield the interval $[b_s, d_s)$ of every
 state. Every state begins at its first observation. Its last support is the last depth image that supports its
 surface. A state ended by a successor closes at the round that decides the handover, or at its last support if that
 comes later, so the map shows both states until the handover. A state ended without a successor closes midway between
@@ -99,7 +102,7 @@ absence likelihood ratios, computed as for $G_A$, multiply to $\Lambda_U$, the l
 $N$. Visible motion, flagged by the layer's object tracker as in Khronos~\cite{schmid2024khronos}, has likelihood ratio
 $\infty$ for $M$, so the same rule ends the state at once.
 
-\paragraph{One prior.}
+\paragraph{Prior.}
 A test of $\ell$ resolves when a round ends one of its states or confirms that it continues, and the prior $q_\ell$, the
 only one the layer learns, is the probability that a resolved test of $\ell$ ends in a change. It is the posterior mean of a Beta distribution whose pseudo-counts $\alpha_c, \beta_c$ come from the other
 objects of $\ell$'s class and whose counts are the $m_\ell$ resolved tests of $\ell$ that ended in a change and the $u_\ell$ that did not:
@@ -109,7 +112,7 @@ objects of $\ell$'s class and whose counts are the $m_\ell$ resolved tests of $\
 \end{equation}
 We write $q$ for $q_\ell$ below.
 
-\paragraph{One decision rule.}
+\paragraph{Decision rule.}
 Every action minimizes the expected loss under two losses. Showing a surface costs the area of the symmetric difference
 between the shown and the true current surface, which puts the handover at $P(M) > 1/2$. When no successor is
 observed, wrongly ending a state costs 99 times more than wrongly keeping it, which puts the end of a state at odds of
@@ -130,7 +133,7 @@ change.
 
 \begin{table}[t]
 \centering\small
-\caption{The three kinds of change under one likelihood, one prior, and one decision rule.}
+\caption{Evidence and decision rule for each kind of change.}
 \label{tab:decisions}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}p{0.2\linewidth}p{0.38\linewidth}p{0.36\linewidth}@{}}

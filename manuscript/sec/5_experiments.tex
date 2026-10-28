@@ -1,10 +1,10 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We attach the same update layer to a TSDF, a 3D Gaussian, and an occupancy mapper. With every mapper, the layer detects
+We attach \ours to a TSDF, a 3D Gaussian, and an occupancy mapper. With every mapper, \ours detects
 the changes within and between visits, removes obsolete surfaces, reaches a higher geometry F1 on the revisits than
-the published update of its representation, and completes the map from the memory of earlier visits. Each mapper also runs without our
-layer, from an empty map and with its own update where it has one.
+the published update of its representation, and completes the map from the memory of earlier visits. Each mapper also runs without
+\ours, from an empty map and with its own update where it has one.
 
 \subsection{Setup}
 \label{sec:setup}
