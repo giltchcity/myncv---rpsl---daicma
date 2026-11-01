@@ -10,10 +10,11 @@ occupancy grid. Keeping earlier geometry indiscriminately leaves objects at outd
 scratch loses previously observed regions. Dynamic mapping must update the changed scene and
 retain the parts that remain consistent.
 
-Khronos reconstructs dense metric-semantic maps of scene evolution over time~\cite{schmid2024khronos}.
-GaME brings online Gaussian reconstruction and novel-view synthesis to evolving scenes~\cite{yugay2026game},
-while wavemap provides efficient probabilistic occupancy mapping through wavelet compression and
-multi-resolution integration~\cite{reijgwart2023wavemap}. Across these representations, dynamic mapping requires
+Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over
+time~\cite{schmid2024khronos}. GaME introduced the first mapping system with novel-view synthesis for
+evolving, long-term dynamic scenes~\cite{yugay2026game}. wavemap combines state-of-the-art lossless
+occupancy compression with efficient multi-resolution integration~\cite{reijgwart2023wavemap}.
+Across these representations, dynamic mapping requires
 a common decision: which geometry remains present, and which observations can contribute to its reconstruction?
 
 We connect these decisions through the time interval in which a scene state exists.
