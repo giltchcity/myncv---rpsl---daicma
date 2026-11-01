@@ -1,35 +1,31 @@
-% Native original images; exact positions and crops are in the companion JSON.
+% Edit each panel directly below: one original PNG per includegraphics.
+% graphicx performs the crop; labels and layout are native LaTeX.
 \begin{figure}[t]
 \centering
 \begingroup
-\rmfamily
-\setlength{\unitlength}{\dimexpr\linewidth/240\relax}
-\begin{picture}(240,302)
-\put(38.000,294.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Baseline}}
-\put(120.000,294.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{997510}Ours}}
-\put(202.000,294.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Reference}}
-\put(82.000,290.000){\color[HTML]{997510}\rule{76.000\unitlength}{0.6pt}}
-\put(0.000,278.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(a) TSDF / Khronos}}
-\put(240.000,278.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Real}}
-\put(0.000,218.714){\includegraphics[width=76.000\unitlength,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}
-\put(82.000,218.714){\includegraphics[width=76.000\unitlength,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png}}
-\put(164.000,218.714){\includegraphics[width=76.000\unitlength,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
-\put(0.000,206.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(b) TSDF / Khronos}}
-\put(240.000,206.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Synthetic}}
-\put(0.000,146.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png}}
-\put(82.000,146.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/3_ours_tsdf.png}}
-\put(164.000,146.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(0.000,134.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(c) Occupancy / wavemap}}
-\put(240.000,134.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Synthetic}}
-\put(0.000,74.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png}}
-\put(82.000,74.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/7_ours_occ.png}}
-\put(164.000,74.714){\includegraphics[width=76.000\unitlength,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(0.000,62.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(d) Occupancy / wavemap}}
-\put(240.000,62.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Flat}}
-\put(0.000,2.714){\includegraphics[width=76.000\unitlength,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png}}
-\put(82.000,2.714){\includegraphics[width=76.000\unitlength,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png}}
-\put(164.000,2.714){\includegraphics[width=76.000\unitlength,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png}}
-\end{picture}
+\fontsize{8}{9}\selectfont
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0}
+\newcommand{\geowidth}{\dimexpr(\linewidth-12pt)/3\relax}
+\begin{tabular}{@{}ccc@{}}
+Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
+\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(a) TSDF / Khronos}\hfill\textcolor{resultgray}{Real}}}\\[3pt]
+\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
+\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
+\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}\\[7pt]
+\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(b) TSDF / Khronos}\hfill\textcolor{resultgray}{Synthetic}}}\\[3pt]
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png} &
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/3_ours_tsdf.png} &
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 218.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}\\[7pt]
+\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(c) Occupancy / wavemap}\hfill\textcolor{resultgray}{Synthetic}}}\\[3pt]
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png} &
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/7_ours_occ.png} &
+\includegraphics[width=\geowidth,trim={0.0000bp 0.0000bp 288.0000bp 200.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}\\[7pt]
+\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(d) Occupancy / wavemap}\hfill\textcolor{resultgray}{Flat}}}\\[3pt]
+\includegraphics[width=\geowidth,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png} &
+\includegraphics[width=\geowidth,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png} &
+\includegraphics[width=\geowidth,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png}\\
+\end{tabular}
 \endgroup
 \caption{\textbf{The shared update removes stale geometry.} Khronos vs.\ our TSDF (top two rows); wavemap vs.\ our occupancy (bottom two). Each row shares the camera, crop, and scale. Final maps use reference colors; occupancy resolution is 2\,cm.}
 \label{fig:geometry_details}
