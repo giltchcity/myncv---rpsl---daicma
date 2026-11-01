@@ -1,0 +1,19 @@
+% Generated from experiments_rewrite_20261101/results.json
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}llrrrr@{}}
+\toprule
+Scene & Method & Bg. & Obj. & Dyn. & Chg. \\ \midrule
+Office & Khronos & 74.6 & 69.0 & 84.8 & 43.6 \\
+ & Ours & \textbf{76.1} & \textbf{69.5} & \textbf{98.7} & \textbf{79.0} \\
+\midrule
+Apartment & Khronos & 78.0 & 55.9 & 85.3 & 36.9 \\
+ & Ours & \textbf{79.9} & \textbf{63.3} & \textbf{95.1} & \textbf{92.7} \\
+\bottomrule
+\end{tabular*}
+\caption{\textbf{Single-run 4D mapping on TESSE.} Official Khronos query aggregation, F1 (\%, $\uparrow$), with 5\,cm voxels and background tolerance. Bg./Obj./Dyn./Chg.: background/static objects/dynamic objects/changes. Full P/R/F1 appear in the supplement.}
+\label{tab:tesse}
+\end{table}

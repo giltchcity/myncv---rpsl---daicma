@@ -1,0 +1,19 @@
+% Generated from experiments_rewrite_20261101/results.json
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}lrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{Recall $\uparrow$} & \multicolumn{2}{c}{F1 $\uparrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Map & Restart & Ours & Restart & Ours \\ \midrule
+TSDF & 77.6 & \textbf{98.7} & 86.6 & \textbf{99.2} \\
+3DGS & 78.7 & \textbf{96.0} & 85.4 & \textbf{96.6} \\
+Occupancy & 76.5 & \textbf{93.6} & 85.3 & \textbf{94.2} \\
+\bottomrule
+\end{tabular*}
+\caption{\textbf{Retaining geometry through partial revisits.} Synthetic visit B: recall and F1 at 5\,cm (\%, $\uparrow$). Native restart versus our continued map; the reference covers surfaces observed up to B.}
+\label{tab:restart}
+\end{table}

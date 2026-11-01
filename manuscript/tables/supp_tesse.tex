@@ -1,0 +1,21 @@
+% Generated from experiments_rewrite_20261101/results.json
+\begin{table*}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{2.3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}ll*{13}{r}@{}}
+\toprule
+& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Geometry \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
+Scene & Method & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 & F1 \\ \midrule
+Office & Khronos & 93.8 & 66.0 & 74.6 & 99.3 & 57.0 & 69.0 & 97.3 & 75.5 & 84.8 & 9.2 & 49.3 & 43.6 & 92.8 \\
+ & Ours & 95.3 & 67.5 & 76.1 & 99.1 & 57.4 & 69.5 & 100.0 & 97.5 & 98.7 & 94.4 & 50.4 & 79.0 & 94.2 \\
+\midrule
+Apartment & Khronos & 91.9 & 69.0 & 78.0 & 96.7 & 38.8 & 55.9 & 95.7 & 76.2 & 85.3 & 16.3 & 56.8 & 36.9 & 86.1 \\
+ & Ours & 96.5 & 69.3 & 79.9 & 96.7 & 46.7 & 63.3 & 94.9 & 94.0 & 95.1 & 93.3 & 59.2 & 92.7 & 88.1 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Full TESSE evaluation.} Precision, recall, and F1 are official query-aggregated percentages. Final geometry uses F1 at 5\,cm.}
+\label{tab:supp_tesse}
+\end{table*}

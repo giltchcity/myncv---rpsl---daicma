@@ -1,0 +1,30 @@
+% Generated from experiments_rewrite_20261101/results.json
+\begin{table*}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{2.3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}ll*{13}{r}@{}}
+\toprule
+& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Geometry \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
+Scene & Method & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 & F1 \\ \midrule
+Real A & Khronos & 88.7 & 76.2 & 80.6 & 99.0 & 90.6 & 94.3 & 0.0 & 0.0 & -- & 6.9 & 98.8 & 54.2 & 90.9 \\
+ & Ours & 97.2 & 76.9 & 84.6 & 97.9 & 95.0 & 96.4 & 92.6 & 98.3 & 96.0 & 36.6 & 100.0 & 97.0 & 94.5 \\
+\midrule
+Real B & Khronos & 93.2 & 82.6 & 86.6 & 95.0 & 90.2 & 92.4 & 96.5 & 14.9 & 28.2 & 6.7 & 15.5 & 42.0 & 95.9 \\
+ & Ours & 95.9 & 82.5 & 87.7 & 98.0 & 94.0 & 95.9 & 76.0 & 98.2 & 88.4 & 26.9 & 75.1 & 66.7 & 97.4 \\
+\midrule
+Real C & Khronos & 92.6 & 83.0 & 86.7 & 85.0 & 84.2 & 84.1 & 16.8 & 0.9 & 3.3 & 29.2 & 25.3 & 46.0 & 94.8 \\
+ & Ours & 96.4 & 83.8 & 88.9 & 94.0 & 92.9 & 93.3 & 90.5 & 80.6 & 97.0 & 88.3 & 69.1 & 85.7 & 97.0 \\
+\midrule
+Synthetic A & Khronos & 95.3 & 64.8 & 77.0 & 63.9 & 78.2 & 69.5 & 1.7 & 0.4 & 0.9 & 31.0 & 85.9 & 63.5 & 93.6 \\
+ & Ours & 98.1 & 87.3 & 92.1 & 72.5 & 82.8 & 77.0 & 100.0 & 43.7 & 73.6 & 52.9 & 45.9 & 71.3 & 99.2 \\
+\midrule
+Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 27.4 & 23.9 & 45.1 & 43.7 & 86.6 \\
+ & Ours & 98.5 & 64.1 & 77.1 & 74.0 & 84.7 & 77.9 & 99.9 & 57.5 & 73.9 & 75.7 & 32.4 & 59.2 & 89.9 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Independent single-visit runs.} Precision, recall, and F1 are official query-aggregated percentages. Final geometry uses F1 at 5\,cm.}
+\label{tab:supp_single}
+\end{table*}

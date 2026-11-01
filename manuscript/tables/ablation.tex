@@ -1,0 +1,27 @@
+% Generated from experiments_rewrite_20261101/results.json
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{2.0pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}lrrrrr@{}}
+\toprule
+Variant & Geom. & Obj. & Chg. & PSNR & L1 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{(a) Change decisions}} \\
+w/o change decisions & 84.42 & 66.73 & 68.75 & 23.79 & 3.31 \\
+\textbf{Full} & 90.00 & 66.77 & 83.33 & 27.63 & 0.48 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{(b) Observation reuse}} \\
+Unrestricted reuse & 86.19 & 66.67 & 83.33 & 22.69 & 3.66 \\
+Discard whole frames & 89.95 & 66.89 & 83.33 & 27.78 & 0.47 \\
+\textbf{Full} & 89.81 & 66.46 & 83.33 & 27.77 & 0.45 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{(c) Predicted segmentation}} \\
+Predicted masks & 89.89 & 42.17 & 72.73 & 27.56 & 0.50 \\
+\textbf{Annotated masks (Full)} & 89.81 & 66.46 & 83.33 & 27.77 & 0.45 \\
+\bottomrule
+\end{tabular*}
+\caption{\textbf{Mechanism ablations and input robustness on Flat.} Matched Full per block. F1 (\%) is before refinement; PSNR (dB) and depth L1 (cm) are after refinement. Predicted masks use OneFormer. Higher is better except for L1.}
+\label{tab:ablation_variants}
+\end{table}
