@@ -1,257 +1,206 @@
 \section{Method}
 \label{sec:method}
 
-\ours answers two questions beside an existing mapper (\cref{fig:method}): which observations still describe the
-scene, and which elements of the earlier map remain. Both are questions about rays and object states, and \ours answers
-them with three decisions. \emph{State intervals} record when each object
-state holds (\cref{sec:states}). \emph{Valid domains} restrict each observation to the space where the state it
-measured still holds (\cref{sec:validity}). The \emph{continuation test} keeps an element of the previous map until
-current observations place its surface elsewhere (\cref{sec:memory}). A mapper connects to \ours through the
-\emph{update interface} (\cref{sec:representations}). Every element keeps its \emph{lifetime}, and each visit hands
-its state to the next (\cref{sec:handoff}). This formulation has three properties. First, changes in view, out of view,
-and between visits go through the same decision. Second, the mapper keeps its own integration of measured surfaces, so a
-TSDF, a 3D Gaussian, and an occupancy mapper join through the same four operations. Third, ending an element sets its
-lifetime instead of erasing it, so every map can be queried at any earlier time.
+Our goal is a map that stays correct while the scene changes. The input is a posed RGB-D stream with instance masks,
+which assign each pixel to an object and keep that assignment across frames. When an object moves, the map should drop
+it from its old place and rebuild it where it now stands. Static regions should keep accumulating observations, regions
+out of view should keep their last observed geometry, and the map should still show the scene at any earlier time. An
+object may change in view, while the camera looks elsewhere, or while the robot is away between two visits. We handle
+all of these cases with one mechanism in two parts. The first judges which object states have ended and which have
+begun (\cref{sec:states}). The second applies these judgments to the map: it ends the geometry of ended states,
+restricts every observation to the scene it measured, and decides which parts of the earlier map remain
+(\cref{sec:validity}). Both parts reason about object states and the times of observations, not about voxels,
+Gaussians, or cells. The same mechanism therefore updates a TSDF, a 3D Gaussian map, and an occupancy map, each of
+which keeps its own way of integrating a measurement (\cref{sec:representations,fig:method}).
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/method_overview.pdf}
-\caption{\textbf{Persistent updating beside native mappers.} Each visit imports the scene memory of the previous visit
-and exports its own for the next. State inference separates ending an old state from handing it over to a successor: old-site
-evidence and tracked motion end a state, the learned prior $q$ also enters the end of an inherited state, and displacement,
-new-site evidence, and the prior decide a handover. The state intervals expire the pixels of ended states, stop free
-space a band before current objects, and keep the measured surface band. The valid observations feed both the native
-integration and the continuation test, which compares support and see-through votes; occluded readings cast no direct
-vote, and ties use $C(e)$ or the prior. Object elements end with their states. Numbered ports mark the four operations of
-the update interface. Ending an element sets its lifetime instead of erasing it.}
+\caption{\textbf{One mechanism for three maps.} Judging change: the current depth tests the surfaces of the object
+states, and only readings that hit or pass a surface count as evidence. A state ends once these readings cover
+enough of its surface; new observations elsewhere become its successor when a move explains them best; motion in view
+is followed by the tracker. Applying change: an ended state ends all of its geometry, every observation acts only
+within its valid domain, and an element of the earlier map remains until the current readings see through it or a
+newly measured surface replaces it. The same steps update a TSDF, a 3D Gaussian map, and an occupancy map. Ending an
+element sets its lifetime instead of erasing it, so the map of every earlier time stays available.}
 \label{fig:method}
 \end{figure*}
 
-\subsection{Problem Setting}
+\subsection{Map and Object States}
 \label{sec:setting}
 
-We address persistent mapping. An existing mapper builds a map during a visit to an indoor scene, and later visits
-return after the scene has changed. Visits are interrupted observations of one evolving scene, so the layer treats the gap
-between two visits like a gap within a visit and carries its state across it. The layer targets a map that is correct at every time: the map at time $t$ shows
-the surfaces that held at $t$, and a region that a visit leaves unobserved keeps its last observed state. We target
-surfaces that disappear, appear, or move. Each change may happen in view, out of view during a visit, or between visits. Moving people are masked out of
-the static map.
-
-Like Panoptic Multi-TSDFs~\cite{schmid2022panoptic}, the layer starts from posed, segmented RGB-D
-frames. An observation
-$o$ is the depth ray of one pixel with depth, with measured range $r_o$, time $t_o$, and segment label
-$\ell_o$, possibly none. Each physical object $\ell$ has a sequence of geometric states. A state $s$ has a
-reconstructed surface $G_s$ and a state interval $[b_s, d_s)$, and ending a state moves it to history. The map
-consists of elements $\mathcal{E}$ that the mapper can keep or end individually: a surface face of a TSDF mesh, a 3D
-Gaussian, or an occupied cell. Element $e$ has a position $x_e$, a half-size $h_e$ (half a voxel, three standard
-deviations of a Gaussian, or half a cell), an identity $\ell_e$ that is $0$ for the background, and a lifetime
-$[c_e, d_e)$. The map at time $t$ is
+An observation $o$ is the depth reading of one pixel, with measured range $r_o$, capture time $t_o$, and instance label
+$\ell_o$. Each object $\ell$ is described by a sequence of static states. A state $s$ has a surface $G_s$, reconstructed
+from the observations of $\ell$ during the state, and an interval $[b_s, d_s)$ in which it holds. When an object moves,
+its next state is reconstructed from the observations at its new place alone, so no geometry is carried over from the
+old place. The map is a set of elements $\mathcal{E}$: the surface faces of a TSDF, the Gaussians of a Gaussian map, or
+the occupied cells of an occupancy map. Element $e$ has a position $x_e$, a half-size $h_e$ (half a voxel, three
+standard deviations of a Gaussian, or half a cell), an instance label $\ell_e$, which is $0$ for the background, and a
+lifetime $[c_e, d_e)$. An element of state $s$ ends with it, $d_e = d_s$. The map at time $t$ is
 \begin{equation}
   \mathcal{M}(t) = \{\, e \in \mathcal{E} : c_e \le t < d_e \,\}.
   \label{eq:map_at_t}
 \end{equation}
-An element lives from the change-detection round (\cref{sec:states}) that first shows it, $c_e$, to the time it ends,
-$d_e$, and an object element of
-state $s$ has $d_e = d_s$. Ending an element sets $d_e$ instead of deleting it, so the map of any earlier time remains available.
+Ending an element sets $d_e$ instead of deleting it, so the map of every earlier time remains available.
 
-\subsection{State Intervals}
+\subsection{Judging Change}
 \label{sec:states}
 
-Objects change in three ways: they move in view, change out of view during a visit, or change between visits. The layer
-decides all three with the same likelihood and decision rule, and the three differ only in their evidence and in the
-odds they start from. The decisions run in periodic change-detection rounds and yield the interval $[b_s, d_s)$ of every
-state. Every state begins at its first observation. Its last support is the last depth image that supports its
-surface. A state ended by a successor closes at the round that decides the handover, or at its last support if that
-comes later, so the map shows both states until the handover. A state ended without a successor closes midway between
-its last support and the deciding round.
+A camera sees only part of the scene at a time, and most surfaces are out of view or occluded most of the time. A
+surface that is not observed is not evidence that it is gone, and a surface seen through at one small patch is not
+evidence that the whole object has left. We therefore judge a change only from readings that reach the place of an
+existing surface, and we count them by how much of the surface they cover.
 
-\paragraph{Evidence.}
-The layer reconstructs object states from the segmented depth, detects moving people with the free-space cue of
-Dynablox~\cite{schmid2023dynablox}, as Khronos does~\cite{schmid2024khronos}, keeps them out of the static map, and
-tests each state against later depth images. A surface sample of the state is \emph{supported} if the reading at its
-pixel lies within 5\,cm of its depth, \emph{seen through} if the reading lies farther, and \emph{occluded} if it lies
-closer. Readings more than $60^\circ$ from the sample normal do not count~\cite{nguyen2012kinect}. Only reliable
-samples vote, which excludes thin parts, edges, and mislabeled pixels (supplementary material), and a depth image is
-scored only if it judges at least $\min(30, \nu_{\mathrm{rel}})$ reliable samples, $\nu_{\mathrm{rel}}$ being the number of
-reliable samples of the state.
+\paragraph{Evidence from the current depth.}
+We test each state against every later depth image. Each reliable surface sample of $G_s$ is projected into the image.
+Reliable samples exclude thin parts, edges, and mislabeled pixels, whose readings pass the surface even while it is in
+place. A sample is
+\emph{supported} if the reading at its pixel lies within a sensor tolerance of its depth, \emph{seen through} if the
+reading lies farther, and \emph{occluded} if it lies closer. Only supported and seen-through samples carry evidence.
+Occluded samples, samples outside the view, and missing readings carry none, so a surface that the camera does not see
+stays as it is.
 
-\paragraph{Three explanations.}
-Let $A$ be the current state of object $\ell$ and $N$ the observations of $\ell$ in the current visit that the layer has
-not yet associated with $A$. Under $S$, $A$ persists and $N$ shows other parts of it. Under $M$, $A$ has ended and $N$
-is its successor. Under $U$, $A$ persists and $N$ is spurious: a fragment or a mislabel. Occluded readings, readings outside the view,
-and invalid readings have likelihood ratio one, and the remaining readings fall into three disjoint groups.
-
-The first group, the \emph{old-site evidence}, consists of the readings that fall on $G_A$ after its last support. Depth image
-$i$ judges $n_i$ reliable samples and sees through $k_i$ of them, with fraction $f_i = k_i/n_i$. Under $S$, $f$ follows a
-Beta density $p_A$ that the layer learns from the object's own in-place observations, and under $M$, $f$ is uniform. A
-Page statistic~\cite{page1954cusum} maximizes the evidence over the first depth image $j$ after the change:
+\paragraph{From samples to the whole object.}
+Depth image $i$ judges $n_i$ samples of $G_s$ and sees through $k_i$ of them. Even a surface that is still in place is
+seen through at a small fraction $f_i = k_i/n_i$, because of depth noise and slight misregistration. We model this
+fraction by a Beta density $p_s$ learned from the in-place observations of the object, drawn toward those of all objects
+while the object has few of its own, so the test adapts to the sensor and to the object. A change makes $f$ uniform. A Page
+statistic~\cite{page1954cusum} accumulates the evidence from the first image $j$ after the change:
 \begin{equation}
-  L_t = \max\Big(0,\ \max_{j \le t} \sum_{i=j}^{t} w_i(j)\,\big[-\log p_A(f_i)\big]\Big), \qquad
+  L_t = \max\Big(0,\ \max_{j \le t} \sum_{i=j}^{t} w_i(j)\,\big[-\log p_s(f_i)\big]\Big), \qquad
   w_i(j) = \frac{\nu_i(j)}{\nu_{\mathrm{rel}}},
   \label{eq:absence}
 \end{equation}
-where $\nu_i(j)$ counts the reliable samples that image $i$ judges for the first time since image $j$ and
-$\nu_{\mathrm{rel}}$ counts all reliable samples. The weights of a window sum to at most one, so each sample testifies
-once and repeated looks at a small patch cannot add up to a whole object.
+where $\nu_i(j)$ counts the reliable samples that image $i$ judges for the first time since image $j$, and
+$\nu_{\mathrm{rel}}$ counts all reliable samples of the state. The weights of a window sum to at most one, so each
+sample testifies once. Looking repeatedly at a small patch therefore cannot add up to the whole object, which keeps the
+decision accurate, and the state ends as soon as $L_t$ crosses its threshold, without waiting until the whole surface
+has been seen. Its interval closes midway between its last support and that decision.
 
-The second group, the \emph{displacement evidence}, is the position of $N$ relative to $G_A$. Let $\theta$ be the share
-of $N$'s surface that lies farther than 10\,cm from $G_A$. Under $S$, $N$ may show unseen parts of $A$ at any distance,
-so $\theta$ follows a Jeffreys prior. Under $M$, it follows that prior restricted to $\theta > 1/2$. The Bayes factor
-is then $B_{M:S} = 2P(\theta > 1/2 \mid N) \in [0, 2]$. The third group, the \emph{new-site evidence}, consists of the observations of $N$'s own surface, whose
-absence likelihood ratios, computed as for $G_A$, multiply to $\Lambda_U$, the likelihood ratio of $U$ against a genuine
-$N$. Visible motion, flagged by the layer's object tracker as in Khronos~\cite{schmid2024khronos}, has likelihood ratio
-$\infty$ for $M$, so the same rule ends the state at once.
+\paragraph{Successors.}
+New observations of an object at another place raise a different question: they may show more of the current state, a
+successor after a move, or a spurious fragment such as a mislabeled region. We weigh the three explanations with the
+share of the new surface that lies away from the current one, which favors a move, the depth evidence on the new surface
+itself, which exposes a fragment that later readings see through, and the prior probability $q_\ell$ that object $\ell$
+changes. The prior is estimated from the resolved decisions of $\ell$ and of the objects of its class. When a move is
+more probable than not, the new observations begin the successor state and the current state ends; until then, they
+remain a candidate.
 
-\paragraph{Prior.}
-A test of $\ell$ resolves when a round ends one of its states or confirms that it continues, and the prior $q_\ell$, the
-only one the layer learns, is the probability that a resolved test of $\ell$ ends in a change. It is the posterior mean of a Beta distribution whose pseudo-counts $\alpha_c, \beta_c$ come from the other
-objects of $\ell$'s class and whose counts are the $m_\ell$ resolved tests of $\ell$ that ended in a change and the $u_\ell$ that did not:
-\begin{equation}
-  q_\ell = \frac{\alpha_c + m_\ell}{\alpha_c + \beta_c + m_\ell + u_\ell}.
-  \label{eq:prior}
-\end{equation}
-We write $q$ for $q_\ell$ below.
+\paragraph{Motion in view and changes between visits.}
+An object that moves in view is followed by the object tracker, as in Khronos~\cite{schmid2024khronos}. Its state ends
+when the motion starts, the object is a trajectory while it moves, and the frames after it settles reconstruct its next
+state. People are detected with the free-space cue of Dynablox~\cite{schmid2023dynablox}, as in Khronos, and kept out
+of the static map. A later visit starts from the states that the previous visit saved (\cref{sec:handoff}). A change
+made while the robot was away is judged by the same tests, and an inherited state begins its test from the prior odds
+$q_\ell$ that its object has changed.
 
-\paragraph{Decision rule.}
-Every action minimizes the expected loss under two losses. Showing a surface costs the area of the symmetric difference
-between the shown and the true current surface, which puts the handover at $P(M) > 1/2$. When no successor is
-observed, wrongly ending a state costs 99 times more than wrongly keeping it, which puts the end of a state at odds of
-99. Given the displacement and new-site evidence, and with fixed even odds, $v = 1/2$, that $N$ is genuine,
-the three explanations receive the weights
-\begin{equation}
-  P(S) \propto (1-q)\,v, \qquad P(M) \propto q\,v\,B_{M:S}, \qquad P(U) \propto (1-v)\,\Lambda_U,
-  \label{eq:smu}
-\end{equation}
-and $N$ replaces $A$ when $P(M) > 1/2$, that is, $q\,B_{M:S} > (1-q) + \Lambda_U (1-v)/v$. A handover thus needs
-$q > (1 + \Lambda_U)/3$. The old-site evidence decides the end of a state without a successor. A state begun in the visit
-ends when $L_t > \ln 99$, from even odds, and an inherited state when $\max(L_t,\ \operatorname{logit} q +
-L^{\mathrm{pre}}_t) > \ln 99$, where $L^{\mathrm{pre}}_t$ is the sum in \cref{eq:absence} from the state's first scored
-image in the visit, without the clamp at zero. In both cases, the images of that window must see through more samples of
-$G_A$ than they support. The prior thus enters every handover and the end of an inherited state. Merging and display use
-the same weights (supplementary material). \Cref{tab:decisions} lists the evidence and the rule for each kind of
-change.
-
-\begin{table}[t]
-\centering\small
-\caption{Evidence and decision rule for each kind of change.}
-\label{tab:decisions}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}p{0.2\linewidth}p{0.38\linewidth}p{0.36\linewidth}@{}}
-\toprule
-Case & Evidence & Rule \\
-\midrule
-In view & motion flag of the tracker, likelihood ratio $\infty$ & the state ends at once \\
-Out of view, state begun in the visit & old-site evidence & end: $L_t > \ln 99$ \\
- & displacement and new-site evidence, prior $q$ & handover: $P(M) > 1/2$ \\
-Inherited state, changed between visits or out of view & old-site evidence, prior $q$ & end: $\max(L_t, \operatorname{logit} q + L^{\mathrm{pre}}_t) > \ln 99$ \\
- & displacement and new-site evidence, prior $q$ & handover: $P(M) > 1/2$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Valid Domains}
+\subsection{Applying Change}
 \label{sec:validity}
 
-An observation is \emph{temporally valid} only where the state it measured still holds, and it shapes the current
-map only there. The layer removes from the fusion each labeled pixel of $\ell$ whose time lies
-outside the interval $[b_s, d_s)$ of $\ell$'s current state $s$, and all of them if $\ell$ has no current state, so an
-earlier pose of $\ell$ cannot reappear. Every other pixel keeps
-its measured surface, but its free space ends a truncation band $T$ before $\lambda_o$, the first intersection of
-its ray with a current object, taken from the object's faces or, where they are missing, from the voxels of the object's
-own readings, and $\lambda_o = \infty$ if the ray meets none. With $\rho_o(x)$ the range of $x$, let
-$\delta_o(x) = r_o - \rho_o(x)$ be the signed distance of $x$ to the measured surface along the ray, positive in front of
-it. The valid domain of observation $o$ at time $t$ is
+A decision alone does not update a map. After a chair moves, the frames taken before still show it at its old place and
+would fuse it back, the free space observed before a new object arrived would carve into the new object, and earlier
+keyframes would train a Gaussian map toward the old scene. Discarding the earlier observations or the earlier map would
+remove these conflicts but also everything they still describe correctly. The second part of the mechanism therefore
+applies each decision to all the geometry it concerns and lets every observation act only on the scene it measured.
+
+\paragraph{Ending a state ends its geometry.}
+When a state ends, every element of that state ends with it, including parts that no reading has seen through, such as
+the back of a moved sofa. These elements leave the current map and remain in the maps of earlier times
+(\cref{eq:map_at_t}).
+
+\paragraph{Valid domains.}
+An observation is correct for the scene at the time it was taken. A depth image of a chair taken before the chair moved
+still describes the floor and the wall around it, but no longer the chair. An image of empty floor taken before a box
+was put there describes free space that the box now occupies. We therefore restrict each observation to its
+\emph{valid domain}, the space where the state it measured still holds. A pixel of object $\ell$ taken outside the
+interval of $\ell$'s current state, or any pixel of $\ell$ once $\ell$ has no current state, is excluded from the
+integration of the current map. Every other pixel keeps its measured surface, but
+its free space ends a band $T$ before $\lambda_o$, the range at which its ray first meets the surface of a current
+object, with $\lambda_o = \infty$ if it meets none. With $\rho_o(x)$ the range of point $x$ along the ray and
+$\delta_o(x) = r_o - \rho_o(x)$ its signed distance to the measured surface, positive in front of it, the valid domain
+of $o$ at time $t$ is
 \begin{equation}
   \Omega_o(t) = \{\, x : \delta_o(x) > -T \,\wedge\, \big(\delta_o(x) \le T \,\vee\, \rho_o(x) < \lambda_o - T\big) \,\},
   \label{eq:domain}
 \end{equation}
-and empty for a removed pixel. For a mapper that optimizes its elements, the valid domain of a keyframe is the set of
-elements it may train. The domain depends on $t$ through the state intervals, which change at every
-change-detection round, and the layer uses only observations received up to $t$.
+and empty for an excluded pixel. For a map that is optimized over keyframes, the same rule is applied in time: the
+keyframe taken at $t_k$ renders and trains only $\mathcal{M}(t_k)$. An earlier keyframe thus keeps shaping the geometry
+of its own time and of the scene that has not changed, and it no longer pulls the current map toward the old scene.
+Valid domains change whenever a state interval changes, and the map at $t$ uses only the observations received up to
+$t$.
 
-\subsection{The Continuation Test}
+\paragraph{Keeping the earlier map.}
 \label{sec:memory}
-
-The continuation test keeps the map persistent: an element of the previous map continues until observations of the
-current visit, within their valid domains, place its surface elsewhere. For element $e$ and an observation $o$ whose pixel
-sees $x_e$ within its valid domain, let $\tau_e(\rho) = \max(h_e, \sigma(\rho), \tau_{\min})$, where
-$\sigma(\rho)$ is the depth residual of the current reconstruction at range $\rho$, smoothed across range bins, and
-$\tau_{\min}$ is a floor that the mapper sets, zero unless stated. The observation \emph{supports} $e$ if $|\delta_o(x_e)| \le \tau_e$
-and \emph{sees through} $e$ if $\delta_o(x_e) > \tau_e$, and a reading in front of $e$ casts no direct vote. Let $n_{\mathrm{sup}}$ and
-$n_{\mathrm{thr}}$ count the supports and see-throughs over the current visit. Direct evidence decides by majority. Without
-a majority, $e$ ends only if it lies behind a second layer of the same surface within the truncation band $T$
-(condition $C(e)$). Otherwise, it keeps its prior:
+An element of the earlier map that belongs to no ended state remains until the observations of the current visit place
+its surface elsewhere. For element $e$ and an observation $o$ whose pixel sees $x_e$ within its valid domain, let
+$\tau_e = \max(h_e, \sigma(\rho_o(x_e)), \tau_{\min})$, where $\sigma(\rho)$ is the depth residual of the current
+reconstruction at range $\rho$ and $\tau_{\min}$ is a floor, zero unless stated. The observation supports $e$ if $|\delta_o(x_e)| \le \tau_e$ and sees through $e$ if
+$\delta_o(x_e) > \tau_e$. A reading in front of $e$ casts no vote, since the element may be occluded. With
+$n_{\mathrm{sup}}$ and $n_{\mathrm{thr}}$ the supports and see-throughs over the current visit, the element is kept with
 \begin{equation}
   K(e) = \begin{cases}
     [\,n_{\mathrm{sup}} > n_{\mathrm{thr}}\,], & n_{\mathrm{sup}} \ne n_{\mathrm{thr}},\\
     0, & n_{\mathrm{sup}} = n_{\mathrm{thr}},\ C(e),\\
-    K_{\mathrm{prior}}(e), & \text{otherwise}.
+    1, & \text{otherwise}.
   \end{cases}
   \label{eq:continue}
 \end{equation}
-An element that the previous map shows has $K_{\mathrm{prior}} = 1$, so an unobserved region keeps the earlier map. If
-the direct votes are independent and each points the right way with probability $p > 1/2$, the log-likelihood ratio of removal against
-continuation is $(n_{\mathrm{thr}} - n_{\mathrm{sup}})\log[p/(1-p)]$, so the majority is the maximum-likelihood
-decision for every such $p$. The test $C(e)$ encodes a property of the representation: a truncation band holds one surface of a
-given orientation, so an element behind such a layer duplicates it. Object elements follow their state: the elements of
-an ended state leave the current map at once and stay in history.
+If every vote points the right way with the same probability above one half, the majority is the maximum-likelihood
+decision. The condition $C(e)$ holds when a surface that the current visit measured lies in front of $e$ within the band
+$T$ and faces the same way. A band holds one surface of a given orientation, so $e$ is then a stale copy of that surface
+and makes way for the new estimate. Any other element remains, so a region that the current visit does not observe
+keeps the earlier map.
 
-\subsection{The Update Interface}
+\subsection{Three Maps}
 \label{sec:representations}
 
-The update interface has four operations: the mapper reports its elements, ends the elements the layer names, accepts
-the state intervals, and integrates observations within their valid domains. The mapper supplies the half-size $h_e$
-of its elements, the floor $\tau_{\min}$, its truncation band $T$, and its test $C(e)$, and the layer makes the state
-decisions and runs the continuation test with the same code for all three mappers. Each mapper keeps its own integration
-of measured surfaces: the TSDF its weighted average, GaME its photometric and depth optimization, and wavemap its log-odds integration of occupied space. We call a mapper connected through
-this interface a \emph{backend}. The supplementary material details each backend.
+Each map keeps its own integration of measurements. The mechanism changes which observations it integrates, through the
+valid domains, which elements it shows, through their lifetimes, and which earlier elements remain, through
+\cref{eq:continue}.
 
-\paragraph{TSDF backend.}
-Our TSDF backend is a Khronos pipeline~\cite{schmid2024khronos} that keeps Khronos' active window, tracking, and object
-extraction. Khronos' projective integrator fuses each frame within its valid domain into one TSDF with 5\,cm voxels
-and truncation $T = 10$\,cm by the weighted running average~\cite{curless1996volumetric,newcombe2011kinectfusion},
+\paragraph{TSDF.}
+Our TSDF map builds on Khronos~\cite{schmid2024khronos} and keeps its active window, tracking, and object extraction.
+Khronos' projective integrator fuses each frame within its valid domain into a TSDF with 5\,cm voxels and truncation
+$T = 10$\,cm by the weighted running average~\cite{curless1996volumetric,newcombe2011kinectfusion},
 \begin{equation}
   F^{+}(x) = \frac{W(x)\,F(x) + \omega_o(x)\,\phi_o(x)}{W(x) + \omega_o(x)},\quad
   W^{+}(x) = \min\big(W(x) + \omega_o(x),\, W_{\max}\big),\quad x \in \Omega_o(t),
   \label{eq:tsdf}
 \end{equation}
-with Khronos' signed distance $\phi_o$ and weight $\omega_o$. When a round changes the state intervals, the backend
-re-integrates the affected blocks, and Khronos' mesh integrator extracts the present surface. Background faces of the
-previous map pass \cref{eq:continue}, where $C(e)$ holds if a face lies behind a layer of the present surface within $T$
-and both face the same way, and object faces follow their state. Background faces at the old site of an ended state leave
-with it, and faces of a continuing inherited state that lie inside its present surface leave at once. The current map is the present surface, its gaps filled with archived background
-faces of the active window, together with the continuing faces.
+with Khronos' signed distance $\phi_o$ and weight $\omega_o$. When a decision changes a state interval, the blocks whose
+valid domains changed are integrated again from the stored frames in their order, and Khronos' mesh integrator extracts
+the surface. Its elements are the surface faces. Faces of the earlier map continue by \cref{eq:continue}, where $C(e)$
+compares a face with the surface extracted in the current visit. The current map is that surface together with the
+continuing faces of the earlier map.
 
-\paragraph{Gaussian backend.}
-Our Gaussian backend is GaME~\cite{yugay2026game}, which optimizes 3D Gaussians~\cite{kerbl2023gaussians} over
-keyframes with photometric and depth losses, and FlashSplat~\cite{shen2024flashsplat} assigns object identities to the
-Gaussians. Each Gaussian carries a lifetime, and a keyframe at time $t_k$ renders and trains only
-$\mathcal{M}(t_k)$, so the observations of an ended state train only the Gaussians of their time. At each keyframe of
-the current visit, the backend tests every live Gaussian of the previous map at the Gaussian's own pixel, with $\tau_{\min} = 5$\,cm. A reading within
-$T = 10$\,cm in front of the Gaussian, from the side from which the previous visit saw it, \emph{covers} the Gaussian. The test $C(e)$ holds if the visit neither supports nor
-sees through the Gaussian and covering readings outnumber the readings farther in front. Each keyframe $k$ trains only its
-valid domain $V_k \subseteq \mathcal{M}(t_k)$: for a keyframe of the current visit, the Gaussians that the visit created,
-supports, or covers, and for an earlier keyframe, those that the current visit never covers. An earlier Gaussian leaves
-the map only by \cref{eq:continue} or with its ended object state. The refinement after the last visit trains each Gaussian only with the keyframes whose valid domain
-contains it and adds no Gaussians.
+\paragraph{3D Gaussians.}
+Our Gaussian map builds on GaME~\cite{yugay2026game}, which optimizes 3D Gaussians~\cite{kerbl2023gaussians} over
+keyframes with photometric and depth losses, and FlashSplat~\cite{shen2024flashsplat} assigns the instance labels to the
+Gaussians. Each Gaussian carries a lifetime, and the keyframe taken at $t_k$ renders and trains only $\mathcal{M}(t_k)$.
+Within it, a keyframe of the current visit trains the Gaussians that the visit created, supports, or covers, and an
+earlier keyframe trains those that the current visit has not covered. Keyframes of the current visit test each Gaussian
+of the earlier map at the Gaussian's own pixel by \cref{eq:continue}, with $\tau_{\min} = 5$\,cm. A Gaussian that
+GaME's opacity pruning removes is ended instead of deleted, so the maps of earlier times keep it. The refinement after
+the last visit trains each Gaussian only with the keyframes whose valid domain contains it.
 
-\paragraph{Occupancy backend.}
-Our occupancy backend is wavemap~\cite{reijgwart2023wavemap}, which accumulates log-odds occupancy in a
-wavelet-compressed octree with clamping~\cite{hornung2013octomap}. Its elements are the occupied cells that contain a
-measured surface point. Wavemap integrates the occupied space of every frame, and the layer takes over the clearing of
-occupied cells: a cell leaves the current map only through \cref{eq:continue} or with its ended object state, and an ended
-cell keeps its lifetime for the maps of earlier times. Cells carry no orientation, so $C(e)$ never holds and a tie keeps
-the prior.
-% PENDING \TODO{Integrate the occupancy map within the valid domains of \cref{eq:domain}.}
+\paragraph{Occupancy.}
+Our occupancy map builds on wavemap~\cite{reijgwart2023wavemap}, which accumulates log-odds occupancy in a
+wavelet-compressed octree with clamping~\cite{hornung2013octomap}. Its own update lowers the occupancy of the cells a
+reading passes through, so a cell that the current visit sees through leaves the map without a vote. Its elements are
+the occupied cells that contain a measured surface point. The cells of an ended state end together. Where the current
+visit first measures an object surface in a cell that an earlier visit observed as free, the free-space evidence of the
+earlier visit is withdrawn from that cell, which limits the old free space as \cref{eq:domain} does, and the new
+surface is integrated without having to overcome it. An earlier cell for which $C(e)$ holds ends as a stale copy. Ending
+a cell sets its lifetime, so the maps of earlier times keep it.
 
-\subsection{Handoff between Visits and Implementation}
+\subsection{Across Visits and Implementation}
 \label{sec:handoff}
 
-Each visit $k$ exports its \emph{scene memory} $S^k$: the map timeline with element lifetimes, the pooled sensor
-statistics of the old-site evidence, the inference state of the objects (their current states, intervals, and surfaces),
-which seeds the next visit's decisions, and the shown surface of its final map, which becomes the next visit's memory.
-Visit $k+1$ loads $S^k$, aligns its frames to the common frame, and runs the same decisions. All datasets and backends share the constants: the
-5\,cm support tolerance, the $60^\circ$ incidence limit, the $\ln 99$ threshold, at least $\min(30, \nu_{\mathrm{rel}})$
-judged samples per depth image, and the 10\,cm displacement distance. The truncation band $T$ is set per backend.
+At the end of a visit, we save the map with the lifetimes of its elements, the states of all objects with their
+intervals and surfaces, and the pooled sensor statistics of the absence test. The next visit loads them, aligns its
+frames to the common frame, and continues with the same decisions. All datasets and maps share the constants of the
+tests: the 5\,cm support tolerance, a $60^\circ$ incidence limit~\cite{nguyen2012kinect}, the threshold $\ln 99$ on
+$L_t$, at least $\min(30, \nu_{\mathrm{rel}})$ judged samples per depth image, and the 10\,cm displacement distance.
+The band $T$ is the truncation of each map.
 % PENDING \TODO{Add the change-detection period and the frame rate used by each pipeline (update layer: 5\,Hz frames, rounds of
 % PENDING 2.1\,s real and 10.8\,s synthetic; TSDF pipeline: check).}

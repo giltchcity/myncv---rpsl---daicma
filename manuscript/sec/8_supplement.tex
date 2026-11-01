@@ -4,13 +4,69 @@
 \subsection{State Intervals}
 \label{sec:supp_states}
 
-To test a state, the layer projects up to 1{,}500 surface samples of the state, placed on a 2.5\,cm grid, into each
+To test a state, we project up to 1{,}500 surface samples of the state, placed on a 2.5\,cm grid, into each
 later depth image. A pixel without depth or outside the image gives no evidence, and readings more than $60^\circ$ from
 the sample normal do not count~\cite{nguyen2012kinect}. Thin parts, edges, and mislabeled pixels produce false
 see-through readings. A sample is reliable if its posterior of belonging to the object is at least one half under a
 two-component label model, fitted by expectation maximization at every round, and if it was never seen through while
 the object was confirmed in place. The Beta density $p_A$ of the absence statistic $L_t$ shrinks toward pooled
 sensor statistics, and a depth image contributes only if it judges at least $\min(30, \nu_{\mathrm{rel}})$ samples.
+
+\paragraph{Three explanations.}
+Let $A$ be the current state of object $\ell$ and $N$ the observations of $\ell$ in the current visit that are not yet
+associated with $A$. Under $S$, $A$ persists and $N$ shows other parts of it. Under $M$, $A$ has ended and $N$ is its
+successor. Under $U$, $A$ persists and $N$ is spurious: a fragment or a mislabel. Occluded readings, readings outside
+the view, and invalid readings have likelihood ratio one. The \emph{old-site evidence} is the absence statistic $L_t$
+of the main paper on $G_A$ after its last support. The \emph{displacement evidence} is the position of $N$ relative to
+$G_A$. Let $\theta$ be the share of $N$'s surface that lies farther than 10\,cm from $G_A$. Under $S$, $N$ may show
+unseen parts of $A$ at any distance, so $\theta$ follows a Jeffreys prior, and under $M$, it follows that prior
+restricted to $\theta > 1/2$. The Bayes factor is then $B_{M:S} = 2P(\theta > 1/2 \mid N) \in [0, 2]$. The
+\emph{new-site evidence} consists of the observations of $N$'s own surface, whose absence likelihood ratios, computed as
+for $G_A$, multiply to $\Lambda_U$, the likelihood ratio of $U$ against a genuine $N$. Visible motion, flagged by the
+object tracker, has likelihood ratio $\infty$ for $M$, so its state ends at once.
+
+\paragraph{Prior.}
+A test of $\ell$ resolves when a round ends one of its states or confirms that it continues. The prior $q_\ell$ is the
+probability that a resolved test of $\ell$ ends in a change. It is the posterior mean of a Beta distribution whose
+pseudo-counts $\alpha_c, \beta_c$ come from the other objects of $\ell$'s class and whose counts are the $m_\ell$
+resolved tests of $\ell$ that ended in a change and the $u_\ell$ that did not:
+\begin{equation}
+  q_\ell = \frac{\alpha_c + m_\ell}{\alpha_c + \beta_c + m_\ell + u_\ell}.
+  \label{eq:prior}
+\end{equation}
+We write $q$ for $q_\ell$ below.
+
+\paragraph{Decision rule.}
+Every action minimizes the expected loss under two losses. Showing a surface costs the area of the symmetric difference
+between the shown and the true current surface, which puts the handover at $P(M) > 1/2$. When no successor is
+observed, wrongly ending a state costs 99 times more than wrongly keeping it, which puts the end of a state at odds of
+99. Given the displacement and new-site evidence, and with fixed even odds $v = 1/2$ that $N$ is genuine, the three
+explanations receive the weights
+\begin{equation}
+  P(S) \propto (1-q)\,v, \qquad P(M) \propto q\,v\,B_{M:S}, \qquad P(U) \propto (1-v)\,\Lambda_U,
+  \label{eq:smu}
+\end{equation}
+and $N$ replaces $A$ when $P(M) > 1/2$, that is, $q\,B_{M:S} > (1-q) + \Lambda_U (1-v)/v$. A handover thus needs
+$q > (1 + \Lambda_U)/3$. A state begun in the visit ends without a successor when $L_t > \ln 99$, from even odds.
+\Cref{tab:decisions} lists the evidence and the rule for each kind of change.
+
+\begin{table}[t]
+\centering\small
+\caption{Evidence and decision rule for each kind of change.}
+\label{tab:decisions}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.2\linewidth}p{0.38\linewidth}p{0.36\linewidth}@{}}
+\toprule
+Case & Evidence & Rule \\
+\midrule
+In view & motion flag of the tracker, likelihood ratio $\infty$ & the state ends at once \\
+Out of view, state begun in the visit & old-site evidence & end: $L_t > \ln 99$ \\
+ & displacement and new-site evidence, prior $q$ & handover: $P(M) > 1/2$ \\
+Inherited state, changed between visits or out of view & old-site evidence, prior $q$ & end: $\max(L_t, \operatorname{logit} q + L^{\mathrm{pre}}_t) > \ln 99$ \\
+ & displacement and new-site evidence, prior $q$ & handover: $P(M) > 1/2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 For the displacement factor, $\theta \sim \mathrm{Beta}(1/2 + n_{\mathrm{eff}}\phi,\ 1/2 + n_{\mathrm{eff}}(1-\phi))$, with
 $\phi$ the fraction of $N$'s surface cells that lie farther than 10\,cm from $G_A$ and $n_{\mathrm{eff}}$ their effective
@@ -21,7 +77,8 @@ fixed. Every action in a change-detection round reads $q$ from the history befor
 independent of the identifiers, their order, and the end of a visit.
 
 A state $A$ ends without a successor when $\max(\operatorname{logit} q + L^{\mathrm{pre}}_t,\ L_t) > \ln 99$ and the
-same images see through $G_A$ more often than they support it. The prior term applies only to a state inherited from the
+same images see through $G_A$ more often than they support it, where $L^{\mathrm{pre}}_t$ is the sum of the absence
+statistic from the state's first scored image in the visit, without the clamp at zero. The prior term applies only to a state inherited from the
 previous visit. The observations $N$ merge into $A$ when $A$ has current support and
 $1 - q \ge q\,B_{M:S}$. The map shows $G_A \cup G_N$ while $S$ is the most probable explanation and $G_A$ otherwise,
 until a handover commits. At the end of a visit, the same rules apply to the evidence gathered so far, and a remaining
