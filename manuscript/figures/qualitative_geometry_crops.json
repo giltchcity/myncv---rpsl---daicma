@@ -1,16 +1,16 @@
 {
-  "name": "geometry_details",
+  "name": "geometry_four_rows",
   "width": 240,
-  "height": 201,
+  "height": 302,
   "protocol": "Original images, unchanged pixels/colors. Matched camera, crop and scale within each comparison row.",
   "assets": [
     {
       "file": "figures/results_native/qual/2_real_02540/1_khronos.png",
       "crop": [
         100,
-        180,
-        440,
-        520
+        255,
+        450,
+        505
       ],
       "size": [
         958,
@@ -20,7 +20,7 @@
         0,
         29,
         76,
-        76.0
+        54.285714285714285
       ],
       "sha256": "6f50570fcd980e8414d4333ce2cf91d7b6cf7ed9ae5ee21e12a8638a9621254f"
     },
@@ -28,9 +28,9 @@
       "file": "figures/results_native/qual/2_real_02540/3_ours_tsdf.png",
       "crop": [
         100,
-        180,
-        440,
-        520
+        255,
+        450,
+        505
       ],
       "size": [
         958,
@@ -40,7 +40,7 @@
         82,
         29,
         76,
-        76.0
+        54.285714285714285
       ],
       "sha256": "e4753d008d84dc269de2976cc1f0ce9cb9ee4a44cc5b190d7c1abb0e764960d7"
     },
@@ -48,9 +48,9 @@
       "file": "figures/results_native/qual/2_real_02540/0_image.png",
       "crop": [
         100,
-        180,
-        440,
-        520
+        255,
+        450,
+        505
       ],
       "size": [
         958,
@@ -60,16 +60,16 @@
         164,
         29,
         76,
-        76.0
+        54.285714285714285
       ],
       "sha256": "70228d8c16c2c8188ddac2505443a4740445af285e93ac6067e8a805fd98dcc9"
     },
     {
-      "file": "figures/results_native/qual/4_sim_03065/6_wavemap.png",
+      "file": "figures/results_native/qual/4_sim_03065/1_khronos.png",
       "crop": [
-        20,
-        160,
-        340,
+        0,
+        150,
+        462,
         480
       ],
       "size": [
@@ -78,18 +78,18 @@
       ],
       "position": [
         0,
-        123,
+        101,
         76,
-        76.0
+        54.285714285714285
       ],
-      "sha256": "6bcc55f964695088a0ec15fc34e8dd797801dac87c23163b443a13add3869a54"
+      "sha256": "87378b54733271fb059392b5a8a791bf7b2bec41376173f7f68af98bd00646e6"
     },
     {
-      "file": "figures/results_native/qual/4_sim_03065/7_ours_occ.png",
+      "file": "figures/results_native/qual/4_sim_03065/3_ours_tsdf.png",
       "crop": [
-        20,
-        160,
-        340,
+        0,
+        150,
+        462,
         480
       ],
       "size": [
@@ -98,18 +98,18 @@
       ],
       "position": [
         82,
-        123,
+        101,
         76,
-        76.0
+        54.285714285714285
       ],
-      "sha256": "9a04dbed3ef79a728159bef1ae62209fee1b74e536c6c67590ec5ffc589ae868"
+      "sha256": "d6befc0a4786ca8908e7e2b221fe9ebb1eb9bf4643343e8f354ac241f8cd3cee"
     },
     {
       "file": "figures/results_native/qual/4_sim_03065/0_image.png",
       "crop": [
-        20,
-        160,
-        340,
+        0,
+        150,
+        462,
         480
       ],
       "size": [
@@ -118,11 +118,131 @@
       ],
       "position": [
         164,
-        123,
+        101,
         76,
-        76.0
+        54.285714285714285
       ],
       "sha256": "310641b3628dafadcb6183e5fb8e0396ece687336a1e96ff0416a2a3bdfc5ac0"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/6_wavemap.png",
+      "crop": [
+        0,
+        200,
+        392,
+        480
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        0,
+        173,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "6bcc55f964695088a0ec15fc34e8dd797801dac87c23163b443a13add3869a54"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/7_ours_occ.png",
+      "crop": [
+        0,
+        200,
+        392,
+        480
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        82,
+        173,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "9a04dbed3ef79a728159bef1ae62209fee1b74e536c6c67590ec5ffc589ae868"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/0_image.png",
+      "crop": [
+        0,
+        200,
+        392,
+        480
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        164,
+        173,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "310641b3628dafadcb6183e5fb8e0396ece687336a1e96ff0416a2a3bdfc5ac0"
+    },
+    {
+      "file": "figures/results_native/qual/6_flat_00225/6_wavemap.png",
+      "crop": [
+        140,
+        170,
+        560,
+        470
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        0,
+        245,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "834499454e9fadb9d0ace3de085b9fc4ec4d8dde834d600f9eec1a5dabef9d60"
+    },
+    {
+      "file": "figures/results_native/qual/6_flat_00225/7_ours_occ.png",
+      "crop": [
+        140,
+        170,
+        560,
+        470
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        82,
+        245,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "d4a31afb23a68123d40604d5a54127aab329aaf7e4338620c5792df9f10347e2"
+    },
+    {
+      "file": "figures/results_native/qual/6_flat_00225/0_image.png",
+      "crop": [
+        140,
+        170,
+        560,
+        470
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        164,
+        245,
+        76,
+        54.285714285714285
+      ],
+      "sha256": "c204ad00e01b4797db7119322f719d458bbc6c83f583820683fa8d1a5679372a"
     }
   ]
 }

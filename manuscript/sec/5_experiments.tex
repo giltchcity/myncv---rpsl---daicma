@@ -1,5 +1,10 @@
 \section{Experiments}
 \label{sec:experiments}
+% Keep the expanded result figures close to their corresponding analyses.
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{8pt plus 2pt minus 2pt}
 
 We first evaluate whether the shared updates reconstruct changing scenes accurately across three
 representations while retaining valid geometry. We then examine Gaussian rendering and use ablations
@@ -63,13 +68,13 @@ comparison measures the benefit of retaining earlier geometry through a partial 
 
 \input{tables/tesse}
 
+\input{figures/qualitative_gaussians}
+
 \paragraph{Temporal reconstruction.}
 TESSE further tests whether the reconstructed scene is accurate over time. Its official 4D evaluation
 aggregates over map and query times during a single visit
 (\cref{tab:tesse}). Our TSDF improves all four F1 categories on both scenes. Change F1 increases from
 43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment.
-
-\input{figures/qualitative_gaussians}
 
 \subsection{Gaussian Reconstruction}
 \label{sec:exp_gaussians}
