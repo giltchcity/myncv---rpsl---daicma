@@ -22,6 +22,6 @@
 % Table shading represents rank, independently of method identity.
 \definecolor{rankbest}{RGB}{205,225,250}
 \definecolor{ranksecond}{RGB}{240,246,253}
-\newcommand{\rankbestcell}[1]{\cellcolor{rankbest}\textbf{#1}}
-\newcommand{\ranksecondcell}[1]{\cellcolor{ranksecond}#1}
+\newcommand{\rankbestcell}[1]{\begingroup\setlength{\fboxsep}{1.1pt}\colorbox{rankbest}{\textbf{#1}}\endgroup}
+\newcommand{\ranksecondcell}[1]{\begingroup\setlength{\fboxsep}{1.1pt}\colorbox{ranksecond}{#1}\endgroup}
 \newcommand{\ranklegend}{\begingroup\setlength{\fboxsep}{0.7pt}\colorbox{rankbest}{best}/\colorbox{ranksecond}{second}\endgroup}
