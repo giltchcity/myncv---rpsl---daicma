@@ -1,8 +1,8 @@
 \section{Method}
 \label{sec:method}
 
-Our goal is a map that stays correct while the scene changes. The input is a posed RGB-D stream with instance masks,
-which assign each pixel to an object and keep that assignment across frames. When an object moves, the map should drop
+Our goal is a map that stays correct while the scene changes. The input is a posed RGB-D stream with SAM
+masks~\cite{kirillov2023sam}, which assign each pixel to an object and keep that assignment across frames. When an object moves, the map should drop
 it from its old place and rebuild it where it now stands. Static regions should keep accumulating observations, regions
 out of view should keep their last observed geometry, and the map should still show the scene at any earlier time. An
 object may change in view, while the camera looks elsewhere, or while the robot is away between two visits. We handle
@@ -15,14 +15,13 @@ which keeps its own way of integrating a measurement (\cref{sec:representations,
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/method_overview.pdf}
-\caption{\textbf{One mechanism for three maps.} Judging change: the current depth tests the surfaces of the object
-states, and only readings that hit or pass a surface count as evidence. A state ends once these readings cover
-enough of its surface; new observations elsewhere become its successor when a move explains them best; motion in view
-is followed by the tracker. Applying change: an ended state ends all of its geometry, every observation acts only
-within its valid domain, and an element of the earlier map remains until the current readings see through it or a
-newly measured surface replaces it. The same steps update a TSDF, a 3D Gaussian map, and an occupancy map. Ending an
-element sets its lifetime instead of erasing it, so the map of every earlier time stays available.}
+\includegraphics[width=\textwidth]{figures/pipeline_unified_v18.pdf}
+\caption{\textbf{One mechanism updates three maps.} The current RGB-D frames, SAM masks, and poses are compared with
+the earlier map and its object states, which reveals missing objects (purple) and new objects (yellow). Change
+detection turns this evidence into state intervals: a state ends, is kept, or begins. Map update restricts every
+observation to its valid domain, so old observations keep the past state and the retained background while new
+observations build the new state. The same mechanism updates 3D Gaussians by the time of each keyframe, a TSDF by
+fusing each object within its state, and an occupancy map by retiring and superseding cells.}
 \label{fig:method}
 \end{figure*}
 
