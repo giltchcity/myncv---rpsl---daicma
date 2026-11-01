@@ -18,3 +18,10 @@
 \usepackage{xspace}
 \newcommand{\ours}{DynaState\xspace}
 \newcommand{\tgroup}[2]{\multicolumn{#1}{@{}l}{\textit{#2}}\\}
+
+% Table shading represents rank, independently of method identity.
+\definecolor{rankbest}{RGB}{205,225,250}
+\definecolor{ranksecond}{RGB}{240,246,253}
+\newcommand{\rankbestcell}[1]{\cellcolor{rankbest}\textbf{#1}}
+\newcommand{\ranksecondcell}[1]{\cellcolor{ranksecond}#1}
+\newcommand{\ranklegend}{\begingroup\setlength{\fboxsep}{0.7pt}\colorbox{rankbest}{best}/\colorbox{ranksecond}{second}\endgroup}
