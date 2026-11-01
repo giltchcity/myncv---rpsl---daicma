@@ -10,20 +10,17 @@ occupancy grid. Keeping earlier geometry indiscriminately leaves objects at outd
 scratch loses previously observed regions. Dynamic mapping must update the changed scene and
 retain the parts that remain consistent.
 
+Khronos reconstructs dense metric-semantic maps of scene evolution over time~\cite{schmid2024khronos}.
+GaME brings online Gaussian reconstruction and novel-view synthesis to evolving scenes~\cite{yugay2026game},
+while wavemap provides efficient probabilistic occupancy mapping through wavelet compression and
+multi-resolution integration~\cite{reijgwart2023wavemap}. Across these representations, dynamic mapping requires
+a common decision: which geometry remains present, and which observations can contribute to its reconstruction?
 
-
-Khronos reconstructs object fragments and reconciles them over time using a library of rays~\cite{schmid2024khronos},
-while Panoptic Multi-TSDFs reasons about the presence of object submaps~\cite{schmid2022panoptic}.
-GaME adds and removes Gaussians and filters outdated keyframe regions~\cite{yugay2026game}, while wavemap updates
-occupancy through accumulated log odds~\cite{reijgwart2023wavemap}. These methods provide different ways to revise
-geometry as the scene evolves. We seek a common update mechanism that applies to each representation and continues
-when observations resume on another visit.
-
-A scene change must revise both the map and the observations used to reconstruct it.
+We connect these decisions through the time interval in which a scene state exists.
 After the chair moves, its earlier images still describe the chair at the old location; using them to fit the current
 scene can reconstruct it again. Yet those same images may still provide useful measurements of the unchanged wall.
-The time interval in which a surface exists determines which geometry is current and which parts of each observation
-remain compatible with it. This distinguishes a surface that has ended from one that is hidden or left unobserved.
+That interval determines which geometry is current and which parts of each observation remain compatible with it,
+distinguishing an ended surface from one that is hidden or left unobserved.
 
 We introduce \ours, a unified method for persistent dynamic mapping built around \emph{change detection} and
 \emph{map update} (\cref{fig:method}). Change detection compares current depth with existing surfaces to establish

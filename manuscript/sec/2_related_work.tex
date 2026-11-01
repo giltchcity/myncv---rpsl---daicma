@@ -14,14 +14,16 @@ state changes through one map-update mechanism.
 Map maintenance has been studied for point clouds~\cite{pomerleau2014longterm,lazaro2018efficient,kim2022ltmapper},
 TSDFs~\cite{fehr2017tsdfchange,schmid2022panoptic}, occupancy grids~\cite{hornung2013octomap,reijgwart2023wavemap},
 and Gaussians~\cite{yugay2026game,cheng2025ltgaussian,zeng2025gaussianupdate,ackermann2025clsplats}.
-Panoptic Multi-TSDFs classifies object submaps as persistent, absent, or unobserved~\cite{schmid2022panoptic}.
+Panoptic Multi-TSDFs maintains temporal consistency through object-centric volumetric
+submaps~\cite{schmid2022panoptic}.
 POCD estimates object change and stationarity, and POV-SLAM couples this reasoning with pose
-estimation~\cite{qian2022pocd,qian2023povslam}. Khronos reconstructs object fragments in an active window and uses
-fragment reconciliation with a library of rays to infer their temporal presence~\cite{schmid2024khronos}.
-GaME updates Gaussian geometry and masks conflicting regions of old keyframes~\cite{yugay2026game}.
-wavemap integrates occupied and free-space evidence through clamped log odds~\cite{reijgwart2023wavemap}.
-Our method tests existing surfaces against current depth and uses the inferred state intervals to control both
-geometry and observation contributions. The same mechanism drives these different native integration procedures.
+estimation~\cite{qian2022pocd,qian2023povslam}. Khronos jointly models short-term motion and long-term changes
+in an online spatio-temporal metric-semantic map~\cite{schmid2024khronos}.
+GaME combines scene adaptation and keyframe management for Gaussian reconstruction and novel-view synthesis
+in evolving scenes~\cite{yugay2026game}. wavemap efficiently integrates probabilistic occupancy evidence
+in a wavelet representation~\cite{reijgwart2023wavemap}.
+We use scene-state intervals to determine both the geometry present in the map and the observations that can
+update it, applying this decision to TSDF fusion, Gaussian optimization, and occupancy integration.
 
 \paragraph{Object association and scene history.}
 Object-based maps associate observations across time and visits. RIO re-localizes instances in changing

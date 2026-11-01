@@ -8,15 +8,18 @@ and ablations for Gaussians.
 
 \subsection{Experimental Setup}
 
-\paragraph{Datasets and baselines.}
+\paragraph{Datasets.}
 The real room (three visits) and simulated apartment (two visits) contain changes both within and across visits.
 Flat~\cite{schmid2022panoptic} (two visits) and eight rescanned 3RScan rooms~\cite{wald2019rio} evaluate
-cross-visit changes. Baselines are Khronos~\cite{schmid2024khronos} and
-Panoptic Multi-TSDFs~\cite{schmid2022panoptic} for TSDF, GaME~\cite{yugay2026game} for Gaussians, and
-wavemap~\cite{reijgwart2023wavemap} for occupancy. Methods process the same posed sequences and carry maps
-across visits. TESSE evaluates changes within a single visit using Khronos's official 4D protocol;
-we compare TSDF reconstructions in this setting.
+cross-visit changes. TESSE evaluates changes within a single visit using Khronos's official 4D protocol.
 
+\paragraph{Baselines.}
+We compare against GaME~\cite{yugay2026game} for Gaussian mapping of evolving scenes,
+Khronos~\cite{schmid2024khronos} for spatio-temporal metric-semantic mapping, and
+wavemap~\cite{reijgwart2023wavemap} for efficient probabilistic occupancy mapping.
+Panoptic Multi-TSDFs~\cite{schmid2022panoptic} provides an additional object-centric TSDF baseline.
+Methods process the same posed sequences and carry maps across visits; the TESSE evaluation compares TSDF
+reconstructions with Khronos.
 
 \paragraph{Metrics.}
 Geometry uses surface F1 at 5\,cm before Gaussian refinement. Object F1 uses 0.5\,m matching and
