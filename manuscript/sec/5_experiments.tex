@@ -1,18 +1,21 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We evaluate one update mechanism across three map representations, repeated visits, and single-run 4D reconstruction.
+We evaluate unified dynamic mapping in three representations, with detailed reconstruction results
+and ablations for Gaussians.
 
 \input{tables/main_results}
 
 \subsection{Experimental Setup}
 
 \paragraph{Datasets and baselines.}
-We use a real room (three visits), a simulated apartment and Flat~\cite{schmid2022panoptic} (two visits each),
-and eight rescanned 3RScan rooms~\cite{wald2019rio}. Baselines are Khronos~\cite{schmid2024khronos} and
+The real room (three visits) and simulated apartment (two visits) contain changes both within and across visits.
+Flat~\cite{schmid2022panoptic} (two visits) and eight rescanned 3RScan rooms~\cite{wald2019rio} evaluate
+cross-visit changes. Baselines are Khronos~\cite{schmid2024khronos} and
 Panoptic Multi-TSDFs~\cite{schmid2022panoptic} for TSDF, GaME~\cite{yugay2026game} for Gaussians, and
 wavemap~\cite{reijgwart2023wavemap} for occupancy. Methods process the same posed sequences and carry maps
-across visits. TESSE additionally compares our TSDF with Khronos in its single-run 4D setting.
+across visits. TESSE evaluates changes within a single visit using Khronos's official 4D protocol;
+we compare TSDF reconstructions in this setting.
 
 
 \paragraph{Metrics.}
@@ -28,18 +31,19 @@ The shared tests use a 5\,cm surface tolerance and threshold $\ln 99$ across dat
 Our TSDF and occupancy maps use 5\,cm cells. Controlled comparisons use annotated segmentation;
 we also evaluate predicted masks.
 
-\subsection{Persistent Mapping}
+\subsection{Unified Dynamic Mapping}
 \label{sec:exp_main}
 
-The unified update improves geometry, object F1, and change F1 across the three representations and four
-datasets (\cref{tab:main}). In the real room, our TSDF improves object and change F1 over Khronos by 18.1
-and 27.6 points. The same decisions remove obsolete geometry and retain consistent surfaces.
+Our method improves geometry, object F1, and change F1 in all three representations (\cref{tab:main}),
+both when within-visit and cross-visit changes coexist and on the cross-visit benchmarks.
 \Cref{fig:qualitative} compares six matched views across three datasets.
 
+\paragraph{TSDF and occupancy.}
+In the real room, TSDF geometry F1 increases from 87.7 to 96.1 over Khronos, and occupancy geometry F1
+increases from 84.5 to 91.0 over wavemap. Both representations also improve object and change F1 on all
+four datasets.
+
 \input{tables/restart}
-\input{tables/rendering}
-\input{tables/tesse}
-\input{tables/ablation}
 
 \paragraph{Partial revisits.}
 Continued maps preserve geometry left unobserved by a revisit (\cref{tab:restart}). On synthetic visit B,
@@ -48,26 +52,41 @@ All three also improve geometry F1.
 
 \input{figures/qualitative_native}
 
-\paragraph{Rendering the updated scene.}
+\input{tables/tesse}
+
+\paragraph{Temporal reconstruction.}
+The official 4D evaluation on TESSE tests reconstruction over map and query times during a single visit
+(\cref{tab:tesse}). Our TSDF improves all four F1 categories on both scenes. Change F1 increases from
+43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment.
+
+\subsection{Gaussian Reconstruction}
+\label{sec:exp_gaussians}
+
+\paragraph{Geometry and changes.}
+Gaussian reconstruction improves in geometry, object F1, and change F1 on every dataset (\cref{tab:main}).
+Before refinement, geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 points in the simulated
+apartment.
+
+\input{tables/rendering}
+
+\paragraph{Novel-view rendering.}
 Our Gaussian maps improve all four rendering metrics on every dataset (\cref{tab:rendering}), gaining
 0.96--3.43\,dB over GaME. On Flat, depth L1 decreases from 1.07 to 0.47\,cm. Observation reuse respects
 changes while retaining compatible supervision.
 
 \paragraph{Changes within and across visits.}
-\Cref{fig:evolution} follows the same living-room viewpoint at four times across two visits.
-The Gaussian reconstruction follows the changing furniture configuration as new observations arrive.
+\Cref{fig:evolution} follows one Gaussian reconstruction from a fixed living-room viewpoint.
+Four snapshots show changes within visits and between them: the reconstruction follows the new furniture
+configuration while retaining the surrounding room.
 
 \input{figures/evolution_native}
-
-\paragraph{Single-run 4D mapping.}
-All four official F1 categories improve on both TESSE scenes (\cref{tab:tesse}). Change F1 increases from
-43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment. This evaluation queries both current
-and earlier states.
 
 \subsection{Ablation Studies}
 
 We ablate the shared mechanism using the Gaussian representation over Flat A$\rightarrow$B
 (\cref{tab:ablation_variants}).
+
+\input{tables/ablation}
 
 \paragraph{Change decisions.}
 Removing change decisions reduces geometry F1 by 5.58 points, change F1 by 14.58 points, and PSNR by
