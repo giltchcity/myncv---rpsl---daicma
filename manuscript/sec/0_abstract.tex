@@ -9,7 +9,8 @@ the map geometry and its observation contributions. Changed geometry leaves the 
 reconstruct its replacement, and unchanged surfaces continue to accumulate measurements.
 Ended states remain available for historical queries, while the saved map and scene state support the next visit.
 We reconstruct TSDF, Gaussian, and occupancy maps using the same geometry and observation updates.
-Across four repeated-visit datasets, all three representations outperform their native updates in geometry, object
-reconstruction, and change detection. On a partial revisit of a simulated apartment, geometry recall improves
-over rebuilding from scratch by up to 21.1 points.
+Experiments include real and synthetic sequences with changes both within and across visits.
+Across four datasets, all three representations improve geometry, object reconstruction, and change detection
+over their corresponding baselines. Gaussian rendering improves by 0.96--3.43\,dB PSNR over GaME.
+On a partial revisit, retaining valid geometry raises recall over rebuilding from scratch by up to 21.1 points.
 \end{abstract}

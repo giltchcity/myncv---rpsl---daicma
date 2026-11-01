@@ -39,17 +39,18 @@ We implement these updates through TSDF fusion, Gaussian optimization, and occup
 Each representation uses its native reconstruction procedure; the shared mechanism determines its active geometry and
 observation contributions. This separates the decision about scene change from the representation used to reconstruct it.
 
-Across a real room, a simulated apartment, Flat, and 3RScan, each representation outperforms its native update
-in geometry, object reconstruction, and change detection (\cref{tab:main}).
-During a partial revisit, continued mapping raises geometry recall over native restart by 17.1--21.1 points
-(\cref{tab:restart}). Gaussian rendering improves on all four datasets, and our TSDF also improves the official
-single-run 4D evaluation on TESSE. These results test a shared update across different representations, observation
-coverage, and visit boundaries.
+Real and synthetic sequences test changes within and across visits in the same evolving map;
+Flat and 3RScan extend the evaluation to additional cross-visit changes.
+All three representations improve geometry, object reconstruction, and change detection over their corresponding
+baselines (\cref{tab:main}). During a partial revisit, retained geometry raises recall by 17.1--21.1 points
+over native restart (\cref{tab:restart}). TESSE further evaluates temporal reconstruction using the official 4D
+protocol. We examine Gaussian reconstruction in detail: novel-view rendering improves by 0.96--3.43\,dB PSNR
+over GaME across all four datasets, and ablations establish the roles of change decisions and observation reuse.
 
 Our contributions are:
 \begin{itemize}
-  \item A shared change-detection and map-update mechanism for TSDF, Gaussian, and occupancy maps, with continuation
-  across visits and historical queries.
-  \item An evaluation across repeated visits, partial revisits, and single-run dynamics, with ablations of change
-  decisions and observation reuse.
+  \item A unified dynamic mapping method that handles changes within and across visits through shared updates
+  to geometry and observation contributions in TSDF, Gaussian, and occupancy maps.
+  \item An evaluation of both types of change in continuous reconstructions, complemented by public benchmarks,
+  temporal evaluation, and detailed Gaussian reconstruction results and mechanism ablations.
 \end{itemize}
