@@ -14,12 +14,13 @@ to measure the effects of geometry retirement and observation reuse.
 
 \subsection{Experimental Setup}
 
-\paragraph{Our benchmark.}
-We record three visits to the same room with an Azure Kinect for \emph{DynaState-Real} (Real).
-For \emph{DynaState-Sim} (Synthetic), we animate objects and camera paths in an Isaac Sim apartment
-and record two visits. Both test motion observed during mapping and changes discovered after looking
-away or returning. Each method maintains one map through the visit chain. The synthetic sequence
-provides ground-truth geometry at each timestamp.
+\paragraph{DynaState benchmark.}
+To evaluate dynamic mapping within and across visits, we introduce \emph{DynaState-Real} (Real)
+and \emph{DynaState-Sim} (Synthetic). Real contains three Azure Kinect recordings of one room spanning
+nearly two weeks; Synthetic contains two animated visits to an Isaac Sim apartment. Both include
+observed motion and changes discovered after looking away or returning. Real provides aligned camera
+poses and annotated object changes; Synthetic provides ground-truth poses, labels, and time-varying
+scene geometry. Each method maintains one map throughout the visit chain.
 
 \paragraph{Public datasets.}
 Flat~\cite{schmid2022panoptic} comprises two synthetic RGB-D recordings with object rearrangements;

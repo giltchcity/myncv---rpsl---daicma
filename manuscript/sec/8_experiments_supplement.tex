@@ -1,24 +1,22 @@
 \section{Datasets}
 
-\paragraph{DynaState-Real.}
-We capture three visits to the same room with an Azure Kinect, including motion during recording
-and object changes within and between visits. The recordings contain 4,003, 4,041, and 7,216 RGB-D
-frames at 1920$\times$1080 and 30\,Hz, for 15,260 frames in total. Depth is aligned to RGB, and each
-frame has a timestamp, camera pose, and semantic and instance masks. We estimate camera poses with
-ORB-SLAM3~\cite{campos2021orbslam3} and register visits B and C to visit A using landmark correspondences,
-automatic geometric registration, and manual refinement. We prepare the masks with SAM assistance
-and manual review, assign physical instance identities, and manually annotate object changes over time.
-A room-restricted surface reconstructed at 1\,cm resolution provides the geometric reference.
-We abbreviate the dataset as Real in the tables.
+\paragraph{DynaState-Real (Real).}
+We record three Azure Kinect visits to one room over nearly two weeks, capturing motion during mapping
+and changes between visits. The visits contain 4,003, 4,041, and 7,216 RGB-D frames (15,260 total) at
+1920$\times$1080 and 30\,Hz. Depth is aligned to RGB; camera poses are estimated with
+ORB-SLAM3~\cite{campos2021orbslam3}. We register visits B and C to A using landmark correspondences,
+automatic registration, and manual refinement. Masks combine SAM assistance and manual review,
+with ADE20K classes and 17 persistent object IDs. People are labeled dynamic, and object changes
+are annotated over time by hand. A surface reconstructed at 1\,cm resolution within the room
+provides the geometry reference.
 
-\paragraph{DynaState-Sim.}
-We author object changes and camera trajectories in an InteriorAgent apartment~\cite{InteriorAgent2025}
-and capture two visits in Isaac Sim. The raw recordings contain 4,186 and 3,555 RGB-D frames at
-680$\times$480 and 30\,Hz. They include camera poses, semantic and instance labels, and per-frame
-object transforms and visibility. These transforms and the original object meshes recover the
-ground-truth scene geometry at each timestamp. Changes occur during and between visits; the second
-visit covers only part of the previously observed scene. This supports evaluation of both dynamic
-reconstruction and retained map completeness. We abbreviate this dataset as Synthetic.
+\paragraph{DynaState-Sim (Synthetic).}
+We animate objects and camera trajectories in InteriorAgent's kujiale\_0021 apartment~\cite{InteriorAgent2025}
+and capture two visits in Isaac Sim. The visits share a world coordinate frame and contain 4,186 and
+3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export ground-truth camera poses, semantic and
+instance labels, and per-frame object transforms and visibility. The transforms and original object
+meshes recover scene geometry at each timestamp. Changes occur within and across visits. The second
+visit covers part of the scene, supporting evaluation of retained map completeness.
 
 \paragraph{Flat.}
 Flat was introduced with Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. It contains two RGB-D trajectories
