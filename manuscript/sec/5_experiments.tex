@@ -1,19 +1,26 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We evaluate one update mechanism across three map representations, repeated visits, and single-run 4D reconstruction.
+We first evaluate whether the shared updates reconstruct changing scenes accurately across three
+representations while retaining valid geometry. We then examine Gaussian rendering and use ablations
+to measure the effects of geometry retirement and observation reuse.
 
 \input{tables/main_results}
 
 \subsection{Experimental Setup}
 
-\paragraph{Datasets and baselines.}
-We use a real room (three visits), a simulated apartment and Flat~\cite{schmid2022panoptic} (two visits each),
-and eight rescanned 3RScan rooms~\cite{wald2019rio}. Baselines are Khronos~\cite{schmid2024khronos} and
-Panoptic Multi-TSDFs~\cite{schmid2022panoptic} for TSDF, GaME~\cite{yugay2026game} for Gaussians, and
-wavemap~\cite{reijgwart2023wavemap} for occupancy. Methods process the same posed sequences and carry maps
-across visits. TESSE additionally compares our TSDF with Khronos in its single-run 4D setting.
-Input settings and adapters appear in the supplement.
+\paragraph{Datasets.}
+The real room (three visits) and simulated apartment (two visits) contain changes both within and across visits.
+Flat~\cite{schmid2022panoptic} (two visits) and eight rescanned 3RScan rooms~\cite{wald2019rio} evaluate
+cross-visit changes. TESSE evaluates changes within a single visit using Khronos's official 4D protocol.
+
+\paragraph{Baselines.}
+We compare against GaME~\cite{yugay2026game} for Gaussian mapping of evolving scenes,
+Khronos~\cite{schmid2024khronos} for spatio-temporal metric-semantic mapping, and
+wavemap~\cite{reijgwart2023wavemap} for efficient probabilistic occupancy mapping.
+Panoptic Multi-TSDFs~\cite{schmid2022panoptic} provides an additional object-centric TSDF baseline.
+Methods process the same posed sequences and carry maps across visits; the TESSE evaluation compares TSDF
+reconstructions with Khronos.
 
 \paragraph{Metrics.}
 Geometry uses surface F1 at 5\,cm before Gaussian refinement. Object F1 uses 0.5\,m matching and
@@ -25,76 +32,93 @@ over map and query times.
 
 \paragraph{Implementation.}
 The shared tests use a 5\,cm surface tolerance and threshold $\ln 99$ across datasets.
-Our TSDF and occupancy maps use 5\,cm cells. Other parameters are in the supplement.
+Our TSDF and occupancy maps use 5\,cm cells. Controlled comparisons use annotated segmentation;
+we also evaluate predicted masks.
 
-\subsection{Persistent Mapping}
+\subsection{Unified Dynamic Mapping}
 \label{sec:exp_main}
 
-The unified update improves geometry, object F1, and change F1 across the three representations and four
-datasets (\cref{tab:main}). In the real room, our TSDF improves object and change F1 over Khronos by 18.1
-and 27.6 points. The same decisions remove obsolete geometry and retain consistent surfaces.
+One evolving map must handle changes observed during a visit and changes discovered after returning.
+The real and synthetic sequences test this joint setting; Flat and 3RScan test further cross-visit changes.
+Our method improves geometry, object F1, and change F1 for all three representations on all four datasets
+(\cref{tab:main}). The reconstruction therefore improves alongside the change decisions.
+\Cref{fig:geometry_details} shows the removal of stale geometry in TSDF and occupancy maps.
+
+\paragraph{TSDF and occupancy.}
+In the real room, TSDF geometry F1 increases from 87.7 to 96.1 over Khronos, and occupancy geometry F1
+increases from 84.5 to 91.0 over wavemap. Both representations also improve object and change F1 on all
+four datasets. These results test the same geometry and observation decisions under signed-distance
+fusion and probabilistic occupancy integration.
+
+\input{figures/qualitative_geometry}
 
 \input{tables/restart}
-\input{tables/rendering}
-\input{tables/tesse}
-\input{tables/ablation}
 
 \paragraph{Partial revisits.}
-Continued maps preserve geometry left unobserved by a revisit (\cref{tab:restart}). On synthetic visit B,
+Updating the changed scene also preserves valid geometry outside the current observation coverage
+(\cref{fig:retention}). On synthetic visit B,
 recall improves over native restart by 21.1, 17.3, and 17.1 points for TSDF, Gaussians, and occupancy.
-All three also improve geometry F1. \Cref{fig:qualitative} shows changed locations and retained regions.
+All three also improve geometry F1. The reference includes surfaces observed up to visit B, so this
+comparison measures the benefit of retaining earlier geometry through a partial revisit.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/qualitative.pdf}
-\caption{\textbf{Updating changes while retaining unobserved geometry.} Central crops compare continued maps at
-changed locations. Right-hand crops compare native restarts with our continued maps in a region unobserved during
-the third visit, alongside its first-visit reference. Our maps update changed locations and retain this region.
-TSDF and occupancy colors are transferred from the reference.}
-\label{fig:qualitative}
-\end{figure*}
+\input{tables/tesse}
 
-\paragraph{Rendering the updated scene.}
+\paragraph{Temporal reconstruction.}
+TESSE further tests whether the reconstructed scene is accurate over time. Its official 4D evaluation
+aggregates over map and query times during a single visit
+(\cref{tab:tesse}). Our TSDF improves all four F1 categories on both scenes. Change F1 increases from
+43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment.
+
+\input{figures/qualitative_gaussians}
+
+\subsection{Gaussian Reconstruction}
+\label{sec:exp_gaussians}
+
+\paragraph{Geometry and changes.}
+The Gaussian map improves geometry, object F1, and change F1 on every dataset (\cref{tab:main}).
+Before refinement, geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 in the synthetic apartment.
+
+\input{tables/rendering}
+
+\paragraph{Novel-view rendering.}
 Our Gaussian maps improve all four rendering metrics on every dataset (\cref{tab:rendering}), gaining
-0.96--3.43\,dB over GaME. On Flat, depth L1 decreases from 1.07 to 0.47\,cm. Observation reuse respects
-changes while retaining compatible supervision.
-
-\paragraph{Single-run 4D mapping.}
-All four official F1 categories improve on both TESSE scenes (\cref{tab:tesse}). Change F1 increases from
-43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment. This evaluation queries both current
-and earlier states; complete P/R/F1 and independent single-visit runs appear in the supplement.
+0.96--3.43\,dB over GaME. On Flat, depth L1 decreases from 1.07 to 0.47\,cm. The gains in color and depth
+show that the updated geometry supports more accurate novel views after refinement. \Cref{fig:gaussian_details} shows the corresponding reduction in old-object residue and duplicated structure. We isolate the effect of old-observation constraints in the ablations below.
 
 \paragraph{Changes within and across visits.}
-\Cref{fig:evolution} shows our Gaussian map before and after two changes: a bed moved between visits and a chair
-replaced by a sofa within a visit. The continued map reconstructs both changes as new observations arrive.
+\Cref{fig:evolution} follows one Gaussian reconstruction from a fixed living-room viewpoint.
+Four snapshots show changes within visits and between them: the reconstruction follows the new furniture
+configuration while retaining the surrounding room.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/fourd.pdf}
-\caption{\textbf{Updating within and across visits.} Ground-truth images (top) and pre-refinement Gaussian map
-snapshots from one continued run (bottom). Left: the bed moves between visits. Right: a sofa replaces the chair
-during the second visit. Each pair shows the reconstruction before and after the change. PSNR uses the full frame.}
-\label{fig:evolution}
-\end{figure*}
+\input{figures/evolution_native}
 
 \subsection{Ablation Studies}
 
-We ablate the shared mechanism on the Gaussian backend over Flat A$\rightarrow$B
-(\cref{tab:ablation_variants}); the supplement reports all completed variants.
+On Flat A$\rightarrow$B, we test the two reconstruction consequences of a change decision: retiring
+outdated geometry and restricting observation contributions (\cref{tab:ablation_variants}). All variants
+use the Gaussian representation and are compared with their matched Full configuration.
 
-\paragraph{Change decisions.}
-Removing change decisions reduces geometry F1 by 5.58 points, change F1 by 14.58 points, and PSNR by
-3.84\,dB. Retiring outdated geometry benefits both detection and reconstruction.
+\input{tables/ablation}
+
+\paragraph{Applying changes to geometry.}
+Withholding geometry retirement reduces geometry F1 by 5.58 points, change F1 by 14.58 points, and PSNR by
+3.84\,dB. The effect spans geometric and rendering quality: confirmed changes must be applied to the
+stored reconstruction.
 
 \paragraph{Observation reuse.}
-Unrestricted old frames reduce PSNR from 27.77 to 22.69\,dB and increase depth L1 from 0.45 to 3.66\,cm.
-Discarding whole conflicting frames reaches similar PSNR on the extensively revisited Flat scene; selective
-reuse achieves lower depth error and retains compatible observations.
+Allowing old frames to supervise the current reconstruction without observation constraints reduces PSNR
+from 27.77 to 22.69\,dB and increases depth L1 from 0.45 to 3.66\,cm. This comparison tests the observation
+constraint as a whole. Discarding entire conflicting frames reaches similar quality on Flat, where the
+second visit covers most of the scene. Selective reuse retains compatible measurements within old frames.
 
 \paragraph{Parameter sensitivity.}
 Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR, with at most one event difference.
-The fixed-prior sweep gives similar reconstruction scores. Full values appear in the supplement.
+The fixed-prior sweep gives similar reconstruction scores.
 
 \paragraph{Predicted segmentation.}
 OneFormer~\cite{jain2023oneformer} predictions retain 89.89 geometry F1 and 27.56\,dB PSNR,
 while object and change F1 reflect segmentation errors (\cref{tab:ablation_variants}).
+
+\paragraph{Computational cost.}
+On Flat, mapping and refinement take 2,898\,s versus 2,647\,s for GaME on an RTX 5070 Ti with 16\,GB.
+Peak memory is 6.6 versus 5.9\,GB. These measurements include the Gaussian reconstruction and its retained history.

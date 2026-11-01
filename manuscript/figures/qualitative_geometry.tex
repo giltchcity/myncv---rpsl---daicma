@@ -1,0 +1,26 @@
+% Native original images; exact positions and crops are in the companion JSON.
+\begin{figure}[t]
+\centering
+\begingroup
+\rmfamily
+\setlength{\unitlength}{\dimexpr\linewidth/240\relax}
+\begin{picture}(240,201)
+\put(38.000,193.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Baseline}}
+\put(120.000,193.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{997510}Ours}}
+\put(202.000,193.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Reference}}
+\put(82.000,189.000){\color[HTML]{997510}\rule{76.000\unitlength}{0.6pt}}
+\put(0.000,177.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(a) TSDF / Khronos}}
+\put(240.000,177.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Real}}
+\put(0.000,96.000){\includegraphics[width=76.000\unitlength,trim={100.0000bp 12.0000bp 518.0000bp 180.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}
+\put(82.000,96.000){\includegraphics[width=76.000\unitlength,trim={100.0000bp 12.0000bp 518.0000bp 180.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png}}
+\put(164.000,96.000){\includegraphics[width=76.000\unitlength,trim={100.0000bp 12.0000bp 518.0000bp 180.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
+\put(0.000,83.500){\makebox(0,0)[l]{\fontsize{7.5}{8.5}\selectfont\bfseries\color[HTML]{222222}(b) Occupancy / wavemap}}
+\put(240.000,83.500){\makebox(0,0)[r]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{666666}Synthetic}}
+\put(0.000,2.000){\includegraphics[width=76.000\unitlength,trim={20.0000bp 0.0000bp 340.0000bp 160.0000bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png}}
+\put(82.000,2.000){\includegraphics[width=76.000\unitlength,trim={20.0000bp 0.0000bp 340.0000bp 160.0000bp},clip]{figures/results_native/qual/4_sim_03065/7_ours_occ.png}}
+\put(164.000,2.000){\includegraphics[width=76.000\unitlength,trim={20.0000bp 0.0000bp 340.0000bp 160.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
+\end{picture}
+\endgroup
+\caption{\textbf{The shared update removes stale geometry.} Matched crops compare Khronos with our TSDF (top) and wavemap with our occupancy map (bottom). Final maps use reference colors; occupancy is visualized at 2\,cm resolution.}
+\label{fig:geometry_details}
+\end{figure}

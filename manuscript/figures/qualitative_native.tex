@@ -1,0 +1,77 @@
+% Original PNG panels; square cropping is applied by graphicx.
+% Crop coordinates and comparison rule: figures/qualitative_crops.json.
+\begin{figure*}[t]
+\centering
+\begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
+\newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
+\fontsize{7}{8}\selectfont
+\begin{tabular}{@{}c*{8}{c}@{}}
+& & \multicolumn{3}{c}{TSDF} & \multicolumn{2}{c}{3D Gaussians} & \multicolumn{2}{c}{Occupancy}\\[3pt]
+& Image & Khronos & Panoptic & Ours & GaME & Ours & wavemap & Ours\\[3pt]
+% 1_real_05320 [165, 72, 615, 522]
+\rotatebox{90}{Real C} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/4_game.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/7_ours_occ.png}\\[2pt]
+% 2_real_02540 [105, 80, 550, 525]
+\rotatebox{90}{Real C} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/4_game.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png}\\[2pt]
+% 3_sim_02850 [150, 15, 580, 445]
+\rotatebox{90}{Synthetic B} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/0_image.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/4_game.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/7_ours_occ.png}\\[2pt]
+% 4_sim_03065 [210, 20, 640, 450]
+\rotatebox{90}{Synthetic B} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={210.0000bp 30.0000bp 40.0000bp 20.0000bp},clip]{figures/results_native/qual/4_sim_03065/7_ours_occ.png}\\[2pt]
+% 5_flat_00270 [160, 90, 550, 480]
+\rotatebox{90}{Flat B} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/7_ours_occ.png}\\[2pt]
+% 6_flat_00225 [100, 30, 525, 455]
+\rotatebox{90}{Flat B} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/4_game.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png}\\[2pt]
+\end{tabular}\endgroup
+\caption{\textbf{Scene updates across three representations.} Six views from the real room, synthetic apartment,
+and Flat, with each method rendered at the image pose. Each row uses the same square crop and scale across methods.
+TSDF and occupancy use reference colors. Real-room occupancy panels use the capture-time maps; other panels
+use final maps. Occupancy is visualized at 2\,cm resolution.}
+\label{fig:qualitative}
+\end{figure*}

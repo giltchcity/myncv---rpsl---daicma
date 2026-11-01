@@ -1,9 +1,9 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \ours, a unified method for dynamic mapping within and across visits.
-Depth evidence identifies changes, and the inferred state intervals control both the geometry retained in the map
-and the observations used to update it. TSDF, Gaussian, and occupancy maps apply this shared mechanism through
-their native reconstruction procedures. They update changed objects, retain unobserved regions, and preserve earlier
-states for historical queries. Experiments show improved reconstruction and change detection across representations,
-with greater completeness on partial revisits.
+We presented \ours for dynamic mapping within and across visits. Scene-state intervals connect changes
+in map geometry to changes in observation contributions: outdated geometry leaves the current map,
+new observations reconstruct its replacement, and compatible earlier information continues to complete
+unchanged regions. The same mechanism applies to TSDF, Gaussian, and occupancy reconstruction and retains
+earlier states for historical queries. Experiments demonstrate more accurate dynamic reconstruction
+across the three representations, greater completeness on partial revisits, and improved Gaussian rendering.
