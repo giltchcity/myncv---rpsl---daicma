@@ -1,54 +1,56 @@
 \section{Introduction}
 \label{sec:intro}
 
-When a chair moves, the map should reconstruct its new location, clear its old location, and retain the unchanged
-room around it.
-This requirement holds whether the robot sees the motion, discovers it after turning back, or returns on another
-visit (\cref{fig:teaser}).
-It also holds for any map representation: a truncated signed distance field (TSDF), a set of 3D Gaussians, or an
-occupancy grid. Keeping earlier geometry indiscriminately leaves objects at outdated locations, while rebuilding from
-scratch loses previously observed regions. Dynamic mapping must update the changed scene and
-retain the parts that remain consistent.
+A robot revisiting a room must update its map to the new furniture arrangement while retaining unchanged
+geometry. The same requirement arises during a visit, when an object moves in view
+or changes position while the robot looks elsewhere (\cref{fig:teaser}). Such changes occur throughout
+long-term operation, so mapping must reconstruct the changing scene from successive, partial observations.
+Accurate geometric maps support navigation and interaction, while renderable maps provide a visual model
+for inspecting the evolving environment.
 
-Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over
-time~\cite{schmid2024khronos}. GaME introduced the first mapping system with novel-view synthesis for
-evolving, long-term dynamic scenes~\cite{yugay2026game}. wavemap combines state-of-the-art lossless
-occupancy compression with efficient multi-resolution integration~\cite{reijgwart2023wavemap}.
-Across these representations, dynamic mapping requires
-a common decision: which geometry remains present, and which observations can contribute to its reconstruction?
+Recent mapping systems have established substantial capabilities in these settings. Khronos introduced
+the first real-time system for metric-semantic reconstruction of a scene over time~\cite{schmid2024khronos}.
+GaME introduced the first mapping system with novel-view synthesis for evolving, long-term dynamic
+scenes~\cite{yugay2026game}. wavemap combines state-of-the-art lossless occupancy compression with
+efficient multi-resolution integration~\cite{reijgwart2023wavemap}. These systems reconstruct surfaces,
+Gaussians, or occupancy, but all must decide how a scene change affects the geometry already stored and
+the measurements that continue to update it.
 
-We connect these decisions through the time interval in which a scene state exists.
-After the chair moves, its earlier images still describe the chair at the old location; using them to fit the current
-scene can reconstruct it again. Yet those same images may still provide useful measurements of the unchanged wall.
-That interval determines which geometry is current and which parts of each observation remain compatible with it,
-distinguishing an ended surface from one that is hidden or left unobserved.
+Consider a chair that has moved. Current depth may reveal the floor behind part of its old location,
+providing evidence that the old state has ended. Updating the reconstruction must then account for the
+chair's stored geometry, including parts outside the current view. It must also account for earlier
+observations that remain in fusion or optimization: old images still depict the chair, and old free-space
+measurements may pass through its new location. Yet those same observations can contain useful information
+about the unchanged wall. A change therefore affects both map content and the spatial and temporal scope
+of observation contributions.
 
-We introduce \ours, a unified method for persistent dynamic mapping built around \emph{change detection} and
-\emph{map update} (\cref{fig:method}). Change detection compares current depth with existing surfaces to establish
-which object states continue, end, or begin. Map update applies these decisions to the object's reconstruction and to
-the observations that can affect it. A confirmed change retires the old object's geometry, including parts outside
-the current view. New observations reconstruct the new state, while compatible earlier observations continue to
-complete unchanged surfaces. The method retains occluded and unobserved geometry until evidence supports an update.
+We use the interval in which a scene state exists as a common basis for these two updates. Measurements
+of a state contribute to its reconstruction; a confirmed change ends its geometry in the current map and
+revises where earlier measurements can act. For example, an earlier depth measurement of the wall can
+retain its surface contribution while its free-space update stops before a newly placed object.
+This distinction lets new observations reconstruct the changed scene and earlier observations continue
+to complete the parts that remain consistent.
 
-The mechanism combines object-tracking and free-space motion cues with changes discovered against the retained map,
-both within and across visits. The next visit resumes from the saved map
-and state, and ended geometry remains available for queries at earlier times.
-We implement these updates through TSDF fusion, Gaussian optimization, and occupancy integration.
-Each representation uses its native reconstruction procedure; the shared mechanism determines its active geometry and
-observation contributions. This separates the decision about scene change from the representation used to reconstruct it.
+We introduce \ours, a unified dynamic mapping method with two components, \emph{change detection} and
+\emph{map update} (\cref{fig:method}). Change detection checks retained surfaces against current depth
+and combines this evidence with motion cues to determine which states continue, end, or begin.
+Map update applies these decisions to geometry and observation contributions. The same procedure continues
+when observations resume on another visit and governs TSDF fusion, Gaussian optimization, and occupancy
+integration. Geometry that is occluded or left unobserved is retained until evidence supports an update;
+ended states remain available for queries at earlier times.
 
-Real and synthetic sequences test changes within and across visits in the same evolving map;
-Flat and 3RScan extend the evaluation to additional cross-visit changes.
-All three representations improve geometry, object reconstruction, and change detection over their corresponding
-baselines (\cref{tab:main}). During a partial revisit, retained geometry raises recall by 17.1--21.1 points
-over native restart (\cref{tab:restart}). TESSE further evaluates temporal reconstruction using the official 4D
-protocol. We examine Gaussian reconstruction in detail: novel-view rendering improves by 0.96--3.43\,dB PSNR
-over GaME across all four datasets, and ablations establish the roles of change decisions and observation reuse.
+Our real and synthetic sequences contain changes both within and across visits in the same evolving map.
+Flat and 3RScan provide further cross-visit evaluation. Across these four datasets, all three representations
+improve geometry, object reconstruction, and change detection over their corresponding baselines
+(\cref{tab:main}). Partial revisits demonstrate greater completeness, and TESSE provides an additional
+evaluation of temporal reconstruction. We examine Gaussian reconstruction in detail, with
+0.96--3.43\,dB higher novel-view PSNR than GaME across the four datasets and ablations that measure the
+effects of geometry retirement and observation reuse.
 
 Our contributions are:
 \begin{itemize}
-  \item A unified dynamic mapping method that handles changes within and across visits through shared updates
-  to geometry and observation contributions in TSDF, Gaussian, and occupancy maps.
-  \item An evaluation of both types of change in continuous reconstructions, complemented by public benchmarks,
-  temporal evaluation, and detailed Gaussian reconstruction results and mechanism ablations.
+  \item A unified dynamic mapping method that uses scene-state intervals to coordinate geometry and observation
+  updates within and across visits, realized in TSDF, Gaussian, and occupancy reconstruction.
+  \item An evaluation of continuous reconstruction under both types of change, with public benchmarks,
+  temporal and completeness evaluations, and detailed Gaussian rendering results and mechanism ablations.
 \end{itemize}

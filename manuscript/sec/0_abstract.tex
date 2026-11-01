@@ -1,16 +1,15 @@
 \begin{abstract}
-Dynamic mapping must update scene geometry and determine how earlier observations can contribute as objects
-change during and between visits.
-Existing systems handle these updates through rules tied to their own representations, from signed-distance
-surfaces to Gaussian primitives and occupancy cells.
-We present \ours, a unified method for dynamic mapping within and across visits.
-It uses depth observations to infer when each object state exists, then applies these time intervals to both
-the map geometry and its observation contributions. Changed geometry leaves the current map, new observations
-reconstruct its replacement, and unchanged surfaces continue to accumulate measurements.
-Ended states remain available for historical queries, while the saved map and scene state support the next visit.
-We reconstruct TSDF, Gaussian, and occupancy maps using the same geometry and observation updates.
-Experiments include real and synthetic sequences with changes both within and across visits.
-Across four datasets, all three representations improve geometry, object reconstruction, and change detection
-over their corresponding baselines. Gaussian rendering improves by 0.96--3.43\,dB PSNR over GaME.
-On a partial revisit, retaining valid geometry raises recall over rebuilding from scratch by up to 21.1 points.
+Reconstructing a changing scene requires updating both its geometry and the observations used to build it.
+The same earlier image can constrain an unchanged wall while its object or free-space measurements conflict
+with the current scene. We present \ours, a unified method for dynamic mapping within and across visits
+that connects these updates through scene-state intervals. Change detection uses current observations to
+determine which states persist, end, or begin. Map update applies these decisions to associated geometry
+and restricts observation contributions to compatible states and regions. New observations reconstruct the
+changed scene, while valid earlier information continues to complete it. The same mechanism governs TSDF
+fusion, Gaussian optimization, and occupancy integration, with ended states retained for historical queries.
+Experiments on four datasets include real and synthetic sequences with both within-visit and cross-visit
+changes. All three representations outperform their corresponding baselines in geometry, object
+reconstruction, and change detection. Gaussian rendering improves by 0.96--3.43\,dB PSNR over GaME,
+and retaining valid geometry on a partial revisit increases recall over rebuilding from scratch by up to
+21.1 points.
 \end{abstract}
