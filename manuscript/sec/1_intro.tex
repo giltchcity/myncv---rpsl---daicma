@@ -7,18 +7,10 @@ This requirement holds whether the robot sees the motion, discovers it after tur
 visit (\cref{fig:teaser}).
 It also holds for any map representation: a truncated signed distance field (TSDF), a set of 3D Gaussians, or an
 occupancy grid. Keeping earlier geometry indiscriminately leaves objects at outdated locations, while rebuilding from
-scratch loses previously observed regions (\cref{fig:problem}). Dynamic mapping must update the changed scene and
+scratch loses previously observed regions. Dynamic mapping must update the changed scene and
 retain the parts that remain consistent.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/problem.pdf}
-\caption{\textbf{Update changes and retain unobserved regions.} Gaussian maps after the second visit to the simulated
-apartment. (a)~Keeping all earlier geometry leaves the moved sofa and side table at both locations.
-(b)~Rebuilding from scratch loses the ceiling and upper walls, which the second visit barely observes.
-Our continued map removes the outdated objects and retains the earlier room structure. Boxes mark enlarged crops.}
-\label{fig:problem}
-\end{figure*}
+
 
 Khronos reconstructs object fragments and reconciles them over time using a library of rays~\cite{schmid2024khronos},
 while Panoptic Multi-TSDFs reasons about the presence of object submaps~\cite{schmid2022panoptic}.
@@ -40,11 +32,11 @@ the observations that can affect it. A confirmed change retires the old object's
 the current view. New observations reconstruct the new state, while compatible earlier observations continue to
 complete unchanged surfaces. The method retains occluded and unobserved geometry until evidence supports an update.
 
-The mechanism combines motion cues from the mapping front end with changes discovered against the retained map,
+The mechanism combines object-tracking and free-space motion cues with changes discovered against the retained map,
 both within and across visits. The next visit resumes from the saved map
 and state, and ended geometry remains available for queries at earlier times.
 We implement these updates through TSDF fusion, Gaussian optimization, and occupancy integration.
-Each backend retains its native reconstruction procedure; the shared mechanism determines its active geometry and
+Each representation uses its native reconstruction procedure; the shared mechanism determines its active geometry and
 observation contributions. This separates the decision about scene change from the representation used to reconstruct it.
 
 Across a real room, a simulated apartment, Flat, and 3RScan, each representation outperforms its native update

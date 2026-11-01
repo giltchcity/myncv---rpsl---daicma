@@ -1,11 +1,11 @@
 \section{Method}
 \label{sec:method}
 
-Given posed RGB-D observations and an earlier map, \ours reconstructs the changing scene and retains its history.
+Given posed RGB-D observations and an earlier map, \ours detects scene changes and updates the reconstruction.
 The method has two parts (\cref{fig:method}). \emph{Change detection} determines which object states continue,
 end, or begin from the new observations (\cref{sec:states}). \emph{Map update} applies these decisions to existing
 geometry and selects the observations used to reconstruct each state (\cref{sec:validity}).
-The resulting update is implemented through the native procedures of TSDF, Gaussian, and occupancy maps.
+The same decisions govern TSDF fusion, Gaussian optimization, and occupancy integration.
 
 \begin{figure*}[t]
 \centering
@@ -13,7 +13,7 @@ The resulting update is implemented through the native procedures of TSDF, Gauss
 \caption{\textbf{One update mechanism for three map representations.} Current observations reveal missing objects
 (purple) and new objects (yellow). Change detection determines when object states end or begin. Map update uses
 these decisions to retire old geometry, reconstruct new states, and retain compatible observations and surfaces.
-The shared mechanism connects to three native map updates and preserves earlier states for historical queries.}
+The same decisions govern all three map representations and preserve earlier states for historical queries.}
 \label{fig:method}
 \end{figure*}
 
@@ -22,7 +22,7 @@ The shared mechanism connects to three native map updates and preserves earlier 
 An object state represents an object while its geometry remains unchanged. State $s$ has a reconstructed surface
 $G_s$ and an interval $[b_s,d_s)$ during which it is present.
 Further observations extend that surface; after a move, a new state is reconstructed from observations at the new
-location. We use the object masks and associations supplied by the mapping front end.
+location. Object masks (SAM masks in \cref{fig:method}) group surface observations; associations link these regions across frames.
 Each map element $e$ carries its object association, if available, and a lifetime $[c_e,d_e)$.
 Elements are TSDF surface faces, Gaussians, or occupied cells, depending on the representation.
 The map at time $t$ is
@@ -30,7 +30,7 @@ The map at time $t$ is
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-Element lifetimes follow the represented scene states and can begin before allocation by the mapper.
+Element lifetimes follow the represented scene states and can begin before their allocation during reconstruction.
 Closing a lifetime removes the element from the current map while preserving it for historical queries.
 
 \subsection{Change Detection}
@@ -75,7 +75,7 @@ current surface and their support in subsequent observations before committing a
 extend a continuing state; a confirmed successor starts a new state and closes the previous one.
 Unresolved observations remain candidates. These decisions determine the state intervals used by map update.
 
-Visible motion is supplied by the mapping front end, including the tracking and free-space motion cues of
+We identify visible motion using object tracking and free-space motion cues from
 Khronos and Dynablox~\cite{schmid2024khronos,schmid2023dynablox}. Geometry is reconstructed from observations of the
 object after it settles. Changes discovered after looking away or returning to the scene are assessed against the
 retained map using the surface tests above. Both sources of change feed the same map-update mechanism.
@@ -142,10 +142,16 @@ The local replacement condition $C(e)$ holds when a current surface lies just in
 with the same orientation. In a tied case, the current estimate replaces this older copy.
 The remaining geometry is retained, including unobserved regions. Occlusion alone contributes no evidence for removal.
 
-\paragraph{Backend integration.}
+\paragraph{Continuing across visits.}
+\label{sec:handoff}
+We save the current map, element lifetimes, object-state summaries, and evidence statistics at the end of a visit.
+The next visit expresses its observations in the shared coordinate frame and resumes the same detection and update
+procedures from this retained state.
+
+\paragraph{Reconstruction in three representations.}
 \label{sec:representations}
-Each mapper provides four operations: report its elements, end selected elements, accept state intervals, and integrate
-observations within their valid domains. The following implementations retain the native geometry update of each mapper.
+The same state decisions and observation domains determine the reconstruction in all three representations.
+TSDF fusion, Gaussian optimization, and occupancy integration realize these decisions as follows.
 
 \emph{TSDF.} We retain Khronos' active window, tracking, and object extraction~\cite{schmid2024khronos}.
 Its projective integrator averages signed-distance measurements~\cite{curless1996volumetric,newcombe2011kinectfusion}
@@ -165,9 +171,3 @@ integration~\cite{reijgwart2023wavemap,hornung2013octomap}.
 Cells associated with an ended state leave the current map together. Where a newly measured object surface occupies
 a cell, the previous visit's free-space contribution is withdrawn before continuing integration.
 The replacement condition $C(e)$ retires nearby stale copies, while eligible unobserved cells are retained.
-
-\paragraph{Continuing across visits.}
-\label{sec:handoff}
-We save the current map, element lifetimes, object-state summaries, and evidence statistics at the end of a visit.
-The next visit expresses its observations in the shared coordinate frame and resumes the same detection and update
-procedures from this retained state.

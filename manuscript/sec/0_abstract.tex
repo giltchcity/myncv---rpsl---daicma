@@ -8,8 +8,8 @@ It uses depth observations to infer when each object state exists, then applies 
 the map geometry and its observation contributions. Changed geometry leaves the current map, new observations
 reconstruct its replacement, and unchanged surfaces continue to accumulate measurements.
 Ended states remain available for historical queries, while the saved map and scene state support the next visit.
-This mechanism connects to TSDF, Gaussian, and occupancy maps through their native integration procedures.
-Across four repeated-visit datasets, all three mappers outperform their native updates in geometry, object
+We reconstruct TSDF, Gaussian, and occupancy maps using the same geometry and observation updates.
+Across four repeated-visit datasets, all three representations outperform their native updates in geometry, object
 reconstruction, and change detection. On a partial revisit of a simulated apartment, geometry recall improves
 over rebuilding from scratch by up to 21.1 points.
 \end{abstract}
