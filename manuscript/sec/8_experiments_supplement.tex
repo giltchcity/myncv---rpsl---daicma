@@ -1,11 +1,14 @@
 \section{Datasets}
 
 \paragraph{DynaState-Real.}
-We record the same room on three visits, with motion during recording and object changes within and
-between visits. The recordings contain 4,003, 4,041, and 7,216 RGB-D frames at 1920$\times$1080 and
-30\,Hz, for 15,260 frames in total. Depth is aligned to RGB, and each frame has a timestamp, camera
-pose, semantic label image, and instance label image. Rigid session transforms align visits B and C
-to visit A. A room-restricted surface reconstructed at 1\,cm resolution provides the geometric reference.
+We capture three visits to the same room with an Azure Kinect, including motion during recording
+and object changes within and between visits. The recordings contain 4,003, 4,041, and 7,216 RGB-D
+frames at 1920$\times$1080 and 30\,Hz, for 15,260 frames in total. Depth is aligned to RGB, and each
+frame has a timestamp, camera pose, and semantic and instance masks. We estimate camera poses with
+ORB-SLAM3~\cite{campos2021orbslam3} and register visits B and C to visit A using landmark correspondences,
+automatic geometric registration, and manual refinement. We prepare the masks with SAM assistance
+and manual review, assign physical instance identities, and manually annotate object changes over time.
+A room-restricted surface reconstructed at 1\,cm resolution provides the geometric reference.
 We abbreviate the dataset as Real in the tables.
 
 \paragraph{DynaState-Sim.}
@@ -26,15 +29,14 @@ This controlled cross-visit setting is also used for the Gaussian ablations.
 \paragraph{3RScan.}
 3RScan~\cite{wald2019rio} contains repeated RGB-D scans of indoor environments with aligned reconstructions
 and object-instance annotations across rescans. We evaluate eight room chains, maintaining the map
-across successive scans in each room. The rescans test updates to real scenes under object rearrangement
-and changing observation coverage.
+across successive scans in each room. The rescans test object rearrangement under changing coverage.
 
 \paragraph{TESSE.}
 We use the Apartment and Office sequences released with Khronos~\cite{schmid2024khronos}. They combine
 moving objects and longer-term object changes during continuous robot trajectories, including revisits
 to previously observed areas. Their scene annotations support Khronos's official evaluation of
 background, static objects, dynamics, and changes over map and query times. We use this protocol for
-the TSDF comparison, as detailed below.
+the TSDF comparison with Khronos's official evaluation code.
 
 \section{Evaluation Protocol}
 
