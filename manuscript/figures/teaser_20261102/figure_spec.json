@@ -1,0 +1,1004 @@
+{
+  "schema": "academic-figure/FigureSpec@1",
+  "figure_id": "bed_input_origin_lowered_120px",
+  "plan_revision": 65,
+  "sources": [
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30",
+      "evidence": "Two cases: see an object move; find an object changed, including on a later revisit. Enlarge events and observer times. Restart T0 after 2 days. Preserve native furniture; simplify module; expose full right bedroom."
+    },
+    {
+      "kind": "native_assets",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Teaser\\two_cases_20261030\\assets",
+      "evidence": "Copied native maps, exact native RGBA object renders, and common-camera GT bed pair; provenance retained."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 compact footer",
+      "evidence": "User prefers the previous curved inputs entering the update panel directly; the bus and separate downward arrow waste space."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 no zoom, layered",
+      "evidence": "Remove zoom-in panels. Deliver the complete main figure first and prepare cumulative layers for incremental refinement."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 time style",
+      "evidence": "Remove white backgrounds behind T123 and use another visual effect."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 event guidance",
+      "evidence": "Separate T1/T2 events, outline objects, strengthen movement indication, populate right-side events and explicitly guide the reader between the two bed states."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 route the connections",
+      "evidence": "Route the lines more carefully; endpoints may be placed around the event rather than at the exact object origin."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 remove rightward turns",
+      "evidence": "User identifies two rightward branch turns that oppose the leftward flow into the algorithm; route both smoothly downstream instead."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 motion arrows",
+      "evidence": "Inspect both object-motion arrows enlarged, correct their geometry, and distinguish their colour from gold mechanism connections."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 details cleanup",
+      "evidence": "Move the awkward gold branch origin; recover the visible trajectory; unify arrowheads and align them; separate T2/T3 chair positions from background furniture; distinguish visit-gap connections from object-state arrows."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 view alignment and compact footer",
+      "evidence": "Align observing regions with robot heading, use a consistent region size, replace the unexplained two-colour cut lines, and reduce vertical space consumed by the update panel."
+    },
+    {
+      "kind": "geometry_model",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Teaser\\full_scene_20261030\\observation_model.json",
+      "evidence": "One exact forward vector per observer is used by the 3D rover and its front-origin field. Common angle/range are illustrative, not calibrated hardware specifications."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 embedded zoom",
+      "evidence": "Embed the detail views in the teaser and show Case2 intuitively as a previously seen object/region, mapping elsewhere, then a changed state on reobservation."
+    },
+    {
+      "kind": "native_detail",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Use\\zoom_examples_20261030\\figure_spec.json",
+      "evidence": "Actual tracked Gaussian motion and native same-view temporal state pairs; source imperfections and symbolic time boundaries remain explicit."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 main hierarchy",
+      "evidence": "Read more original papers. Main scene feels too small while bottom zooms are too large; restore main scene dominance."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://arxiv.org/abs/2503.11651",
+      "evidence": "Viewed VGGT Fig1: dominant center reconstruction with compact edge evidence."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://arxiv.org/abs/2501.12387",
+      "evidence": "Viewed CUT3R Fig1: small input filmstrips subordinate to each reconstructed scene."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://arxiv.org/abs/2512.08924",
+      "evidence": "Viewed D4RT Fig5 scene/input hierarchy and distinguished the much larger zoom ablation layout in Fig6."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 slope, indentation and bedroom label",
+      "evidence": "Reduce wasted central space by adjusting cut slope and scene indentation; improve the two neutral annotation colors. Clarification: three right-side event titles are crowded, remove or reposition the bedroom Changed since last seen title. Keep the bed itself and observer time."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-30 brighter, more saturated, symbolic time",
+      "evidence": "Increase brightness and saturation, optimize the layout using paper references, remove the 4DGS lettering, replace seconds with the schematic T notation."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 larger detail and review all text",
+      "evidence": "Both corner zooms are too small. Find a better layout. Make text clearer, design text colors and review every text object."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 start and gradient backgrounds",
+      "evidence": "The revisitT0 has no Start label. The elliptical white gradient behind2days later looks good; consider consistent treatment or rectangular gradients for existing rectangular backgrounds."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 annotation1 and overflow",
+      "evidence": "Detail views became too large and added height. Reduce them and the typography. The finalr in2days later escapes its backing. Shorten Changed since last seen."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 revisit terminology rejected",
+      "evidence": "User rejects the revisit-based Changed wording. Their second case concerns a prior observed state and an intervening unobserved transition, not necessarily a physical return."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://arxiv.org/html/2205.01202v2#S1",
+      "evidence": "POCD Introduction calls these unobserved changes and contrasts motion tracking with comparing prior object pose to current measurements. This supports vocabulary, not equivalence of methods."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 top evidence wastes space and reverses reading",
+      "evidence": "Remove the upper zoom placement and large upper-middle blank area. Reading should proceed top-to-bottom and left-to-right. Do not widen the figure."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 unreadable detail times and remove wording",
+      "evidence": "The T labels in the detail images are difficult to read. Remove Seen before and Seen again from the figure."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 unequal sizes and unstable balance",
+      "evidence": "Sizes differ and overall layout feels tilted and unbalanced. Seen before and Seen again may appear in the enlarged detail; they should be removed only from the map, where they confuse the first case."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 wording and right details",
+      "evidence": "Change Same bed to Changed while away and Observed motion to Observed change; consider Unsupervised change, assess the wording. Too much empty space; consider moving the zooms to the right."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 return zooms below and use table",
+      "evidence": "Move zooms back below, spread them across the width, reduce empty left/right margins. Find actual table4Dmotion instead of the chair. Clarify confusingT1minus/T1/T1plusand restore the unified mechanism position."
+    },
+    {
+      "kind": "native_motion",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_table_details_20261031\\table_motion_manifest.json",
+      "evidence": "Table164nativeGaussian rows transformed using observed frame-wise tracked poses.19framesfrom118.9167to120.4167seconds,allbackgroundround11,fixed640x320crop. Source main right table is the same identity164in jobs_obl_s.json."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 swap left case objects",
+      "evidence": "The wide table detail is too large. Swap the objects used by the left two cases and restore chair motion evidence."
+    },
+    {
+      "kind": "native_assets",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_swap_cases_20261031\\swap_manifest.json",
+      "evidence": "Existing oblique-camera native chair72cutout and table163cutout. Same cutout and scale used for earlier/current copies. Nearby native floor texture clears only the two staged main-map furniture sites; result images/video are unchanged."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 smaller examples and side labels",
+      "evidence": "Use the older compact example size, remove the middle time symbol, move text to the left of the examples and move the two groups slightly farther left/right. Reference annotation requests readable navyTmarks with white keylines and aligned images."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 move mechanism into map",
+      "evidence": "Move the Dynamic update upward into the middle of the map, with a white gradient effect behind it."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 separate away change and improve times",
+      "evidence": "The left unobserved-change example is too close/unclear. Move Seen before/Seen againto the left of each image. PutT1,T1.5,T2inside motion frames and enlarge the white time backing. Consider Changed while awayfor all unobserved cases. Move2dayslaterup slightly."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 mechanism frame and awkward hook",
+      "evidence": "Restore the missing mechanism box and repair the awkward upward-turning gold input; retain the latest accepted scene and white fade."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 GT schematic clarification",
+      "evidence": "Teaser is an illustration. Keep the accepted map layout; use Synthetic_ABC GT furniture to add the schematic prior-position sofa panel. Make three panels per case, flatter matching sizes, larger consistent fonts and time halos; remove decimal video times, raise the two-day caption and separate right T0 from the mechanism."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 in-map links and GT cases",
+      "evidence": "Do not dip down then curve up into the mechanism. Lines may be drawn on the map. The observed-motion detail can use Isaac GT as this is an illustration. Unify typography."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 resumed detail corrections",
+      "evidence": "Restore T1minus/T1/T1plus in the motion detail, single T1on the map. Correct the too-near reobservation robot and observation layering. Remove duplicate T4. Restore the missing background sofa using actual Isaac assets."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 T0 T1 too close",
+      "evidence": "Separate the adjacent revisit T0 and T1 markers."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 gap position and similar captions",
+      "evidence": "The two-day label is awkwardly positioned; Changed while away and Seen before look too similar."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 relative positions incorrect",
+      "evidence": "The chair-to-sofa spatial relationship in the motion detail must match the approved main map."
+    },
+    {
+      "kind": "derived_geometry",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_reobservation_20261031\\motion_alignment\\alignment.json",
+      "evidence": "The original native chair cutout projection and known USD pose calibrate its map-centroid offset. The two schematic map positions are backprojected to stage the same USD chair. Reprojection matches both native map centroids."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 text ellipse alignment",
+      "evidence": "Align the white ellipse behind the two-day text and clock."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 equal input heights",
+      "evidence": "Make left/right input heights consistent; the left is straight while the right bends."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 left-to-right motion reading and left curve",
+      "evidence": "Keep the triptych, change the actual camera so the motion reads normally left-to-right. Earlier image starts lower-right and final image ends upper-left, which looks incorrect. Also soften the strange left algorithm curve."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 stronger left and right positioning",
+      "evidence": "The first and last chair positions are still not far enough toward the left and right of each image."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 overall tone and typography colours",
+      "evidence": "Increase overall brightness and saturation and improve the colour design of all text."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 crop meaningless left and balance margins",
+      "evidence": "Crop the meaningless far-left part and make distances to the outer edges consistent on both sides and top/bottom."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 balance map windows and lift T3",
+      "evidence": "Give the left map more visible room, reveal a little more at its left, balance the main maps and move the indicated T3 upward."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 T2 incorrectly appears attached to case1",
+      "evidence": "The left T2 label is too close to the observed-change chair. Attach it to its own robot for the first observation of the table-change case."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 advance robot T3",
+      "evidence": "Advance the T3 robot itself upward along the route, rather than just moving its label."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 overall balance and temporal caption",
+      "evidence": "The figure still feels visually unbalanced, and the two-day transition is placed awkwardly. Correct the whole-image hierarchy and the transition together."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 maps feel different sizes",
+      "evidence": "The two maps still appear to have different displayed sizes. Make their main room spans visually comparable."
+    },
+    {
+      "kind": "local_asset",
+      "uri_or_path": "D:\\3Study\\ETH\\FT\\CVPR\\Teaser\\two_cases_20261030\\assets\\source55\\base_a_final.png",
+      "evidence": "Original unclipped first-visit native render, verified pixel-identical to prepared piece_a over its opaque area. Reveals existing content beyond the old crop."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 center region and equal case halves",
+      "evidence": "Make the central separation neutral and unobtrusive, fix the oddly placed center region, remove the prominent line through the right room, and place the lower two cases in equal left/right cells."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 right rail and dominant case2 caption",
+      "evidence": "The right gold line and its floating dots are inappropriate, and the large central Case2 caption attracts the first glance. Reconsider the whole reading hierarchy."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-10-31 study CVPR auxiliary views; gold approved",
+      "evidence": "Study actual CVPR papers to improve auxiliary view design; smaller insets are acceptable. Main map centered and gold lines explicitly approved, so preserve them."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://openaccess.thecvf.com/content/CVPR2024/papers/Huang_Photo-SLAM_Real-time_Simultaneous_Localization_and_Photorealistic_Mapping_for_Monocular_Stereo_CVPR_2024_paper.pdf",
+      "evidence": "Fig.6 (p.21589);Fig.8 (p.21590). Transfer: Stable framing and restrained repeated visual keys associate local views; labels remain outside the photo."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://openaccess.thecvf.com/content/CVPR2024/papers/Keetha_SplaTAM_Splat_Track__Map_3D_Gaussians_for_Dense_RGB-D_CVPR_2024_paper.pdf",
+      "evidence": "Fig.1 (p.21357);Fig.3 (p.21364). Transfer: Keep the hero map dominant and auxiliary groups compact; repeat semantic colors without long main-to-inset leaders."
+    },
+    {
+      "kind": "reference",
+      "uri_or_path": "https://openaccess.thecvf.com/content/CVPR2024/papers/Wu_4D_Gaussian_Splatting_for_Real-Time_Dynamic_Scene_Rendering_CVPR_2024_paper.pdf",
+      "evidence": "Fig.5 (p.20314);Fig.6 (p.20315);Fig.7 (p.20316). Transfer: Control comparison framing and separate contextual imagery from the principal evidence."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:finish remaining layout",
+      "evidence": "Finish the remaining layout. Preserve explicitly approved gold lines and centered main maps while completing auxiliary-view alignment, grouping and typography."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-01 boxed zoom groups",
+      "evidence": "The middle white area is too empty. Enclose the two zoom groups in boxes and coordinate the maps and zooms as a whole. Approved gold lines remain fixed."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-01 right-context whitespace",
+      "evidence": "The user points at the small New location image and its large surrounding blank areas, requesting the layout be tightened."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-01 delete New location",
+      "evidence": "User explicitly requests removing the New location label after its meaning was clarified."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-01 excess top/bottom zoom space",
+      "evidence": "User points at the blank bands above/below the zoom photos and requests a layout change to remove wasted space."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-01 resume rejected crop and bed-input edit",
+      "evidence": "Resume the unfinished bed connection after rejection of the broad white cutout and long central S route."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 accurate object edges and consistent view masks",
+      "evidence": "User flags inconsistent fan occlusion, rough object edges and empty spaces, and requests the corrected figure. The 3D-frustum trial was rejected."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 soften edges inward",
+      "evidence": "User says the corrected edges are too hard and requests a gradient inside the objects."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 historical sofa too faint",
+      "evidence": "User points to the old-position sofa and says the disappeared object is no longer visible after the soft-gradient edit."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 inaccurate sofa dashed line",
+      "evidence": "User marks the purple dashed correspondence between old and current sofas and says the dashed line is inaccurate."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 straighten upper bed input",
+      "evidence": "User points to the upper gold curve and asks to remove its bend by moving the origin."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 lower bed input origin",
+      "evidence": "User asks to move the gold source point down slightly."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 lower source another48px",
+      "evidence": "User requests another48px downward shift from the current source position."
+    },
+    {
+      "kind": "user_instruction",
+      "uri_or_path": "conversation:2026-11-02 lower source another48px again",
+      "evidence": "User requests a further48px downward shift from the current source position."
+    }
+  ],
+  "prompt": "Move only the gold bed-input source another48px down from authoring(3120,367)to(3120,415), shortening its upper vertical segment accordingly. Keep X, dot size/style, lower merge and all other SVG content unchanged.",
+  "aspect_ratio": "16:9",
+  "final_width_mm": 183,
+  "visible_text": [
+    "Start",
+    "T\u2080",
+    "T\u2081",
+    "T\u2082",
+    "T\u2083",
+    "T\u2084",
+    "T\u2081\u207b",
+    "T\u2081\u207a",
+    "2 days later",
+    "Observed change",
+    "Changed while away",
+    "Dynamic update",
+    "Seen before",
+    "Seen again"
+  ],
+  "layout": {
+    "composition": "custom",
+    "hero": "first_map",
+    "reading_order": [
+      "first_map",
+      "later_map",
+      "update",
+      "zoom_motion",
+      "zoom_sofa_old",
+      "zoom_return_before",
+      "zoom_return_after"
+    ],
+    "whitespace": "compact",
+    "requested_ratio_override": "3578:1476",
+    "canvas_px": [
+      3578,
+      1476
+    ],
+    "actual_size_px": [
+      3578,
+      1476
+    ],
+    "aspect_ratio_override": "3578:1476;compactborderlegends"
+  },
+  "topology": {
+    "components": [
+      {
+        "id": "first_map",
+        "label": "First native map"
+      },
+      {
+        "id": "later_map",
+        "label": "Native map two days later"
+      },
+      {
+        "id": "a_t0",
+        "label": "Start / T_0"
+      },
+      {
+        "id": "a_t1",
+        "label": "Observed chair change at T1"
+      },
+      {
+        "id": "a_t2",
+        "label": "Prior table observation T2"
+      },
+      {
+        "id": "a_t3",
+        "label": "Reobserved table at T3"
+      },
+      {
+        "id": "b_t0",
+        "label": "Start / T_0 on the revisit"
+      },
+      {
+        "id": "b_t1",
+        "label": "Observed table change at T1"
+      },
+      {
+        "id": "gap",
+        "label": "2 days later"
+      },
+      {
+        "id": "live_chair_old",
+        "label": "Earlier observed chair72"
+      },
+      {
+        "id": "live_chair_new",
+        "label": "Current observed chair72"
+      },
+      {
+        "id": "changed_table_old",
+        "label": "Previously observed table163"
+      },
+      {
+        "id": "changed_table_new",
+        "label": "Table163rediscovered in new position"
+      },
+      {
+        "id": "bed_old",
+        "label": "Earlier bed"
+      },
+      {
+        "id": "bed_new",
+        "label": "Changed bed"
+      },
+      {
+        "id": "motion",
+        "label": "Observed change at the left chair and right table"
+      },
+      {
+        "id": "return",
+        "label": "Changed while away:table,sofaandbed"
+      },
+      {
+        "id": "update",
+        "label": "Dynamic update within inter-map area"
+      },
+      {
+        "id": "b_t2",
+        "label": "Prior sofa observation T2"
+      },
+      {
+        "id": "b_t3",
+        "label": "Reobserved sofa T3"
+      },
+      {
+        "id": "b_t4",
+        "label": "Bed observed at T4 after restart"
+      },
+      {
+        "id": "side_table_old",
+        "label": "Earlier right-side table position"
+      },
+      {
+        "id": "side_table_new",
+        "label": "Current right-side table position"
+      },
+      {
+        "id": "sofa_old",
+        "label": "Previously observed sofa position"
+      },
+      {
+        "id": "sofa_new",
+        "label": "Current native sofa"
+      },
+      {
+        "id": "zoom_motion",
+        "label": "Isaac chair motion: T1minus/T1/T1plus",
+        "role": "core"
+      },
+      {
+        "id": "zoom_return_before",
+        "label": "Previously observed balcony context",
+        "role": "core"
+      },
+      {
+        "id": "zoom_return_after",
+        "label": "Sofa discovered in balcony, T3",
+        "role": "core"
+      },
+      {
+        "id": "zoom_sofa_old",
+        "label": "Sofa at its prior position, T2",
+        "role": "core"
+      }
+    ],
+    "connections": [
+      {
+        "id": "e01",
+        "from": "a_t0",
+        "to": "a_t1",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with chevrons",
+        "label": ""
+      },
+      {
+        "id": "e02",
+        "from": "a_t1",
+        "to": "a_t2",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with chevrons",
+        "label": ""
+      },
+      {
+        "id": "e03",
+        "from": "a_t2",
+        "to": "a_t3",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with chevrons",
+        "label": ""
+      },
+      {
+        "id": "e04",
+        "from": "b_t0",
+        "to": "b_t1",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with chevrons",
+        "label": ""
+      },
+      {
+        "id": "e05",
+        "from": "a_t3",
+        "to": "gap",
+        "kind": "temporal_gap",
+        "direction": "forward",
+        "line": "warm-grey dash-dot bridge and clock",
+        "label": "2 days later"
+      },
+      {
+        "id": "e06",
+        "from": "gap",
+        "to": "b_t0",
+        "kind": "restart",
+        "direction": "forward",
+        "line": "warm-grey dash-dot continuation with open chevron",
+        "label": ""
+      },
+      {
+        "id": "e07",
+        "from": "a_t1",
+        "to": "live_chair_old",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "e08",
+        "from": "a_t1",
+        "to": "live_chair_new",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "e09",
+        "from": "a_t2",
+        "to": "changed_table_old",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "e10",
+        "from": "a_t3",
+        "to": "changed_table_new",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "e11",
+        "from": "b_t4",
+        "to": "bed_new",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "e12",
+        "from": "live_chair_old",
+        "to": "live_chair_new",
+        "kind": "observed_displacement",
+        "direction": "forward",
+        "line": "one-piece solid coral straight arrow; thin light edge; no marker seam",
+        "label": ""
+      },
+      {
+        "id": "class_motion",
+        "from": "live_chair_new",
+        "to": "motion",
+        "kind": "classification",
+        "direction": "forward",
+        "line": "leader from case label to current chair",
+        "label": ""
+      },
+      {
+        "id": "class_return_new",
+        "from": "changed_table_new",
+        "to": "return",
+        "kind": "classification",
+        "direction": "forward",
+        "line": "leader from case label to current table",
+        "label": ""
+      },
+      {
+        "id": "class_return_bed",
+        "from": "bed_new",
+        "to": "return",
+        "kind": "classification",
+        "direction": "forward",
+        "line": "unspecified",
+        "label": ""
+      },
+      {
+        "id": "update_table",
+        "from": "live_chair_new",
+        "to": "update",
+        "kind": "algorithm_input",
+        "direction": "forward",
+        "line": "highlighted gold inputs through two shared ports; the bed branch joins the existing right trunk",
+        "label": ""
+      },
+      {
+        "id": "update_chair",
+        "from": "changed_table_new",
+        "to": "update",
+        "kind": "algorithm_input",
+        "direction": "forward",
+        "line": "highlighted gold inputs through two shared ports; the bed branch joins the existing right trunk",
+        "label": ""
+      },
+      {
+        "id": "b_t1_to_b_t2",
+        "from": "b_t1",
+        "to": "b_t2",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with directional chevrons",
+        "label": ""
+      },
+      {
+        "id": "b_t2_to_b_t3",
+        "from": "b_t2",
+        "to": "b_t3",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with directional chevrons",
+        "label": ""
+      },
+      {
+        "id": "b_t3_to_b_t4",
+        "from": "b_t3",
+        "to": "b_t4",
+        "kind": "schematic_traversal",
+        "direction": "forward",
+        "line": "blue floor footprints with directional chevrons",
+        "label": ""
+      },
+      {
+        "id": "view_b_t1_side_table_old",
+        "from": "b_t1",
+        "to": "side_table_old",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "view_b_t1_side_table_new",
+        "from": "b_t1",
+        "to": "side_table_new",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "view_b_t2_sofa_old",
+        "from": "b_t2",
+        "to": "sofa_old",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "view_b_t3_sofa_new",
+        "from": "b_t3",
+        "to": "sofa_new",
+        "kind": "observation",
+        "direction": "forward",
+        "line": "blue projected ground viewing footprint with one consistent native-ground and exact-object-alpha occlusion rule",
+        "label": ""
+      },
+      {
+        "id": "motion_right_table",
+        "from": "side_table_old",
+        "to": "side_table_new",
+        "kind": "observed_displacement",
+        "direction": "forward",
+        "line": "one-piece solid coral straight arrow; thin light edge; no marker seam",
+        "label": ""
+      },
+      {
+        "id": "chair_discovered",
+        "from": "changed_table_old",
+        "to": "changed_table_new",
+        "kind": "state_correspondence",
+        "direction": "forward",
+        "line": "headless plum dashed correspondence between separated states; motion was not observed",
+        "label": ""
+      },
+      {
+        "id": "sofa_discovered",
+        "from": "sofa_old",
+        "to": "sofa_new",
+        "kind": "state_correspondence",
+        "direction": "forward",
+        "line": "headless plum dashed correspondence anchored exactly to the two displayed sofa contours; complete terminal dash at each end; motion was not observed",
+        "label": ""
+      },
+      {
+        "id": "bed_correspondence",
+        "from": "bed_old",
+        "to": "bed_new",
+        "kind": "identity_correspondence",
+        "direction": "bidirectional",
+        "line": "warm-grey arrowless dashed curve with ring endpoints on native bed silhouettes",
+        "label": "Changed while away"
+      },
+      {
+        "id": "class_right_live",
+        "from": "side_table_new",
+        "to": "motion",
+        "kind": "classification",
+        "direction": "forward",
+        "line": "leader from main-scene case label",
+        "label": ""
+      },
+      {
+        "id": "class_right_sofa",
+        "from": "sofa_new",
+        "to": "return",
+        "kind": "classification",
+        "direction": "forward",
+        "line": "leader from main-scene case label",
+        "label": ""
+      },
+      {
+        "id": "update_right_table",
+        "from": "side_table_new",
+        "to": "update",
+        "kind": "algorithm_input",
+        "direction": "forward",
+        "line": "highlighted gold inputs through two shared ports; the bed branch joins the existing right trunk",
+        "label": ""
+      },
+      {
+        "id": "update_right_sofa",
+        "from": "sofa_new",
+        "to": "update",
+        "kind": "algorithm_input",
+        "direction": "forward",
+        "line": "highlighted gold inputs through two shared ports; the bed branch joins the existing right trunk",
+        "label": ""
+      },
+      {
+        "id": "detail_reobservation_pair",
+        "from": "zoom_return_before",
+        "to": "zoom_return_after",
+        "kind": "observation_sequence",
+        "direction": "forward",
+        "line": "Fixed-camera prior balcony context and later balcony state; T3only on the later state, grouped with Seen before/Seen again",
+        "label": ""
+      },
+      {
+        "id": "detail_old_to_current_sofa",
+        "from": "zoom_sofa_old",
+        "to": "zoom_return_after",
+        "kind": "illustrative_state_correspondence",
+        "direction": "forward",
+        "line": "two labeled observations separated by the prior balcony panel; no unseen motion trajectory",
+        "label": ""
+      },
+      {
+        "id": "update_bed",
+        "from": "bed_new",
+        "to": "update",
+        "kind": "algorithm_input",
+        "direction": "forward",
+        "line": "gold bed input descending vertically from its source into the unchanged lower curve and shared right-hand gold trunk",
+        "label": ""
+      }
+    ],
+    "groups": [
+      {
+        "id": "observed_case",
+        "component_ids": [
+          "live_chair_old",
+          "live_chair_new",
+          "motion",
+          "side_table_old",
+          "side_table_new"
+        ]
+      },
+      {
+        "id": "return_case",
+        "component_ids": [
+          "changed_table_old",
+          "changed_table_new",
+          "bed_old",
+          "bed_new",
+          "return",
+          "sofa_old",
+          "sofa_new"
+        ]
+      },
+      {
+        "id": "embedded_motion_detail",
+        "label": "Observed change",
+        "component_ids": [
+          "zoom_motion"
+        ]
+      },
+      {
+        "id": "embedded_reobservation_detail",
+        "label": "Changed while away",
+        "component_ids": [
+          "zoom_return_before",
+          "zoom_return_after"
+        ]
+      }
+    ],
+    "authority_boundaries": []
+  },
+  "style_profile": "reference-led",
+  "style_preset": "reference-led",
+  "style_selection": "confirmed",
+  "style_source": "user",
+  "style_grammar": {
+    "composition": "Shared compact framed mechanism inside the map over a soft white fade; compact evidence below.",
+    "marks": "Exact-yaw 3D rover glyphs and shared-scale front-origin blue view fields; accepted coral/plum/grey/gold semantics retained.",
+    "typography": "Arialwith existingrole sizes/weights. Text palette uses deepnavy,semanticcoral/violet,subordinategrayblueandneutraltemporalgray.",
+    "texture": "Original native reconstruction, no generated scene or furniture",
+    "regions": "Existing native scene and compact lower evidence; mechanism stays within the scene footprint.",
+    "emphasis": "Five event sources converge into one clearly framed shared algorithm through opposing horizontal side entries."
+  },
+  "semantic_color_roles": {
+    "blue": "robot route and viewing fields",
+    "gold": "update inputs and shared algorithm only",
+    "teal": "current state",
+    "muted_grey": "earlier state",
+    "plum": "discovered object-state transition only",
+    "coral": "directly observed physical object motion",
+    "muted_violet": "earlier-object outline; identity preserved",
+    "light_neutral": "same-object identity correspondence only",
+    "charcoal": "#454B55: clocked time-gap caption and stroke",
+    "dark_coral": "#AF4053: observed-change text",
+    "navy": "#183B5B: observer times, entry labels and shared-update text",
+    "slate": "#596A7E: auxiliary observation-role text",
+    "violet_text": "#70509B: changed-while-away text, including cross-visit bed caption"
+  },
+  "reference_images": [
+    "D:\\3Study\\ETH\\FT\\CVPR\\Teaser\\two_cases_20261030\\teaser_native.png",
+    "D:\\3Study\\ETH\\FT\\CVPR\\Use\\zoom_examples_20261030\\zoom_examples.png",
+    "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_hierarchy_20261030\\references\\vggt_p1.png",
+    "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_hierarchy_20261030\\references\\cut3r\\fig1.png",
+    "D:\\3Study\\ETH\\FT\\CVPR\\Use\\teaser_hierarchy_20261030\\references\\d4rt\\fig5_scene_input_hierarchy.png"
+  ],
+  "must_not_claim": [
+    "Measured trajectory or robot footprint collision feasibility",
+    "A third independent cross-session case",
+    "A measured two-day acquisition interval",
+    "Observed continuous movement for the discovered-change examples",
+    "Generated furniture as reconstruction evidence"
+  ],
+  "forbidden_connections": [],
+  "negative_constraints": [
+    "No D1/D2/D3 labels",
+    "No T labels on objects",
+    "No generated scene or furniture",
+    "No cumulative time indices across visits; the right visit starts again at T0.",
+    "No dynamic-update icon",
+    "No alternate bed pasted into the native map",
+    "No collector bus, junction dot or extra vertical arrow above the update panel",
+    "No quantization to four sprite headings.",
+    "No per-target field-size changes.",
+    "No blue/gold divider rails.",
+    "Do not duplicate the Changed since last seen caption at the bedroom.",
+    "No T1\u2013T3on the main map; no decimaltimeindices.",
+    "No duplicated time marker on the context balcony detail.",
+    "No blue field drawn across either table silhouette."
+  ],
+  "prompt_review": "waived",
+  "workspace_root": "D:/3Study/ETH/FT",
+  "output_path": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\teaser_straight_bed_input_20261102\\teaser_with_zooms.png",
+  "caption_notes": [
+    "This is a schematic teaser, not an experimental trajectory or reconstruction comparison. The approved native scene composition is retained.",
+    "Two cases: a change observed as it happens, and a state change discovered after absence. Across-visit layout changes are the second case on a longer interval, not a third algorithm.",
+    "T1minus/T1/T1plus are phases around one observed event, not fractional stop indices or measured seconds. Each visit restarts atT0; the main observed event isT1.",
+    "Right details show the previous sofa atT2, prior balcony context without a repeated marker, and the later balcony sofa atT3. The unseen movement is not rendered.",
+    "The native bed orientations, diagonal cut, semantic colours, common algorithm frame and five input relationships remain unchanged.",
+    "All text uses Arial with role-basedsizes, italicTand uprightindices; whitekeylines are letter-shaped, not rectangular badges.",
+    "Revisit T0andT1are placed below their own rover centres; labels are not extra observation events.",
+    "Purple bold text names the change category. Neutral medium-weight Seen before/Seen againlabels name the observation role and sit next to their own image group. The two-day clock marks the transition between visits.",
+    "The time-gap white ellipse is centred on the actual combined clock/text bounds, with symmetric padding. Text/icon positions and size are unchanged.",
+    "The two algorithm inputs enter at the same height with horizontal terminal directions. The module shifts within existing map-edge whitespace to preserve clearance from the revisit time labels.",
+    "Motiondetail uses one physical side camera at38degrees,perpendicular to the displacement. Three calibrated chairpositions project at the same imageheight and advance left-to-right. RawRGBand video are unmirrored.",
+    "The sourcechair/sofa geometry and worldmotion are unchanged. The insetview differs from the obliquemapview to make temporalreading clear.",
+    "The two leftinputcurves retain their semanticroles; the secondanchor is nudged within its eventregion to avoid a tightcorner. Both ports stillenterhorizontally at965.",
+    "The motion inset uses an identical crop for every still and video frame. First/last projected centres are near20/80percentofimagewidth; the camera, worldposes, temporalorder and sharedbackground are unchanged.",
+    "A uniform global display tone is applied to all photographic illustration content and video. Sourceimages and geometry remain unchanged. Text colours follow semantic roles; minimumwhite-backgroundcontrast exceeds5.5:1.",
+    "Only the irrelevant scene outskirts are clipped. Both rows share the same left/right edges and24pixelouterpadding. The detail row is uniformly scaled as a group; image aspect ratios and relative annotation geometry are preserved.",
+    "The left map is translated, not independently enlarged; a window adjustment restores more of its left side while retaining consistent object scale across visits.",
+    "First-visit T2 is placed beside its own rover, identifying the earlier observation in the changed-while-away example.",
+    "The shared update frame is centered on the canvas; the compact time-gap label follows the departure/restart path and remains visually distinct from the gold mechanism.",
+    "Both visits retain one native camera scale; the diagonal allocates nearly equal room width at the main event band. Revealed left-room content comes from the original unclipped render.",
+    "The lower examples are two equal-width case panels. The across-visit bed is grouped under Changed while away; its separate room-crossing algorithm rail is intentionally omitted in favor of the shared case input.",
+    "Footer captions follow the examples in the reading order, with equal hierarchy and neutral type. Right event inputs originate beside their associated table/sofa states and merge into the common mechanism.",
+    "The smaller Earlier view is spatial context from the later location before the sofa appeared there, not a third object-state snapshot. Sofa endpoints have equal object-relative orientation/intrinsics; the chair sequence uses a fixed world camera.",
+    "Two requested case-group boxes provide visual grouping only. Their coral/purple colors repeat the map case categories. Narrower central spacing and equal panel bounds keep the main map and auxiliary evidence centered together.",
+    "The middle right frame has no location label. The first two views are earlier observations grouped under Seen before; the final view is Seen again. This does not assert observed intervening motion.",
+    "Case titles now form the upper panel legends. The right earlier/final observation captions form lower legends, preserving the same before/again grouping without standalone title bands.",
+    "The bed change explicitly joins the same right-hand Dynamic update input. The gray dashed curve remains a before/after identity correspondence, not an observation of the motion.",
+    "All seven fans are ground-plane direction/range illustrations. Native walls and furniture plus the precise staged-object mattes occlude them. No bed-surface highlight exemption.",
+    "Current and historical object highlights fade inward from the same precise contours; tint does not change observation validity or geometry.",
+    "Purple translucent bodies show earlier object states; increased historical-state visibility does not indicate that they remain in the current map."
+  ]
+}
