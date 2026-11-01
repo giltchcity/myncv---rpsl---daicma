@@ -1,0 +1,75 @@
+{
+  "row": 2,
+  "key": "7_flat_00190",
+  "dataset": "Flat",
+  "frame": "00190",
+  "crop": [
+    20,
+    80,
+    580,
+    480
+  ],
+  "origin": {
+    "scene": "flat00190",
+    "files": [
+      "/home/jixian/Desktop/FT/notes/paper_method_experiments_20261019/renders_views/renders/flat00190_tsdf_khronos_c1030.png",
+      "/home/jixian/Desktop/FT/notes/paper_method_experiments_20261019/renders_views/renders/flat00190_tsdf_ours_l1030.png",
+      "/home/jixian/Desktop/FT/notes/paper_method_experiments_20261019/renders_views/photos/flat00190.png"
+    ]
+  },
+  "camera_file": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\flat_visit2\\00190\\camera.json",
+  "map_query": "final map, same c1030/l1030 export family as the previous TSDF panel",
+  "images": [
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\geometry_bc_selection_20261102\\candidate_flat00190\\baseline.png",
+      "file": "1_khronos.png",
+      "sha256": "74d1e475d47e48eca9b77f8ce76b5429ba152fdfca0fcd345696187b37660e16"
+    },
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\geometry_bc_selection_20261102\\candidate_flat00190\\ours.png",
+      "file": "3_ours_tsdf.png",
+      "sha256": "e8a4df0cdf0a37e436bdbf29e23fc79ca36ceea85b3bfac799735a115fe4dc71"
+    },
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\geometry_bc_selection_20261102\\candidate_flat00190\\reference.png",
+      "file": "0_image.png",
+      "sha256": "ffd9204c4d20cd6d75daa4a8abc2eca160e40b25024888401778922c14ba54f9"
+    }
+  ],
+  "camera": {
+    "name": "flat00190",
+    "width": 640,
+    "height": 480,
+    "fx": 320.0,
+    "fy": 320.0,
+    "cx": 320.0,
+    "cy": 240.0,
+    "T_world_cam": [
+      [
+        0.99799,
+        -0.008784,
+        -0.062755,
+        -3.530839
+      ],
+      [
+        0.062726,
+        -0.003562,
+        0.998024,
+        -0.676108
+      ],
+      [
+        -0.00899,
+        -0.999955,
+        -0.003004,
+        0.492868
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "frame": "000190"
+  }
+}

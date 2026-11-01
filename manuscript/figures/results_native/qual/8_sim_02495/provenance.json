@@ -1,0 +1,67 @@
+{
+  "row": 3,
+  "key": "8_sim_02495",
+  "dataset": "Synthetic",
+  "frame": "02495",
+  "crop": [
+    80,
+    80,
+    640,
+    480
+  ],
+  "camera_file": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\sim_apartment_visit2\\02495\\camera.json",
+  "map_query": "final map, 2 cm, official wavemap versus ours; source camera explicitly records finalB_synthetic_002495",
+  "images": [
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\sim_apartment_visit2\\02495\\Occ_2_wavemap_2cm_final.png",
+      "file": "6_wavemap.png",
+      "sha256": "f0e599dd3bf2d86b2a11e5d5c12dde70ab6b26e26f4fb6875a7b0b3526c073d1"
+    },
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\sim_apartment_visit2\\02495\\Occ_3_Ours_2cm_final.png",
+      "file": "7_ours_occ.png",
+      "sha256": "923af8ce5f131338c1fb02d1da19bd221ba908482a323b068d3e4e260a6899c2"
+    },
+    {
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\sim_apartment_visit2\\02495\\00_image.png",
+      "file": "0_image.png",
+      "sha256": "66d0d7684c81464c8b783ae88749a89198a2fce4c3c7cc33dd3d15d4e11779b6"
+    }
+  ],
+  "camera": {
+    "name": "sim02495",
+    "width": 680,
+    "height": 480,
+    "fx": 588.897289890142,
+    "fy": 588.897289890142,
+    "cx": 340.0,
+    "cy": 240.0,
+    "T_world_cam": [
+      [
+        -0.767982089392,
+        -0.152401149318,
+        0.622075075903,
+        9.06128596103
+      ],
+      [
+        -0.640470124843,
+        0.184617735003,
+        -0.745462481354,
+        -0.65564402712
+      ],
+      [
+        -0.00123675258305,
+        -0.970922335519,
+        -0.239391496996,
+        1.50848863207
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "frame": "002495"
+  }
+}
