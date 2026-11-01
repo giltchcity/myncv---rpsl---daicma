@@ -1,0 +1,248 @@
+{
+  "name": "gaussian_details",
+  "width": 495,
+  "height": 317,
+  "protocol": "Original images, unchanged pixels/colors. Matched camera, crop and scale within each comparison row.",
+  "assets": [
+    {
+      "file": "figures/results_native/qual/2_real_02540/0_image.png",
+      "crop": [
+        0,
+        0,
+        958,
+        532
+      ],
+      "size": [
+        958,
+        532
+      ],
+      "position": [
+        0,
+        38,
+        80,
+        44.4258872651357
+      ],
+      "sha256": "70228d8c16c2c8188ddac2505443a4740445af285e93ac6067e8a805fd98dcc9"
+    },
+    {
+      "file": "figures/results_native/qual/2_real_02540/4_game.png",
+      "crop": [
+        90,
+        250,
+        370,
+        450
+      ],
+      "size": [
+        958,
+        532
+      ],
+      "position": [
+        95,
+        19,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "164cc364fb062fb65d14b14889af5209be65027ee7ec0ff8a6c57f712d8157df"
+    },
+    {
+      "file": "figures/results_native/qual/2_real_02540/5_ours_3dgs.png",
+      "crop": [
+        90,
+        250,
+        370,
+        450
+      ],
+      "size": [
+        958,
+        532
+      ],
+      "position": [
+        230,
+        19,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "24bd9c0f1d484d49612fe5d2cebc63c2664a8f1eaa5f75ad2fdb3389b780b60e"
+    },
+    {
+      "file": "figures/results_native/qual/2_real_02540/0_image.png",
+      "crop": [
+        90,
+        250,
+        370,
+        450
+      ],
+      "size": [
+        958,
+        532
+      ],
+      "position": [
+        365,
+        19,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "70228d8c16c2c8188ddac2505443a4740445af285e93ac6067e8a805fd98dcc9"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/0_image.png",
+      "crop": [
+        0,
+        0,
+        680,
+        480
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        0,
+        138,
+        80,
+        56.470588235294116
+      ],
+      "sha256": "310641b3628dafadcb6183e5fb8e0396ece687336a1e96ff0416a2a3bdfc5ac0"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/4_game.png",
+      "crop": [
+        140,
+        150,
+        560,
+        450
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        95,
+        119,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "cca5e08c7367328d3619350f63a2d2ede81e3f124020f06a7d4aeba483255b70"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/5_ours_3dgs.png",
+      "crop": [
+        140,
+        150,
+        560,
+        450
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        230,
+        119,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "807c32323f8f489cb998cc7fd94cfeb4a710bdc76c4bbd4af103d43f5e59cf86"
+    },
+    {
+      "file": "figures/results_native/qual/4_sim_03065/0_image.png",
+      "crop": [
+        140,
+        150,
+        560,
+        450
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        365,
+        119,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "310641b3628dafadcb6183e5fb8e0396ece687336a1e96ff0416a2a3bdfc5ac0"
+    },
+    {
+      "file": "figures/results_native/qual/5_flat_00270/0_image.png",
+      "crop": [
+        0,
+        0,
+        640,
+        480
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        0,
+        238,
+        80,
+        60.0
+      ],
+      "sha256": "dc4a39ee723799c635818d8d3fc1e9db1e03f2a1b9a443e48ee7fc3e19f06285"
+    },
+    {
+      "file": "figures/results_native/qual/5_flat_00270/4_game.png",
+      "crop": [
+        170,
+        220,
+        450,
+        420
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        95,
+        219,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "334e1ae09098f2f22278f7f714874110ba25d68616701257f39401f09f9b1f32"
+    },
+    {
+      "file": "figures/results_native/qual/5_flat_00270/5_ours_3dgs.png",
+      "crop": [
+        170,
+        220,
+        450,
+        420
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        230,
+        219,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "c0f4b485e8ed928715ef26ff4a15599cfc8efe3cea35e987085b8e8d3cbd06d3"
+    },
+    {
+      "file": "figures/results_native/qual/5_flat_00270/0_image.png",
+      "crop": [
+        170,
+        220,
+        450,
+        420
+      ],
+      "size": [
+        640,
+        480
+      ],
+      "position": [
+        365,
+        219,
+        130,
+        92.85714285714286
+      ],
+      "sha256": "dc4a39ee723799c635818d8d3fc1e9db1e03f2a1b9a443e48ee7fc3e19f06285"
+    }
+  ]
+}

@@ -4,24 +4,32 @@
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{2.0pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}lrrrrr@{}}
+\def\resultrows{
 \toprule
-Variant & Geom. & Obj. & Chg. & PSNR & L1 \\
+ & \multicolumn{3}{c}{Map quality (F1)} & \multicolumn{2}{c}{Rendering} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}
+Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{(a) Geometry retirement}} \\
+\multicolumn{6}{@{}l}{\textbf{(a) Geometry retirement}} \\
 w/o retirement & 84.42 & 66.73 & 68.75 & 23.79 & 3.31 \\
+\rowcolor{oursbg}
 \textbf{Full} & 90.00 & 66.77 & 83.33 & 27.63 & 0.48 \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{(b) Observation reuse}} \\
+\multicolumn{6}{@{}l}{\textbf{(b) Observation reuse}} \\
 Unrestricted reuse & 86.19 & 66.67 & 83.33 & 22.69 & 3.66 \\
 Discard whole frames & 89.95 & 66.89 & 83.33 & 27.78 & 0.47 \\
+\rowcolor{oursbg}
 \textbf{Full} & 89.81 & 66.46 & 83.33 & 27.77 & 0.45 \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{(c) Predicted segmentation}} \\
+\multicolumn{6}{@{}l}{\textbf{(c) Predicted segmentation}} \\
 Predicted masks & 89.89 & 42.17 & 72.73 & 27.56 & 0.50 \\
-\textbf{Annotated masks (Full)} & 89.81 & 66.46 & 83.33 & 27.77 & 0.45 \\
+\rowcolor{oursbg}
+\textbf{Annotated (Full)} & 89.81 & 66.46 & 83.33 & 27.77 & 0.45 \\
 \bottomrule
-\end{tabular*}
+}
+\sbox0{\begin{tabular}{lrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{lrrrrr}\resultrows\end{tabular}
 \caption{\textbf{Mechanism ablations and input robustness on Flat.} Matched Full per block. F1 (\%) is before refinement; PSNR (dB) and depth L1 (cm) are after refinement. Predicted masks use OneFormer. Higher is better except for L1.}
 \label{tab:ablation_variants}
 \end{table}

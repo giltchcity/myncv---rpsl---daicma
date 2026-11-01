@@ -1,0 +1,168 @@
+{
+  "name": "temporal_sequence",
+  "width": 495,
+  "height": 163,
+  "protocol": "Original images, unchanged pixels/colors. Matched camera, crop and scale within each comparison row.",
+  "assets": [
+    {
+      "file": "figures/results_native/temporal/1_visit1_080s/0_gt.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        18,
+        29,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "1a7f4049acbd5b56bd5f95c8f9b79045c1c17eabf771ce4124108fd11c9ae5fe"
+    },
+    {
+      "file": "figures/results_native/temporal/1_visit1_080s/5_ours_3dgs.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        18,
+        96,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "18217660e4d8f5e5028b0bd89e3e45be0947f58af99487612d5535d7b163f346"
+    },
+    {
+      "file": "figures/results_native/temporal/2_visit1_end/0_gt.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        138,
+        29,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "a8461853d0ebc4006afaef08ca606a01dfe768bc70c2d78d8800b213f8fc1215"
+    },
+    {
+      "file": "figures/results_native/temporal/2_visit1_end/5_ours_3dgs.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        138,
+        96,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "e9afd3f0bf21443907172c3d485b0c5662d76b9d1e2a704950ce0aed4e8db20a"
+    },
+    {
+      "file": "figures/results_native/temporal/3_visit2_097s/0_gt.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        258,
+        29,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "3e539bf89f3b06483ded20e835f682f0417f3443e3a929727fe40dcc6899a3ea"
+    },
+    {
+      "file": "figures/results_native/temporal/3_visit2_097s/5_ours_3dgs.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        258,
+        96,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "38884c3c946e222b5126bc31b2985de0f953c8404af163d050c6b7e9a016854a"
+    },
+    {
+      "file": "figures/results_native/temporal/4_visit2_end/0_gt.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        378,
+        29,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "cdee0a6486c3040808d6b2fa4e36db4219c5cb5b546291c14974b9c9b60c92cc"
+    },
+    {
+      "file": "figures/results_native/temporal/4_visit2_end/5_ours_3dgs.png",
+      "crop": [
+        0,
+        10,
+        680,
+        388
+      ],
+      "size": [
+        680,
+        480
+      ],
+      "position": [
+        378,
+        96,
+        117,
+        65.03823529411764
+      ],
+      "sha256": "8040f87ddc3975f38099c41e68400ab8264d72dccd0d2ea9d6cc5947ec4bcbc4"
+    }
+  ]
+}

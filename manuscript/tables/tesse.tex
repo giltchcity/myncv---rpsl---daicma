@@ -4,16 +4,23 @@
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{3.0pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}llrrrr@{}}
+\def\resultrows{
 \toprule
-Scene & Method & Bg. & Obj. & Dyn. & Chg. \\ \midrule
+ & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Scene & Method & Bg. & Obj. & Obj. & Chg. \\ \midrule
 Office & Khronos & 74.6 & 69.0 & 84.8 & 43.6 \\
- & Ours & \textbf{76.1} & \textbf{69.5} & \textbf{98.7} & \textbf{79.0} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{76.1} & \textbf{69.5} & \textbf{98.7} & \textbf{79.0} \\
 \midrule
 Apartment & Khronos & 78.0 & 55.9 & 85.3 & 36.9 \\
- & Ours & \textbf{79.9} & \textbf{63.3} & \textbf{95.1} & \textbf{92.7} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{79.9} & \textbf{63.3} & \textbf{95.1} & \textbf{92.7} \\
 \bottomrule
-\end{tabular*}
-\caption{\textbf{Single-run 4D mapping on TESSE.} Official Khronos query aggregation, F1 (\%, $\uparrow$), with 5\,cm voxels and background tolerance. Bg./Obj./Dyn./Chg.: background/static objects/dynamic objects/changes.}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\caption{\textbf{Single-run 4D mapping on TESSE.} Official Khronos query aggregation, F1 (\%, $\uparrow$), with 5\,cm voxels and background tolerance. Static: background and static objects; Dynamic: moving objects and changes.}
 \label{tab:tesse}
 \end{table}

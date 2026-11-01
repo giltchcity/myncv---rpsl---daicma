@@ -4,25 +4,31 @@
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}ll*{12}{r}@{}}
+\def\resultrows{
 \toprule
-& & \multicolumn{6}{c}{Within and across visits} & \multicolumn{6}{c}{Across visits} \\
+& & \multicolumn{6}{c}{\textbf{Within and across visits}} & \multicolumn{6}{c}{\textbf{Across visits}} \\
 \cmidrule(lr){3-8}\cmidrule(lr){9-14}
-& & \multicolumn{3}{c}{Real} & \multicolumn{3}{c}{Synthetic} & \multicolumn{3}{c}{Flat} & \multicolumn{3}{c}{3RScan} \\
+& & \multicolumn{3}{c}{\textbf{Real}} & \multicolumn{3}{c}{\textbf{Synthetic}} & \multicolumn{3}{c}{\textbf{Flat}} & \multicolumn{3}{c}{\textbf{3RScan}} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
-Map & Method & Geom. & Obj. & Chg. & Geom. & Obj. & Chg. & Geom. & Obj. & Chg. & Geom. & Obj. & Chg. \\
+Map & Method & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-TSDF & Khronos & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
+\textbf{TSDF} & Khronos & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
  & Panoptic & 87.3 & 63.4 & 50.0 & 90.5 & 77.2 & 75.9 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
+\rowcolor{oursbg}
  & \textbf{Ours} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} & \textbf{99.2} & \textbf{83.6} & \textbf{97.9} & \textbf{90.1} & \textbf{50.7} & \textbf{76.5} & \textbf{91.8} & \textbf{68.6} & \textbf{80.5} \\
 \midrule
-3DGS & GaME & 90.1 & 76.9 & 96.7 & 91.2 & 72.6 & 82.9 & 87.4 & 65.2 & 76.5 & 87.0 & 77.5 & 87.8 \\
+\textbf{3DGS} & GaME & 90.1 & 76.9 & 96.7 & 91.2 & 72.6 & 82.9 & 87.4 & 65.2 & 76.5 & 87.0 & 77.5 & 87.8 \\
+\rowcolor{oursbg}
  & \textbf{Ours} & \textbf{95.0} & \textbf{94.0} & \textbf{98.4} & \textbf{96.6} & \textbf{84.0} & \textbf{97.9} & \textbf{89.8} & \textbf{67.1} & \textbf{83.3} & \textbf{89.7} & \textbf{82.6} & \textbf{96.1} \\
 \midrule
-Occ. & wavemap & 84.5 & 80.0 & 89.7 & 93.2 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 & 75.6 & 79.5 & 95.3 \\
+\textbf{Occ.} & wavemap & 84.5 & 80.0 & 89.7 & 93.2 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 & 75.6 & 79.5 & 95.3 \\
+\rowcolor{oursbg}
  & \textbf{Ours} & \textbf{91.0} & \textbf{93.8} & \textbf{100.0} & \textbf{94.2} & \textbf{86.5} & \textbf{98.6} & \textbf{82.4} & \textbf{55.4} & \textbf{95.0} & \textbf{79.4} & \textbf{80.6} & \textbf{97.4} \\
 \bottomrule
-\end{tabular*}
+}
+\sbox0{\begin{tabular}{ll*{12}{r}}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/28\relax}
+\begin{tabular}{ll*{12}{r}}\resultrows\end{tabular}
 \caption{\textbf{Dynamic mapping within and across visits.} All entries are F1 scores (\%, $\uparrow$). Geom.: final-visit geometry at 5\,cm (Real C; Synthetic/Flat B), or the room-wise average for 3RScan. Obj./Chg.: objects/changes over the full chain. Best within each representation is bold.}
 \label{tab:main}
 \end{table*}

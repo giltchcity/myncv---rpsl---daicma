@@ -4,23 +4,32 @@
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{2.3pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}@{}llrrrr@{}}
+\def\resultrows{
 \toprule
+ & & \multicolumn{3}{c}{Color} & Depth \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-6}
 Dataset & Method & PSNR$\uparrow$ & MS-S$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
 \midrule
 Real & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
- & Ours & \textbf{19.90} & \textbf{0.811} & \textbf{0.370} & \textbf{4.96} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{19.90} & \textbf{0.811} & \textbf{0.370} & \textbf{4.96} \\
 \midrule
 Synthetic & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
- & Ours & \textbf{24.90} & \textbf{0.824} & \textbf{0.215} & \textbf{15.32} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{24.90} & \textbf{0.824} & \textbf{0.215} & \textbf{15.32} \\
 \midrule
 Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
- & Ours & \textbf{27.64} & \textbf{0.947} & \textbf{0.117} & \textbf{0.47} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{27.64} & \textbf{0.947} & \textbf{0.117} & \textbf{0.47} \\
 \midrule
 3RScan & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
- & Ours & \textbf{21.06} & \textbf{0.774} & \textbf{0.366} & \textbf{2.79} \\
+\rowcolor{oursbg}
+ & \textbf{Ours} & \textbf{21.06} & \textbf{0.774} & \textbf{0.366} & \textbf{2.79} \\
 \bottomrule
-\end{tabular*}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
 \caption{\textbf{Gaussian rendering after the final visit.} Held-out views after global refinement. L1: measured-depth error (cm); MS-S: MS-SSIM. Best per dataset is bold.}
 \label{tab:rendering}
 \end{table}

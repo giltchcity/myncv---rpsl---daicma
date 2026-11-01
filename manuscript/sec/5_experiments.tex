@@ -42,7 +42,7 @@ One evolving map must handle changes observed during a visit and changes discove
 The real and synthetic sequences test this joint setting; Flat and 3RScan test further cross-visit changes.
 Our method improves geometry, object F1, and change F1 for all three representations on all four datasets
 (\cref{tab:main}). The reconstruction therefore improves alongside the change decisions.
-\Cref{fig:qualitative} shows the corresponding scene updates from six viewpoints.
+\Cref{fig:geometry_details} shows the removal of stale geometry in TSDF and occupancy maps.
 
 \paragraph{TSDF and occupancy.}
 In the real room, TSDF geometry F1 increases from 87.7 to 96.1 over Khronos, and occupancy geometry F1
@@ -50,16 +50,16 @@ increases from 84.5 to 91.0 over wavemap. Both representations also improve obje
 four datasets. These results test the same geometry and observation decisions under signed-distance
 fusion and probabilistic occupancy integration.
 
+\input{figures/qualitative_geometry}
+
 \input{tables/restart}
 
 \paragraph{Partial revisits.}
 Updating the changed scene also preserves valid geometry outside the current observation coverage
-(\cref{tab:restart}). On synthetic visit B,
+(\cref{fig:retention}). On synthetic visit B,
 recall improves over native restart by 21.1, 17.3, and 17.1 points for TSDF, Gaussians, and occupancy.
 All three also improve geometry F1. The reference includes surfaces observed up to visit B, so this
 comparison measures the benefit of retaining earlier geometry through a partial revisit.
-
-\input{figures/qualitative_native}
 
 \input{tables/tesse}
 
@@ -69,22 +69,21 @@ aggregates over map and query times during a single visit
 (\cref{tab:tesse}). Our TSDF improves all four F1 categories on both scenes. Change F1 increases from
 43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment.
 
+\input{figures/qualitative_gaussians}
+
 \subsection{Gaussian Reconstruction}
 \label{sec:exp_gaussians}
 
 \paragraph{Geometry and changes.}
-We next examine the Gaussian representation, where observations continue to influence geometry and
-appearance through optimization. Geometry, object F1, and change F1 improve on every dataset (\cref{tab:main}).
-Before refinement, geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 points in the simulated
-apartment.
+The Gaussian map improves geometry, object F1, and change F1 on every dataset (\cref{tab:main}).
+Before refinement, geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 in the synthetic apartment.
 
 \input{tables/rendering}
 
 \paragraph{Novel-view rendering.}
 Our Gaussian maps improve all four rendering metrics on every dataset (\cref{tab:rendering}), gaining
 0.96--3.43\,dB over GaME. On Flat, depth L1 decreases from 1.07 to 0.47\,cm. The gains in color and depth
-show that the updated geometry supports more accurate novel views after refinement. We isolate the effect
-of old-observation constraints in the ablations below.
+show that the updated geometry supports more accurate novel views after refinement. \Cref{fig:gaussian_details} shows the corresponding reduction in old-object residue and duplicated structure. We isolate the effect of old-observation constraints in the ablations below.
 
 \paragraph{Changes within and across visits.}
 \Cref{fig:evolution} follows one Gaussian reconstruction from a fixed living-room viewpoint.
