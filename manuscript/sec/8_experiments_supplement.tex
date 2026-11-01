@@ -1,3 +1,41 @@
+\section{Datasets}
+
+\paragraph{DynaState-Real.}
+We record the same room on three visits, with motion during recording and object changes within and
+between visits. The recordings contain 4,003, 4,041, and 7,216 RGB-D frames at 1920$\times$1080 and
+30\,Hz, for 15,260 frames in total. Depth is aligned to RGB, and each frame has a timestamp, camera
+pose, semantic label image, and instance label image. Rigid session transforms align visits B and C
+to visit A. A room-restricted surface reconstructed at 1\,cm resolution provides the geometric reference.
+We abbreviate the dataset as Real in the tables.
+
+\paragraph{DynaState-Sim.}
+We author object changes and camera trajectories in an InteriorAgent apartment~\cite{InteriorAgent2025}
+and capture two visits in Isaac Sim. The raw recordings contain 4,186 and 3,555 RGB-D frames at
+680$\times$480 and 30\,Hz. They include camera poses, semantic and instance labels, and per-frame
+object transforms and visibility. These transforms and the original object meshes recover the
+ground-truth scene geometry at each timestamp. Changes occur during and between visits; the second
+visit covers only part of the previously observed scene. This supports evaluation of both dynamic
+reconstruction and retained map completeness. We abbreviate this dataset as Synthetic.
+
+\paragraph{Flat.}
+Flat was introduced with Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. It contains two RGB-D trajectories
+through a simulated apartment, with eight objects moved, five added, and four removed between the runs.
+We process them as consecutive visits and evaluate against the provided geometry and object annotations.
+This controlled cross-visit setting is also used for the Gaussian ablations.
+
+\paragraph{3RScan.}
+3RScan~\cite{wald2019rio} contains repeated RGB-D scans of indoor environments with aligned reconstructions
+and object-instance annotations across rescans. We evaluate eight room chains, maintaining the map
+across successive scans in each room. The rescans test updates to real scenes under object rearrangement
+and changing observation coverage.
+
+\paragraph{TESSE.}
+We use the Apartment and Office sequences released with Khronos~\cite{schmid2024khronos}. They combine
+moving objects and longer-term object changes during continuous robot trajectories, including revisits
+to previously observed areas. Their scene annotations support Khronos's official evaluation of
+background, static objects, dynamics, and changes over map and query times. We use this protocol for
+the TSDF comparison, as detailed below.
+
 \section{Evaluation Protocol}
 
 \paragraph{Visit chains and geometry.}
@@ -98,6 +136,13 @@ Within the object-scope variant, removing handover reduces geometry F1 from 89.7
 the inherited geometry in the full configuration.
 
 \paragraph{Old observations.}
+The main table compares three ways to use keyframes from visit A while mapping and refining visit B.
+Unrestricted reuse treats an earlier keyframe as a current one: it samples it without replay weights,
+supervises the current map on all pixels, and allows it to optimize currently alive Gaussians.
+Whole-frame rejection uses the same policy but excludes an earlier keyframe when at least 50 pixels
+observe geometry whose lifetime has ended; a rejected draw is replaced to keep the optimization budget.
+Full uses the observation constraints described in the method. All three retain the change rules and
+geometry retirement, and the two variants start from the same saved visit-A map as Full.
 Unrestricted old-frame reuse reduces post-refinement PSNR by 5.08\,dB. Applying this change only during
 refinement reduces PSNR by 4.99\,dB, with the same pre-refinement map and scores as Full.
 For a spatial view of this effect, we also report the existing changed-region PSNR evaluation: pixels whose

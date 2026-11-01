@@ -1,12 +1,11 @@
 \section{Method}
 \label{sec:method}
 
-Given posed RGB-D observations and a maintained map, \ours reconstructs the scene as it changes within and
-across visits. A confirmed change must affect both the stored geometry and the observations used to update it.
+From posed RGB-D observations, \ours updates a map through changes within and across visits.
+A confirmed change updates both the stored geometry and the observations used to reconstruct it.
 We connect these operations through scene-state intervals (\cref{fig:method}): \emph{change detection}
 determines which states continue, end, or begin (\cref{sec:states}); \emph{map update} applies these decisions
-to geometry and observation contributions (\cref{sec:validity}). The same mechanism governs TSDF fusion,
-Gaussian optimization, and occupancy integration.
+to geometry and observation contributions (\cref{sec:validity}). These decisions drive all three map representations.
 
 \begin{figure*}[t]
 \centering
@@ -14,8 +13,8 @@ Gaussian optimization, and occupancy integration.
 \caption{\textbf{A scene change updates both geometry and observation contributions.} Current observations
 reveal missing objects (purple) and new objects (yellow) relative to the retained map. Change detection
 estimates their state intervals. Map update ends the old geometry and revises observation domains so that
-new states can be reconstructed while unchanged surfaces retain compatible measurements. The resulting
-decisions govern TSDF, Gaussian, and occupancy reconstruction.}
+new observations reconstruct changed states and compatible measurements complete unchanged surfaces.
+The same decisions govern all three map representations.}
 \label{fig:method}
 \end{figure*}
 
@@ -33,8 +32,8 @@ The map at time $t$ is
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-Element lifetimes follow the represented scene states and can begin before their allocation during reconstruction.
-Closing a lifetime removes the element from the current map while preserving it for historical queries.
+Element lifetimes follow scene states and may begin before the elements are allocated.
+Closing a lifetime retires an element while preserving its history.
 
 \subsection{Change Detection}
 \label{sec:states}
@@ -47,14 +46,14 @@ away or returning on another visit.
 
 \paragraph{Surface evidence.}
 We project surface samples of $G_s$ into each subsequent depth image.
-A sample is supported when the measured depth agrees with its predicted depth, seen through when the measurement lies
-farther along the ray, and occluded when it lies closer. Supported and seen-through samples provide evidence about
-the surface; occluded samples, invalid depths, and samples outside the image contribute no absence evidence.
-The comparison uses a depth tolerance and reliable surface samples to account for measurement noise and reconstruction
-error. Object associations determine which state receives the evidence.
+A sample is supported when depths agree, seen through when the measurement lies farther along the ray,
+and occluded when it lies closer. Support and see-through observations provide evidence about the surface;
+occlusions, invalid depths, and samples outside the image contribute no absence evidence.
+A depth tolerance and reliable surface samples account for measurement noise and reconstruction error.
+Object associations assign the evidence to a state.
 
 \paragraph{Change decisions.}
-Repeated views of one patch should retain that patch's spatial coverage in the decision.
+Each patch contributes according to its coverage, even when observed repeatedly.
 At round $i$, let $f_i=k_i/n_i$ be the fraction of inspected samples that are seen through.
 We model $f_i$ with a Beta density $p_s(f)$ estimated from in-place observations and use a uniform
 changed-state model. A Page statistic~\cite{page1954cusum} accumulates their one-sided log-likelihood ratio
@@ -67,29 +66,26 @@ $\ell_s(f_i)$ over candidate change times $j$, weighted by newly inspected surfa
 \label{eq:absence}
 \end{equation}
 Here $\nu_i(j)$ counts reliable samples inspected for the first time since $j$, and $\nu_{\mathrm{rel}}$
-counts all reliable samples of the state. Each sample contributes once per candidate window, so evidence
-from a repeatedly viewed patch carries its actual coverage. We confirm absence when the score exceeds
-the decision threshold and see-through evidence outweighs support. Object and class persistence statistics
-supply prior odds for changes preceding a revisit.
+counts all reliable samples of the state. Each sample contributes once per candidate window.
+We confirm absence when the score exceeds
+the decision threshold and see-through evidence outweighs support. Object and class persistence set revisit priors.
 
-Compatible observations extend a continuing state. Incompatible observations form candidates whose
-geometric relation to the current surface and support in subsequent observations are checked before
-confirming a successor. A confirmed successor starts a new state and closes the previous one; unresolved
-observations remain candidates. The new state's geometry is reconstructed from its own observations.
-These decisions determine the intervals used by map update.
+Compatible observations extend a state; incompatible observations form candidates. We check each
+candidate's geometric relation to the current surface and its support in later observations.
+A confirmed successor starts a new state and closes the previous one; unresolved candidates are retained.
+Each state's observations reconstruct its geometry.
 
-Visible motion supplies another source of state changes through object tracking and free-space motion cues
-from Khronos and Dynablox~\cite{schmid2024khronos,schmid2023dynablox}. Geometry is reconstructed from
-observations after the object settles. Observed motion and changes discovered against the retained map
-therefore lead to the same geometry and observation updates.
+We detect visible motion using object tracking and free-space cues from Khronos and
+Dynablox~\cite{schmid2024khronos,schmid2023dynablox}. Once the object settles, new observations reconstruct
+its geometry. Observed motion and changes discovered against the retained map lead to the same updates.
 
 \subsection{Map Update}
 \label{sec:validity}
 
-Once a change is confirmed, its effect must extend to the reconstruction and its observation contributions.
+A confirmed change alters both geometry and observation contributions.
 Earlier measurements may describe the old object or empty space now occupied by its replacement.
 We apply state intervals to both geometry and observations: ended geometry leaves the current map, and
-measurements contribute where they remain compatible. Unchanged surfaces continue to accumulate information.
+measurements contribute where they remain compatible. Unchanged surfaces accumulate further measurements.
 
 \paragraph{Applying changes to geometry.}
 A confirmed change concerns the associated state, including geometry outside the current view.
@@ -116,21 +112,20 @@ With surface band $T$, the spatial domain is
 \label{eq:domain}
 \end{equation}
 We set $\lambda_o=\infty$ when there is no such intersection and $\Omega_o(t)=\varnothing$ for an excluded pixel.
-The surface band preserves measured geometry, while the free-space bound protects newly established surfaces from
-earlier empty-space observations. A state change revises the domains of affected observations.
+The surface band preserves measured geometry, while the free-space bound protects new surfaces from
+earlier observations. State changes revise the affected domains.
 
-Keyframe optimization follows the same compatibility condition. A frame captured at $t_k$ evaluates
-its loss on $\mathcal{M}(t_k)$ and updates compatible geometry. An earlier image of the chair thus
+Keyframe optimization follows the same condition. A frame captured at $t_k$ evaluates
+its loss on $\mathcal{M}(t_k)$ and updates compatible geometry. An earlier image of the chair
 constrains its earlier state, while measurements of the unchanged wall continue to constrain that wall.
-Frame selection and the trainable geometry implement this observation constraint together with temporal
-map selection. The current map uses only observations received up to the current processing time.
+Frame selection, trainable geometry, and map-time selection jointly enforce this constraint.
+The current map uses only observations received by the current processing time.
 
 \paragraph{Retaining and replacing surfaces.}
 \label{sec:memory}
-Earlier geometry also contains background surfaces and nearby copies displaced by depth or alignment
-errors. Updating these elements must preserve unobserved regions while replacing stale estimates of a
-surface that has been reconstructed again. We use the same support and see-through comparisons within
-observation domains to decide which earlier elements remain in the current map.
+Earlier maps also contain background surfaces and nearby copies displaced by depth or alignment errors.
+We retain unobserved regions and replace stale copies of surfaces reconstructed again.
+Support and see-through tests within observation domains determine which earlier elements remain.
 For an element at $x_e$, we count support and see-through observations within their valid domains, using
 $\tau_e=\max(h_e,\sigma(\rho_o(x_e)),\tau_{\min})$ as the depth tolerance.
 Here $h_e$ is the element's geometric support scale, $\sigma$ is the calibrated depth-residual scale, and
@@ -152,19 +147,18 @@ The remaining geometry is retained, including unobserved regions. Occlusion alon
 \paragraph{Continuing across visits.}
 \label{sec:handoff}
 We save the current map, element lifetimes, object-state summaries, and evidence statistics at the end of a visit.
-The next visit expresses its observations in the shared coordinate frame and resumes the same detection and update
-procedures from this retained state.
+The next visit resumes from this state in the shared coordinate frame.
 
 \paragraph{Reconstruction in three representations.}
 \label{sec:representations}
 The same state decisions and observation domains determine the reconstruction in all three representations.
 TSDF fusion, Gaussian optimization, and occupancy integration realize these decisions as follows.
 
-\emph{TSDF.} Signed-distance measurements are fused within $\Omega_o(t)$, with $T$ set to the
-truncation band. When a domain changes, affected voxel blocks are rebuilt from archived frames in
-observation order. The current mesh combines this reconstruction with eligible earlier faces retained
-by \cref{eq:continue}. We use projective TSDF fusion~\cite{curless1996volumetric,newcombe2011kinectfusion}
-and Khronos' active window, tracking, and object extraction~\cite{schmid2024khronos}.
+\emph{TSDF.} We fuse signed-distance measurements within $\Omega_o(t)$, using the truncation band for $T$.
+When a domain changes, we rebuild affected voxel blocks from archived frames in observation order.
+The current mesh includes eligible earlier faces selected by \cref{eq:continue}. We use projective
+fusion~\cite{curless1996volumetric,newcombe2011kinectfusion} with Khronos' active window, tracking, and
+object extraction~\cite{schmid2024khronos}.
 
 \emph{3D Gaussians.} Each keyframe renders $\mathcal{M}(t_k)$ and updates compatible geometry;
 ended Gaussians are frozen to preserve their historical reconstruction. Current-visit frames optimize

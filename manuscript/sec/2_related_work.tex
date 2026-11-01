@@ -7,8 +7,8 @@ xu2019midfusion,strecke2019emfusion}. DynaSLAM~II and DynoSAM jointly estimate c
 motion~\cite{bescos2021dynaslam2,morris2025dynosam}, while Dynablox detects objects entering observed free
 space~\cite{schmid2023dynablox}. Dynamic Gaussian and surface representations capture time-varying geometry for
 reconstruction and rendering~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam}.
-We use object-tracking and free-space motion cues together with changes discovered against a retained map, then apply the resulting
-state changes through one map-update mechanism.
+We combine tracking and free-space motion cues with changes detected against the retained map.
+A single mechanism applies the resulting state changes.
 
 \paragraph{Updating evolving scenes.}
 Map maintenance has been studied for point clouds~\cite{pomerleau2014longterm,lazaro2018efficient,kim2022ltmapper},
@@ -22,8 +22,8 @@ in an online spatio-temporal metric-semantic map~\cite{schmid2024khronos}.
 GaME combines scene adaptation and keyframe management for Gaussian reconstruction and novel-view synthesis
 in evolving scenes~\cite{yugay2026game}. wavemap efficiently integrates probabilistic occupancy evidence
 in a wavelet representation~\cite{reijgwart2023wavemap}.
-We use scene-state intervals to determine both the geometry present in the map and the observations that can
-update it, applying this decision to TSDF fusion, Gaussian optimization, and occupancy integration.
+Scene-state intervals determine which geometry is present and which observations can update it.
+These decisions govern reconstruction in all three representations.
 
 \paragraph{Object association and scene history.}
 Object-based maps associate observations across time and visits. RIO re-localizes instances in changing
@@ -34,5 +34,4 @@ occupancy transitions~\cite{meyerdelius2012changinggrid}, periodic changes~\cite
 appearance and disappearance hypotheses~\cite{saavedraruiz2025perpetua}. Khronos and CL-Splats also retain
 information about earlier scene states~\cite{schmid2024khronos,ackermann2025clsplats}.
 We connect temporal scene reasoning to reconstruction: an object's state interval controls which geometry is
-current and which observations may update it. The stored intervals also support historical queries and continuation
-on subsequent visits.
+current and which observations may update it. Stored intervals also support historical queries and later visits.

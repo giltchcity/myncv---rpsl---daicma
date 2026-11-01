@@ -15,9 +15,8 @@ challenge is to reconcile new evidence with a reconstruction built from observat
 
 Scene changes create conflicts between otherwise accurate observations. An earlier image of a chair and
 a later image of the empty floor are individually correct, but they cannot both describe the current
-scene. Continuing to use both without accounting for the change can preserve or recreate obsolete
-geometry, while discarding the earlier image also removes observations of unchanged surroundings. The change must
-therefore reach both the map and the observations that continue to reconstruct it.
+scene. Using both for the current map can preserve or recreate obsolete geometry. Discarding the earlier
+image also discards evidence of unchanged surroundings. A change must revise geometry and observation use together.
 
 We introduce \ours, a unified dynamic mapping method that uses scene-state intervals to connect these
 two updates. Each interval records when an object remains in a particular configuration.
@@ -29,20 +28,22 @@ continue to complete unchanged surfaces.
 
 The same state decisions govern TSDF fusion, Gaussian optimization, and occupancy integration.
 Reconstruction continues across visits from the retained map and states, using the same updates for
-changes observed during mapping and changes discovered on return. Geometry that is occluded or left unobserved is
-retained until evidence supports an update; ended states remain available for queries at earlier times.
+changes observed during mapping and changes discovered on return. Occluded or unobserved geometry remains
+until evidence supports an update; ended states remain queryable.
 
-Our real and synthetic sequences combine changes within and across visits, while Flat and 3RScan extend
+We collect a real and synthetic RGB-D benchmark combining changes within and across visits, while Flat and 3RScan extend
 the cross-visit evaluation. Across these four datasets, all three representations
 improve geometry, object reconstruction, and change detection over their corresponding baselines
 (\cref{tab:main}). Partial revisits demonstrate greater completeness; TESSE evaluates temporal
 reconstruction. Gaussian novel-view PSNR improves by 0.96--3.43\,dB over GaME
 across the four datasets; ablations examine geometry retirement and observation reuse.
 
+\begin{samepage}
 Our contributions are:
 \begin{itemize}
   \item A unified dynamic mapping method that uses scene-state intervals to coordinate geometry and observation
   updates within and across visits, realized in TSDF, Gaussian, and occupancy reconstruction.
-  \item An evaluation of continuous reconstruction under both types of change, with public benchmarks,
-  temporal and completeness evaluations, and detailed Gaussian rendering results and mechanism ablations.
+  \item A real and synthetic RGB-D benchmark for changes within and across visits, evaluated alongside
+  public datasets with temporal, completeness, and Gaussian rendering studies and mechanism ablations.
 \end{itemize}
+\end{samepage}

@@ -14,10 +14,19 @@ to measure the effects of geometry retirement and observation reuse.
 
 \subsection{Experimental Setup}
 
-\paragraph{Datasets.}
-The real room (three visits) and simulated apartment (two visits) contain changes both within and across visits.
-Flat~\cite{schmid2022panoptic} (two visits) and eight rescanned 3RScan rooms~\cite{wald2019rio} evaluate
-cross-visit changes. TESSE evaluates changes within a single visit using Khronos's official 4D protocol.
+\paragraph{Our benchmark.}
+We record three RGB-D visits to the same room for \emph{DynaState-Real} (Real).
+For \emph{DynaState-Sim} (Synthetic), we animate objects and camera paths in an Isaac Sim apartment
+and record two visits. Both test motion observed during mapping and changes discovered after looking
+away or returning. Each method maintains one map through the visit chain. The synthetic sequence
+provides ground-truth geometry at each timestamp.
+
+\paragraph{Public datasets.}
+Flat~\cite{schmid2022panoptic} comprises two synthetic RGB-D recordings with object rearrangements;
+3RScan~\cite{wald2019rio} provides repeated scans of real indoor environments. We use Flat and eight
+3RScan room chains to evaluate cross-visit updates. Khronos's TESSE Apartment and Office
+sequences~\cite{schmid2024khronos} combine observed motion and changes discovered during a continuous
+mapping run. We use them for evaluation under its official 4D protocol.
 
 \paragraph{Baselines.}
 We compare against GaME~\cite{yugay2026game} for Gaussian mapping of evolving scenes,
@@ -37,8 +46,7 @@ over map and query times.
 
 \paragraph{Implementation.}
 The shared tests use a 5\,cm surface tolerance and threshold $\ln 99$ across datasets.
-Our TSDF and occupancy maps use 5\,cm cells. Controlled comparisons use annotated segmentation;
-we also evaluate predicted masks.
+Our TSDF and occupancy maps use 5\,cm cells. We evaluate annotated segmentation and predicted masks.
 
 \subsection{Unified Dynamic Mapping}
 \label{sec:exp_main}
@@ -46,8 +54,8 @@ we also evaluate predicted masks.
 One evolving map must handle changes observed during a visit and changes discovered after returning.
 The real and synthetic sequences test this joint setting; Flat and 3RScan test further cross-visit changes.
 Our method improves geometry, object F1, and change F1 for all three representations on all four datasets
-(\cref{tab:main}). The reconstruction therefore improves alongside the change decisions.
-\Cref{fig:geometry_details} shows the removal of stale geometry in TSDF and occupancy maps.
+(\cref{tab:main}). Reconstruction improves alongside change decisions, with stale geometry removed from
+TSDF and occupancy maps (\cref{fig:geometry_details}).
 
 \paragraph{TSDF and occupancy.}
 In the real room, TSDF geometry F1 increases from 87.7 to 96.1 over Khronos, and occupancy geometry F1
@@ -110,15 +118,16 @@ Withholding geometry retirement reduces geometry F1 by 5.58 points, change F1 by
 3.84\,dB. The effect spans geometric and rendering quality: confirmed changes must be applied to the
 stored reconstruction.
 
-\paragraph{Observation reuse.}
-Allowing old frames to supervise the current reconstruction without observation constraints reduces PSNR
-from 27.77 to 22.69\,dB and increases depth L1 from 0.45 to 3.66\,cm. This comparison tests the observation
-constraint as a whole. Discarding entire conflicting frames reaches similar quality on Flat, where the
-second visit covers most of the scene. Selective reuse retains compatible measurements within old frames.
+\paragraph{Old-keyframe reuse.}
+We vary old-keyframe use during mapping and refinement: unrestricted reuse, whole-frame rejection,
+or selective reuse (Full). Unrestricted reuse reduces PSNR by 5.08\,dB and increases depth L1 from 0.45
+to 3.66\,cm. Geometry F1 falls by 3.62 points, while change F1 remains 83.33.
+Whole-frame rejection and Full reach 27.78 and 27.77\,dB on this extensively revisited scene;
+Full retains compatible observations.
 
 \paragraph{Parameter sensitivity.}
-Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR, with at most one event difference.
-The fixed-prior sweep gives similar reconstruction scores.
+Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by at most one detected event.
+Fixed priors give similar results.
 
 \paragraph{Predicted segmentation.}
 OneFormer~\cite{jain2023oneformer} predictions retain 89.89 geometry F1 and 27.56\,dB PSNR,
@@ -126,4 +135,4 @@ while object and change F1 reflect segmentation errors (\cref{tab:ablation_varia
 
 \paragraph{Computational cost.}
 On Flat, mapping and refinement take 2,898\,s versus 2,647\,s for GaME on an RTX 5070 Ti with 16\,GB.
-Peak memory is 6.6 versus 5.9\,GB. These measurements include the Gaussian reconstruction and its retained history.
+Including retained history, peak memory is 6.6\,GB for \ours and 5.9\,GB for GaME.

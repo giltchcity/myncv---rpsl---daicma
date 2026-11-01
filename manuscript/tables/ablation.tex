@@ -6,7 +6,7 @@
 \renewcommand{\arraystretch}{1.08}
 \def\resultrows{
 \toprule
- & \multicolumn{3}{c}{Map quality (F1)} & \multicolumn{2}{c}{Rendering} \\
+ & \multicolumn{3}{c}{F1 (pre)} & \multicolumn{2}{c}{Rendering (post)} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}
 Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
@@ -14,8 +14,8 @@ Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L
 w/o retirement & \ranksecondcell{84.42} & \ranksecondcell{66.73} & \ranksecondcell{68.75} & \ranksecondcell{23.79} & \ranksecondcell{3.31} \\
 \textbf{Full} & \rankbestcell{90.00} & \rankbestcell{66.77} & \rankbestcell{83.33} & \rankbestcell{27.63} & \rankbestcell{0.48} \\
 \midrule
-\multicolumn{6}{@{}l}{\textbf{(b) Observation reuse}} \\
-Unrestricted reuse & 86.19 & \ranksecondcell{66.67} & \rankbestcell{83.33} & 22.69 & 3.66 \\
+\multicolumn{6}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
+Unrestricted & 86.19 & \ranksecondcell{66.67} & \rankbestcell{83.33} & 22.69 & 3.66 \\
 Discard whole frames & \rankbestcell{89.95} & \rankbestcell{66.89} & \rankbestcell{83.33} & \rankbestcell{27.78} & \ranksecondcell{0.47} \\
 \textbf{Full} & \ranksecondcell{89.81} & 66.46 & \rankbestcell{83.33} & \ranksecondcell{27.77} & \rankbestcell{0.45} \\
 \midrule
@@ -27,6 +27,6 @@ Predicted masks & \rankbestcell{89.89} & \ranksecondcell{42.17} & \ranksecondcel
 \sbox0{\begin{tabular}{lrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{lrrrrr}\resultrows\end{tabular}
-\caption{\textbf{Mechanism ablations and input robustness on Flat.} Matched Full per block. Map F1 (\%) precedes refinement; PSNR (dB) and depth L1 (cm) follow refinement. Predicted masks: OneFormer. Ranking: \ranklegend{} within each block; ties share a rank.}
+\caption{\textbf{Mechanism ablations and input robustness on Flat.} Matched Full per block. Pre/post: before/after refinement. Units: F1 (\%), PSNR (dB), depth L1 (cm). In (b), policies apply during visit B and refinement. Predicted masks: OneFormer. Ranking: \ranklegend{} per block; ties share a rank.}
 \label{tab:ablation_variants}
 \end{table}
