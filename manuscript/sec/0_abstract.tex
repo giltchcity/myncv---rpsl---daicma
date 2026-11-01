@@ -1,13 +1,15 @@
 \begin{abstract}
-The world does not reset when a mapper does. A robot that returns to a room may find the chair moved and the suitcase
-gone. Reloading the old map keeps both at their old sites, and starting over discards every room the robot does not
-revisit. Existing updates split the problem: they reason within one visit or carry a map without its reasoning, each for
-one representation. We present \ours, a unified method for persistent mapping. Its core idea is that a change made while
-the robot is away is decided like one made while it looks away. \ours infers when each object state holds, admits an
-observation only while its state holds, and keeps an earlier map element until current observations place its surface
-elsewhere. The map records where surfaces are, and \ours decides when they hold, so one method updates a TSDF, a 3D
-Gaussian, and an occupancy map through four operations, and each map can be queried at any earlier time. Over three
-visits to a real room, the TSDF keeps under \prov{7\%} of the surface of departed objects, against about 60\% for
-Panoptic Multi-TSDFs. When the second visit to a simulated apartment sees only part of it, all three maps stay more
-complete than under their published updates and far more complete than when rebuilt from scratch.
+Dynamic mapping must update scene geometry and determine how earlier observations can contribute as objects
+change during and between visits.
+Existing systems handle these updates through rules tied to their own representations, from signed-distance
+surfaces to Gaussian primitives and occupancy cells.
+We present \ours, a unified method for dynamic mapping within and across visits.
+It uses depth observations to infer when each object state exists, then applies these time intervals to both
+the map geometry and its observation contributions. Changed geometry leaves the current map, new observations
+reconstruct its replacement, and unchanged surfaces continue to accumulate measurements.
+Ended states remain available for historical queries, while the saved map and scene state support the next visit.
+This mechanism connects to TSDF, Gaussian, and occupancy maps through their native integration procedures.
+Across four repeated-visit datasets, all three mappers outperform their native updates in geometry, object
+reconstruction, and change detection. On a partial revisit of a simulated apartment, geometry recall improves
+over rebuilding from scratch by up to 21.1 points.
 \end{abstract}

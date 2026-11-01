@@ -1,105 +1,63 @@
 \section{Introduction}
 \label{sec:intro}
 
-The world does not reset when the mapper does. A robot maps an apartment, leaves, and returns. Meanwhile, someone has
-moved four pieces of furniture and taken two away, and the bathroom is as it was. During the new visit, people walk past
-and objects change while the camera looks elsewhere. Whether it fuses a truncated signed distance field (TSDF),
-optimizes 3D Gaussians, or accumulates occupancy, the robot needs a map that removes what changed, keeps what is merely
-unobserved, and keeps following the changes of the present visit. A mapper without change handling has two choices. It
-can reload the old map, which leaves each moved object in two places, or start over, which discards every room the robot
-leaves unobserved (\cref{fig:problem}).
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/teaser.pdf}
-\caption{\textbf{Persistent mapping within and across visits.} Left: one scene memory continues across visits and keeps
-the states that have ended. The large panel is our Gaussian map of the simulated apartment at the current time, and the
-inset queries it at an earlier time. Bottom: changes within the first visit, between the visits, and within the second
-visit update the same memory (schematic). Right: one held-out view of the second visit, rendered from each baseline and
-from the same representation with our layer: Khronos, which starts the visit from an empty map, and our TSDF map; GaME
-and our Gaussian map; wavemap and our occupancy map. TSDF and occupancy surfaces take the color of the nearest reference
-surface.}
-\label{fig:teaser}
-\end{figure*}
+When a chair moves, the map should reconstruct its new location, clear its old location, and retain the unchanged
+room around it.
+This requirement holds whether the robot sees the motion, discovers it after turning back, or returns on another
+visit (\cref{fig:teaser}).
+It also holds for any map representation: a truncated signed distance field (TSDF), a set of 3D Gaussians, or an
+occupancy grid. Keeping earlier geometry indiscriminately leaves objects at outdated locations, while rebuilding from
+scratch loses previously observed regions (\cref{fig:problem}). Dynamic mapping must update the changed scene and
+retain the parts that remain consistent.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/problem.pdf}
-\caption{\textbf{Gone or merely unseen?} A new visit leaves two kinds of earlier surfaces without support: surfaces that
-are gone and surfaces it does not look at. Gaussian maps of the simulated apartment after its second visit. (a)~At a
-held-out pose of the second visit, a reloaded map, which keeps every element of the first visit, shows the moved sofa and
-side table at both places. (b)~At a pose of the first visit: the second visit looks down and almost never sees the
-ceiling, so a map restarted in it lacks the ceiling and the upper walls; the furniture has moved since. Our map ends the
-first kind and keeps the second. Boxes mark the enlarged regions.}
+\caption{\textbf{Update changes and retain unobserved regions.} Gaussian maps after the second visit to the simulated
+apartment. (a)~Keeping all earlier geometry leaves the moved sofa and side table at both locations.
+(b)~Rebuilding from scratch loses the ceiling and upper walls, which the second visit barely observes.
+Our continued map removes the outdated objects and retains the earlier room structure. Boxes mark enlarged crops.}
 \label{fig:problem}
 \end{figure*}
 
-Dynamic mapping follows change while a mapper runs. Object-level systems track and reconstruct moving
-objects~\cite{runz2017cofusion,xu2019midfusion}, Dynablox detects moving points~\cite{schmid2023dynablox}, and Khronos
-verifies object fragments against the rays it stores over a session~\cite{schmid2024khronos}. Long-term mapping carries
-a map from one visit to the next. Volumetric methods compare TSDF reconstructions to find changed
-voxels~\cite{fehr2017tsdfchange}, keep object submaps that become persistent, absent, or
-unobserved~\cite{schmid2022panoptic}, or estimate how stationary each object is~\cite{qian2022pocd}. GaME adds and
-removes Gaussians and masks the stale regions of its keyframes~\cite{yugay2026game}, and occupancy mappers lower the
-occupancy of every cell that a ray traverses~\cite{hornung2013octomap,reijgwart2023wavemap}. Between visits, the geometry
-persists, but the reasoning that produced it does not, and the old scene stays in the map: after two revisits of a real
-room, Panoptic Multi-TSDFs still shows 57\% and 60\% of the surface of objects that have left, and GaME 42\% and 61\%
-(\cref{sec:exp_main}). In both maps, the suitcase that was taken away still appears in front of the chair
-(\cref{fig:qualitative}). Each rule also acts on its own primitives, so every new mapper needs a new update rule.
+Khronos reconstructs object fragments and reconciles them over time using a library of rays~\cite{schmid2024khronos},
+while Panoptic Multi-TSDFs reasons about the presence of object submaps~\cite{schmid2022panoptic}.
+GaME adds and removes Gaussians and filters outdated keyframe regions~\cite{yugay2026game}, while wavemap updates
+occupancy through accumulated log odds~\cite{reijgwart2023wavemap}. These methods provide different ways to revise
+geometry as the scene evolves. We seek a common update mechanism that applies to each representation and continues
+when observations resume on another visit.
 
-A visit ends because the robot stops, not because the world does. We therefore treat visits as interrupted observations
-of one evolving scene. Within a visit, an object moves either in view or while the robot looks away. Between visits, it
-changes while the robot itself is away. A change while the robot looks away and a change while it is away differ only in
-the length of the gap and in what the robot knew before it. A returning robot should therefore inherit the scene state of
-its last visit, not a snapshot of its map: the output of a visit is the prior of the next.
+A scene change must revise both the map and the observations used to reconstruct it.
+After the chair moves, its earlier images still describe the chair at the old location; using them to fit the current
+scene can reconstruct it again. Yet those same images may still provide useful measurements of the unchanged wall.
+The time interval in which a surface exists determines which geometry is current and which parts of each observation
+remain compatible with it. This distinguishes a surface that has ended from one that is hidden or left unobserved.
 
-Two questions decide every update, and neither depends on the representation. The first asks which observations still
-describe the scene. A depth image of a chair is correct when the camera takes it, but once the chair moves, the image
-describes history and must stop shaping the current map. The second asks which parts of the earlier map remain. Where
-the new visit sees through an old surface, the surface is gone. Where it never looks, the earlier map is the only
-evidence, and the old surface stays: a missing observation is not evidence of absence. Both questions concern
-observations and object states, not voxels or Gaussians. The map records where surfaces are, and the update decides when
-they hold.
+We introduce \ours, a unified method for persistent dynamic mapping built around \emph{change detection} and
+\emph{map update} (\cref{fig:method}). Change detection compares current depth with existing surfaces to establish
+which object states continue, end, or begin. Map update applies these decisions to the object's reconstruction and to
+the observations that can affect it. A confirmed change retires the old object's geometry, including parts outside
+the current view. New observations reconstruct the new state, while compatible earlier observations continue to
+complete unchanged surfaces. The method retains occluded and unobserved geometry until evidence supports an update.
 
-We therefore shift the update from a rule of each representation to a decision about when each surface holds. We
-introduce \ours, a unified method for persistent mapping that runs beside an existing mapper on the same frames
-(\cref{fig:method}). It infers the \emph{state interval} of each object state, restricts each observation to its
-\emph{valid domain} (the space where its state still holds), and decides with a \emph{continuation test} which elements
-of the previous map remain. Objects that move in view, change out of view, or change between visits go through the same
-decision, which differs only in its evidence and in the odds it starts from. \ours ends an element by closing its
-\emph{lifetime} instead of deleting it, so every map can be queried at any earlier time, and at the end of a visit it
-exports its state as the prior of the next. The mapper connects through an
-\emph{update interface} of four operations: it reports its elements, ends the elements the layer names, accepts the
-state intervals, and integrates observations within their valid domains. It keeps its own way of integrating measured
-surfaces.
+The mechanism combines motion cues from the mapping front end with changes discovered against the retained map,
+both within and across visits. The next visit resumes from the saved map
+and state, and ended geometry remains available for queries at earlier times.
+We implement these updates through TSDF fusion, Gaussian optimization, and occupancy integration.
+Each backend retains its native reconstruction procedure; the shared mechanism determines its active geometry and
+observation contributions. This separates the decision about scene change from the representation used to reconstruct it.
 
-We connect \ours to three mappers that share nothing but the scene. A TSDF mapper built on
-Khronos~\cite{schmid2024khronos} averages signed distances, the Gaussian mapper GaME~\cite{yugay2026game} trains 3D
-Gaussians by gradient descent, and the occupancy mapper wavemap~\cite{reijgwart2023wavemap} accumulates log odds. They
-hold the surfaces, the appearance, and the free space that a robot uses a map for, and each comes with a published update
-that errs in its own direction. Panoptic Multi-TSDFs and GaME keep too much of the old scene, and wavemap's update, which
-lowers the occupancy of every cell that a ray traverses, also clears surfaces that still exist. If one method corrects all
-three, the update was never a property of the representation (\cref{fig:teaser}).
-
-With \ours, all three maps follow the scene across visits (\cref{tab:main}). Objects that have left leave the
-map: after two revisits of the real room, under \prov{7\%} of their surface remains in our TSDF map, where Panoptic
-Multi-TSDFs~\cite{schmid2022panoptic} keeps about 60\%. What a visit does not see is kept: when the second visit to a
-simulated apartment observes only part of it, each of our maps stays more complete than under the published update of
-its representation and far more complete than a map rebuilt from scratch. Each mapper with \ours detects more of the
-changes and reaches a higher geometry F1 than the published update of its representation, our TSDF map also exceeds
-Khronos, including on Khronos' own data, and the Gaussian map renders held-out
-views better than GaME's update.
+Across a real room, a simulated apartment, Flat, and 3RScan, each representation outperforms its native update
+in geometry, object reconstruction, and change detection (\cref{tab:main}).
+During a partial revisit, continued mapping raises geometry recall over native restart by 17.1--21.1 points
+(\cref{tab:restart}). Gaussian rendering improves on all four datasets, and our TSDF also improves the official
+single-run 4D evaluation on TESSE. These results test a shared update across different representations, observation
+coverage, and visit boundaries.
 
 Our contributions are:
 \begin{itemize}
-  \item We propose \ours, a unified method for persistent mapping in which visits are interrupted observations of one
-  evolving scene: changes in view, out of view, and between visits go through the same decision, and each visit hands
-  its state to the next.
-  \item We show that \ours connects to a TSDF, a 3D Gaussian, and an occupancy mapper through four operations. Its valid
-  domains admit an observation only while the state it measured holds, and its continuation test keeps an element of the
-  earlier map until current observations place its surface elsewhere, which corrects each published update in its own
-  direction.
-  \item On three visits to a real room, a simulated apartment, the public Flat and 3RScan rescans, and the TESSE data
-  released with Khronos, every mapper with \ours reaches a higher geometry F1 than the published update of its
-  representation, and our TSDF map exceeds Khronos on Khronos' own data.
+  \item A shared change-detection and map-update mechanism for TSDF, Gaussian, and occupancy maps, with continuation
+  across visits and historical queries.
+  \item An evaluation across repeated visits, partial revisits, and single-run dynamics, with ablations of change
+  decisions and observation reuse.
 \end{itemize}

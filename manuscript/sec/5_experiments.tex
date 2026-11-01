@@ -64,6 +64,19 @@ All four official F1 categories improve on both TESSE scenes (\cref{tab:tesse}).
 43.6 to 79.0 in the office and from 36.9 to 92.7 in the apartment. This evaluation queries both current
 and earlier states; complete P/R/F1 and independent single-visit runs appear in the supplement.
 
+\paragraph{Changes within and across visits.}
+\Cref{fig:evolution} shows our Gaussian map before and after two changes: a bed moved between visits and a chair
+replaced by a sofa within a visit. The continued map reconstructs both changes as new observations arrive.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fourd.pdf}
+\caption{\textbf{Updating within and across visits.} Ground-truth images (top) and pre-refinement Gaussian map
+snapshots from one continued run (bottom). Left: the bed moves between visits. Right: a sofa replaces the chair
+during the second visit. Each pair shows the reconstruction before and after the change. PSNR uses the full frame.}
+\label{fig:evolution}
+\end{figure*}
+
 \subsection{Ablation Studies}
 
 We ablate the shared mechanism on the Gaussian backend over Flat A$\rightarrow$B

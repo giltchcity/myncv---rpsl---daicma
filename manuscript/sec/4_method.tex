@@ -1,28 +1,28 @@
 \section{Method}
 \label{sec:method}
 
-\ours maintains a map of a changing scene from posed RGB-D observations, continuing from the saved map when the robot
-returns. As shown in \cref{fig:method}, change detection compares new observations with existing surfaces to identify
-changes (\cref{sec:states}). Map update uses these decisions to retire outdated geometry and select the observations
-used for reconstruction (\cref{sec:validity}). New content is reconstructed from current observations, while unchanged
-regions continue to accumulate measurements. We implement this shared mechanism through the native updates of TSDF,
-Gaussian, and occupancy maps.
+Given posed RGB-D observations and an earlier map, \ours reconstructs the changing scene and retains its history.
+The method has two parts (\cref{fig:method}). \emph{Change detection} determines which object states continue,
+end, or begin from the new observations (\cref{sec:states}). \emph{Map update} applies these decisions to existing
+geometry and selects the observations used to reconstruct each state (\cref{sec:validity}).
+The resulting update is implemented through the native procedures of TSDF, Gaussian, and occupancy maps.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/pipeline_unified_v18.pdf}
+\includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
 \caption{\textbf{One update mechanism for three map representations.} Current observations reveal missing objects
-(purple) and new objects (yellow) relative to the earlier map. Change detection estimates state intervals; map update
-uses them to restrict observations to valid domains, replace changed geometry, and retain unchanged surfaces.
-The same decisions drive TSDF, Gaussian, and occupancy updates while preserving historical states.}
+(purple) and new objects (yellow). Change detection determines when object states end or begin. Map update uses
+these decisions to retire old geometry, reconstruct new states, and retain compatible observations and surfaces.
+The shared mechanism connects to three native map updates and preserves earlier states for historical queries.}
 \label{fig:method}
 \end{figure*}
 
 \paragraph{Map representation.}
 \label{sec:setting}
-An object state $s$ consists of a reconstructed surface $G_s$ and an interval $[b_s,d_s)$ during which it is present.
-Observations of an unchanged object extend its surface; after a move, the new location is reconstructed from its own
-observations. Object masks and their associations are supplied by the mapping front end.
+An object state represents an object while its geometry remains unchanged. State $s$ has a reconstructed surface
+$G_s$ and an interval $[b_s,d_s)$ during which it is present.
+Further observations extend that surface; after a move, a new state is reconstructed from observations at the new
+location. We use the object masks and associations supplied by the mapping front end.
 Each map element $e$ carries its object association, if available, and a lifetime $[c_e,d_e)$.
 Elements are TSDF surface faces, Gaussians, or occupied cells, depending on the representation.
 The map at time $t$ is
@@ -30,15 +30,16 @@ The map at time $t$ is
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-An element's lifetime follows the represented surface and can therefore begin before the element was allocated by the
-mapper. Closing the lifetime removes it from the current map while preserving it for historical queries.
+Element lifetimes follow the represented scene states and can begin before allocation by the mapper.
+Closing a lifetime removes the element from the current map while preserving it for historical queries.
 
 \subsection{Change Detection}
 \label{sec:states}
 
-Depth ordering distinguishes a surface that has disappeared from one hidden by an occluder.
-We use this relation to test existing surfaces and combine the evidence over the observed portion of each object.
-The resulting decisions specify which states persist, end, or begin, together with their time intervals.
+Current depth distinguishes disappearance from occlusion. Seeing the floor behind an earlier chair provides evidence
+that the chair has left; seeing another object in front of it indicates occlusion.
+We test the existing surface against these measurements and combine evidence over the observed portion of the object.
+The resulting decisions specify which states continue, end, or begin and the times of those changes.
 
 \paragraph{Surface evidence.}
 We project surface samples of $G_s$ into each subsequent depth image.
@@ -49,7 +50,8 @@ The comparison uses a depth tolerance and reliable surface samples to account fo
 error. Object associations determine which state receives the evidence.
 
 \paragraph{Change decisions.}
-We combine the evidence using a coverage-weighted sequential test. At observation round $i$, let $f_i=k_i/n_i$ be the
+Repeated views of a small patch provide less spatial evidence than observations covering the whole object.
+We account for this coverage in a sequential test. At observation round $i$, let $f_i=k_i/n_i$ be the
 fraction of the $n_i$ inspected samples that are seen through. A Beta density $p_s(f)$, estimated from in-place
 observations, models this fraction while the state is present; the changed-state model is uniform.
 A Page statistic~\cite{page1954cusum} tests candidate
@@ -81,11 +83,9 @@ retained map using the surface tests above. Both sources of change feed the same
 \subsection{Map Update}
 \label{sec:validity}
 
-The detected changes determine both which geometry remains in the map and which observations can update it.
-An earlier image of a chair and a later image of the exposed floor describe different states of the same location.
-Likewise, a newly placed object occupies space that earlier depth images recorded as empty.
-We use the inferred intervals to assign observations to the geometry present at their capture times and to revise
-their contributions to the current map.
+An object change affects its stored geometry and the observations used to reconstruct it.
+We apply the inferred intervals to both: the old reconstruction becomes historical, while each observation contributes
+to the state present when it was captured. Unchanged surfaces continue to use compatible measurements from earlier times.
 
 \paragraph{Applying changes to geometry.}
 When a state ends, its associated elements close their lifetimes together, including parts outside the current view.
@@ -94,10 +94,11 @@ This applies a confirmed object change to its full reconstruction and retains it
 $\mathcal{M}(t)$ for earlier times.
 
 \paragraph{Selecting observation contributions.}
-An observation's valid domain specifies where its contribution is compatible with the reconstructed state.
-For volumetric fusion, pixels belonging to an earlier state of a changed object are excluded from the current
-reconstruction. Other pixels retain their measured surface contribution, while their free-space contribution is
-bounded by surfaces of current objects.
+A depth pixel contributes a measured surface and free-space evidence in front of that surface.
+After a change, its surface contribution may describe an ended object, or its earlier free-space evidence may
+intersect a newly placed object. We restrict these contributions to the observation's \emph{valid domain}.
+Pixels belonging to an ended state are excluded from the current reconstruction. Other pixels retain their measured
+surface contribution, while free-space updates stop before the surfaces of new objects.
 Let observation $o$ have capture time $t_o$ and measured range $r_o$.
 For a point $x$ on its ray, define $\delta_o(x)=r_o-\rho_o(x)$, where $\rho_o(x)$ is the range of $x$.
 Let $\lambda_o$ be the first intersection with a current object state that began after $t_o$.
@@ -120,8 +121,9 @@ continue to constrain that wall. The current map uses only observations received
 
 \paragraph{Retaining and replacing surfaces.}
 \label{sec:memory}
-Earlier geometry that remains eligible for the current map is checked against the current visit.
-This includes background surfaces and local copies displaced by small depth or alignment errors.
+The remaining earlier geometry includes both unobserved surfaces to retain and nearby stale copies to replace.
+We check these elements against the current visit, including background surfaces and copies displaced by small
+depth or alignment errors.
 For an element at $x_e$, we count support and see-through observations within their valid domains, using
 $\tau_e=\max(h_e,\sigma(\rho_o(x_e)),\tau_{\min})$ as the depth tolerance.
 Here $h_e$ is the element's geometric support scale, $\sigma$ is the calibrated depth-residual scale, and
@@ -137,9 +139,8 @@ K(e)=\begin{cases}
 \label{eq:continue}
 \end{equation}
 The local replacement condition $C(e)$ holds when a current surface lies just in front of $e$, within its surface band,
-with the same orientation. In a tied case, this condition lets the current estimate replace the older copy.
-Otherwise, the previous geometry is retained, including areas with no new observations.
-Occlusion alone contributes no evidence for removal.
+with the same orientation. In a tied case, the current estimate replaces this older copy.
+The remaining geometry is retained, including unobserved regions. Occlusion alone contributes no evidence for removal.
 
 \paragraph{Backend integration.}
 \label{sec:representations}
