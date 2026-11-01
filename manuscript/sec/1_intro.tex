@@ -1,49 +1,43 @@
 \section{Introduction}
 \label{sec:intro}
 
-A map can become outdated while it is still being built. A robot may observe a chair being moved,
-discover its absence when it looks back, or return to a rearranged room (\cref{fig:teaser}).
-All of these changes must be incorporated into the same reconstruction. Since the robot sees only part
-of the scene at a time, updating changed geometry must also preserve valid geometry outside the current
-view. Such maps support robots that repeatedly navigate and interact with a space, as well as visual
-models used to inspect its evolving appearance.
+The world does not reset when the mapper does.
+Objects move while a robot watches, while it looks elsewhere, and between visits to the same space
+(\cref{fig:teaser}). For a robot that repeatedly navigates and interacts with its environment, these
+changes must become part of one evolving map. Maintaining that map requires following what changes
+while preserving what remains, across both views and visits.
 
-Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over time~\cite{schmid2024khronos}.
-GaME introduced the first mapping system with novel-view synthesis for evolving, long-term dynamic
+Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over time~\cite{schmid2024khronos},
+while GaME introduced the first mapping system with novel-view synthesis for evolving, long-term dynamic
 scenes~\cite{yugay2026game}. wavemap combines state-of-the-art lossless occupancy compression with
-efficient multi-resolution integration~\cite{reijgwart2023wavemap}. These advances provide strong
-reconstruction capabilities across different representations. Scene changes pose a shared problem for
-them: how should new evidence revise the accumulated geometry and measurements?
+efficient multi-resolution integration~\cite{reijgwart2023wavemap}. Across these representations, the shared
+challenge is to reconcile new evidence with a reconstruction built from observations of an earlier scene.
 
-After a chair moves, earlier images still show it at its old location, while earlier depth rays may mark
-its new location as free space. These measurements were accurate when acquired; the scene they describe has since changed.
-Continuing to apply these observations without accounting for the change
-can restore outdated geometry or interfere with the new reconstruction. Yet the same images and depth
-measurements can still describe the unchanged wall. A change decision therefore needs to revise both the stored geometry and the observations
-that continue to influence it.
+Scene changes create conflicts between otherwise accurate observations. An earlier image of a chair and
+a later image of the empty floor are individually correct, but they cannot both describe the current
+scene. Continuing to use both without accounting for the change can preserve or recreate obsolete
+geometry, while discarding the earlier image also removes observations of unchanged surroundings. The change must
+therefore reach both the map and the observations that continue to reconstruct it.
 
-We use scene-state intervals as a common basis for geometry and observation updates. A confirmed change
-ends the old state's geometry in the current map and revises where earlier measurements can act.
-For an earlier depth image of the wall, this retains the wall measurement while stopping its free-space
-update before a newly placed object. New observations reconstruct the changed scene, while compatible
-earlier measurements continue to complete it. The same state decision thus governs what the map contains
-and which evidence can shape it.
+We introduce \ours, a unified dynamic mapping method that uses scene-state intervals to connect these
+two updates. Each interval records when an object remains in a particular configuration.
+\emph{Change detection} checks retained surfaces against current depth and combines the evidence with
+motion cues to determine which states continue, end, or begin (\cref{fig:method}). \emph{Map update}
+uses these decisions to end obsolete geometry and restrict observation contributions to the states and
+regions they describe. New observations reconstruct the changed scene, while compatible measurements
+continue to complete unchanged surfaces.
 
-We introduce \ours, a unified dynamic mapping method with two components, \emph{change detection} and
-\emph{map update} (\cref{fig:method}). Change detection checks retained surfaces against current depth
-and combines this evidence with motion cues to determine which states continue, end, or begin.
-Map update applies these decisions to geometry and observation contributions. The same procedure continues
-when observations resume on another visit and governs TSDF fusion, Gaussian optimization, and occupancy
-integration. Geometry that is occluded or left unobserved is retained until evidence supports an update;
-ended states remain available for queries at earlier times.
+The same state decisions govern TSDF fusion, Gaussian optimization, and occupancy integration.
+Reconstruction continues across visits from the retained map and states, using the same updates for
+changes observed during mapping and changes discovered on return. Geometry that is occluded or left unobserved is
+retained until evidence supports an update; ended states remain available for queries at earlier times.
 
-Our real and synthetic sequences contain changes both within and across visits in the same evolving map.
-Flat and 3RScan provide further cross-visit evaluation. Across these four datasets, all three representations
+Our real and synthetic sequences combine changes within and across visits, while Flat and 3RScan extend
+the cross-visit evaluation. Across these four datasets, all three representations
 improve geometry, object reconstruction, and change detection over their corresponding baselines
-(\cref{tab:main}). Partial revisits demonstrate greater completeness, and TESSE provides an additional
-evaluation of temporal reconstruction. We examine Gaussian reconstruction in detail, with
-0.96--3.43\,dB higher novel-view PSNR than GaME across the four datasets and ablations that measure the
-effects of geometry retirement and observation reuse.
+(\cref{tab:main}). Partial revisits demonstrate greater completeness; TESSE evaluates temporal
+reconstruction. Gaussian novel-view PSNR improves by 0.96--3.43\,dB over GaME
+across the four datasets; ablations examine geometry retirement and observation reuse.
 
 Our contributions are:
 \begin{itemize}
