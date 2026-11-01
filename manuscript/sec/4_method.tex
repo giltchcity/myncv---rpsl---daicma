@@ -1,15 +1,16 @@
 \section{Method}
 \label{sec:method}
 
-We map a scene that changes while it is being mapped. The input is a posed RGB-D stream with SAM
-masks~\cite{kirillov2023sam}, which assign each pixel to an object and keep that assignment across frames, and, on a
-revisit, the map and the object states of the previous visit. Dynamic mapping raises two questions, and one mechanism
-answers both (\cref{fig:method}). The first is how to judge a change: the decision must be reliable although the camera
-sees only part of the scene, and it must come as soon as the evidence suffices (\cref{sec:states}). The second is how to
-apply it: a change must reach all the geometry it concerns, and it must leave everything else untouched
-(\cref{sec:validity}). The mechanism works with object states and the capture times of observations, not with the
-primitives of a map, so the same mechanism updates a TSDF, a 3D Gaussian map, and an occupancy map
-(\cref{sec:representations}).
+Our method keeps a map correct while objects in the scene move, appear, and disappear, during a visit and between
+visits. It takes posed RGB-D frames with SAM masks~\cite{kirillov2023sam}, which give every pixel an object identity
+that persists across frames, and, on a revisit, the map and the object states saved by the previous visit.
+\Cref{fig:method} shows the two steps that every depth image goes through. Change detection compares the image with the
+surfaces of the current object states and turns the comparison into state intervals: a state ends when its surface is
+gone, continues while the camera keeps finding it, and begins when an object appears (\cref{sec:states}). Map update
+applies these intervals to the map, so that the geometry of an ended state leaves the map and every observation updates
+only the geometry that held when it was taken (\cref{sec:validity}). Both steps operate on object states and capture
+times rather than on voxels, Gaussians, or cells, which is why the same mechanism runs on a TSDF, a 3D Gaussian map, and
+an occupancy map (\cref{sec:representations}).
 
 \begin{figure*}[t]
 \centering
@@ -23,46 +24,47 @@ fusing each object within its state, and an occupancy map by retiring and supers
 \label{fig:method}
 \end{figure*}
 
-\subsection{Object States}
+\subsection{Object States and Map Elements}
 \label{sec:setting}
 
-An observation $o$ is the depth reading of one pixel, with measured range $r_o$, capture time $t_o$, and instance label
-$\ell_o$. Each object $\ell$ is a sequence of static states. A state $s$ has a surface $G_s$, reconstructed from the
-observations of $\ell$ during the state, and an interval $[b_s, d_s)$ in which it holds. A change ends a state and may
-begin another: a moved object begins a new state, reconstructed from the observations at its new place alone. The map
-is a set of elements $\mathcal{E}$: the surface faces of a TSDF, the Gaussians of a Gaussian map, or the occupied cells
-of an occupancy map. Element $e$ has a position $x_e$, a half-size $h_e$ (half a voxel, three standard deviations of a
-Gaussian, or half a cell), an instance label $\ell_e$, which is $0$ for the background, and a lifetime $[c_e, d_e)$. The
-elements of a state end with it. The map at time $t$ is
+We describe the scene by object states. Each object $\ell$ passes through a sequence of static states, and state $s$ has
+a surface $G_s$, reconstructed from the observations of $\ell$ while it stayed in that state, and an interval
+$[b_s, d_s)$ in which it holds. When the armchair of \cref{fig:method} is carried away, its state ends. If it is put
+down elsewhere, a new state begins there and is built from the observations of its new place alone. An observation $o$
+is the depth reading of one pixel, with range $r_o$, capture time $t_o$, and instance label $\ell_o$. The map consists of
+elements $\mathcal{E}$: the surface faces of a TSDF, the Gaussians of a Gaussian map, or the occupied cells of an
+occupancy map. Each element $e$ has a position $x_e$, a half-size $h_e$ (half a voxel, three standard deviations of a
+Gaussian, or half a cell), an instance label $\ell_e$ that is $0$ for the background, and a lifetime $[c_e, d_e)$, and
+the elements of a state end with it. The map at time $t$ is
 \begin{equation}
   \mathcal{M}(t) = \{\, e \in \mathcal{E} : c_e \le t < d_e \,\}.
   \label{eq:map_at_t}
 \end{equation}
-Ending an element sets $d_e$ instead of deleting it, so the map can be queried at any earlier time.
+Ending an element closes its lifetime rather than deleting it, so the map can still be queried at any earlier time.
 
-\subsection{Fast and Reliable Change Decisions}
+\subsection{Change Detection with State Intervals}
 \label{sec:states}
 
-A camera sees only part of the scene at a time, and most surfaces are out of view or occluded most of the time. A
-surface that is not observed is not evidence that it is gone, and a surface seen through at one small patch is not
-evidence that the whole object has left. Deciding from each image alone ends surfaces that depth noise or a partial view
-only seems to clear, and waiting until the whole object has been seen again delays every decision. We therefore test
-existing surfaces directly with the current depth and decide as soon as the readings cover enough of a surface.
+Detecting a change is hard because the camera sees only part of the scene. A surface that the camera does not look at
+has not disappeared, and one frame that sees through a small patch does not show that the whole armchair is gone. A
+detector that decides frame by frame therefore removes surfaces that noise or occlusion only seem to clear, while one
+that waits until it has seen a whole object again reacts late. We test the surfaces of the map directly against the
+current depth instead, and we end a state as soon as the readings have covered enough of its surface.
 
-\paragraph{Direct evidence.}
-We test each state against every later depth image. Each reliable surface sample of $G_s$ is projected into the image.
-Reliable samples exclude thin parts, edges, and mislabeled pixels, whose readings pass the surface even while it is in
-place. A sample is \emph{supported} if the reading at its pixel lies within a sensor tolerance of its depth, \emph{seen
-through} if the reading lies farther, and \emph{occluded} if it lies closer. Only supported and seen-through samples
-carry evidence. Occluded samples, samples outside the view, and missing readings carry none, so a decision rests only on
-readings that reach the place of the surface.
+\paragraph{Testing surfaces with the current depth.}
+Every later depth image tests the current states. We project the reliable surface samples of $G_s$ into the image,
+leaving out thin parts, edges, and mislabeled pixels, whose readings pass the surface even when it is in place. A sample
+is \emph{supported} when the reading at its pixel lies within a sensor tolerance of its depth, \emph{seen through} when
+the reading lies farther, and \emph{occluded} when it lies closer. Only supported and seen-through samples count as
+evidence. An occluded sample, a sample outside the image, or a pixel without depth says nothing about the surface, so
+occlusion never ends a state.
 
-\paragraph{Accumulated over the surface.}
-Even a surface that is still in place is seen through at a small fraction of its samples, because of depth noise and
-slight misregistration. If depth image $i$ judges $n_i$ samples of $G_s$ and sees through $k_i$ of them, we model the
-fraction $f_i = k_i/n_i$ of a state in place by a Beta density $p_s$. We learn it from the in-place observations of the
-object, drawn toward those of all objects while the object has few of its own, so the test adapts to the sensor and to
-the object. A change makes $f$ uniform. A Page statistic~\cite{page1954cusum} accumulates the evidence from the first
+\paragraph{Accumulating evidence over the surface.}
+A surface in place is still seen through at a small fraction of its samples, because depth is noisy and frames are not
+perfectly aligned. For depth image $i$, which judges $n_i$ samples of $G_s$ and sees through $k_i$ of them, we model the
+fraction $f_i = k_i/n_i$ of a state in place by a Beta density $p_s$. This density is learned from the frames in which
+the object stayed in place, and it is drawn toward the statistics of all objects while the object has few such frames.
+Under a change, $f$ is uniform. A Page statistic~\cite{page1954cusum} accumulates the evidence from the unknown first
 image $j$ after the change:
 \begin{equation}
   L_t = \max\Big(0,\ \max_{j \le t} \sum_{i=j}^{t} w_i(j)\,\big[-\log p_s(f_i)\big]\Big), \qquad
@@ -70,72 +72,71 @@ image $j$ after the change:
   \label{eq:absence}
 \end{equation}
 where $\nu_i(j)$ counts the reliable samples that image $i$ judges for the first time since image $j$, and
-$\nu_{\mathrm{rel}}$ counts all reliable samples of the state. The weights of a window sum to at most one, so each
-sample testifies once. Repeated looks at a small patch therefore cannot add up to the whole object, which keeps the
-decision reliable. The state ends as soon as $L_t$ crosses its threshold, without waiting until the whole surface has
-been seen again, which keeps it fast. Its interval closes midway between its last support and that decision.
+$\nu_{\mathrm{rel}}$ counts all reliable samples of the state. The weights let every sample testify once. Looking at the
+same patch again adds nothing, and the weights of a window sum to at most one, so a few glances at the armrest cannot
+stand in for the whole armchair. The statistic also needs no complete view of the surface: a state ends as soon as
+$L_t$ crosses its threshold, and its interval closes midway between its last support and that decision.
 
 \paragraph{Successors.}
-When an object reappears elsewhere, its new observations may show more of the current state, a successor after a move,
-or a spurious fragment such as a mislabeled region. Two pieces of evidence separate them: a new surface that lies away
-from the current one favors a move, and a new surface that later readings see through is a fragment. The prior
-probability $q_\ell$ that object $\ell$ changes, estimated from the resolved decisions of $\ell$ and of the objects of
-its class, weighs the two. When a move is more probable than not, the new observations begin the successor state and the
-current state ends; until then, they remain a candidate.
+An object can also reappear elsewhere, as the armchair does when it is put down in another corner. Observations of an
+object away from its current state may show an unseen side of that state, a successor after a move, or a fragment
+produced by a mislabel. A new surface that lies away from the current one favors a move, and a new surface that later
+readings see through is a fragment. The prior probability $q_\ell$ that object $\ell$ changes, estimated from the
+resolved decisions of $\ell$ and of its class, weighs the two. Once a move is more probable than not, the new
+observations begin the successor state and the current state ends; until then, they remain a candidate.
 
 \paragraph{In view, out of view, and between visits.}
-An object that moves in view is followed by the object tracker, as in Khronos~\cite{schmid2024khronos}, and its state
-ends when the motion starts; the frames after it settles reconstruct its next state. People are detected with the
-free-space cue of Dynablox~\cite{schmid2023dynablox} and kept out of the static map. An object that changes while the
-camera looks elsewhere, or while the robot is away between two visits, goes through the tests above once a later
-observation reaches its place. A revisit thus continues the decisions of the previous visit: an inherited state enters
-the same tests, starting from the prior odds $q_\ell$ that its object has changed.
+The ways an object can change differ only in the evidence they leave. An object that moves in view is tracked as in
+Khronos~\cite{schmid2024khronos}, its state ends when the motion starts, and the frames after it settles build its next
+state. People are detected with the free-space cue of Dynablox~\cite{schmid2023dynablox} and kept out of the static
+map. An object that changes while the camera looks elsewhere, or while the robot is away, is caught by the tests above
+as soon as a later observation reaches its place. A revisit therefore continues the decisions of the previous visit, and
+an inherited state enters the tests with the prior odds $q_\ell$ that its object has changed.
 
-\subsection{Complete Updates without Side Effects}
+\subsection{Map Update with Valid Domains}
 \label{sec:validity}
 
-Once a state has ended, the map has to change accordingly, and two failures are typical. An update can be incomplete:
-removing only the surface that a reading has seen through leaves the rest of the object behind. And it can have side
-effects. The frames taken before the change still show the object at its old place and would fuse it back. Free space
-observed before a new object arrived would erase the new object, and earlier keyframes would train a Gaussian map toward
-the old scene. A new estimate of a surface would reinforce a stale copy of it instead of replacing it. Our update
-addresses the first failure by acting on the whole state and the second by restricting every observation to the scene
-it measured.
+A detected change helps only if the map follows it completely and without side effects. Removing only the patch that the
+camera saw through leaves the rest of the armchair in the map. The observations taken before the change also keep acting
+on the map. The frames that saw the armchair would fuse it back, the free space observed before the sofa arrived would
+erase the sofa, and earlier keyframes would train a Gaussian map toward the old room. A new measurement of the wall would
+even reinforce a stale copy of the wall instead of replacing it. Map update removes each of these effects.
 
 \paragraph{Ending the whole state.}
-When a state ends, every element of that state ends with it, including parts that no reading has seen through, such as
-the back of a moved sofa. The object leaves the current map at once and stays in the maps of earlier times
-(\cref{eq:map_at_t}). Its successor, if any, is built from its own observations.
+When a state ends, all of its elements end with it, including parts that no reading has seen through, such as the back
+of the armchair. The armchair leaves the current map at once and remains in the maps of earlier times
+(\cref{eq:map_at_t}).
 
 \paragraph{Valid domains.}
-An observation is correct for the scene at the time it was taken. A depth image of a chair taken before the chair moved
-still describes the floor and the wall around it, but no longer the chair, and an image of empty floor taken before a box
-arrived describes free space that the box now occupies. We therefore restrict each observation to its \emph{valid
-domain}, the space where the state it measured still holds. A pixel of object $\ell$ taken outside the interval of
-$\ell$'s current state, or any pixel of $\ell$ once $\ell$ has no current state, is excluded from the integration of the
-current map. Every other pixel keeps its measured surface, but its free space ends a band $T$ before $\lambda_o$, the
-range at which its ray first meets the surface of a current object, with $\lambda_o = \infty$ if it meets none. With
-$\rho_o(x)$ the range of point $x$ along the ray and $\delta_o(x) = r_o - \rho_o(x)$ its signed distance to the measured
-surface, positive in front of it, the valid domain of $o$ at time $t$ is
+Every observation is correct for the moment it was taken. A frame of the armchair taken before it was moved still shows
+the floor and the wall correctly, but no longer the armchair, and a frame of the empty corner taken before the sofa
+arrived shows free space that the sofa now fills. We therefore let each observation update only its \emph{valid
+domain}, the space in which the state it measured still holds. Pixels of object $\ell$ taken outside the interval of
+$\ell$'s current state, and all pixels of $\ell$ once $\ell$ has no current state, are excluded. Every other pixel keeps
+its measured surface, but its free space stops a band $T$ before $\lambda_o$, the range at which its ray first meets the
+surface of a current object, with $\lambda_o = \infty$ if it meets none. With $\rho_o(x)$ the range of point $x$ along
+the ray and $\delta_o(x) = r_o - \rho_o(x)$ its signed distance to the measured surface, positive in front of it, the
+valid domain of $o$ at time $t$ is
 \begin{equation}
   \Omega_o(t) = \{\, x : \delta_o(x) > -T \,\wedge\, \big(\delta_o(x) \le T \,\vee\, \rho_o(x) < \lambda_o - T\big) \,\},
   \label{eq:domain}
 \end{equation}
-and empty for an excluded pixel. For a map optimized over keyframes, the same rule acts in time: the keyframe taken at
-$t_k$ renders and trains only $\mathcal{M}(t_k)$. Old observations thus complete the surfaces that have not changed,
-without rebuilding a removed object or erasing a new one. Valid domains change whenever a state interval changes, and
-the map at $t$ uses only the observations received up to $t$.
+and it is empty for an excluded pixel. For a map optimized over keyframes, the valid domain becomes a choice in time: the
+keyframe taken at $t_k$ renders and trains only $\mathcal{M}(t_k)$. In both forms, old observations complete the
+surfaces that did not change, without rebuilding the armchair or erasing the sofa. Valid domains change whenever a state
+interval changes, and the map at $t$ uses only the observations received up to $t$.
 
 \paragraph{Replacing stale copies.}
 \label{sec:memory}
-Some earlier geometry has no state that could end: the background, such as a window sash that has been closed, and a
-stale copy of a surface that the current visit has measured again, left slightly behind it by small differences in pose
-and depth. We test such elements directly. For element $e$ and an observation $o$ whose pixel sees $x_e$ within its
-valid domain, let $\tau_e = \max(h_e, \sigma(\rho_o(x_e)), \tau_{\min})$, where $\sigma(\rho)$ is the depth residual of
-the current reconstruction at range $\rho$ and $\tau_{\min}$ is a floor, zero unless stated. The observation supports
-$e$ if $|\delta_o(x_e)| \le \tau_e$ and sees through $e$ if $\delta_o(x_e) > \tau_e$. A reading in front of $e$ casts no
-vote, since the element may be occluded. With $n_{\mathrm{sup}}$ and $n_{\mathrm{thr}}$ the supports and see-throughs
-over the current visit, the element is kept with
+Some geometry of the earlier map belongs to no state that could end. This is the background, such as a window sash that
+has been closed since the last visit, and stale copies of surfaces that the current visit measures again, which small
+differences in pose and depth leave slightly behind the new estimate. We test these elements directly. For element $e$
+and an observation $o$ whose pixel sees $x_e$ within its valid domain, let
+$\tau_e = \max(h_e, \sigma(\rho_o(x_e)), \tau_{\min})$, where $\sigma(\rho)$ is the depth residual of the current
+reconstruction at range $\rho$ and $\tau_{\min}$ is a floor, zero unless stated. The observation supports $e$ if
+$|\delta_o(x_e)| \le \tau_e$, sees through $e$ if $\delta_o(x_e) > \tau_e$, and casts no vote if its reading lies in front
+of $e$, which may only be occluded. With $n_{\mathrm{sup}}$ supports and $n_{\mathrm{thr}}$ see-throughs over the current
+visit, $e$ is kept with
 \begin{equation}
   K(e) = \begin{cases}
     [\,n_{\mathrm{sup}} > n_{\mathrm{thr}}\,], & n_{\mathrm{sup}} \ne n_{\mathrm{thr}},\\
@@ -144,19 +145,16 @@ over the current visit, the element is kept with
   \end{cases}
   \label{eq:continue}
 \end{equation}
-If every vote points the right way with the same probability above one half, the majority is the maximum-likelihood
-decision. The condition $C(e)$ holds when a surface that the current visit measured lies in front of $e$ within the band
-$T$ and faces the same way. A band holds one surface of a given orientation, so $e$ is then a stale copy, and the new
-estimate replaces it instead of reinforcing it. An element that is only occluded or not observed casts no vote against
-itself and stays.
+The majority is the maximum-likelihood decision when every vote points the right way with the same probability above one
+half. A tie ends $e$ only under $C(e)$: a surface measured in the current visit lies in front of $e$ within the band $T$
+and faces the same way. A band holds a single surface of a given orientation, so $e$ is then a stale copy, and the new
+estimate replaces it rather than reinforcing it. Elements that are occluded or out of view receive no votes and stay.
 
 \subsection{Three Maps}
 \label{sec:representations}
 
-The same mechanism updates three maps. Each map keeps its own integration of measurements; the mechanism decides which
-observations it integrates, through the valid domains, which elements it shows, through their lifetimes, and which
-earlier elements remain, through \cref{eq:continue}. \Cref{tab:maps} lists the element, the integration, and the valid
-domain of each map.
+The mechanism changes three things in a map: which observations it integrates, which elements it shows, and which
+earlier elements remain. Each map keeps its own integration of measurements (\cref{tab:maps}).
 
 \begin{table}[t]
 \centering\small
@@ -183,10 +181,9 @@ average~\cite{curless1996volumetric,newcombe2011kinectfusion},
   W^{+}(x) = \min\big(W(x) + \omega_o(x),\, W_{\max}\big),\quad x \in \Omega_o(t),
   \label{eq:tsdf}
 \end{equation}
-with Khronos' signed distance $\phi_o$ and weight $\omega_o$, and $T$ is its truncation band. When a decision changes a
-state interval, the blocks whose valid domains changed are integrated again from the stored frames in their order. The
-current map is the surface extracted from this volume together with the faces of the earlier map that
-\cref{eq:continue} keeps.
+with Khronos' signed distance $\phi_o$ and weight $\omega_o$, and $T$ is its truncation band. When a state interval
+changes, the blocks whose valid domains changed are integrated again from the stored frames in their order. The current
+map is the surface extracted from this volume together with the faces of the earlier map that \cref{eq:continue} keeps.
 
 \paragraph{3D Gaussians.}
 Our Gaussian map builds on GaME~\cite{yugay2026game}, which optimizes 3D Gaussians~\cite{kerbl2023gaussians} over
@@ -201,15 +198,15 @@ keyframes whose valid domain contains it.
 \paragraph{Occupancy.}
 Our occupancy map builds on wavemap~\cite{reijgwart2023wavemap}, which accumulates log-odds occupancy in a
 wavelet-compressed octree with clamping~\cite{hornung2013octomap} and lowers the occupancy of the cells that a reading
-passes through. Its elements are the occupied cells that contain a measured surface point, and the cells of an ended
-state end together, whether or not a ray reaches them again. Where the current visit first measures an object surface
-in a cell that an earlier visit observed as free, the free evidence of the earlier visit is withdrawn from that cell,
-which bounds the old free space as \cref{eq:domain} does, so the new surface does not have to overcome it. An earlier
-cell for which $C(e)$ holds ends as a stale copy.
+passes through. Its elements are the occupied cells that contain a measured surface point. The cells of an ended state
+end together, whether or not a ray reaches them again. Where the current visit first measures an object surface in a
+cell that an earlier visit observed as free, the free evidence of the earlier visit is withdrawn from that cell, which
+bounds the old free space as \cref{eq:domain} does, so the sofa does not have to overcome it. An earlier cell for which
+$C(e)$ holds ends as a stale copy.
 
 \subsection{Across Visits}
 \label{sec:handoff}
 
 At the end of a visit, we save the map with the lifetimes of its elements, the states of all objects with their
-intervals and surfaces, and the in-place statistics of the absence test. The next visit loads them, aligns its frames to
-the common frame, and continues the same decisions from where the previous visit stopped.
+intervals and surfaces, and the statistics of the absence test. The next visit loads them, aligns its frames to the
+common frame, and continues the same decisions from where the previous visit stopped.
