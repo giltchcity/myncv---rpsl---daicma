@@ -1,2 +1,10 @@
 \section{Experiments}
 \label{sec:experiments}
+
+\paragraph{Implementation details.}
+All datasets and maps share the constants of the tests: a 5\,cm support tolerance, a $60^\circ$ incidence
+limit~\cite{nguyen2012kinect}, the threshold $\ln 99$ on $L_t$, at least $\min(30, \nu_{\mathrm{rel}})$ judged samples per
+depth image, and a 10\,cm displacement distance for successors. The TSDF uses 5\,cm voxels and a truncation band of
+$T = 10$\,cm, and the Gaussian map tests earlier Gaussians with $\tau_{\min} = 5$\,cm.
+% PENDING \TODO{Add the change-detection period and the frame rate used by each pipeline (5\,Hz frames, rounds of
+% PENDING 2.1\,s real and 10.8\,s synthetic; TSDF pipeline: check).}
