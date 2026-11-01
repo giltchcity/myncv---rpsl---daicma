@@ -96,9 +96,9 @@ the same tests, starting from the prior odds $q_\ell$ that its object has change
 
 Once a state has ended, the map has to change accordingly, and two failures are typical. An update can be incomplete:
 removing only the surface that a reading has seen through leaves the rest of the object behind. And it can have side
-effects: the frames taken before the change still show the object at its old place and would fuse it back, free space
-observed before a new object arrived would erase the new object, earlier keyframes would train a Gaussian map toward the
-old scene, and a new estimate of a surface would reinforce a stale copy of it instead of replacing it. Our update
+effects. The frames taken before the change still show the object at its old place and would fuse it back. Free space
+observed before a new object arrived would erase the new object, and earlier keyframes would train a Gaussian map toward
+the old scene. A new estimate of a surface would reinforce a stale copy of it instead of replacing it. Our update
 addresses the first failure by acting on the whole state and the second by restricting every observation to the scene
 it measured.
 
