@@ -1,0 +1,21 @@
+{
+  "source": "D:/3Study/ETH/FT/CVPR/FF/teaser_bed_views_wall_clipped_20261103",
+  "files": {
+    "teaser_with_zooms.pdf": {
+      "sha256": "fcf44314a428ebd788ff13cd93d099831d3768f317ac30c9fd65c1a8a28873e4",
+      "bytes": 12814200
+    },
+    "teaser_with_zooms.png": {
+      "sha256": "0d3b021a8094d2d8e00c7a0ffa127e5df9f1955d2c3b461d61736046a93407ba",
+      "bytes": 5159439
+    },
+    "teaser_with_zooms.svg": {
+      "sha256": "bc4de2935c0dc66ca16127946a32f65e1ce4dff0be2c17f1142d6be67335f10b",
+      "bytes": 24259944
+    }
+  },
+  "pdf_size_pt": [
+    679.9199829101562,
+    281.0400085449219
+  ]
+}
