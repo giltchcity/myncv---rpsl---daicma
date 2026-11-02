@@ -1,24 +1,13 @@
-# CVPR Paper
+# DynaState
 
-**Persistent Map Updates from Temporally Valid Observations**
+CVPR 2027 manuscript.
 
-This repository contains the LaTeX manuscript and publication assets.
+- `manuscript/main.tex`: complete main paper, tables and figure captions.
+- `manuscript/experiments_supplement.tex`: supplementary material.
+- `manuscript/main.bib`: the shared bibliography.
+- `manuscript/figures/`: referenced images and sources for the current figures.
 
-## Paper sources
+Build with `latexmk -pdf main.tex` from `manuscript/`.
+In Overleaf, select `manuscript/main.tex` as the main document.
 
-- `manuscript/main.tex` — main entry point
-- `manuscript/sec/` — paper sections
-- `manuscript/figures/` — figures and diagram sources
-- `manuscript/*.bib` — bibliographies
-- `manuscript/cvpr.sty`, `manuscript/ieeenat_fullname.bst` — CVPR formatting
-
-## Build
-
-```bash
-cd manuscript
-latexmk -pdf main.tex
-```
-
-For Overleaf, select `manuscript/main.tex` as the main document.
-
-Research PDFs, literature download manifests, temporary drafts, and agent handoff notes are maintained separately from this paper repository.
+Formatting uses the official [CVPR2027-v1 author kit](https://github.com/cvpr-org/author-kit/releases/tag/CVPR2027-v1).

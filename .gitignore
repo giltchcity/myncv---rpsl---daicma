@@ -27,6 +27,7 @@
 _build/
 latex.out/
 manuscript/main.pdf
+manuscript/experiments_supplement.pdf
 
 # Editor and OS artifacts
 .DS_Store
