@@ -1,36 +1,7 @@
-% Single bibliography for main.tex and experiments_supplement.tex.
-% Citation keys and entry contents are preserved from the previous seven databases.
-% Edit or replace entries here; keep a key unchanged to preserve its citations.
+% Only references cited by main.tex or experiments_supplement.tex.
+% 39 entries; citation keys and bibliographic contents are preserved.
 
-% ===== References originally in main.bib =====
-@String(PAMI = {IEEE Trans. Pattern Anal. Mach. Intell.})
-@String(IJCV = {Int. J. Comput. Vis.})
-@String(CVPR = {IEEE Conf. Comput. Vis. Pattern Recog.})
-@String(ICCV = {Int. Conf. Comput. Vis.})
-@String(ECCV = {Eur. Conf. Comput. Vis.})
-@String(NIPS = {Adv. Neural Inform. Process. Syst.})
-@String(ICPR = {Int. Conf. Pattern Recog.})
-@String(BMVC = {Brit. Mach. Vis. Conf.})
-@String(TOG = {ACM Trans. Graph.})
-@String(TIP = {IEEE Trans. Image Process.})
-@String(TVCG = {IEEE Trans. Vis. Comput. Graph.})
-@String(TMM = {IEEE Trans. Multimedia})
-@String(ACMMM = {ACM Int. Conf. Multimedia})
-@String(ICME = {Int. Conf. Multimedia and Expo})
-@String(ICASSP = {ICASSP})
-@String(ICIP = {IEEE Int. Conf. Image Process.})
-@String(ACCV = {ACCV})
-@String(ICLR = {Int. Conf. Learn. Represent.})
-@String(IJCAI = {IJCAI})
-@String(PR = {Pattern Recognition})
-@String(AAAI = {AAAI})
-@String(CVPRW = {IEEE Conf. Comput. Vis. Pattern Recog. Worksh.})
-@String(CSVT = {IEEE Trans. Circuit Syst. Video Technol.})
-
-% -----------------------------------------------------------------------------
-% Single-session dynamic SLAM and dense dynamic mapping.
-% -----------------------------------------------------------------------------
-
+% [01/39]
 @inproceedings{Runz_2017,
    title={Co-fusion: Real-time segmentation, tracking and fusion of multiple objects},
    url={http://dx.doi.org/10.1109/ICRA.2017.7989518},
@@ -41,27 +12,7 @@
    year={2017},
    month=May, pages={4471–4478} }
 
-@inproceedings{runz2018maskfusion,
-  author    = {Martin R{\"u}nz and Maud Buffier and Lourdes Agapito},
-  title     = {{MaskFusion}: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects},
-  booktitle = {IEEE International Symposium on Mixed and Augmented Reality (ISMAR)},
-  pages     = {10--20},
-  year      = {2018},
-  doi       = {10.1109/ISMAR.2018.00024}
-}
-
-@INPROCEEDINGS{8613746,
-  author={Runz, Martin and Buffier, Maud and Agapito, Lourdes},
-  booktitle={2018 IEEE International Symposium on Mixed and Augmented Reality (ISMAR)}, 
-  title={MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects}, 
-  year={2018},
-  volume={},
-  number={},
-  pages={10-20},
-  keywords={Semantics;Simultaneous localization and mapping;Real-time systems;Three-dimensional displays;Image reconstruction;Image segmentation;Cameras},
-  doi={10.1109/ISMAR.2018.00024}}
-
-
+% [02/39]
 @inproceedings{xu2019midfusion,
   author    = {Binbin Xu and Wenbin Li and Dimos Tzoumanikas and Michael Bloesch and Andrew J. Davison and Stefan Leutenegger},
   title     = {{MID-Fusion}: Octree-Based Object-Level Multi-Instance Dynamic {SLAM}},
@@ -71,6 +22,7 @@
   doi       = {10.1109/ICRA.2019.8794371}
 }
 
+% [03/39]
 @INPROCEEDINGS{9010932,
   author={Strecke, Michael and Stueckler, Joerg},
   booktitle={2019 IEEE/CVF International Conference on Computer Vision (ICCV)}, 
@@ -82,23 +34,7 @@
   keywords={Simultaneous localization and mapping;Cameras;Image segmentation;Probabilistic logic;Three-dimensional displays;Clocks;Tracking},
   doi={10.1109/ICCV.2019.00596}}
 
-
-
-
-@ARTICLE{8421015,
-  author={Bescos, Berta and Fácil, José M. and Civera, Javier and Neira, José},
-  journal={IEEE Robotics and Automation Letters}, 
-  title={DynaSLAM: Tracking, Mapping, and Inpainting in Dynamic Scenes}, 
-  year={2018},
-  volume={3},
-  number={4},
-  pages={4076-4083},
-  keywords={Vehicle dynamics;Simultaneous localization and mapping;Heuristic algorithms;Image segmentation;Cameras;Visualization;Geometry;SLAM;visual-based navigation;localization},
-  doi={10.1109/LRA.2018.2860039}}
-
-
-
-
+% [04/39]
 @ARTICLE{9385844,
   author={Bescos, Berta and Campos, Carlos and Tardós, Juan D. and Neira, José},
   journal={IEEE Robotics and Automation Letters}, 
@@ -110,9 +46,7 @@
   keywords={Cameras;Simultaneous localization and mapping;Dynamics;Vehicle dynamics;Tracking;Trajectory;Semantics;Dynamic objects;SLAM;semantics;tracking},
   doi={10.1109/LRA.2021.3068640}}
 
-
-
-
+% [05/39]
 @ARTICLE{10218983,
   author={Schmid, Lukas and Andersson, Olov and Sulser, Aurelio and Pfreundschuh, Patrick and Siegwart, Roland},
   journal={IEEE Robotics and Automation Letters}, 
@@ -124,24 +58,7 @@
   keywords={Robot sensing systems;Robots;Point cloud compression;Dynamics;Real-time systems;Object detection;Pedestrians;Object detection;segmentation and categorization;mapping;range sensing},
   doi={10.1109/LRA.2023.3305239}}
 
-
-
-
-@ARTICLE{10173578,
-  author={Mersch, Benedikt and Guadagnino, Tiziano and Chen, Xieyuanli and Vizzo, Ignacio and Behley, Jens and Stachniss, Cyrill},
-  journal={IEEE Robotics and Automation Letters}, 
-  title={Building Volumetric Beliefs for Dynamic Environments Exploiting Map-Based Moving Object Segmentation}, 
-  year={2023},
-  volume={8},
-  number={8},
-  pages={5180-5187},
-  keywords={Laser radar;Three-dimensional displays;Location awareness;Feature extraction;Point cloud compression;Object segmentation;Fuses;Mapping;computer vision for transportation;intelligent transportation systems},
-  doi={10.1109/LRA.2023.3292583}}
-
-
-
-
-
+% [06/39]
 @ARTICLE{11288097,
   author={Morris, Jesse and Wang, Yiduo and Kliniewski, Mikolaj and Ila, Viorela},
   journal={IEEE Transactions on Robotics}, 
@@ -153,60 +70,7 @@
   keywords={Simultaneous localization and mapping;Accuracy;Vehicle dynamics;Aerodynamics;Cameras;Trajectory;Robots;Pose estimation;Optimization;Kinematics;Dynamic SLAM;mapping;RGBD perception},
   doi={10.1109/TRO.2025.3641813}}
 
-
-
-
-% Manuscript/preprint status; retain in the audit but cite in the paper only if
-% its final publication record is verified before submission.
-@article{zhang2020vdoslam,
-  title={{VDO-SLAM: A Visual Dynamic Object-aware SLAM System}},
-  author={Zhang, Jun and Henein, Mina and Mahony, Robert and Ila, Viorela},
-  year={2020},
-  eprint={2005.11052},
-  archivePrefix={arXiv},
-  primaryClass={cs.RO}
- }
-% -----------------------------------------------------------------------------
-% Single-session hidden change and unified D1+D2 mapping.
-% -----------------------------------------------------------------------------
-
-@ARTICLE{8542753,
-  author={Bore, Nils and Ekekrantz, Johan and Jensfelt, Patric and Folkesson, John},
-  journal={IEEE Transactions on Robotics}, 
-  title={Detection and Tracking of General Movable Objects in Large Three-Dimensional Maps}, 
-  year={2019},
-  volume={35},
-  number={1},
-  pages={231-247},
-  keywords={Tracking;Probabilistic logic;Mobile robots;Task analysis;Object detection;Robot sensing systems;Dynamic mapping;mobile robot;movable objects;multitarget tracking (MTT);Rao–Blackwellized particle filter (RBPF);service robots},
-  doi={10.1109/TRO.2018.2876111}}
-
-
-
-TY  - JOUR
-AU  - Virgolino Soares, João Carlos
-AU  - Medeiros, Vivian Suzano
-AU  - Abati, Gabriel Fischer
-AU  - Becker, Marcelo
-AU  - Caurin, Glauco
-AU  - Gattass, Marcelo
-AU  - Meggiolaro, Marco Antonio
-PY  - 2023
-DA  - 2023/12/15
-TI  - Visual Localization and Mapping in Dynamic and Changing Environments
-JO  - Journal of Intelligent & Robotic Systems
-SP  - 95
-VL  - 109
-IS  - 4
-AB  - The real-world deployment of fully autonomous mobile robots depends on a robust simultaneous localization and mapping (SLAM) system, capable of handling dynamic environments, where objects are moving in front of the robot, and changing environments, where objects are moved or replaced after the robot has already mapped the scene. This paper proposes Changing-SLAM, a method for robust Visual SLAM in both dynamic and changing environments. This is achieved by using a Bayesian filter combined with a long-term data association algorithm. Also, it employs an efficient algorithm for dynamic keypoints filtering based on object detection that correctly identifies features inside the bounding box that are not dynamic, preventing a depletion of features that could cause lost tracks. Furthermore, a new dataset was developed with RGB-D data specially designed for the evaluation of changing environments on an object level, called PUC-USP dataset. Six sequences were created using a mobile robot, an RGB-D camera and a motion capture system. The sequences were designed to capture different scenarios that could lead to a tracking failure or map corruption. Changing-SLAM does not assume a given camera pose or a known map, being also able to operate in real time. The proposed method was evaluated using benchmark datasets and compared with other state-of-the-art methods, proving to be highly accurate.
-SN  - 1573-0409
-UR  - https://doi.org/10.1007/s10846-023-02019-6
-DO  - 10.1007/s10846-023-02019-6
-ID  - Virgolino Soares2023
-ER  - 
-
-
-
+% [07/39]
 @inproceedings{Schmid-RSS24-Khronos,
 title     = {Khronos: A Unified Approach for Spatio-Temporal Metric-Semantic SLAM in Dynamic Environments},
 author    = {Lukas Schmid and Marcus Abate and Yun Chang and Luca Carlone},
@@ -217,8 +81,7 @@ address   = {Delft, Netherlands},
 doi       = {10.15607/RSS.2024.XX.081}
 }
 
-
-
+% [08/39]
 @misc{yugay2025gaussianmappingevolvingscenes,
       title={Gaussian Mapping for Evolving Scenes}, 
       author={Vladimir Yugay and Thies Kersten and Luca Carlone and Theo Gevers and Martin R. Oswald and Lukas Schmid},
@@ -229,12 +92,7 @@ doi       = {10.15607/RSS.2024.XX.081}
       url={https://arxiv.org/abs/2506.06909}, 
 }
 
-
-
-% -----------------------------------------------------------------------------
-% Cross-session scene-memory and long-term map maintenance.
-% -----------------------------------------------------------------------------
-
+% [09/39]
 @INPROCEEDINGS{6907397,
   author={Pomerleau, Francois and Krüsi, Philipp and Colas, Francis and Furgale, Paul and Siegwart, Roland},
   booktitle={2014 IEEE International Conference on Robotics and Automation (ICRA)}, 
@@ -246,8 +104,7 @@ doi       = {10.15607/RSS.2024.XX.081}
   keywords={Three-dimensional displays;Dynamics;Simultaneous localization and mapping;Heuristic algorithms;Laser modes;Long-term mapping;dynamic obstacles;ICP;kd-tree;registration;scan matching;robot;SLAM},
   doi={10.1109/ICRA.2014.6907397}}
 
-
-
+% [10/39]
 @INPROCEEDINGS{8594310,
   author={Lázaro, María T. and Capobianco, Roberto and Grisetti, Giorgio},
   booktitle={2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
@@ -259,44 +116,7 @@ doi       = {10.15607/RSS.2024.XX.081}
   keywords={Simultaneous localization and mapping;Cloud computing;Three-dimensional displays;Two dimensional displays;Merging;Optimization},
   doi={10.1109/IROS.2018.8594310}}
 
-
-
-@INPROCEEDINGS{10802029,
-  author={Breitfuss, Matthias and Geimer, Marcus and Gruber, Christoph},
-  booktitle={2024 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
-  title={Long-Term Map-Maintenance in Changing Environments using Ray-Bundle-Impact-Factor Estimation}, 
-  year={2024},
-  volume={},
-  number={},
-  pages={12271-12278},
-  keywords={Location awareness;Three-dimensional displays;Laser radar;Accuracy;Interference;Laser stability;Real-time systems;Maintenance;Intelligent robots;Synthetic data},
-  doi={10.1109/IROS58592.2024.10802029}}
-
-
-@INPROCEEDINGS{7487237,
-  author={Rosen, David M. and Mason, Julian and Leonard, John J.},
-  booktitle={2016 IEEE International Conference on Robotics and Automation (ICRA)}, 
-  title={Towards lifelong feature-based mapping in semi-static environments}, 
-  year={2016},
-  volume={},
-  number={},
-  pages={1063-1070},
-  keywords={Feature extraction;Detectors;Computational modeling;Adaptation models;Simultaneous localization and mapping;Bayes methods},
-  doi={10.1109/ICRA.2016.7487237}}
-
-
-@INPROCEEDINGS{9196913,
-  author={Hashemifar, Zakieh and Dantu, Karthik},
-  booktitle={2020 IEEE International Conference on Robotics and Automation (ICRA)}, 
-  title={Practical Persistence Reasoning in Visual SLAM}, 
-  year={2020},
-  volume={},
-  number={},
-  pages={7307-7313},
-  keywords={Simultaneous localization and mapping;Visualization;Estimation;Cognition;Probability;Feature extraction},
-  doi={10.1109/ICRA40945.2020.9196913}}
-
-
+% [11/39]
 @inproceedings{schmid2022panoptic,
   title={Panoptic Multi-TSDFs: a Flexible Representation for Online Multi-resolution Volumetric Mapping and Long-term Dynamic Scene Consistency},
   author={Schmid, Lukas and Delmerico, Jeffrey and Sch{\"o}nberger, Johannes and Nieto, Juan and Pollefeys, Marc and Siegwart, Roland and Cadena, Cesar},
@@ -306,9 +126,8 @@ doi       = {10.15607/RSS.2024.XX.081}
   number={},
   pages={8018-8024},
   doi={10.1109/ICRA46639.2022.9811877}}
-}
 
-
+% [12/39]
 @INPROCEEDINGS{QianChatrathPOCD,
   author={Qian, Jingxing and Chatrath, Veronica and Yang, Jun and Servos, James and Schoellig, Angela and Waslander, Steven L.},
   booktitle={2022 Robotics: Science and Systems (RSS)}, 
@@ -319,8 +138,7 @@ doi       = {10.15607/RSS.2024.XX.081}
   pages={},
   doi={10.15607/RSS.2022.XVIII.013}}
 
-
-POV slam 还需要么 好像不怎么相关呢
+% [13/39]
 @inproceedings{qian-rss23,
 author = {Jingxing Qian and Veronica Chatrath and James Servos and Aaron Mavrinac and Wolfram Burgard and Steven L. Waslander and Angela P. Schoellig},
 title = {{POV-SLAM}: Probabilistic Object-Aware Variational {SLAM} in Semi-Static Environments},
@@ -330,7 +148,7 @@ doi = {10.15607/RSS.2023.XIX.069},
 abstract = {Simultaneous localization and mapping (SLAM) in slowly varying scenes is important for long-term robot task completion in GPS-denied environments. Failing to detect scene changes may lead to inaccurate maps and, ultimately, lost robots. Classical SLAM algorithms assume static scenes, and recent works take dynamics into account, but require scene changes to be observed in consecutive frames. Semi-static scenes, wherein objects appear, disappear, or move slowly over time, are often overlooked, yet are critical for long-term operation. We propose an object-aware, factor-graph SLAM framework that tracks and reconstructs semi-static object-level changes. Our novel variational expectation-maximization strategy is used to optimize factor graphs involving a Gaussian-Uniform bimodal measurement likelihood for potentially-changing objects. We evaluate our approach alongside the state-of-the-art SLAM solutions in simulation and on our novel real-world SLAM dataset captured in a warehouse over four months. Our method improves the robustness of localization in the presence of semi-static changes, providing object-level reasoning about the scene.}
 }
 
-
+% [14/39]
 @ARTICLE{10423794,
   author={Adkins, Amanda and Chen, Taijing and Biswas, Joydeep},
   journal={IEEE Robotics and Automation Letters}, 
@@ -342,7 +160,7 @@ abstract = {Simultaneous localization and mapping (SLAM) in slowly varying scene
   keywords={Simultaneous localization and mapping;Visualization;Feature extraction;Trajectory;Optimization;Ellipsoids;Image analysis;Assistive robots;Service robots;SLAM;localization;semantic scene understanding},
   doi={10.1109/LRA.2024.3363534}}
 
-
+% [15/39]
 @inproceedings{zhu2023living,
 author = {Liyuan Zhu and Shengyu Huang and Konrad Schindler, Iro Armeni},
 title = {Living Scenes: Multi-object Relocalization and Reconstruction in Changing 3D Environments},
@@ -350,8 +168,7 @@ booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVP
 year = {2024}
 }
 
-
-% PREPRINT / UNDER REVIEW as of 2026-08-06.
+% [16/39]
 @misc{oh2026oasismap,
   author        = {Haedam Oh and Yifu Tao and Nived Chebrolu and Maurice Fallon},
   title         = {{OASIS-Map}: Object-Level Change Detection in Multi-Session Mapping Using Semantic Correspondence Matching},
@@ -362,45 +179,7 @@ year = {2024}
   note          = {Under-review preprint; status checked 2026-08-06}
 }
 
-% ===== References originally in gaussian.bib =====
-% Gaussian SLAM foundations and dynamic/evolving Gaussian scene mapping.
-% Publication status checked on 2026-08-06.
-
-@inproceedings{matsuki2024gaussianslam,
-  author    = {Hidenobu Matsuki and Riku Murai and Paul H. J. Kelly and Andrew J. Davison},
-  title     = {Gaussian Splatting {SLAM}},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages     = {18039--18048},
-  year      = {2024},
-  doi       = {10.1109/CVPR52733.2024.01708}
-}
-
-@inproceedings{keetha2024splatam,
-  author    = {Nikhil Keetha and Jay Karhade and Krishna Murthy Jatavallabhula and Gengshan Yang and Sebastian Scherer and Deva Ramanan and Jonathon Luiten},
-  title     = {{SplaTAM}: Splat, Track \& Map 3D Gaussians for Dense {RGB-D} {SLAM}},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages     = {21357--21366},
-  year      = {2024}
-}
-
-@inproceedings{zheng2025wildgsslam,
-  author    = {Jianhao Zheng and Zihan Zhu and Valentin Bieri and Marc Pollefeys and Songyou Peng and Iro Armeni},
-  title     = {{WildGS-SLAM}: Monocular Gaussian Splatting {SLAM} in Dynamic Environments},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages     = {11461--11471},
-  year      = {2025},
-  doi       = {10.1109/CVPR52734.2025.01070}
-}
-
-@inproceedings{wen2025gassidy,
-  author    = {Long Wen and Shixin Li and Yu Zhang and Yuhong Huang and Jianjie Lin and Fengjunjie Pan and Zhenshan Bing and Alois Knoll},
-  title     = {Gassidy: Gaussian Splatting {SLAM} in Dynamic Environments},
-  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
-  pages     = {8471--8477},
-  year      = {2025},
-  doi       = {10.1109/ICRA55743.2025.11127678}
-}
-
+% [17/39]
 @inproceedings{li2025fourdgsslam,
   author    = {Yanyan Li and Youxu Fang and Zunjie Zhu and Kunyi Li and Yong Ding and Federico Tombari},
   title     = {4D Gaussian Splatting {SLAM}},
@@ -409,14 +188,7 @@ year = {2024}
   year      = {2025}
 }
 
-@inproceedings{sun2025d4dgsslam,
-  author    = {Zhicong Sun and Jacqueline Lo and Jinxing Hu},
-  title     = {Embracing Dynamics: Dynamics-Aware 4D Gaussian Splatting {SLAM}},
-  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages     = {5331--5338},
-  year      = {2025}
-}
-
+% [18/39]
 @inproceedings{li2026dynagslam,
   author    = {Runfa Blark Li and Mahdi Shaghaghi and Keito Suzuki and Xinshuang Liu and Varun Moparthi and Bang Du and Walker Curtis and Martin Renschler and Ki Myung Brian Lee and Nikolay Atanasov and Truong Q. Nguyen},
   title     = {{DynaGSLAM}: Real-Time Gaussian-Splatting {SLAM} for Online Rendering, Tracking, Motion Predictions of Moving Objects in Dynamic Scenes},
@@ -426,22 +198,7 @@ year = {2024}
   doi       = {10.1109/WACV61042.2026.00240}
 }
 
-@inproceedings{wang2026flow4dgsslam,
-  author    = {Yunsong Wang and Gim Hee Lee},
-  title     = {{Flow4DGS-SLAM}: Optical Flow-Guided 4D Gaussian Splatting {SLAM}},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages     = {33364--33373},
-  year      = {2026}
-}
-
-@inproceedings{zhao2026ru4dslam,
-  author    = {Yangfan Zhao and Hanwei Zhang and Ke Huang and Qiufeng Wang and Zhenzhou Shao and Dengyu Wu},
-  title     = {{RU4D-SLAM}: Reweighting Uncertainty in Gaussian Splatting {SLAM} for 4D Scene Reconstruction},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition Findings (CVPR Findings)},
-  pages     = {1492--1502},
-  year      = {2026}
-}
-
+% [19/39]
 @inproceedings{cheng2025ltgaussian,
   author    = {Luqi Cheng and Zhangshuo Qi and Zijie Zhou and Chao Lu and Guangming Xiong},
   title     = {{LT-Gaussian}: Long-Term Map Update Using 3D Gaussian Splatting for Autonomous Driving},
@@ -451,28 +208,7 @@ year = {2024}
   doi       = {10.1109/IV64158.2025.11097624}
 }
 
-% PREPRINT as of 2026-08-06. Re-check before submission.
-@misc{fu2025gslts,
-  author        = {Bin Fu and Jialin Li and Bin Zhang and Ruiping Wang and Xilin Chen},
-  title         = {{GS-LTS}: 3D Gaussian Splatting-Based Adaptive Modeling for Long-Term Service Robots},
-  year          = {2025},
-  eprint        = {2503.17733},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.RO},
-  note          = {Preprint; status checked 2026-08-06}
-}
-
-% PREPRINT as of 2026-08-06. Re-check before submission.
-@misc{galappaththige2026gsdiff,
-  author        = {Chamuditha Jayanga Galappaththige and Jason Lai and Timothy Patten and Donald Dansereau and Niko Suenderhauf and Dimity Miller},
-  title         = {From Pixels to Primitives: Scene Change Detection in 3D Gaussian Splatting},
-  year          = {2026},
-  eprint        = {2605.07203},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CV},
-  note          = {Preprint; status checked 2026-08-06}
-}
-
+% [20/39]
 @inproceedings{zeng2025gaussianupdate,
   author    = {Lin Zeng and Boming Zhao and Jiarui Hu and Xujie Shen and Ziqiang Dang and Hujun Bao and Zhaopeng Cui},
   title     = {{GaussianUpdate}: Continual 3D Gaussian Splatting Update for Changing Environments},
@@ -482,6 +218,7 @@ year = {2024}
   doi       = {10.1109/ICCV51701.2025.02393}
 }
 
+% [21/39]
 @inproceedings{ackermann2025clsplats,
   author    = {Jan Ackermann and Jonas Kulhanek and Shengqu Cai and Haofei Xu and Marc Pollefeys and Gordon Wetzstein and Leonidas J. Guibas and Songyou Peng},
   title     = {{CL-Splats}: Continual Learning of Gaussian Splatting with Local Optimization},
@@ -491,38 +228,7 @@ year = {2024}
   doi       = {10.1109/ICCV51701.2025.00732}
 }
 
-% ===== References originally in landscape.bib =====
-% Additional high-priority literature discovered during the broad dynamic-map audit.
-% Publication status checked on 2026-08-07. Preprints are explicitly marked.
-
-@inproceedings{zhao2026supermap,
-  author    = {Shibo Zhao and Guofei Chen and Honghao Zhu and Zhiheng Li and Changwei Yao and Nader Zantout and Seungchan Kim and Wenshan Wang and Ji Zhang and Sebastian Scherer},
-  title     = {{SuperMap}: A Spatio-Temporal {SLAM} System for Visual-Language Navigation},
-  booktitle = {Robotics: Science and Systems (RSS)},
-  year      = {2026},
-  url       = {https://www.roboticsproceedings.org/rss22/p052.pdf}
-}
-
-@article{ali2026probperlilo,
-  author  = {Waqas Ali and Yixi Cai and Patric Jensfelt and Thien-Minh Nguyen},
-  title   = {{ProbPer-LiLo}: Probabilistic Persistency Modeling for Life-Long Mapping},
-  journal = {IEEE Robotics and Automation Letters},
-  volume  = {11},
-  number  = {3},
-  pages   = {2530--2537},
-  year    = {2026},
-  doi     = {10.1109/LRA.2026.3653311}
-}
-
-@inproceedings{gil2025elite,
-  author    = {Hyeonjae Gil and Dongjae Lee and Giseop Kim and Ayoung Kim},
-  title     = {Ephemerality Meets {LiDAR}-Based Lifelong Mapping},
-  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
-  pages     = {3312--3319},
-  year      = {2025},
-  doi       = {10.1109/ICRA55743.2025.11127618}
-}
-
+% [22/39]
 @inproceedings{saavedraruiz2025perpetua,
   author    = {Miguel Saavedra-Ruiz and Samer B. Nashed and Charlie Gauthier and Liam Paull},
   title     = {{Perpetua}: Multi-Hypothesis Persistence Modeling for Semi-Static Environments},
@@ -532,28 +238,7 @@ year = {2024}
   doi       = {10.1109/IROS60139.2025.11247086}
 }
 
-@article{behrens2025lostfound,
-  author  = {Tjark Behrens and Ren{\'e} Zurbr{\"u}gg and Marc Pollefeys and Zuria Bauer and Hermann Blum},
-  title   = {{Lost \& Found}: Tracking Changes From Egocentric Observations in 3D Dynamic Scene Graphs},
-  journal = {IEEE Robotics and Automation Letters},
-  volume  = {10},
-  number  = {4},
-  pages   = {3739--3746},
-  year    = {2025},
-  doi     = {10.1109/LRA.2025.3544518}
-}
-
-@article{jiang2025dualmap,
-  author  = {Jiajun Jiang and Yiming Zhu and Zirui Wu and Jie Song},
-  title   = {{DualMap}: Online Open-Vocabulary Semantic Mapping for Natural Language Navigation in Dynamic Changing Scenes},
-  journal = {IEEE Robotics and Automation Letters},
-  volume  = {10},
-  number  = {12},
-  pages   = {12612--12619},
-  year    = {2025},
-  doi     = {10.1109/LRA.2025.3621942}
-}
-
+% [23/39]
 @inproceedings{kim2022ltmapper,
   author    = {Giseop Kim and Ayoung Kim},
   title     = {{LT-Mapper}: A Modular Framework for {LiDAR}-Based Lifelong Mapping},
@@ -563,44 +248,7 @@ year = {2024}
   doi       = {10.1109/ICRA46639.2022.9811916}
 }
 
-% PREPRINT as of 2026-08-07.
-@misc{giberna2025dynemo,
-  author        = {Marco Giberna and Muhammad Shaheer and Miguel Fernandez-Cortizas and Jose Andres Millan-Romera and Jose Luis Sanchez-Lopez and Holger Voos},
-  title         = {{DYNEMO-SLAM}: Dynamic Entity and Motion-Aware 3D Scene Graph {SLAM}},
-  year          = {2025},
-  eprint        = {2503.02050},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.RO},
-  note          = {Preprint; status checked 2026-08-07}
-}
-
-@inproceedings{mazur2026primitive,
-  author    = {Kirill Mazur and Marwan Taher and Andrew J. Davison},
-  title     = {4D Primitive-Mache: Glueing Primitives for Persistent 4D Scene Reconstruction},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  pages     = {7372--7381},
-  year      = {2026}
-}
-
-@article{matezbandera2022ltc,
-  author  = {Jose-Luis Matez-Bandera and David Fernandez-Chaves and Jose-Raul Ruiz-Sarmiento and Javier Monroy and Nicolai Petkov and Javier Gonzalez-Jimenez},
-  title   = {{LTC-Mapping}: Enhancing Long-Term Consistency of Object-Oriented Semantic Maps in Robotics},
-  journal = {Sensors},
-  volume  = {22},
-  number  = {14},
-  pages   = {5308},
-  year    = {2022},
-  doi     = {10.3390/s22145308}
-}
-
-@inproceedings{kurenkov2023scenegraphmemory,
-  author    = {Andrey Kurenkov and Michael Lingelbach and Tanmay Agarwal and Emily Jin and Chengshu Li and Ruohan Zhang and Li Fei-Fei and Jiajun Wu and Silvio Savarese and Roberto Mart{\'i}n-Mart{\'i}n},
-  title     = {Modeling Dynamic Environments with Scene Graph Memory},
-  booktitle = {International Conference on Machine Learning (ICML)},
-  pages     = {17976--17993},
-  year      = {2023}
-}
-
+% [24/39]
 @article{krajnik2017fremen,
   author  = {Tom{\'a}{\v{s}} Krajnik and Jaime Pulido Fentanes and Jo{\~a}o Machado Santos and Tom Duckett},
   title   = {{FreMEn}: Frequency Map Enhancement for Long-Term Mobile Robot Autonomy in Changing Environments},
@@ -612,13 +260,7 @@ year = {2024}
   doi     = {10.1109/TRO.2017.2665664}
 }
 
-@inproceedings{senanayake2016sthm,
-  author    = {Ransalu Senanayake and Lionel Ott and Simon O'Callaghan and Fabio Ramos},
-  title     = {Spatio-Temporal Hilbert Maps for Continuous Occupancy Representation in Dynamic Environments},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2016}
-}
-
+% [25/39]
 @inproceedings{meyerdelius2012changinggrid,
   author    = {Daniel Meyer-Delius and Maximilian Beinhofer and Wolfram Burgard},
   title     = {Occupancy Grid Models for Robot Mapping in Changing Environments},
@@ -628,36 +270,7 @@ year = {2024}
   doi       = {10.1609/aaai.v26i1.8377}
 }
 
-@article{xian2026llmf,
-  author  = {Kaiyi Xian and Duo Liu and Gexiang Zhang and Ferrante Neri and Song Chen},
-  title   = {A Lifelong Mapping Framework with Multi-View Projection in a Changing Environment},
-  journal = {Integrated Computer-Aided Engineering},
-  year    = {2026},
-  doi     = {10.1177/10692509261442329}
-}
-
-% PREPRINT as of 2026-08-07.
-@misc{yang2025lifelong3d,
-  author        = {Liudi Yang and Sai Manoj Prakhya and Senhua Zhu and Ziyuan Liu},
-  title         = {Lifelong 3D Mapping Framework for Hand-Held and Robot-Mounted {LiDAR} Mapping Systems},
-  year          = {2025},
-  eprint        = {2501.18110},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.RO},
-  note          = {Preprint; status checked 2026-08-07}
-}
-
-@article{chen2024slamramu,
-  author  = {Bushi Chen and Xunyu Zhong and Han Xie and Pengfei Peng and Huosheng Hu and Xungao Zhong and Qiang Liu},
-  title   = {{SLAM-RAMU}: 3D {LiDAR-IMU} Lifelong {SLAM} with Relocalization and Autonomous Map Updating for Accurate and Reliable Navigation},
-  journal = {Industrial Robot},
-  volume  = {51},
-  number  = {2},
-  pages   = {219--235},
-  year    = {2024},
-  doi     = {10.1108/IR-09-2023-0223}
-}
-
+% [26/39]
 @inproceedings{matsuki2025fourdtam,
   author    = {Hidenobu Matsuki and Gwangbin Bae and Andrew J. Davison},
   title     = {{4DTAM}: Non-Rigid Tracking and Mapping via Dynamic Surface Gaussians},
@@ -667,82 +280,33 @@ year = {2024}
   doi       = {10.1109/CVPR52734.2025.02507}
 }
 
-@inproceedings{walcott2012dynamic,
-  author    = {Aisha Walcott-Bryant and Michael Kaess and Hordur Johannsson and John J. Leonard},
-  title     = {Dynamic Pose Graph {SLAM}: Long-Term Mapping in Low Dynamic Environments},
-  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages     = {1871--1878},
-  year      = {2012}
-}
-
-% ===== References originally in bib_additions.bib =====
+% [27/39]
 @inproceedings{wald2019rio,
   title     = {{RIO}: {3D} Object Instance Re-Localization in Changing Indoor Environments},
   author    = {Wald, Johanna and Avetisyan, Armen and Navab, Nassir and Tombari, Federico and Nie{\ss}ner, Matthias},
   booktitle = {ICCV},
   year      = {2019}
 }
-@inproceedings{palazzolo2019bonn,
-  title     = {{ReFusion}: {3D} Reconstruction in Dynamic Environments for {RGB-D} Cameras Exploiting Residuals},
-  author    = {Palazzolo, Emanuele and Behley, Jens and Lottes, Philipp and Gigu{\`e}re, Philippe and Stachniss, Cyrill},
-  booktitle = {IROS},
-  year      = {2019}
-}
-@inproceedings{sturm2012tum,
-  title     = {A Benchmark for the Evaluation of {RGB-D} {SLAM} Systems},
-  author    = {Sturm, J{\"u}rgen and Engelhard, Nikolas and Endres, Felix and Burgard, Wolfram and Cremers, Daniel},
-  booktitle = {IROS},
-  year      = {2012}
-}
 
-% ===== References originally in revision_context.bib =====
-% Primary texts added for the readability revision. Publication status is not inferred.
-@misc{gorlo2025daaam,
-  author = {Nicolas Gorlo and Lukas Schmid and Luca Carlone},
-  title = {Describe Anything Anywhere At Any Moment},
-  year = {2025},
-  eprint = {2512.00565},
-  archivePrefix = {arXiv},
-  primaryClass = {cs.CV}
-}
-@misc{lee2026ltmem,
-  author = {Yumin Lee and Hyoseok Ju and Giseop Kim},
-  title = {{LT-Mem}: Volatility-Aware Spatio-Temporal Memory for Lifelong Scene Understanding},
-  year = {2026},
-  eprint = {2608.19059},
-  archivePrefix = {arXiv},
-  primaryClass = {cs.RO}
-}
-
-% ===== References originally in supporting_refs_20261019.bib =====
-% BibTeX entries fetched programmatically on 2026-10-19 (doi.org content negotiation or arxiv.org/bibtex);
-
-% keys renamed to the manuscript's author-year-keyword convention. Not yet in the manuscript's .bib files.
-
+% [28/39]
 @inproceedings{reijgwart2023wavemap, series={RSS2023}, title={Efficient volumetric mapping of multi-scale environments using wavelet-based compression}, url={http://dx.doi.org/10.15607/RSS.2023.XIX.065}, DOI={10.15607/rss.2023.xix.065}, booktitle={Robotics: Science and Systems XIX}, publisher={Robotics: Science and Systems Foundation}, author={Reijgwart, Victor and Cadena, Cesar and Siegwart, Roland and Ott, Lionel}, year={2023}, month=July, collection={RSS2023} }
 
+% [29/39]
 @article{kerbl2023gaussians, title={3D Gaussian Splatting for Real-Time Radiance Field Rendering}, volume={42}, ISSN={1557-7368}, url={http://dx.doi.org/10.1145/3592433}, DOI={10.1145/3592433}, number={4}, journal={ACM Transactions on Graphics}, publisher={Association for Computing Machinery (ACM)}, author={Kerbl, Bernhard and Kopanas, Georgios and Leimkuehler, Thomas and Drettakis, George}, year={2023}, month=July, pages={1–14} }
 
+% [30/39]
 @inproceedings{curless1996volumetric, series={SIGGRAPH96}, title={A volumetric method for building complex models from range images}, url={http://dx.doi.org/10.1145/237170.237269}, DOI={10.1145/237170.237269}, booktitle={Proceedings of the 23rd annual conference on Computer graphics and interactive techniques}, publisher={ACM}, author={Curless, Brian and Levoy, Marc}, year={1996}, month=Aug, pages={303–312}, collection={SIGGRAPH96} }
 
+% [31/39]
 @inproceedings{newcombe2011kinectfusion, title={KinectFusion: Real-time dense surface mapping and tracking}, url={http://dx.doi.org/10.1109/ISMAR.2011.6092378}, DOI={10.1109/ismar.2011.6092378}, booktitle={2011 10th IEEE International Symposium on Mixed and Augmented Reality}, publisher={IEEE}, author={Newcombe, Richard A. and Fitzgibbon, Andrew and Izadi, Shahram and Hilliges, Otmar and Molyneaux, David and Kim, David and Davison, Andrew J. and Kohi, Pushmeet and Shotton, Jamie and Hodges, Steve}, year={2011}, month=Oct, pages={127–136} }
 
+% [32/39]
 @article{hornung2013octomap, title={OctoMap: an efficient probabilistic 3D mapping framework based on octrees}, volume={34}, ISSN={1573-7527}, url={http://dx.doi.org/10.1007/s10514-012-9321-0}, DOI={10.1007/s10514-012-9321-0}, number={3}, journal={Autonomous Robots}, publisher={Springer Science and Business Media LLC}, author={Hornung, Armin and Wurm, Kai M. and Bennewitz, Maren and Stachniss, Cyrill and Burgard, Wolfram}, year={2013}, month=Feb, pages={189–206} }
 
+% [33/39]
 @article{page1954cusum, title={CONTINUOUS INSPECTION SCHEMES}, volume={41}, ISSN={1464-3510}, url={http://dx.doi.org/10.1093/biomet/41.1-2.100}, DOI={10.1093/biomet/41.1-2.100}, number={1-2}, journal={Biometrika}, publisher={Oxford University Press (OUP)}, author={PAGE, E. S.}, year={1954}, pages={100–115} }
 
-@inproceedings{zhang2018lpips, title={The Unreasonable Effectiveness of Deep Features as a Perceptual Metric}, url={http://dx.doi.org/10.1109/CVPR.2018.00068}, DOI={10.1109/cvpr.2018.00068}, booktitle={2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition}, publisher={IEEE}, author={Zhang, Richard and Isola, Phillip and Efros, Alexei A. and Shechtman, Eli and Wang, Oliver}, year={2018}, month=June, pages={586–595} }
-
-@article{wang2004ssim, title={Image quality assessment: from error visibility to structural similarity}, volume={13}, ISSN={1941-0042}, url={http://dx.doi.org/10.1109/TIP.2003.819861}, DOI={10.1109/tip.2003.819861}, number={4}, journal={IEEE Transactions on Image Processing}, publisher={Institute of Electrical and Electronics Engineers (IEEE)}, author={Zhou Wang and Bovik, A.C. and Sheikh, H.R. and Simoncelli, E.P.}, year={2004}, month=Apr, pages={600–612} }
-
-@inproceedings{wang2003msssim, series={ACSSC-03}, title={Multiscale structural similarity for image quality assessment}, url={http://dx.doi.org/10.1109/ACSSC.2003.1292216}, DOI={10.1109/acssc.2003.1292216}, booktitle={The Thrity-Seventh Asilomar Conference on Signals, Systems &amp; Computers, 2003}, publisher={IEEE}, author={Wang, Z. and Simoncelli, E.P. and Bovik, A.C.}, pages={1398–1402}, collection={ACSSC-03} }
-
-@inproceedings{oleynikova2017voxblox, title={Voxblox: Incremental 3D Euclidean Signed Distance Fields for on-board MAV planning}, url={http://dx.doi.org/10.1109/IROS.2017.8202315}, DOI={10.1109/iros.2017.8202315}, booktitle={2017 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, publisher={IEEE}, author={Oleynikova, Helen and Taylor, Zachary and Fehr, Marius and Siegwart, Roland and Nieto, Juan}, year={2017}, month=Sept, pages={1366–1373} }
-
-@article{lorensen1987marching, title={Marching cubes: A high resolution 3D surface construction algorithm}, volume={21}, ISSN={0097-8930}, url={http://dx.doi.org/10.1145/37402.37422}, DOI={10.1145/37402.37422}, number={4}, journal={ACM SIGGRAPH Computer Graphics}, publisher={Association for Computing Machinery (ACM)}, author={Lorensen, William E. and Cline, Harvey E.}, year={1987}, month=Aug, pages={163–169} }
-
-@inproceedings{huang20242dgs, series={SIGGRAPH ’24}, title={2D Gaussian Splatting for Geometrically Accurate Radiance Fields}, url={http://dx.doi.org/10.1145/3641519.3657428}, DOI={10.1145/3641519.3657428}, booktitle={Special Interest Group on Computer Graphics and Interactive Techniques Conference Conference Papers}, publisher={ACM}, author={Huang, Binbin and Yu, Zehao and Chen, Anpei and Geiger, Andreas and Gao, Shenghua}, year={2024}, month=July, pages={1–11}, collection={SIGGRAPH ’24} }
-
+% [34/39]
 @inproceedings{shen2024flashsplat,
       title={FlashSplat: 2D to 3D Gaussian Splatting Segmentation Solved Optimally},
       author={Qiuhong Shen and Xingyi Yang and Xinchao Wang},
@@ -754,12 +318,10 @@ year = {2024}
       url={https://arxiv.org/abs/2409.08270},
 }
 
-
+% [35/39]
 @inproceedings{fehr2017tsdfchange, title={TSDF-based change detection for consistent long-term dense reconstruction and dynamic object discovery}, url={http://dx.doi.org/10.1109/ICRA.2017.7989614}, DOI={10.1109/icra.2017.7989614}, booktitle={2017 IEEE International Conference on Robotics and Automation (ICRA)}, publisher={IEEE}, author={Fehr, Marius and Furrer, Fadri and Dryanovski, Ivan and Sturm, Jurgen and Gilitschenski, Igor and Siegwart, Roland and Cadena, Cesar}, year={2017}, month=May, pages={5237–5244} }
 
-
-@inproceedings{looper2023vsg, title={3D VSG: Long-term Semantic Scene Change Prediction through 3D Variable Scene Graphs}, url={http://dx.doi.org/10.1109/ICRA48891.2023.10161212}, DOI={10.1109/icra48891.2023.10161212}, booktitle={2023 IEEE International Conference on Robotics and Automation (ICRA)}, publisher={IEEE}, author={Looper, Samuel and Rodriguez-Puigvert, Javier and Siegwart, Roland and Cadena, Cesar and Schmid, Lukas}, year={2023}, month=May, pages={8179–8186} }
-
+% [36/39]
 @inproceedings{nguyen2012kinect,
   author    = {Chuong V. Nguyen and Shahram Izadi and David Lovell},
   title     = {Modeling Kinect Sensor Noise for Improved {3D} Reconstruction and Tracking},
@@ -769,16 +331,7 @@ year = {2024}
   doi       = {10.1109/3DIMPVT.2012.84}
 }
 
-@inproceedings{kirillov2023sam,
-  title     = {Segment Anything},
-  author    = {Kirillov, Alexander and Mintun, Eric and Ravi, Nikhila and Mao, Hanzi and Rolland, Chloe and
-               Gustafson, Laura and Xiao, Tete and Whitehead, Spencer and Berg, Alexander C. and Lo, Wan-Yen and
-               Doll{\'a}r, Piotr and Girshick, Ross},
-  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
-  pages     = {4015--4026},
-  year      = {2023}
-}
-
+% [37/39]
 @article{campos2021orbslam3,
   title   = {{ORB-SLAM3}: An Accurate Open-Source Library for Visual, Visual--Inertial, and Multimap {SLAM}},
   author  = {Campos, Carlos and Elvira, Richard and G{\'o}mez Rodr{\'i}guez, Juan J. and Montiel, Jos{\'e} M. M. and
@@ -790,15 +343,7 @@ year = {2024}
   year    = {2021}
 }
 
-@article{zhou2018open3d,
-  title   = {{Open3D}: A Modern Library for {3D} Data Processing},
-  author  = {Zhou, Qian-Yi and Park, Jaesik and Koltun, Vladlen},
-  journal = {arXiv preprint arXiv:1801.09847},
-  year    = {2018}
-}
-
-% ===== References originally in experiments_refs.bib =====
-% Verified against the CVF Open Access entry on 2026-11-01.
+% [38/39]
 @inproceedings{jain2023oneformer,
   author = {Jain, Jitesh and Li, Jiachen and Chiu, Mang Tik and Hassani, Ali and Orlov, Nikita and Shi, Humphrey},
   title = {{OneFormer}: One Transformer To Rule Universal Image Segmentation},
@@ -807,6 +352,8 @@ year = {2024}
   pages = {2989--2998},
   url = {https://openaccess.thecvf.com/content/CVPR2023/html/Jain_OneFormer_One_Transformer_To_Rule_Universal_Image_Segmentation_CVPR_2023_paper.html}
 }
+
+% [39/39]
 @misc{InteriorAgent2025,
   title = {{InteriorAgent}: Interactive {USD} Interior Scenes for {Isaac Sim}-based Simulation},
   author = {{SpatialVerse Research Team, Manycore Tech Inc.}},
