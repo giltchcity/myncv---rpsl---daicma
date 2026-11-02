@@ -1,5 +1,7 @@
 # DynaState 论文编辑入口
 
+格式采用官方 [CVPR2027-v1](https://github.com/cvpr-org/author-kit/releases/tag/CVPR2027-v1)。正文 teaser 使用官方 `strip` 写法，位于第一页标题下方。
+
 - `main.tex`：完整正文，含摘要、各章节、所有正文表格、图的排版和图注。
 - `experiments_supplement.tex`：完整补充材料，含补充表格和图。
 - `main.bib`：正文与补充材料共用的唯一文献库。

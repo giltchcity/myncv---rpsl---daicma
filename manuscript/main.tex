@@ -1,6 +1,6 @@
 % EDIT HERE: complete main paper, including all tables, figure layouts and captions.
 % References: main.bib.
-% Uses the repository's retained CVPR author kit.
+% Official CVPR2027-v1 author kit; teaser uses the official strip pattern.
 \documentclass[10pt,twocolumn,letterpaper]{article}
 \usepackage[review]{cvpr}
 % ===== BEGIN preamble =====
@@ -11,6 +11,7 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{placeins}
+\usepackage{cuted} % Official two-column teaser support.
 % Retain annotation helpers for working copies; no annotation is used in the main text.
 \newcommand{\red}[1]{{\color{red}#1}}
 \newcommand{\todo}[1]{{\color{red}#1}}
@@ -65,7 +66,6 @@
 % ===== END draft_macros =====
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
-\def\paperID{*****}
 \def\confName{CVPR}
 \def\confYear{2027}
 \title{DynaState: Unified Dynamic Mapping within and across Visits}
@@ -73,15 +73,17 @@
 \begin{document}
 \maketitle
 % ===== BEGIN figures / teaser_front =====
-\begin{figure*}[t]
+\begin{strip}
 \centering
 \includegraphics[width=\linewidth]{figures/teaser_bed_views_wall_clipped_20261103/teaser_with_zooms.pdf}
-\caption{\textbf{A shared update follows scene changes within and across visits.} A robot encounters moving
+\captionsetup{hypcap=false}
+\captionof{figure}{\textbf{A shared update follows scene changes within and across visits.} A robot encounters moving
 objects and discovers changes after looking away or returning. Red marks observed motion; purple marks
 changes discovered against earlier observations. Both lead to the same dynamic update, which reconstructs
 the changed scene and retains valid earlier geometry.}
 \label{fig:teaser}
-\end{figure*}
+\captionsetup{hypcap=true}
+\end{strip}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
