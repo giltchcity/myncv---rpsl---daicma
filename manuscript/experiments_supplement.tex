@@ -105,7 +105,7 @@ and object-instance annotations across rescans. We evaluate eight room chains, m
 across successive scans in each room. The rescans test object rearrangement under changing coverage.
 
 \paragraph{TESSE.}
-We use the Apartment and Office sequences released with Khronos~\cite{schmid2024khronos}. They combine
+We use the Apartment and Office sequences released with Khronos~\cite{Schmid-RSS24-Khronos}. They combine
 moving objects and longer-term object changes during continuous robot trajectories, including revisits
 to previously observed areas. Their scene annotations support Khronos's official evaluation of
 background, static objects, dynamics, and changes over map and query times. We use this protocol for
@@ -217,7 +217,7 @@ For 3RScan, evaluation images are 480$\times$270 for both Gaussian methods. In t
 uses 240$\times$135 inputs to fit memory; evaluation remains at 480$\times$270.
 
 \paragraph{Rendering.}
-Following GaME~\cite{yugay2026game}, every tenth frame of the final visit is held out, except the first frame.
+Following GaME~\cite{yugay2025gaussianmappingevolvingscenes}, every tenth frame of the final visit is held out, except the first frame.
 PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and measured-depth L1 are averaged over held-out frames.
 The 3RScan result is the mean over the final visit of each of eight rooms. Gaussian geometry uses the
 pre-refinement map; the rendering table uses the map after global refinement. The main benchmark and the
@@ -288,7 +288,7 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
 % ===== END tables / supp_single =====
 
 \paragraph{TESSE.}
-We use the office and apartment sequences released with Khronos~\cite{schmid2024khronos}. Both methods use
+We use the office and apartment sequences released with Khronos~\cite{Schmid-RSS24-Khronos}. Both methods use
 5\,cm voxels. The official evaluator queries each saved map at preceding scene times and aggregates background,
 static-object, dynamic-object, and change scores. \Cref{tab:supp_tesse} reports its precision, recall, and F1
 outputs separately. We use a 5\,cm background matching tolerance; the original Khronos paper reports a
