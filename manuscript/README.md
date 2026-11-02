@@ -1,35 +1,27 @@
-# Manuscript
+# DynaState 论文编辑入口
 
-**Working title:** Persistent Map Updates from Temporally Valid Observations.
+- `main.tex`：完整正文，含摘要、各章节、所有正文表格、图的排版和图注。
+- `experiments_supplement.tex`：完整补充材料，含补充表格和图。
+- `main.bib`：正文与补充材料共用的唯一文献库。
+- `figures/`：实际引用的 PDF、PNG、JPG 等图片素材。
+- `cvpr.sty`、`ieeenat_fullname.bst`：会议格式文件。
 
-The canonical paper is `main.tex`, on `main`.
-Select `manuscript/main.tex` as the main document in Overleaf.
+正文和补充材料都可以独立编译，不再依赖分散的章节或图表 `.tex` 文件。
+在 Overleaf 选择 `manuscript/main.tex` 作为 Main document；编译补充材料时选择
+`manuscript/experiments_supplement.tex`。
 
-The method is an update layer that runs beside an existing mapper. The paper
-connects it to a TSDF mapper (Khronos), a 3D Gaussian mapper (GaME), and an
-occupancy mapper (wavemap). Numbers in `\prov{}` are provisional and will be
-replaced by the final runs. Author-only `% SRC` comments
-give the result file behind each number.
+## 修改参考文献
 
-## Contents
+所有 BibTeX 条目都在 `main.bib`。替换作者、标题、会议、年份等字段时保留条目 key，
+例如 `@article{some_key, ...}` 中的 `some_key`，正文的 `\cite{some_key}` 就无需逐处修改。
+若修改 key，同时在两个 `.tex` 中替换对应引用。合并时保留了原有文献条目，没有代替作者改写信息。
 
-- `sec/0_abstract.tex`
-- `sec/1_intro.tex`
-- `sec/2_related_work.tex`
-- `sec/4_method.tex`
-- `sec/5_experiments.tex`
-- `sec/6_limitations.tex`
-- `sec/7_conclusion.tex`
-- `figures/update_overview.tex` — editable LaTeX overview diagram
+## 编译
 
-## Build
+```sh
+latexmk -pdf main.tex
+latexmk -pdf experiments_supplement.tex
+```
 
-Run `latexmk -pdf main.tex` from this directory, or `pdflatex main.tex`,
-`bibtex main`, and `pdflatex main.tex` twice. The retained CVPR author kit is used
-without modification. Bibliography files remain `main.bib`, `gaussian.bib`,
-`landscape.bib`, `bib_additions.bib`, `revision_context.bib`, and
-`supporting_refs_20261019.bib`. Draft markers (`\prov`, `\TODO`, `\note`,
-`\directive`) are defined in `draft_macros.tex`; set `\draftmodefalse` there
-for a clean copy.
-
-Historical workspace notes outside this directory are not included in the paper.
+2026-11-03 的旧分散源码已备份在工作目录之外的 `paper_structure_cleanup_20261103/`。
+每个章节和图表在 `.tex` 内都有 BEGIN / END 注释，便于搜索定位。
