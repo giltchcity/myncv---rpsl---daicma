@@ -99,7 +99,7 @@ states remain available to historical queries. On real and synthetic recordings 
 change, and on Flat and 3RScan, all three representations outperform their native counterparts in geometry,
 object reconstruction, and change detection. On Khronos's TESSE benchmark, our change F1 reaches up to 2.4
 times that of Khronos, and on the Flat and Aria scenes used by GaME, our Gaussian maps raise novel-view PSNR
-by 0.88--3.86\,dB. Code and data will be made publicly available.
+by 0.88--3.91\,dB. Code and data will be made publicly available.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -144,7 +144,7 @@ We collect a real and synthetic RGB-D benchmark in which changes within and acro
 while Flat and 3RScan extend the cross-visit evaluation. On all four datasets, every representation
 outperforms its native counterpart in geometry, object, and change F1 (\cref{tab:main}). On Khronos's TESSE
 sequences, change F1 rises from 46.2 to 78.6 and from 38.6 to 92.6. Retaining valid geometry raises F1 by
-up to 12.6 points over rebuilding on partial revisits, and our Gaussian maps render 0.88--3.86\,dB higher
+up to 12.6 points over rebuilding on partial revisits, and our Gaussian maps render 0.88--3.91\,dB higher
 PSNR than GaME on the Flat and Aria scenes it uses.
 
 \begin{samepage}
@@ -229,11 +229,15 @@ appearance and disappearance hypotheses~\cite{11247086}.
 \section{Method}
 \label{sec:method}
 
-From posed RGB-D observations, \ours updates a map through changes within and across visits.
-A confirmed change updates both the stored geometry and the observations used to reconstruct it.
-We connect these operations through scene-state intervals (\cref{fig:method}): \emph{change detection}
-determines which states continue, end, or begin (\cref{sec:states}); \emph{map update} applies these decisions
-to geometry and observation contributions (\cref{sec:validity}). These decisions drive all three map representations.
+\ours maintains one map from posed RGB-D frames and their segmentation masks, within a visit and across
+visits. Every element of the map carries a lifetime, so the map can be read at any time. Each change is
+first judged and then applied (\cref{fig:method}): \emph{change detection} decides from current depth which
+object states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies each decision to
+the stored geometry and to the observations that keep shaping it (\cref{sec:validity}). We follow one
+example throughout: an armchair is removed, a sofa is placed in front of a wall, and the wall itself does
+not change. Both parts act on object states and capture times rather than on voxels, Gaussians, or cells,
+so the same decisions drive TSDF fusion, Gaussian optimization, and occupancy integration
+(\cref{sec:representations}).
 
 \begin{figure*}[t]
 \centering
@@ -247,92 +251,79 @@ recorded.}
 
 \paragraph{Map representation.}
 \label{sec:setting}
-A state groups observations of an object while its geometry remains unchanged. Additional views complete
-that state's surface; after a move, observations at the new location reconstruct a new state.
-Segmentation masks group surface observations, and associations link these regions
-across frames. State $s$ has a surface $G_s$ and a presence interval $[b_s,d_s)$. This interval specifies
-both when its geometry belongs in the map and which observations describe it.
-Each map element $e$ carries its object association, if available, and a lifetime $[c_e,d_e)$.
-Elements are TSDF surface faces, Gaussians, or occupied cells, depending on the representation.
-The map at time $t$ is
+A \emph{state} is one configuration of an object. Segmentation masks (SAM masks in \cref{fig:method}) group
+the observations of each object, and associations link them across frames, so further views complete the
+surface of the same state. State $s$ has a surface $G_s$ and a presence interval $[b_s,d_s)$, which specifies
+both when its geometry belongs in the map and which observations describe it. Each map element $e$, a TSDF
+surface face, a Gaussian, or an occupied cell, carries its object association, if any, and a lifetime
+$[c_e,d_e)$ that follows its state. The map at time $t$ is
 \begin{equation}
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-Element lifetimes follow scene states and may begin before the elements are allocated.
-Closing a lifetime retires an element while preserving its history.
+Ending a state closes the lifetimes of its elements: the armchair leaves $\mathcal{M}(t)$ for later times
+and stays in it for earlier ones.
 
 \subsection{Change Detection}
 \label{sec:states}
 
-A local observation must establish whether an existing surface has changed or is merely hidden.
-Seeing the floor behind an earlier chair provides evidence that the chair has left; seeing another object
-in front of it indicates occlusion. We collect these comparisons over the observed surface to decide
-which states continue, end, or begin. The same tests apply when a change is discovered after looking
-away or returning on another visit.
+Change detection has to be reliable and prompt. The camera sees only part of an object at a time, and an
+unseen surface is not a missing one: the armchair may be hidden behind the sofa or simply out of view.
+A decision should come as soon as the evidence suffices, without waiting for the whole surface to be
+seen, yet repeated views of one patch must not add up to a whole-object change. The same tests apply when
+a change happens in view, after the camera looks away, or between visits.
 
 \paragraph{Surface evidence.}
-We project surface samples of $G_s$ into each subsequent depth image.
-A sample is supported when depths agree, seen through when the measurement lies farther along the ray,
-and occluded when it lies closer. Support and see-through observations provide evidence about the surface;
-occlusions, invalid depths, and samples outside the image contribute no absence evidence.
-A depth tolerance and reliable surface samples account for measurement noise and reconstruction error.
-Object associations assign the evidence to a state.
+We project surface samples of $G_s$ into each new depth image and assign the evidence to states through
+object associations. A sample is \emph{supported} when the depths agree, \emph{seen through} when the
+measurement lies farther along the ray, and \emph{occluded} when it lies closer. Seeing the floor where the armchair stood is evidence that it has left, whereas the sofa in
+front of the wall only occludes the wall. Occlusions, invalid depths, and samples outside the image
+therefore contribute no absence evidence, and a depth tolerance absorbs measurement noise.
 
 \paragraph{Change decisions.}
-A change should be confirmed as soon as the evidence suffices, without waiting for the whole surface to be
-seen. Repeated views of one patch must not add up to a whole-object change, so each patch contributes
-according to its coverage.
-At round $i$, let $f_i=k_i/n_i$ be the fraction of inspected samples that are seen through.
-We model $f_i$ with a Beta density $p_s(f)$ estimated from in-place observations and use a uniform
-changed-state model. A Page statistic~\cite{11e3eed7-cdc6-3579-8127-4296922d24e9} accumulates their one-sided log-likelihood ratio
-$\ell_s(f_i)$ over candidate change times $j$, weighted by newly inspected surface coverage:
+Let $f_i$ be the fraction of the samples inspected at round $i$ that are seen through. A Page
+statistic~\cite{11e3eed7-cdc6-3579-8127-4296922d24e9} accumulates the log-likelihood ratio $\ell_s(f_i)$
+of a changed state against the state in place, weighted by the share $w_i(j)$ of the state's reliable
+surface inspected for the first time since a candidate change time $j$:
 \begin{equation}
-\begin{aligned}
-  L_t&=\max\!\left(0,\max_{j\leq t}\sum_{i=j}^{t}w_i(j)\,\ell_s(f_i)\right),\\
-  w_i(j)&=\frac{\nu_i(j)}{\nu_{\mathrm{rel}}}.
-\end{aligned}
-\label{eq:absence}
+  L_t=\max\!\left(0,\max_{j\leq t}\sum_{i=j}^{t}w_i(j)\,\ell_s(f_i)\right).
+  \label{eq:absence}
 \end{equation}
-Here $\nu_i(j)$ counts reliable samples inspected for the first time since $j$, and $\nu_{\mathrm{rel}}$
-counts all reliable samples of the state. Each sample contributes once per candidate window.
-We confirm absence when the score exceeds
-the decision threshold and see-through evidence outweighs support. Object and class persistence set revisit priors.
+Because only new coverage adds weight, looking at one patch of the armchair again and again adds little,
+while the score crosses the decision threshold as soon as enough of its surface has been seen through.
+Taking the maximum over $j$ starts the count at the most likely change time, so views from before the
+armchair left do not dilute the evidence gathered after it. The state ends once the threshold is crossed
+and see-through evidence outweighs support.
 
-Compatible observations extend a state; incompatible observations form candidates. We check each
-candidate's geometric relation to the current surface and its support in later observations.
-A confirmed successor starts a new state and closes the previous one; unresolved candidates are retained.
-Each state's observations reconstruct its geometry.
-
-We detect visible motion using object tracking and free-space cues from Khronos and
-Dynablox~\cite{Schmid-RSS-24,10218983}. Once the object settles, new observations reconstruct
-its geometry. Observed motion and changes discovered against the retained map lead to the same updates.
+Observations that match no state form candidates, and a candidate that is consistent with the current
+surface and supported by later observations becomes a successor, which starts a new state and closes the
+previous one, as when the armchair reappears elsewhere; unresolved candidates wait for more evidence.
+Visible motion is detected with the object tracking and free-space cues of Khronos and
+Dynablox~\cite{Schmid-RSS-24,10218983}, and once the object settles, new observations reconstruct it.
+Motion seen in view and changes discovered against the retained map thus end in the same decisions.
 
 \subsection{Map Update}
 \label{sec:validity}
 
-A confirmed change alters both geometry and observation contributions.
-Earlier measurements may describe the old object or empty space now occupied by its replacement.
-We apply state intervals to both geometry and observations: ended geometry leaves the current map, and
-measurements contribute where they remain compatible. Unchanged surfaces accumulate further measurements.
+A decision helps only if the map follows it completely and without side effects. Removing only the part of
+the armchair that was seen through would leave its back in the map. The side effects come from earlier
+observations: the frames that saw the armchair would fuse it back, the free space they measured in front
+of the wall would erase the new sofa, and their keyframes would keep training Gaussians of a scene that no
+longer exists. These frames cannot simply be dropped, since they also measure the unchanged wall. Map
+update therefore acts on the geometry and on the observations.
 
 \paragraph{Applying changes to geometry.}
-A confirmed change concerns the associated state, including geometry outside the current view.
-Its elements therefore close their lifetimes together when the state ends. New observations reconstruct
-the successor, while continuing states accumulate geometry. The ended reconstruction remains in
-$\mathcal{M}(t)$ at earlier times, so updating the current map also preserves its history.
+A decision concerns the whole state, including geometry outside the current view, so all elements of the
+armchair close their lifetimes together, its unseen back included. New observations reconstruct the sofa
+and any successor, while continuing states keep accumulating geometry.
 
 \paragraph{Selecting observation contributions.}
-A depth measurement contributes both a surface and free-space evidence in front of it.
-If a chair is placed in front of a previously observed wall, the earlier wall measurement can still
-complete the wall, but its free-space contribution must stop before the new chair. We express this
-restriction as the observation's \emph{valid domain}. Pixels belonging to ended states are excluded
-from the current reconstruction. Other pixels retain their surface measurements, with free-space
-updates bounded by newly established object surfaces.
-Let observation $o$ have capture time $t_o$ and measured range $r_o$.
-For a point $x$ on its ray, define $\delta_o(x)=r_o-\rho_o(x)$, where $\rho_o(x)$ is the range of $x$.
-Let $\lambda_o$ be the first intersection with a current object state that began after $t_o$.
-With surface band $T$, the spatial domain is
+A depth measurement contributes a surface and free space in front of it. The earlier measurement of the
+wall can still complete the wall, but its free space must stop before the sofa, a restriction that we express
+as the observation's \emph{valid domain}. Let observation $o$ have capture time $t_o$ and measured range
+$r_o$; for a point $x$ on its ray, let $\rho_o(x)$ be its range and $\delta_o(x)=r_o-\rho_o(x)$. Let
+$\lambda_o$ be the first intersection with a current object state that began after $t_o$, or $\infty$ if
+there is none. With surface band $T$, the valid domain is
 \begin{equation}
 \begin{split}
 \Omega_o(t)=\{x:\;&\delta_o(x)>-T,\\
@@ -340,70 +331,40 @@ With surface band $T$, the spatial domain is
 \end{split}
 \label{eq:domain}
 \end{equation}
-We set $\lambda_o=\infty$ when there is no such intersection and $\Omega_o(t)=\varnothing$ for an excluded pixel.
-The surface band preserves measured geometry, while the free-space bound protects new surfaces from
-earlier observations. State changes revise the affected domains.
-
-Keyframe optimization follows the same condition. A frame captured at $t_k$ evaluates
-its loss on $\mathcal{M}(t_k)$ and updates compatible geometry. An earlier image of the chair
-constrains its earlier state, while measurements of the unchanged wall continue to constrain that wall.
-Frame selection, trainable geometry, and map-time selection jointly enforce this constraint.
-The current map uses only observations received by the current processing time.
+The surface band keeps the measured surface, while $\lambda_o$ stops earlier free space at newer objects.
+Pixels of ended states are excluded ($\Omega_o(t)=\varnothing$), and state changes revise the affected
+domains. Keyframes follow the same rule in time: a keyframe captured at $t_k$ evaluates its loss on
+$\mathcal{M}(t_k)$, the scene it actually saw. The image of the armchair thus keeps describing the
+armchair's earlier state, while its view of the wall still constrains the current wall.
 
 \paragraph{Retaining and replacing surfaces.}
 \label{sec:memory}
-Earlier maps also contain background surfaces and nearby copies displaced by depth or alignment errors.
-We retain unobserved regions and replace stale copies of surfaces reconstructed again.
-Support and see-through tests within observation domains determine which earlier elements remain.
-For an element at $x_e$, we count support and see-through observations within their valid domains, using
-$\tau_e=\max(h_e,\sigma(\rho_o(x_e)),\tau_{\min})$ as the depth tolerance.
-Here $h_e$ is the element's geometric support scale, $\sigma$ is the calibrated depth-residual scale, and
-$\tau_{\min}$ is a representation-specific minimum.
-Measurements within $\tau_e$ support the element; measurements farther behind it provide see-through evidence.
-Let $n_{\mathrm{sup}}$ and $n_{\mathrm{thr}}$ denote these counts. The retention decision is
-\begin{equation}
-K(e)=\begin{cases}
-  [n_{\mathrm{sup}}>n_{\mathrm{thr}}],&n_{\mathrm{sup}}\neq n_{\mathrm{thr}},\\
-  0,&n_{\mathrm{sup}}=n_{\mathrm{thr}},\ C(e),\\
-  1,&\text{otherwise}.
-\end{cases}
-\label{eq:continue}
-\end{equation}
-The local replacement condition $C(e)$ holds when a current surface lies just in front of $e$, within its surface band,
-with the same orientation. In a tied case, the current estimate replaces this older copy.
-The remaining geometry is retained, including unobserved regions. Occlusion alone contributes no evidence for removal.
+Background surfaces, such as a closed window sash, and copies displaced by depth or alignment errors have
+no state that could end, so earlier elements are also tested individually. An element is removed when
+see-through measurements within valid domains outnumber supporting ones, or, on a tie, when a current
+surface measured just in front of it with the same orientation replaces it; otherwise it remains. Such a
+surface is the same one measured again, so keeping the older copy would leave a duplicate behind it.
+Occlusion alone never removes geometry, so unobserved regions stay in the map.
 
 \paragraph{Continuing across visits.}
 \label{sec:handoff}
-We save the current map, element lifetimes, object-state summaries, and evidence statistics at the end of a visit.
-The next visit resumes from this state in the shared coordinate frame.
+At the end of a visit we save the map, element lifetimes, state summaries, and evidence statistics. The
+next visit resumes from them in the shared coordinate frame, so changes discovered on return pass through
+the same tests.
 
 \paragraph{Reconstruction in three representations.}
 \label{sec:representations}
-The same state decisions and observation domains determine the reconstruction in all three representations.
-TSDF fusion, Gaussian optimization, and occupancy integration realize these decisions as follows.
-
-\emph{TSDF.} We fuse signed-distance measurements within $\Omega_o(t)$, using the truncation band for $T$.
-When a domain changes, we rebuild affected voxel blocks from archived frames in observation order.
-The current mesh includes eligible earlier faces selected by \cref{eq:continue}. We use projective
-fusion~\cite{10.1145/237170.237269,6162880} with Khronos' active window, tracking, and
-object extraction~\cite{Schmid-RSS-24}.
-
-\emph{3D Gaussians.} Each keyframe renders $\mathcal{M}(t_k)$ and updates compatible geometry;
-ended Gaussians are frozen to preserve their historical reconstruction. Current-visit frames optimize
-new and revisited regions, while historical replay maintains earlier geometry outside the current
-coverage. These constraints also apply during final refinement. We use GaME's photometric and depth
-optimization~\cite{Yugay_2026_CVPR,10.1145/3592433} and FlashSplat for mask-to-Gaussian
-assignment~\cite{10.1007/978-3-031-72670-5_26}. Pruned historical Gaussians receive an end time and remain
-available to earlier queries.
-
-\emph{Occupancy.} Cells associated with an ended state leave the current map together. Where a newly
-measured object surface occupies a cell, the previous visit's free-space contribution is withdrawn
-before integration continues. The replacement condition $C(e)$ retires nearby stale copies, while
-eligible unobserved cells are retained. Measurements are integrated using wavemap's wavelet
-representation and clamped log odds~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
-% ===== END sec / 4_method =====
-% ===== BEGIN sec / 5_experiments =====
+Each representation keeps its own integration and applies the shared decisions wherever it uses
+observations. In TSDF maps, signed-distance measurements are fused only within $\Omega_o(t)$, with the
+truncation band as $T$, and blocks whose domains change are rebuilt from the stored frames; we build on
+projective fusion~\cite{10.1145/237170.237269,6162880} with the tracking and object extraction of
+Khronos~\cite{Schmid-RSS-24}. In Gaussian maps, each keyframe renders and trains $\mathcal{M}(t_k)$,
+and ended Gaussians are frozen so that earlier times keep their reconstruction; we use the photometric and
+depth optimization of GaME~\cite{Yugay_2026_CVPR,10.1145/3592433} and FlashSplat for mask-to-Gaussian
+assignment~\cite{10.1007/978-3-031-72670-5_26}. In occupancy maps, cells of an ended state leave the
+current map together, and where a newly measured object surface occupies a cell, the free-space
+contribution of the previous visit is withdrawn before integration continues; measurements are integrated
+with the wavelet representation and clamped log odds of wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 \section{Experiments}
 \label{sec:experiments}
 % Keep the expanded result figures close to their corresponding analyses.
@@ -448,7 +409,7 @@ Map & Method & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparro
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} F1 (\%, $\uparrow$). Geom.: final map at 5\,cm (Real C; Synthetic/Flat B); 3RScan averages rooms. Obj./Chg.: full-chain scores. Bold: best per representation. Shading: \ranklegend{} overall per column; ties share a rank.}
+\caption{\textbf{Dynamic mapping within and across visits.} F1 (\%). Geom.: final map at 5\,cm (Real C; Synthetic/Flat B); 3RScan averages rooms. Obj./Chg.: full-chain scores. Bold: best per representation. Shading: \ranklegend{} overall per column; ties share a rank.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -490,7 +451,7 @@ duration-weighted snapshots following Khronos~\cite{Schmid-RSS-24}; change F1 po
 3RScan averages geometry and object scores within rooms, then across rooms; events are pooled over all rooms.
 Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit, except its first, is held out.
 After global refinement, we measure PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR},
-and measured-depth L1; the compact rendering table reports PSNR. TESSE uses Khronos's official aggregation
+and the L1 error of rendered against measured depth. TESSE uses Khronos's official aggregation
 over map and query times~\cite{Schmid-RSS-24}, with a 5\,cm background tolerance and 0.5\,m object matching.
 
 \paragraph{Implementation.}
@@ -622,7 +583,7 @@ The final maps also reach higher geometry F1.
 \toprule
  & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} & \\
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}
-Scene & Method & Bg. & Obj. & Obj. & Chg. & Geom. \\ \midrule
+Scene & Method & Bg.$\uparrow$ & Obj.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ \\ \midrule
 Office & Khronos & \ranksecondcell{74.6} & \ranksecondcell{67.4} & \ranksecondcell{84.8} & \ranksecondcell{46.2} & \ranksecondcell{92.8} \\
  & \textbf{Ours (TSDF)} & \rankbestcell{76.1} & \rankbestcell{69.2} & \rankbestcell{96.7} & \rankbestcell{78.6} & \rankbestcell{94.1} \\
 \midrule
@@ -633,7 +594,7 @@ Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecon
 \sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
-\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%, $\uparrow$), using official temporal aggregation. Static: background/objects; Dynamic: moving objects/changes; Geom.: final map at 5\,cm. Ranking: \ranklegend{} per scene.}
+\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%), using official temporal aggregation. Static: background/objects; Dynamic: moving objects/changes; Geom.: final map at 5\,cm. Ranking: \ranklegend{} per scene.}
 \label{tab:tesse}
 \end{table}
 % ===== END tables / tesse =====
@@ -646,39 +607,42 @@ Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecon
 
 \paragraph{Geometry and changes.}
 The Gaussian map improves geometry, object F1, and change F1 on every dataset (\cref{tab:main}).
-Before refinement, geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 in the synthetic apartment.
+Geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 in the synthetic apartment.
 The corresponding reconstructions show fewer old-object remnants and duplicated surfaces
 (\cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / rendering =====
-% SRC: held-out PSNR after refinement; framewise SAM masks.
-% Flat ours 28.124652: flat_sam_5c5092b/ours/render_post_ref.json (completed run).
-% Aria ours: aria_16e2b03/{room0,room1}/ours/render_post_ref.json.
-% GaME: published Flat/room1 values; official local room0 reproduction.
+% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
 \begin{table}[t]
 \centering
 \fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{8pt}
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrr@{}}
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\def\resultrows{
 \toprule
- & \multicolumn{2}{c}{PSNR (dB)$\uparrow$} & \\
-\cmidrule(lr){2-3}
-Scene & GaME & Ours & Gain \\
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & GaME & \ranksecondcell{24.21} & \ranksecondcell{0.92} & \ranksecondcell{0.16} & \ranksecondcell{1.07} \\
+ & \textbf{Ours} & \rankbestcell{28.12} & \rankbestcell{0.96} & \rankbestcell{0.10} & \rankbestcell{0.39} \\
 \midrule
-Flat & \ranksecondcell{24.26}\textsuperscript{P} & \rankbestcell{28.12} & +3.86 \\
-Aria room0 & \ranksecondcell{31.55} & \rankbestcell{32.43} & +0.88 \\
-Aria room1 & \ranksecondcell{31.97}\textsuperscript{P} & \rankbestcell{33.39} & +1.42 \\
+Aria room0 & GaME & \ranksecondcell{31.55} & \ranksecondcell{0.95} & \ranksecondcell{0.15} & \rankbestcell{0.69} \\
+ & \textbf{Ours} & \rankbestcell{32.43} & \rankbestcell{0.96} & \rankbestcell{0.14} & \ranksecondcell{0.74} \\
+\midrule
+Aria room1 & GaME & \ranksecondcell{31.97} & \ranksecondcell{0.95} & \ranksecondcell{0.10} & \ranksecondcell{1.80} \\
+ & \textbf{Ours} & \rankbestcell{33.39} & \rankbestcell{0.97} & \rankbestcell{0.09} & \rankbestcell{1.17} \\
 \bottomrule
-\end{tabular*}
-\caption{\textbf{Sharper novel views after scene updates.} PSNR on held-out views of the final visit after global refinement. \textsuperscript{P}: published GaME results~\cite{Yugay_2026_CVPR}. Ranking: \ranklegend{} per scene.}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\caption{\textbf{Sharper novel views after scene updates.} Held-out views of the final visit; PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per scene.}
 \label{tab:rendering}
 \end{table}
 % ===== END tables / rendering =====
 
 \paragraph{Novel-view rendering.}
-Our Gaussian maps improve held-out PSNR on Flat and both Aria rooms (\cref{tab:rendering}).
-The gains are 3.86\,dB on Flat and 0.88--1.42\,dB on Aria. The reconstruction follows the changed scene
+Our Gaussian maps render the held-out views of Flat and both Aria rooms better than GaME in PSNR, MS-SSIM,
+and LPIPS (\cref{tab:rendering}). PSNR rises by 3.91\,dB on Flat and by 0.88--1.42\,dB on Aria, and depth L1
+falls from 1.07 to 0.39\,cm on Flat and from 1.80 to 1.17\,cm on room1. The reconstruction follows the changed scene
 while compatible observations continue to constrain the surrounding geometry. The ablations below
 isolate the contributions of geometry retirement and observation reuse.
 
@@ -761,39 +725,38 @@ use the Gaussian representation and are compared with their matched Full configu
 \renewcommand{\arraystretch}{1.08}
 \def\resultrows{
 \toprule
- & \multicolumn{3}{c}{F1 (pre)} & \multicolumn{2}{c}{Rendering (post)} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-6}
 Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
 \multicolumn{6}{@{}l}{\textbf{(a) Geometry retirement}} \\
-w/o retirement & \ranksecondcell{84.42} & \ranksecondcell{66.73} & \ranksecondcell{68.75} & \ranksecondcell{23.79} & \ranksecondcell{3.31} \\
-\textbf{Full} & \rankbestcell{90.00} & \rankbestcell{66.77} & \rankbestcell{83.33} & \rankbestcell{27.63} & \rankbestcell{0.48} \\
+w/o retirement & \ranksecondcell{84.4} & \ranksecondcell{66.7} & \ranksecondcell{68.8} & \ranksecondcell{23.79} & \ranksecondcell{3.31} \\
+\textbf{Full} & \rankbestcell{90.0} & \rankbestcell{66.8} & \rankbestcell{83.3} & \rankbestcell{27.63} & \rankbestcell{0.48} \\
 \midrule
 \multicolumn{6}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
-Unrestricted & 86.19 & \ranksecondcell{66.67} & \rankbestcell{83.33} & 22.69 & 3.66 \\
-Discard whole frames & \rankbestcell{89.95} & \rankbestcell{66.89} & \rankbestcell{83.33} & \rankbestcell{27.78} & \ranksecondcell{0.47} \\
-\textbf{Full} & \ranksecondcell{89.81} & 66.46 & \rankbestcell{83.33} & \ranksecondcell{27.77} & \rankbestcell{0.45} \\
+Unrestricted & 86.2 & \rankbestcell{66.7} & \rankbestcell{83.3} & 22.69 & 3.66 \\
+Discard whole frames & \ranksecondcell{89.6} & \ranksecondcell{66.6} & \rankbestcell{83.3} & \ranksecondcell{23.43} & \ranksecondcell{1.92} \\
+\textbf{Full} & \rankbestcell{89.8} & 66.5 & \rankbestcell{83.3} & \rankbestcell{27.77} & \rankbestcell{0.45} \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{lrrrrr}\resultrows\end{tabular}
-\caption{\textbf{Mechanism ablations on Flat.} Matched Full per block. Pre/post: before/after refinement. Units: F1 (\%), PSNR (dB), depth L1 (cm). In (b), policies apply during visit B and refinement. Ranking: \ranklegend{} per block; ties share a rank.}
+\caption{\textbf{Mechanism ablations on Flat.} Matched Full per block; F1 in \%, PSNR in dB, depth L1 in cm. In (b), policies apply during visit B and refinement. Ranking: \ranklegend{} per block; ties share a rank.}
 \label{tab:ablation_variants}
 \end{table}
 % ===== END tables / ablation =====
 
 \paragraph{Applying changes to geometry.}
-Withholding geometry retirement reduces geometry F1 by 5.58 points, change F1 by 14.58 points, and PSNR by
-3.84\,dB. The effect spans geometric and rendering quality: confirmed changes must be applied to the
+Withholding geometry retirement lowers geometry F1 from 90.0 to 84.4, change F1 from 83.3 to 68.8,
+and PSNR by 3.84\,dB. The effect spans geometric and rendering quality: confirmed changes must be applied to the
 stored reconstruction.
 
 \paragraph{Old-keyframe reuse.}
 We vary old-keyframe use during mapping and refinement: unrestricted reuse, whole-frame rejection,
 or selective reuse (Full). Unrestricted reuse reduces PSNR by 5.08\,dB and increases depth L1 from 0.45
-to 3.66\,cm. Geometry F1 falls by 3.62 points, while change F1 remains 83.33.
-Whole-frame rejection and Full reach 27.78 and 27.77\,dB on this extensively revisited scene;
-Full retains compatible observations.
+to 3.66\,cm. Geometry F1 falls from 89.8 to 86.2, while change F1 stays at 83.3.
+Whole-frame rejection, which drops every keyframe that observed a Gaussian ending later, as GaME's keyframe
+filtering does, lowers PSNR by 4.34\,dB while geometry and change F1 stay at 89.6 and 83.3: the rejected
+frames still held valid observations of the unchanged scene.
 
 \paragraph{Parameter sensitivity.}
 Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by at most one detected event.

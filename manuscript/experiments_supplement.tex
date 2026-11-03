@@ -72,6 +72,57 @@
 \maketitle
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
+% ===== BEGIN sec / method_details =====
+\section{Method Details}
+\label{sec:supp_method}
+
+\paragraph{Change decisions.}
+At round $i$, let $f_i=k_i/n_i$ be the fraction of the $n_i$ inspected reliable samples of state $s$ that
+are seen through. We model $f_i$ with a Beta density $p_s(f)$ estimated from in-place observations and use
+a uniform changed-state model; $\ell_s(f_i)$ is their one-sided log-likelihood ratio. In the Page statistic
+of the main paper, the weight $w_i(j)=\nu_i(j)/\nu_{\mathrm{rel}}$ divides the number $\nu_i(j)$ of reliable
+samples inspected for the first time since the candidate change time $j$ by the number $\nu_{\mathrm{rel}}$
+of all reliable samples of the state, so each sample contributes once per candidate window. Absence is
+confirmed when the score exceeds the decision threshold and see-through evidence outweighs support. Object
+and class persistence set revisit priors. Reliable surface samples and a depth tolerance account for
+measurement noise and reconstruction error.
+
+\paragraph{Retention test.}
+For an element at $x_e$, we count support and see-through observations within their valid domains, using
+$\tau_e=\max(h_e,\sigma(\rho_o(x_e)),\tau_{\min})$ as the depth tolerance. Here $h_e$ is the element's
+geometric support scale, $\sigma$ is the calibrated depth-residual scale, and $\tau_{\min}$ is a
+representation-specific minimum. Measurements within $\tau_e$ support the element; measurements farther
+behind it provide see-through evidence. Let $n_{\mathrm{sup}}$ and $n_{\mathrm{thr}}$ denote these counts.
+The retention decision is
+\begin{equation}
+K(e)=\begin{cases}
+  [n_{\mathrm{sup}}>n_{\mathrm{thr}}],&n_{\mathrm{sup}}\neq n_{\mathrm{thr}},\\
+  0,&n_{\mathrm{sup}}=n_{\mathrm{thr}},\ C(e),\\
+  1,&\text{otherwise}.
+\end{cases}
+\label{eq:supp_continue}
+\end{equation}
+The local replacement condition $C(e)$ holds when a current surface lies just in front of $e$, within its
+surface band, with the same orientation. In a tied case, the current estimate replaces this older copy.
+The remaining geometry is retained, including unobserved regions.
+
+\paragraph{Lifetimes and observation times.}
+Element lifetimes follow scene states and may begin before the elements are allocated. For keyframe
+optimization, frame selection, trainable geometry, and map-time selection jointly enforce that a keyframe
+captured at $t_k$ evaluates its loss on $\mathcal{M}(t_k)$. The current map uses only observations received
+by the current processing time.
+
+\paragraph{Representations.}
+\emph{TSDF.} When a valid domain changes, the affected voxel blocks are rebuilt from archived frames in
+observation order. The current mesh includes the earlier faces that pass the retention test. We use the
+active window, tracking, and object extraction of Khronos~\cite{Schmid-RSS-24}.
+\emph{3D Gaussians.} Current-visit frames optimize new and revisited regions, while historical replay
+maintains earlier geometry outside the current coverage. These constraints also apply during final
+refinement. Pruned historical Gaussians receive an end time and remain available to earlier queries.
+\emph{Occupancy.} The replacement condition $C(e)$ retires nearby stale copies, while eligible unobserved
+cells are retained.
+% ===== END sec / method_details =====
+
 % ===== BEGIN sec / 8_experiments_supplement =====
 \section{Datasets}
 
@@ -132,7 +183,7 @@ from scratch with our continuously updated maps.
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}l*{8}{r}@{}}
 \toprule
-& \multicolumn{3}{c}{Real} & \multicolumn{2}{c}{Synthetic} & \multicolumn{2}{c}{Flat} & 3RScan \\
+F1$\uparrow$ & \multicolumn{3}{c}{Real} & \multicolumn{2}{c}{Synthetic} & \multicolumn{2}{c}{Flat} & 3RScan \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
 Method & A & B & C & A & B & A & B & Mean \\ \midrule
 Khronos & 90.8 & 88.9 & 87.7 & 93.6 & 93.1 & 86.0 & 86.9 & 88.8 \\
@@ -146,7 +197,7 @@ wavemap & 87.2 & 81.2 & 84.5 & 92.2 & 93.2 & 79.5 & 80.2 & 75.6 \\
 Ours (Occ.) & 87.9 & 89.1 & 91.0 & 92.4 & 94.2 & 79.5 & 82.4 & 79.4 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Geometry at every visit.} F1 at 5\,cm (\%, $\uparrow$); 3RScan uses the room-wise averaging described in the text.}
+\caption{\textbf{Geometry at every visit.} F1 (\%) at 5\,cm; 3RScan uses the room-wise averaging described in the text.}
 \label{tab:supp_geometry}
 \end{table*}
 % ===== END tables / supp_geometry =====
@@ -315,7 +366,7 @@ reference and therefore differs from the historical background score.
 \begin{tabular}{@{}l*{9}{r}@{}}
 \toprule
 & \multicolumn{3}{c}{F1 ($\%$)} & \multicolumn{2}{c}{PSNR (dB)} & & & & Region \\
-Variant & Geom. & Obj. & Chg. & Pre & Post & MS-S & LPIPS & L1 & PSNR \\ \midrule
+Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Pre$\uparrow$ & Post$\uparrow$ & MS-S$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ & PSNR$\uparrow$ \\ \midrule
 \multicolumn{10}{@{}l}{\textit{Block a}} \\
 \rowcolor{oursbg!45}
 Full (a) & 90.00 & 66.77 & 83.33 & 23.78 & 27.63 & 0.947 & 0.117 & 0.48 & -- \\
@@ -330,7 +381,8 @@ w/o handover & 89.74 & 66.61 & 80.00 & 23.93 & 27.73 & 0.950 & 0.113 & 0.48 & --
 Full (b) & 89.81 & 66.46 & 83.33 & 23.95 & 27.77 & 0.950 & 0.115 & 0.45 & 28.13 \\
 Unrestricted old frames & 86.19 & 66.67 & 83.33 & 21.50 & 22.69 & 0.891 & 0.174 & 3.66 & 17.45 \\
 Unrestricted during refinement & 89.81 & 66.46 & 83.33 & 23.95 & 22.78 & 0.893 & 0.172 & 3.45 & 17.74 \\
-Discard conflicting frames & 89.95 & 66.89 & 83.33 & 23.83 & 27.78 & 0.949 & 0.118 & 0.47 & 28.05 \\
+Discard conflicting frames & 89.62 & 66.64 & 83.33 & 23.06 & 23.43 & 0.855 & 0.244 & 1.92 & 23.46 \\
+Discard conflicting frames of visit A & 89.95 & 66.89 & 83.33 & 23.83 & 27.78 & 0.949 & 0.118 & 0.47 & 28.05 \\
 Current-time map selection & 90.17 & 66.97 & 83.33 & 23.91 & 27.83 & 0.951 & 0.113 & 0.46 & 28.25 \\
 Geometric association & 89.95 & 66.84 & 83.33 & 23.89 & 28.14 & 0.951 & 0.113 & 0.45 & -- \\
 Odds threshold $9$ & 90.17 & 66.18 & 80.00 & 23.88 & 27.67 & 0.950 & 0.114 & 0.45 & -- \\
@@ -361,11 +413,12 @@ Within the object-scope variant, removing handover reduces geometry F1 from 89.7
 the inherited geometry in the full configuration.
 
 \paragraph{Old observations.}
-The main table compares three ways to use keyframes from visit A while mapping and refining visit B.
+The main table compares three ways to use earlier keyframes while mapping and refining visit B.
 Unrestricted reuse treats an earlier keyframe as a current one: it samples it without replay weights,
 supervises the current map on all pixels, and allows it to optimize currently alive Gaussians.
-Whole-frame rejection uses the same policy but excludes an earlier keyframe when at least 50 pixels
-observe geometry whose lifetime has ended; a rejected draw is replaced to keep the optimization budget.
+Whole-frame rejection follows GaME's keyframe filtering: a keyframe of either visit is dropped once it
+observes a Gaussian whose lifetime later ends, and a rejected draw is replaced to keep the optimization
+budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
 Unrestricted old-frame reuse reduces post-refinement PSNR by 5.08\,dB. Applying this change only during
@@ -373,7 +426,11 @@ refinement reduces PSNR by 4.99\,dB, with the same pre-refinement map and scores
 For a spatial view of this effect, we also report the existing changed-region PSNR evaluation: pixels whose
 reference depths differ by more than 10\,cm between visits, covering 14.2\% of held-out pixels.
 Full reaches 28.13\,dB on these pixels, compared with 17.45 for unrestricted reuse.
-Discarding conflicting frames reaches 27.78\,dB overall on this extensively revisited scene.
+Whole-frame rejection reaches 23.43\,dB overall and 23.46\,dB on the changed pixels, 4.34\,dB and 4.67\,dB
+below Full, while geometry, object, and change F1 stay close to Full: the dropped frames still held valid
+observations. Restricting the rejection to visit-A keyframes that observe at least 50 pixels of ended
+geometry reaches 27.78\,dB: the loss under whole-frame rejection comes mainly from the visit-B keyframes
+it discards.
 
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
