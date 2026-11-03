@@ -112,10 +112,10 @@ Objects move while a robot watches, while it looks elsewhere, and between visits
 changes must become part of one evolving map. Maintaining that map requires following what changes
 while preserving what remains, across both views and visits.
 
-Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over time~\cite{Schmid-RSS24-Khronos},
+Khronos introduced the first real-time system for metric-semantic reconstruction of a scene over time~\cite{Schmid-RSS-24},
 while GaME introduced the first mapping system with novel-view synthesis for evolving, long-term dynamic
-scenes~\cite{yugay2025gaussianmappingevolvingscenes}. wavemap combines state-of-the-art lossless occupancy compression with
-efficient multi-resolution integration~\cite{reijgwart2023wavemap}. Across these representations, the shared
+scenes~\cite{Yugay_2026_CVPR}. wavemap combines state-of-the-art lossless occupancy compression with
+efficient multi-resolution integration~\cite{Reijgwart-RSS-23}. Across these representations, the shared
 challenge is to reconcile new evidence with a reconstruction built from observations of an earlier scene.
 
 Scene changes create conflicts between otherwise accurate observations. An earlier image of a chair and
@@ -158,37 +158,37 @@ Our contributions are:
 \label{sec:related_work}
 
 \paragraph{Dynamic reconstruction.}
-Co-Fusion, MID-Fusion, and EM-Fusion track objects and reconstruct their geometry during motion~\cite{Runz_2017,
-xu2019midfusion,9010932}. DynaSLAM~II and DynoSAM jointly estimate camera and object
+Co-Fusion, MID-Fusion, and EM-Fusion track objects and reconstruct their geometry during motion~\cite{7989518,
+8794371,9010932}. DynaSLAM~II and DynoSAM jointly estimate camera and object
 motion~\cite{9385844,11288097}, while Dynablox detects objects entering observed free
 space~\cite{10218983}. Dynamic Gaussian and surface representations capture time-varying geometry for
-reconstruction and rendering~\cite{matsuki2025fourdtam,li2025fourdgsslam,li2026dynagslam}.
+reconstruction and rendering~\cite{Matsuki_2025_CVPR,Li_2025_ICCV,Li_2026_WACV}.
 We combine tracking and free-space motion cues with changes detected against the retained map.
 A single mechanism applies the resulting state changes.
 
 \paragraph{Updating evolving scenes.}
-Map maintenance has been studied for point clouds~\cite{6907397,8594310,kim2022ltmapper},
-TSDFs~\cite{fehr2017tsdfchange,schmid2022panoptic}, occupancy grids~\cite{hornung2013octomap,reijgwart2023wavemap},
-and Gaussians~\cite{yugay2025gaussianmappingevolvingscenes,cheng2025ltgaussian,zeng2025gaussianupdate,ackermann2025clsplats}.
+Map maintenance has been studied for point clouds~\cite{6907397,8594310,9811916},
+TSDFs~\cite{7989614,9811877}, occupancy grids~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23},
+and Gaussians~\cite{Yugay_2026_CVPR,11097624,Zeng_2025_ICCV,Ackermann_2025_ICCV}.
 Panoptic Multi-TSDFs maintains temporal consistency through object-centric volumetric
-submaps~\cite{schmid2022panoptic}.
+submaps~\cite{9811877}.
 POCD estimates object change and stationarity, and POV-SLAM couples this reasoning with pose
-estimation~\cite{QianChatrathPOCD,qian-rss23}. Khronos jointly models short-term motion and long-term changes
-in an online spatio-temporal metric-semantic map~\cite{Schmid-RSS24-Khronos}.
+estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos jointly models short-term motion and long-term changes
+in an online spatio-temporal metric-semantic map~\cite{Schmid-RSS-24}.
 GaME combines scene adaptation and keyframe management for Gaussian reconstruction and novel-view synthesis
-in evolving scenes~\cite{yugay2025gaussianmappingevolvingscenes}. wavemap efficiently integrates probabilistic occupancy evidence
-in a wavelet representation~\cite{reijgwart2023wavemap}.
+in evolving scenes~\cite{Yugay_2026_CVPR}. wavemap efficiently integrates probabilistic occupancy evidence
+in a wavelet representation~\cite{Reijgwart-RSS-23}.
 Scene-state intervals determine which geometry is present and which observations can update it.
 These decisions govern reconstruction in all three representations.
 
 \paragraph{Object association and scene history.}
 Object-based maps associate observations across time and visits. RIO re-localizes instances in changing
-scans~\cite{wald2019rio}; Living Scenes reconstructs objects from scans acquired at different
-times~\cite{zhu2023living}; ObVi-SLAM and OASIS-Map transfer or associate object landmarks across
-sessions~\cite{10423794,oh2026oasismap}. Other methods model the persistence of map content through
-occupancy transitions~\cite{meyerdelius2012changinggrid}, periodic changes~\cite{krajnik2017fremen}, or multiple
-appearance and disappearance hypotheses~\cite{saavedraruiz2025perpetua}. Khronos and CL-Splats also retain
-information about earlier scene states~\cite{Schmid-RSS24-Khronos,ackermann2025clsplats}.
+scans~\cite{9010673}; Living Scenes reconstructs objects from scans acquired at different
+times~\cite{Zhu_2024_CVPR}; ObVi-SLAM and OASIS-Map transfer or associate object landmarks across
+sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}. Other methods model the persistence of map content through
+occupancy transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodic changes~\cite{7878680}, or multiple
+appearance and disappearance hypotheses~\cite{11247086}. Khronos and CL-Splats also retain
+information about earlier scene states~\cite{Schmid-RSS-24,Ackermann_2025_ICCV}.
 We connect temporal scene reasoning to reconstruction: an object's state interval controls which geometry is
 current and which observations may update it. Stored intervals also support historical queries and later visits.
 % ===== END sec / 2_related_work =====
@@ -251,7 +251,7 @@ Object associations assign the evidence to a state.
 Each patch contributes according to its coverage, even when observed repeatedly.
 At round $i$, let $f_i=k_i/n_i$ be the fraction of inspected samples that are seen through.
 We model $f_i$ with a Beta density $p_s(f)$ estimated from in-place observations and use a uniform
-changed-state model. A Page statistic~\cite{page1954cusum} accumulates their one-sided log-likelihood ratio
+changed-state model. A Page statistic~\cite{11e3eed7-cdc6-3579-8127-4296922d24e9} accumulates their one-sided log-likelihood ratio
 $\ell_s(f_i)$ over candidate change times $j$, weighted by newly inspected surface coverage:
 \begin{equation}
 \begin{aligned}
@@ -271,7 +271,7 @@ A confirmed successor starts a new state and closes the previous one; unresolved
 Each state's observations reconstruct its geometry.
 
 We detect visible motion using object tracking and free-space cues from Khronos and
-Dynablox~\cite{Schmid-RSS24-Khronos,10218983}. Once the object settles, new observations reconstruct
+Dynablox~\cite{Schmid-RSS-24,10218983}. Once the object settles, new observations reconstruct
 its geometry. Observed motion and changes discovered against the retained map lead to the same updates.
 
 \subsection{Map Update}
@@ -352,22 +352,22 @@ TSDF fusion, Gaussian optimization, and occupancy integration realize these deci
 \emph{TSDF.} We fuse signed-distance measurements within $\Omega_o(t)$, using the truncation band for $T$.
 When a domain changes, we rebuild affected voxel blocks from archived frames in observation order.
 The current mesh includes eligible earlier faces selected by \cref{eq:continue}. We use projective
-fusion~\cite{curless1996volumetric,newcombe2011kinectfusion} with Khronos' active window, tracking, and
-object extraction~\cite{Schmid-RSS24-Khronos}.
+fusion~\cite{10.1145/237170.237269,6162880} with Khronos' active window, tracking, and
+object extraction~\cite{Schmid-RSS-24}.
 
 \emph{3D Gaussians.} Each keyframe renders $\mathcal{M}(t_k)$ and updates compatible geometry;
 ended Gaussians are frozen to preserve their historical reconstruction. Current-visit frames optimize
 new and revisited regions, while historical replay maintains earlier geometry outside the current
 coverage. These constraints also apply during final refinement. We use GaME's photometric and depth
-optimization~\cite{yugay2025gaussianmappingevolvingscenes,kerbl2023gaussians} and FlashSplat for mask-to-Gaussian
-assignment~\cite{shen2024flashsplat}. Pruned historical Gaussians receive an end time and remain
+optimization~\cite{Yugay_2026_CVPR,10.1145/3592433} and FlashSplat for mask-to-Gaussian
+assignment~\cite{10.1007/978-3-031-72670-5_26}. Pruned historical Gaussians receive an end time and remain
 available to earlier queries.
 
 \emph{Occupancy.} Cells associated with an ended state leave the current map together. Where a newly
 measured object surface occupies a cell, the previous visit's free-space contribution is withdrawn
 before integration continues. The replacement condition $C(e)$ retires nearby stale copies, while
 eligible unobserved cells are retained. Measurements are integrated using wavemap's wavelet
-representation and clamped log odds~\cite{reijgwart2023wavemap,hornung2013octomap}.
+representation and clamped log odds~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 % ===== END sec / 4_method =====
 % ===== BEGIN sec / 5_experiments =====
 \section{Experiments}
@@ -430,17 +430,17 @@ poses and annotated object changes; Synthetic provides ground-truth poses, label
 scene geometry. Each method maintains one map throughout the visit chain.
 
 \paragraph{Public datasets.}
-Flat~\cite{schmid2022panoptic} comprises two synthetic RGB-D recordings with object rearrangements;
-3RScan~\cite{wald2019rio} provides repeated scans of real indoor environments. We use Flat and eight
+Flat~\cite{9811877} comprises two synthetic RGB-D recordings with object rearrangements;
+3RScan~\cite{9010673} provides repeated scans of real indoor environments. We use Flat and eight
 3RScan room chains to evaluate cross-visit updates. Khronos's TESSE Apartment and Office
-sequences~\cite{Schmid-RSS24-Khronos} combine observed motion and changes discovered during a continuous
+sequences~\cite{Schmid-RSS-24} combine observed motion and changes discovered during a continuous
 mapping run. We use them for evaluation under its official 4D protocol.
 
 \paragraph{Baselines.}
-We compare against GaME~\cite{yugay2025gaussianmappingevolvingscenes} for Gaussian mapping of evolving scenes,
-Khronos~\cite{Schmid-RSS24-Khronos} for spatio-temporal metric-semantic mapping, and
-wavemap~\cite{reijgwart2023wavemap} for efficient probabilistic occupancy mapping.
-Panoptic Multi-TSDFs~\cite{schmid2022panoptic} provides an additional object-centric TSDF baseline.
+We compare against GaME~\cite{Yugay_2026_CVPR} for Gaussian mapping of evolving scenes,
+Khronos~\cite{Schmid-RSS-24} for spatio-temporal metric-semantic mapping, and
+wavemap~\cite{Reijgwart-RSS-23} for efficient probabilistic occupancy mapping.
+Panoptic Multi-TSDFs~\cite{9811877} provides an additional object-centric TSDF baseline.
 Methods process the same posed sequences and carry maps across visits; the TESSE evaluation compares TSDF
 reconstructions with Khronos.
 
@@ -765,7 +765,7 @@ Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by 
 Fixed priors give similar results.
 
 \paragraph{Predicted segmentation.}
-OneFormer~\cite{jain2023oneformer} predictions retain 89.89 geometry F1 and 27.56\,dB PSNR,
+OneFormer~\cite{Jain_2023_CVPR} predictions retain 89.89 geometry F1 and 27.56\,dB PSNR,
 while object and change F1 reflect segmentation errors (\cref{tab:ablation_variants}).
 
 \paragraph{Computational cost.}

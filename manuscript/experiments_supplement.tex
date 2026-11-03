@@ -79,7 +79,7 @@
 We record three Azure Kinect visits to one room over nearly two weeks, capturing motion during mapping
 and changes between visits. The visits contain 4,003, 4,041, and 7,216 RGB-D frames (15,260 total) at
 1920$\times$1080 and 30\,Hz. Depth is aligned to RGB; camera poses are estimated with
-ORB-SLAM3~\cite{campos2021orbslam3}. We register visits B and C to A using landmark correspondences,
+ORB-SLAM3~\cite{9440682}. We register visits B and C to A using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review,
 with ADE20K classes and 17 persistent object IDs. People are labeled dynamic, and object changes
 are annotated over time by hand. A surface reconstructed at 1\,cm resolution within the room
@@ -94,18 +94,18 @@ meshes recover scene geometry at each timestamp. Changes occur within and across
 visit covers part of the scene, supporting evaluation of retained map completeness.
 
 \paragraph{Flat.}
-Flat was introduced with Panoptic Multi-TSDFs~\cite{schmid2022panoptic}. It contains two RGB-D trajectories
+Flat was introduced with Panoptic Multi-TSDFs~\cite{9811877}. It contains two RGB-D trajectories
 through a simulated apartment, with eight objects moved, five added, and four removed between the runs.
 We process them as consecutive visits and evaluate against the provided geometry and object annotations.
 This controlled cross-visit setting is also used for the Gaussian ablations.
 
 \paragraph{3RScan.}
-3RScan~\cite{wald2019rio} contains repeated RGB-D scans of indoor environments with aligned reconstructions
+3RScan~\cite{9010673} contains repeated RGB-D scans of indoor environments with aligned reconstructions
 and object-instance annotations across rescans. We evaluate eight room chains, maintaining the map
 across successive scans in each room. The rescans test object rearrangement under changing coverage.
 
 \paragraph{TESSE.}
-We use the Apartment and Office sequences released with Khronos~\cite{Schmid-RSS24-Khronos}. They combine
+We use the Apartment and Office sequences released with Khronos~\cite{Schmid-RSS-24}. They combine
 moving objects and longer-term object changes during continuous robot trajectories, including revisits
 to previously observed areas. Their scene annotations support Khronos's official evaluation of
 background, static objects, dynamics, and changes over map and query times. We use this protocol for
@@ -217,14 +217,14 @@ For 3RScan, evaluation images are 480$\times$270 for both Gaussian methods. In t
 uses 240$\times$135 inputs to fit memory; evaluation remains at 480$\times$270.
 
 \paragraph{Rendering.}
-Following GaME~\cite{yugay2025gaussianmappingevolvingscenes}, every tenth frame of the final visit is held out, except the first frame.
+Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit is held out, except the first frame.
 PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and measured-depth L1 are averaged over held-out frames.
 The 3RScan result is the mean over the final visit of each of eight rooms. Gaussian geometry uses the
 pre-refinement map; the rendering table uses the map after global refinement. The main benchmark and the
 controlled Flat ablations retain their respective full-run results.
 
 \paragraph{Integration settings.}
-The common surface test uses a 5\,cm tolerance, a $60^\circ$ incidence limit~\cite{nguyen2012kinect}, and threshold $\ln 99$.
+The common surface test uses a 5\,cm tolerance, a $60^\circ$ incidence limit~\cite{6375037}, and threshold $\ln 99$.
 Each depth image requires at least $\min(30,\nu_{\mathrm{rel}})$ judged samples. The successor displacement
 threshold is 10\,cm. Our TSDF uses 5\,cm voxels and a 10\,cm truncation band, Gaussian surface tests use a
 5\,cm tolerance floor, and occupancy uses 5\,cm cells. These settings are shared across the reported datasets.
@@ -288,7 +288,7 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
 % ===== END tables / supp_single =====
 
 \paragraph{TESSE.}
-We use the office and apartment sequences released with Khronos~\cite{Schmid-RSS24-Khronos}. Both methods use
+We use the office and apartment sequences released with Khronos~\cite{Schmid-RSS-24}. Both methods use
 5\,cm voxels. The official evaluator queries each saved map at preceding scene times and aggregates background,
 static-object, dynamic-object, and change scores. \Cref{tab:supp_tesse} reports its precision, recall, and F1
 outputs separately. We use a 5\,cm background matching tolerance; the original Khronos paper reports a
@@ -390,7 +390,7 @@ settings each miss one additional event. These experiments use the same reconstr
 as the main evaluation.
 
 \paragraph{Predicted masks.}
-OneFormer~\cite{jain2023oneformer} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
+OneFormer~\cite{Jain_2023_CVPR} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
 Predicted instances are associated across frames before reconstruction.
 Geometry F1 changes from 89.81 to 89.89 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
 change F1 to 72.73, with three additional missed events and no false positives. The map remains geometrically
