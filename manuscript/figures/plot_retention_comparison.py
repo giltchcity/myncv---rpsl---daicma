@@ -10,10 +10,13 @@ r=Path(__file__).resolve().parent
 data=json.loads((r/'retention_comparison_data.json').read_text())
 plt.rcParams.update({'font.family':'DejaVu Sans','font.size':7.2,'axes.linewidth':.5,
                      'pdf.fonttype':42,'ps.fonttype':42,'svg.fonttype':'none'})
-fig,axs=plt.subplots(1,2,figsize=(3.25,1.82),sharey=True)
-fig.subplots_adjust(left=.19,right=.97,top=.70,bottom=.18,wspace=.25)
+METRICS=['F1']   # the paper reports no metric finer than F1
+fig,axs=plt.subplots(1,len(METRICS),figsize=(3.25,1.5),sharey=True,squeeze=False)
+axs=axs[0]
+fig.subplots_adjust(left=.19,right=.97,top=.66,bottom=.2,wspace=.25)
 ys=np.array([2,1,0]);gold='#997510';gray='#7b838a'
-for ax,(metric,values) in zip(axs,data.items()):
+for ax,metric in zip(axs,METRICS):
+    values=data[metric]
     ax.set_xlim(70,102);ax.set_ylim(-.72,2.5)
     for x in [70,80,90,100]:ax.axvline(x,color='#ededed',lw=.5,zorder=0)
     for i,y in enumerate(ys):
