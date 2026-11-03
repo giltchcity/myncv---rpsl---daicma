@@ -167,8 +167,7 @@ the TSDF comparison with Khronos's official evaluation code.
 \paragraph{Visit chains and geometry.}
 The real room contains visits A, B, and C; the simulated apartment and Flat contain visits A and B.
 Each method continues through the chain using its own map updates. Panoptic Multi-TSDFs loads the preceding
-visit's map through its native interface. Geometry is evaluated at the end of each visit, before global
-refinement of Gaussian maps. The real-room reference is a reconstructed surface at 1\,cm resolution,
+visit's map through its native interface. We evaluate mesh F1 at the end of each visit. The real-room reference is a reconstructed surface at 1\,cm resolution,
 restricted to the room. The synthetic reference consists of ground-truth surfaces observed up to the evaluation
 time. Thus the reference includes previously observed regions that the current visit does not see.
 \Cref{tab:supp_geometry} reports every visit; \cref{tab:supp_restart} additionally compares native maps rebuilt
@@ -197,7 +196,7 @@ wavemap & 87.2 & 81.2 & 84.5 & 92.2 & 93.2 & 79.5 & 80.2 & 75.6 \\
 Ours (Occ.) & 87.9 & 89.1 & 91.0 & 92.4 & 94.2 & 79.5 & 82.4 & 79.4 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Geometry at every visit.} F1 (\%) at 5\,cm; 3RScan uses the room-wise averaging described in the text.}
+\caption{\textbf{Mesh F1 at each visit.} F1 (\%) at 5\,cm; 3RScan uses the room-wise averaging described in the text.}
 \label{tab:supp_geometry}
 \end{table*}
 % ===== END tables / supp_geometry =====
@@ -270,9 +269,7 @@ uses 240$\times$135 inputs to fit memory; evaluation remains at 480$\times$270.
 \paragraph{Rendering.}
 Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit is held out, except the first frame.
 PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and measured-depth L1 are averaged over held-out frames.
-The 3RScan result is the mean over the final visit of each of eight rooms. Gaussian geometry uses the
-pre-refinement map; the rendering table uses the map after global refinement. The main benchmark and the
-controlled Flat ablations retain their respective full-run results.
+The 3RScan result is the mean over the final visit of each of eight rooms.
 
 \paragraph{Integration settings.}
 The common surface test uses a 5\,cm tolerance, a $60^\circ$ incidence limit~\cite{6375037}, and threshold $\ln 99$.
@@ -291,7 +288,7 @@ threshold is 10\,cm. Our TSDF uses 5\,cm voxels and a 10\,cm truncation band, Ga
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}ll*{13}{r}@{}}
 \toprule
-& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Geometry \\
+& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Mesh \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
 Scene & Method & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 & F1 \\ \midrule
 Office & Khronos & 93.8 & 66.0 & 74.6 & 99.3 & 57.0 & 69.0 & 97.3 & 75.5 & 84.8 & 9.2 & 49.3 & 43.6 & 92.8 \\
@@ -301,7 +298,7 @@ Apartment & Khronos & 91.9 & 69.0 & 78.0 & 96.7 & 38.8 & 55.9 & 95.7 & 76.2 & 85
  & Ours & 96.5 & 69.3 & 79.9 & 96.7 & 46.7 & 63.3 & 94.9 & 94.0 & 95.1 & 93.3 & 59.2 & 92.7 & 88.1 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Full TESSE evaluation.} Precision, recall, and F1 are official query-aggregated percentages. Final geometry uses F1 at 5\,cm.}
+\caption{\textbf{Full TESSE evaluation.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
 \label{tab:supp_tesse}
 \end{table*}
 % ===== END tables / supp_tesse =====
@@ -314,7 +311,7 @@ Apartment & Khronos & 91.9 & 69.0 & 78.0 & 96.7 & 38.8 & 55.9 & 95.7 & 76.2 & 85
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}ll*{13}{r}@{}}
 \toprule
-& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Geometry \\
+& & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Mesh \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
 Scene & Method & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 & F1 \\ \midrule
 Real A & Khronos & 88.7 & 76.2 & 80.6 & 99.0 & 90.6 & 94.3 & 0.0 & 0.0 & -- & 6.9 & 98.8 & 54.2 & 90.9 \\
@@ -333,7 +330,7 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
  & Ours & 98.5 & 64.1 & 77.1 & 74.0 & 84.7 & 77.9 & 99.9 & 57.5 & 73.9 & 75.7 & 32.4 & 59.2 & 89.9 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Independent single-visit runs.} Precision, recall, and F1 are official query-aggregated percentages. Final geometry uses F1 at 5\,cm.}
+\caption{\textbf{Independent single-visit runs.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
 \label{tab:supp_single}
 \end{table*}
 % ===== END tables / supp_single =====
@@ -342,16 +339,15 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
 We use the office and apartment sequences released with Khronos~\cite{Schmid-RSS-24}. Both methods use
 5\,cm voxels. The official evaluator queries each saved map at preceding scene times and aggregates background,
 static-object, dynamic-object, and change scores. \Cref{tab:supp_tesse} reports its precision, recall, and F1
-outputs separately. We use a 5\,cm background matching tolerance; the original Khronos paper reports a
-20\,cm tolerance. Our background export includes current and historical object geometry, matching the geometry
-included in the Khronos background mesh. Final-map geometry is reported separately from the 4D aggregate.
+outputs separately. We use a 5\,cm background matching tolerance, and our background export includes current and historical
+object geometry, as the Khronos background mesh does.
 
 \paragraph{Independent visits.}
 \Cref{tab:supp_single} evaluates each real and synthetic visit from an empty map. The reference state sequence
 is restricted to that visit: objects present at its start are initially present, and changes between visits are
 excluded from its event set. Dynamic references are people in the real sequences and objects moved in front
 of the camera in the synthetic sequences. Background, static objects, dynamics, and changes use the same
-official query aggregation as TESSE. The final geometry column compares the last map with that visit's surface
+official query aggregation as TESSE. The mesh F1 column compares the last map with that visit's surface
 reference and therefore differs from the historical background score.
 
 \section{Complete Ablations}
@@ -363,52 +359,49 @@ reference and therefore differs from the historical background score.
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{2.7pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}l*{9}{r}@{}}
+\begin{tabular}{@{}l*{7}{r}@{}}
 \toprule
-& \multicolumn{3}{c}{F1 ($\%$)} & \multicolumn{2}{c}{PSNR (dB)} & & & & Region \\
-Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Pre$\uparrow$ & Post$\uparrow$ & MS-S$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ & PSNR$\uparrow$ \\ \midrule
-\multicolumn{10}{@{}l}{\textit{Block a}} \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+\multicolumn{8}{@{}l}{\textit{Block a}} \\
 \rowcolor{oursbg!45}
-Full (a) & 90.00 & 66.77 & 83.33 & 23.78 & 27.63 & 0.947 & 0.117 & 0.48 & -- \\
-w/o change decisions & 84.42 & 66.73 & 68.75 & 21.91 & 23.79 & 0.912 & 0.156 & 3.31 & -- \\
-Object scope, no handover & 84.36 & 66.80 & 68.75 & 21.92 & 23.68 & 0.910 & 0.158 & 3.32 & -- \\
-Object scope & 89.70 & 66.91 & 83.33 & 23.85 & 27.46 & 0.947 & 0.117 & 0.53 & -- \\
-Local-surface scope & 89.60 & 66.56 & 80.00 & 23.92 & 27.88 & 0.950 & 0.114 & 0.48 & -- \\
-w/o handover & 89.74 & 66.61 & 80.00 & 23.93 & 27.73 & 0.950 & 0.113 & 0.48 & -- \\
+Full (a) & 90.0 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
+Changes not applied & 84.4 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
+Object scope, no handover & 84.4 & 66.8 & 68.8 & 23.68 & 0.91 & 0.16 & 3.32 \\
+Object scope & 89.7 & 66.9 & 83.3 & 27.46 & 0.95 & 0.12 & 0.53 \\
+Local-surface scope & 89.6 & 66.6 & 80.0 & 27.88 & 0.95 & 0.11 & 0.48 \\
+w/o handover & 89.7 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
 \midrule
-\multicolumn{10}{@{}l}{\textit{Block b}} \\
+\multicolumn{8}{@{}l}{\textit{Block b}} \\
 \rowcolor{oursbg!45}
-Full (b) & 89.81 & 66.46 & 83.33 & 23.95 & 27.77 & 0.950 & 0.115 & 0.45 & 28.13 \\
-Unrestricted old frames & 86.19 & 66.67 & 83.33 & 21.50 & 22.69 & 0.891 & 0.174 & 3.66 & 17.45 \\
-Unrestricted during refinement & 89.81 & 66.46 & 83.33 & 23.95 & 22.78 & 0.893 & 0.172 & 3.45 & 17.74 \\
-Discard conflicting frames & 89.62 & 66.64 & 83.33 & 23.06 & 23.43 & 0.855 & 0.244 & 1.92 & 23.46 \\
-Discard conflicting frames of visit A & 89.95 & 66.89 & 83.33 & 23.83 & 27.78 & 0.949 & 0.118 & 0.47 & 28.05 \\
-Current-time map selection & 90.17 & 66.97 & 83.33 & 23.91 & 27.83 & 0.951 & 0.113 & 0.46 & 28.25 \\
-Geometric association & 89.95 & 66.84 & 83.33 & 23.89 & 28.14 & 0.951 & 0.113 & 0.45 & -- \\
-Odds threshold $9$ & 90.17 & 66.18 & 80.00 & 23.88 & 27.67 & 0.950 & 0.114 & 0.45 & -- \\
-Odds threshold $999$ & 90.07 & 66.22 & 83.33 & 23.88 & 27.81 & 0.950 & 0.113 & 0.46 & -- \\
-Fixed prior $q=1/4$ & 90.09 & 66.20 & 80.00 & 23.88 & 27.75 & 0.950 & 0.115 & 0.46 & -- \\
-Fixed prior $q=1/2$ & 89.88 & 66.61 & 83.33 & 23.91 & 27.85 & 0.951 & 0.112 & 0.46 & -- \\
-Fixed prior $q=3/4$ & 90.05 & 66.54 & 80.00 & 23.87 & 27.78 & 0.949 & 0.114 & 0.46 & -- \\
-Predicted masks & 89.89 & 42.17 & 72.73 & 23.91 & 27.56 & 0.948 & 0.117 & 0.50 & -- \\
+Full (b) & 89.8 & 66.5 & 83.3 & 27.77 & 0.95 & 0.12 & 0.45 \\
+Unrestricted old frames & 86.2 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
+Unrestricted during refinement & 89.8 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
+Discard conflicting frames & 89.6 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
+Discard conflicting frames of visit A & 90.0 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
+Current-time map selection & 90.2 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
+Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
+Odds threshold $9$ & 90.2 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
+Odds threshold $999$ & 90.1 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
+Fixed prior $q=1/4$ & 90.1 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
+Fixed prior $q=1/2$ & 89.9 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
+Fixed prior $q=3/4$ & 90.1 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
+Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Complete Flat ablations.} Two experiment blocks retain their own Full reference. Pre/Post denote PSNR before/after refinement. Region PSNR uses the changed pixels defined in the text; -- indicates an unreported value.}
+\caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm.}
 \label{tab:supp_ablations}
 \end{table*}
 % ===== END tables / supp_ablations =====
 
-All ablations use Flat A$\rightarrow$B and the Gaussian representation. \Cref{tab:supp_ablations} preserves the
-matched Full for each experiment block: block (a) studies decisions and cross-visit handover, while block (b)
-studies observation reuse, association, thresholds, priors, and segmentation. Geometry and scene-change
-metrics are evaluated before refinement; Pre and Post are rendering PSNR before and after refinement.
-The two Full runs are reported independently.
+All ablations use Flat A$\rightarrow$B and the Gaussian representation. Block (a) of \cref{tab:supp_ablations}
+studies decisions and cross-visit handover, and block (b) studies observation reuse, association, thresholds,
+priors, and segmentation.
 
 \paragraph{Decision scope and handover.}
 The object and local-surface variants restrict the application scope of the same change rule.
 Both recover most of the full result on Flat. Removing cross-visit state handover with all rules active changes
-geometry F1 from 90.00 to 89.74 and change F1 from 83.33 to 80.00.
-Within the object-scope variant, removing handover reduces geometry F1 from 89.70 to 84.36 and change F1 from
+mesh F1 from 90.00 to 89.74 and change F1 from 83.33 to 80.00.
+Within the object-scope variant, removing handover reduces mesh F1 from 89.70 to 84.36 and change F1 from
 83.33 to 68.75. Handover carries earlier object states into later decisions; local-surface tests also act on
 the inherited geometry in the full configuration.
 
@@ -421,12 +414,9 @@ observes a Gaussian whose lifetime later ends, and a rejected draw is replaced t
 budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
-Unrestricted old-frame reuse reduces post-refinement PSNR by 5.08\,dB. Applying this change only during
-refinement reduces PSNR by 4.99\,dB, with the same pre-refinement map and scores as Full.
-For a spatial view of this effect, we also report the existing changed-region PSNR evaluation: pixels whose
-reference depths differ by more than 10\,cm between visits, covering 14.2\% of held-out pixels.
-Full reaches 28.13\,dB on these pixels, compared with 17.45 for unrestricted reuse.
-Whole-frame rejection reaches 23.43\,dB overall and 23.46\,dB on the changed pixels, 4.34\,dB and 4.67\,dB
+Unrestricted old-frame reuse reduces PSNR by 5.08\,dB, and applying it only during refinement reduces PSNR
+by 4.99\,dB.
+Whole-frame rejection reaches 23.43\,dB, 4.34\,dB
 below Full, while geometry, object, and change F1 stay close to Full: the dropped frames still held valid
 observations. Restricting the rejection to visit-A keyframes that observe at least 50 pixels of ended
 geometry reaches 27.78\,dB: the loss under whole-frame rejection comes mainly from the visit-B keyframes
@@ -435,13 +425,13 @@ it discards.
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
 selection and trainable-element restrictions. It yields 27.83\,dB, compared with 27.77 for Full.
-The geometry-only association variant yields 89.95 geometry F1 and 28.14\,dB. These diagnostics retain the
+The geometry-only association variant yields 89.95 mesh F1 and 28.14\,dB. These diagnostics retain the
 other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
 constraints as a whole.
 
 \paragraph{Thresholds and priors.}
-The decision threshold is $\ln\eta$ with $\eta\in\{9,99,999\}$. Across these settings, geometry F1 varies by
-0.36 points and post-refinement PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
+The decision threshold is $\ln\eta$ with $\eta\in\{9,99,999\}$. Across these settings, mesh F1 varies by
+0.36 points and PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
 reconstruction scores to the learned prior. The $q=1/2$ setting matches Full's change F1; the other fixed
 settings each miss one additional event. These experiments use the same reconstruction and event metrics
 as the main evaluation.
@@ -449,12 +439,12 @@ as the main evaluation.
 \paragraph{Predicted masks.}
 OneFormer~\cite{Jain_2023_CVPR} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
 Predicted instances are associated across frames before reconstruction.
-Geometry F1 changes from 89.81 to 89.89 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
+Mesh F1 changes from 89.81 to 89.89 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
 change F1 to 72.73, with three additional missed events and no false positives. The map remains geometrically
 accurate while object-level evaluation reflects segmentation errors.
 
 \paragraph{Time and memory.}
-On an RTX 5070 Ti with 16\,GB, the measured Flat run takes 2,898\,s for mapping and refinement, compared with
+On an RTX 5070 Ti with 16\,GB, the Flat run takes 2,898\,s for mapping and refinement, compared with
 2,647\,s for GaME. Peak memory is 6.6 versus 5.9\,GB; mapping throughput is 0.50 versus 0.49 frames/s.
 The current map contains 2.33 million Gaussians, compared with 2.37 million for GaME. Including historical
 states gives approximately 2.60 million Gaussians.

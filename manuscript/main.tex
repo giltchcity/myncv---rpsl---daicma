@@ -142,8 +142,8 @@ states remain queryable, a combination that none of the compared systems offers 
 
 We collect a real and synthetic RGB-D benchmark in which changes within and across visits occur in one map,
 while Flat and 3RScan extend the cross-visit evaluation. On all four datasets, every representation
-outperforms its native counterpart in geometry, object, and change F1 (\cref{tab:main}). On Khronos's TESSE
-sequences, change F1 rises from 46.2 to 78.6 and from 38.6 to 92.6. Retaining valid geometry raises F1 by
+outperforms its native counterpart in mesh, object, and change F1 scores (\cref{tab:main}). On Khronos's TESSE
+sequences, change F1 rises from 46.2 to 78.6 and from 38.6 to 92.6. Retaining valid geometry raises mesh F1 by
 up to 12.6 points over rebuilding on partial revisits, and our Gaussian maps render 0.88--3.91\,dB higher
 PSNR than GaME on the Flat and Aria scenes it uses.
 
@@ -160,29 +160,30 @@ Our contributions are:
 \end{samepage}
 
 % ===== BEGIN tables / capabilities =====
-\begin{table}[t]
+\begin{table*}[t]
 \centering
-\fontsize{7.5}{9}\selectfont
-\setlength{\tabcolsep}{1.6pt}
-\renewcommand{\arraystretch}{1.08}
+\fontsize{8.5}{10}\selectfont
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.18}
 \def\capyes{$\surd$}\def\cappart{$\circ$}\def\capno{--}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lllcccccc@{}}
+\def\caprows{
 \toprule
- & & & \multicolumn{3}{c}{Changes} & & & \\
-\cmidrule(lr){4-6}
-Method & Map & Masks & View & Away & Visit & Obs. & 4D & NVS \\
+Method & Representation & Masks & \shortstack{Observed\\motion} & \shortstack{Changes after\\looking away} & \shortstack{Changes\\across visits} & \shortstack{Observation\\filtering} & \shortstack{Historical\\queries} & \shortstack{Novel-view\\synthesis} \\
 \midrule
 Panoptic~\cite{9811877} & TSDF & Panoptic & \capno & \capyes & \capyes & \cappart & \cappart & \capno \\
-Khronos~\cite{Schmid-RSS-24} & TSDF & Inst./Sem./SAM & \capyes & \capyes & \cappart & \capno & \capyes & \capno \\
+Khronos~\cite{Schmid-RSS-24} & TSDF & \shortstack{Instance /\\Semantic / SAM} & \capyes & \capyes & \cappart & \capno & \capyes & \capno \\
 GaME~\cite{Yugay_2026_CVPR} & 3DGS & SAM & \capno & \capyes & \cappart & \capyes & \capno & \capyes \\
-wavemap~\cite{Reijgwart-RSS-23} & Occ. & \capno & \cappart & \cappart & \cappart & \capno & \capno & \capno \\
+wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \capno & \cappart & \cappart & \cappart & \capno & \capno & \capno \\
 \midrule
-\textbf{Ours} & All three & Inst./Sem./SAM & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes \\
+\textbf{Ours} & \shortstack{TSDF / 3DGS /\\Occupancy} & \shortstack{Instance /\\Semantic / SAM} & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes \\
 \bottomrule
-\end{tabular*}
-\caption{\textbf{Only \ours handles every kind of change in all three representations.} View, Away, Visit: changes observed in view, after looking away, or on a later visit; Obs.: limits earlier observations; 4D: queries of earlier times; NVS: novel views; $\surd$ supported, $\circ$ partial or indirect.}
+}
+\sbox0{\begin{tabular}{lllcccccc}\caprows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/18\relax}
+\begin{tabular}{lllcccccc}\caprows\end{tabular}
+\caption{\textbf{Comparison of mapping capabilities.} $\surd$: supported; $\circ$: partially supported; --: not supported.}
 \label{tab:capabilities}
-\end{table}
+\end{table*}
 % ===== END tables / capabilities =====
 % ===== END sec / 1_intro =====
 % ===== BEGIN sec / 2_related_work =====
@@ -373,10 +374,6 @@ with the wavelet representation and clamped log odds of wavemap~\cite{Reijgwart-
 \setlength{\floatsep}{8pt plus 2pt minus 2pt}
 \setlength{\dblfloatsep}{8pt plus 2pt minus 2pt}
 
-We first test dynamic mapping across three representations. We then evaluate temporal reconstruction
-with TSDF maps and examine Gaussian rendering and scene evolution. Ablations isolate the roles of
-geometry retirement and observation reuse.
-
 % ===== BEGIN tables / main_results =====
 % Values: wt_takeover_runs/RESULTS_TABLE_20261029.md (main table, 11-04).
 \begin{table*}[t]
@@ -390,7 +387,7 @@ geometry retirement and observation reuse.
 \cmidrule(lr){3-8}\cmidrule(lr){9-14}
 & & \multicolumn{3}{c}{\textbf{Real}} & \multicolumn{3}{c}{\textbf{Synthetic}} & \multicolumn{3}{c}{\textbf{Flat}} & \multicolumn{3}{c}{\textbf{3RScan}} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
-Map & Method & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
 \textbf{TSDF} & Khronos & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
  & Panoptic & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
@@ -409,7 +406,7 @@ Map & Method & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparro
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} F1 (\%). Geom.: final map at 5\,cm (Real C; Synthetic/Flat B); 3RScan averages rooms. Obj./Chg.: full-chain scores. Bold: best per representation. Shading: \ranklegend{} overall per column; ties share a rank.}
+\caption{\textbf{Dynamic mapping within and across visits.} Mesh, object, and change F1 scores (\%). Mesh F1 uses a 5\,cm distance threshold. Bold: best per representation; shading: \ranklegend{} per column.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -417,59 +414,44 @@ Map & Method & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparro
 \subsection{Experimental Setup}
 
 \paragraph{DynaState benchmark.}
-To evaluate dynamic mapping within and across visits, we introduce \emph{DynaState-Real} (Real)
-and \emph{DynaState-Sim} (Synthetic). Real contains three Azure Kinect recordings of one room spanning
-nearly two weeks; Synthetic contains two animated visits to an InteriorAgent~\cite{InteriorAgent2025}
-apartment in Isaac Sim. Both include observed motion and changes discovered after looking away or returning.
-Real uses ORB-SLAM3~\cite{9440682} poses aligned across visits and manually annotated object changes;
-Synthetic provides ground-truth poses, labels, and time-varying scene geometry.
-Each method maintains one map throughout the visit chain.
+We introduce \emph{DynaState-Real} (Real) and \emph{DynaState-Sim} (Synthetic). Real contains three Azure
+Kinect recordings of one room over nearly two weeks, with ORB-SLAM3~\cite{9440682} poses aligned across
+visits and annotated object changes. Synthetic contains two animated visits to an
+InteriorAgent~\cite{InteriorAgent2025} apartment in Isaac Sim, with ground-truth poses, labels, and
+time-varying geometry. Both include observed motion and changes discovered after looking away or returning.
 
 \paragraph{Public datasets.}
-Flat~\cite{9811877} comprises two synthetic RGB-D recordings with object rearrangements;
-3RScan~\cite{9010673} provides repeated scans of real indoor environments. We use Flat and eight
-3RScan room chains to evaluate cross-visit updates. Khronos's TESSE Apartment and Office
-sequences~\cite{Schmid-RSS-24} combine observed motion and changes discovered during a continuous
-mapping run. We use them for evaluation under its official 4D protocol.
-For Gaussian rendering, we use Flat and GaME's two Aria room sequences~\cite{Yugay_2026_CVPR},
-which contain repeated observations of rearranged indoor scenes.
+Flat~\cite{9811877} contains two synthetic RGB-D recordings with rearranged objects, and we use eight
+room chains of 3RScan~\cite{9010673}, which rescans real rooms. Khronos's TESSE Office and Apartment
+sequences~\cite{Schmid-RSS-24} contain motion and changes within one continuous run. For rendering,
+we use Flat and GaME's two Aria rooms~\cite{Yugay_2026_CVPR}.
 
 \paragraph{Baselines.}
-We compare against GaME~\cite{Yugay_2026_CVPR} for Gaussian mapping of evolving scenes,
-Khronos~\cite{Schmid-RSS-24} for spatio-temporal metric-semantic mapping, and
-wavemap~\cite{Reijgwart-RSS-23} for efficient probabilistic occupancy mapping.
-Panoptic Multi-TSDFs~\cite{9811877} provides an additional object-centric TSDF baseline.
-Methods process the same posed sequences and carry maps across visits; the TESSE evaluation compares TSDF
-reconstructions with Khronos. The main comparison and its qualitative results give every method instance
-masks, which contain what each baseline uses: instances for Panoptic Multi-TSDFs, semantic labels for
-Khronos, and segments for GaME. TESSE uses semantic masks, and the Flat and Aria rendering scenes use
-framewise SAM masks~\cite{Kirillov_2023_ICCV}.
+We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
+Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and
+wavemap~\cite{Reijgwart-RSS-23} for occupancy. All methods process the same posed sequences and carry
+their maps across visits. Inputs are instance masks in the main comparison, semantic masks on TESSE,
+and framewise SAM masks~\cite{Kirillov_2023_ICCV} on the rendering scenes.
 
 \paragraph{Metrics.}
-Geometry uses surface F1 at 5\,cm before Gaussian refinement. Object F1 uses 0.5\,m matching and
-duration-weighted snapshots following Khronos~\cite{Schmid-RSS-24}; change F1 pools appearance/disappearance events across the chain.
-3RScan averages geometry and object scores within rooms, then across rooms; events are pooled over all rooms.
-Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit, except its first, is held out.
-After global refinement, we measure PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR},
-and the L1 error of rendered against measured depth. TESSE uses Khronos's official aggregation
-over map and query times~\cite{Schmid-RSS-24}, with a 5\,cm background tolerance and 0.5\,m object matching.
+All metrics are computed on the final map, after refinement for Gaussian maps. We evaluate each visit's reconstruction using the mesh F1 score at a 5\,cm distance threshold. Object F1 uses 0.5\,m matching and
+duration-weighted snapshots~\cite{Schmid-RSS-24}, change F1 scores appearance and disappearance events over
+the visit chain, and 3RScan averages over rooms. Every tenth frame of the final visit, except its first, is
+held out~\cite{Yugay_2026_CVPR}, and on these views we measure PSNR, MS-SSIM~\cite{1292216},
+LPIPS~\cite{Zhang_2018_CVPR}, and the L1 error of rendered against measured depth. TESSE uses Khronos's
+official aggregation over map and query times~\cite{Schmid-RSS-24}.
 
 \paragraph{Implementation.}
-The shared tests use a 5\,cm surface tolerance and threshold $\ln 99$ across datasets.
-Our TSDF and occupancy maps use 5\,cm cells; on TESSE, Khronos uses the same resolution.
+All datasets share a 5\,cm surface tolerance and the threshold $\ln 99$, and our TSDF and occupancy maps
+use 5\,cm cells.
 
 \subsection{Unified Dynamic Mapping}
 \label{sec:exp_main}
 
-The real and synthetic sequences test this joint setting; Flat and 3RScan test further cross-visit changes.
-Our method improves geometry, object F1, and change F1 for all three representations on all four datasets
-(\cref{tab:main}). Reconstruction improves alongside change decisions, with stale geometry removed from
-TSDF and occupancy maps (\cref{fig:geometry_details}).
-
-\paragraph{TSDF and occupancy.}
-In the real room, TSDF geometry F1 increases from 87.7 to 96.1 over Khronos, and occupancy geometry F1
-increases from 84.5 to 91.0 over wavemap. Both representations also improve object and change F1 on all
-four datasets.
+Our method improves mesh, object, and change F1 scores in all three representations on all four datasets
+(\cref{tab:main}). In the real room, mesh F1 rises from 87.7 to 96.1 over Khronos for TSDF and from
+84.5 to 91.0 over wavemap for occupancy, and both maps remove the stale geometry that the native updates
+keep (\cref{fig:geometry_details}).
 
 % ===== BEGIN figures / qualitative_geometry =====
 % Edit each panel directly below: one original PNG per includegraphics.
@@ -501,10 +483,20 @@ Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
 \includegraphics[width=\geowidth,trim={140.0000bp 10.0000bp 80.0000bp 170.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png}\\
 \end{tabular}
 \endgroup
-\caption{\textbf{The shared update removes stale geometry.} Khronos vs.\ our TSDF (top two rows); wavemap vs.\ our occupancy (bottom two). Each row shares the camera, crop, and scale. Final maps use reference colors; occupancy resolution is 2\,cm.}
+\caption{\textbf{The shared update removes stale geometry.} Khronos vs.\ our TSDF (top two rows) and wavemap vs.\ our occupancy (bottom two).}
 \label{fig:geometry_details}
 \end{figure}
 % ===== END figures / qualitative_geometry =====
+
+% ===== BEGIN tables / restart =====
+% F1 values from figures/retention_comparison_data.json (plot_retention_comparison.py).
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/retention_comparison.pdf}
+\caption{\textbf{Continued mapping is more accurate on a partial revisit.} Mesh F1 at 5\,cm (\%) on synthetic visit B.}
+\label{fig:retention}
+\end{figure}
+% ===== END tables / restart =====
 
 % ===== BEGIN figures / qualitative_gaussians =====
 % Native original images; exact positions and crops are in the companion JSON.
@@ -542,114 +534,10 @@ Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
 \put(365.000,5.143){\includegraphics[width=130.000\unitlength,trim={170.0000bp 60.0000bp 190.0000bp 220.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
 \end{picture}
 \endgroup
-\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Purple boxes mark the crops, shown at the same scale in every column: old-object residue in the real room, furniture surfaces in the synthetic apartment, and duplicated walls in Flat.}
+\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Purple boxes mark the crops: old-object residue in the real room, furniture surfaces in the synthetic apartment, and duplicated walls in Flat.}
 \label{fig:gaussian_details}
 \end{figure*}
 % ===== END figures / qualitative_gaussians =====
-
-% ===== BEGIN tables / restart =====
-% F1 values from figures/retention_comparison_data.json (plot_retention_comparison.py).
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figures/retention_comparison.pdf}
-\caption{\textbf{Continued mapping is more accurate on a partial revisit.} Synthetic visit B: surface F1 at 5\,cm (\%). Each pair compares native restart with our continued map. The reference covers surfaces observed up to B.}
-\label{fig:retention}
-\end{figure}
-% ===== END tables / restart =====
-
-\paragraph{Partial revisits.}
-Updating the changed scene also preserves valid geometry outside the current observation coverage
-(\cref{fig:retention}). On synthetic visit B,
-F1 improves over native restart by 12.6, 11.2, and 8.9 points for TSDF, Gaussians, and occupancy.
-
-\subsection{Temporal Reconstruction}
-\label{sec:exp_temporal}
-TESSE contains changes within one continuous run: objects that move and changes discovered after looking away.
-Its 4D protocol, introduced with Khronos, queries each map at all earlier times, so we compare our TSDF maps
-with Khronos. Ours improves all four F1 categories on both scenes (\cref{tab:tesse}). Change F1 rises from 46.2
-to 78.6 in Office and from 38.6 to 92.6 in Apartment, and dynamic-object F1 reaches 96.7 and 95.1.
-The final maps also reach higher geometry F1.
-
-% ===== BEGIN tables / tesse =====
-% SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
-% Objects/change: official TABLES_4D.txt; background: official_tables_at.py 0.05; Geom.: final map F1 at 5 cm.
-% Values: wt_takeover_runs/RESULTS_TABLE_20261029.md, TESSE semantic-input table (11-04).
-\begin{table}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.0pt}
-\renewcommand{\arraystretch}{1.08}
-\def\resultrows{
-\toprule
- & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} & \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}
-Scene & Method & Bg.$\uparrow$ & Obj.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Geom.$\uparrow$ \\ \midrule
-Office & Khronos & \ranksecondcell{74.6} & \ranksecondcell{67.4} & \ranksecondcell{84.8} & \ranksecondcell{46.2} & \ranksecondcell{92.8} \\
- & \textbf{Ours (TSDF)} & \rankbestcell{76.1} & \rankbestcell{69.2} & \rankbestcell{96.7} & \rankbestcell{78.6} & \rankbestcell{94.1} \\
-\midrule
-Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecondcell{85.5} & \ranksecondcell{38.6} & \ranksecondcell{86.1} \\
- & \textbf{Ours (TSDF)} & \rankbestcell{79.8} & \rankbestcell{62.2} & \rankbestcell{95.1} & \rankbestcell{92.6} & \rankbestcell{88.1} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{llrrrrr}\resultrows\end{tabular}
-\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%), using official temporal aggregation. Static: background/objects; Dynamic: moving objects/changes; Geom.: final map at 5\,cm. Ranking: \ranklegend{} per scene.}
-\label{tab:tesse}
-\end{table}
-% ===== END tables / tesse =====
-
-
-
-
-\subsection{Gaussian Reconstruction}
-\label{sec:exp_gaussians}
-
-\paragraph{Geometry and changes.}
-The Gaussian map improves geometry, object F1, and change F1 on every dataset (\cref{tab:main}).
-Geometry F1 exceeds GaME by 4.9 points in the real room and 5.4 in the synthetic apartment.
-The corresponding reconstructions show fewer old-object remnants and duplicated surfaces
-(\cref{fig:gaussian_details}).
-
-% ===== BEGIN tables / rendering =====
-% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
-\begin{table}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.0pt}
-\renewcommand{\arraystretch}{1.08}
-\def\resultrows{
-\toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & GaME & \ranksecondcell{24.21} & \ranksecondcell{0.92} & \ranksecondcell{0.16} & \ranksecondcell{1.07} \\
- & \textbf{Ours} & \rankbestcell{28.12} & \rankbestcell{0.96} & \rankbestcell{0.10} & \rankbestcell{0.39} \\
-\midrule
-Aria room0 & GaME & \ranksecondcell{31.55} & \ranksecondcell{0.95} & \ranksecondcell{0.15} & \rankbestcell{0.69} \\
- & \textbf{Ours} & \rankbestcell{32.43} & \rankbestcell{0.96} & \rankbestcell{0.14} & \ranksecondcell{0.74} \\
-\midrule
-Aria room1 & GaME & \ranksecondcell{31.97} & \ranksecondcell{0.95} & \ranksecondcell{0.10} & \ranksecondcell{1.80} \\
- & \textbf{Ours} & \rankbestcell{33.39} & \rankbestcell{0.97} & \rankbestcell{0.09} & \rankbestcell{1.17} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
-\caption{\textbf{Sharper novel views after scene updates.} Held-out views of the final visit; PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per scene.}
-\label{tab:rendering}
-\end{table}
-% ===== END tables / rendering =====
-
-\paragraph{Novel-view rendering.}
-Our Gaussian maps render the held-out views of Flat and both Aria rooms better than GaME in PSNR, MS-SSIM,
-and LPIPS (\cref{tab:rendering}). PSNR rises by 3.91\,dB on Flat and by 0.88--1.42\,dB on Aria, and depth L1
-falls from 1.07 to 0.39\,cm on Flat and from 1.80 to 1.17\,cm on room1. The reconstruction follows the changed scene
-while compatible observations continue to constrain the surrounding geometry. The ablations below
-isolate the contributions of geometry retirement and observation reuse.
-
-\paragraph{Changes within and across visits.}
-\Cref{fig:evolution} follows one Gaussian map through both visits of DynaState-Sim from a fixed
-living-room viewpoint: furniture changes within and between visits, and each snapshot shows the new
-arrangement while the surrounding room remains reconstructed.
 
 % ===== BEGIN figures / evolution_native =====
 % Native original images; exact positions and crops are in the companion JSON.
@@ -705,66 +593,145 @@ arrangement while the surrounding room remains reconstructed.
 \put(8.000,34.500){\makebox(0,0){\rotatebox{90}{\fontsize{8}{9}\selectfont\color[HTML]{997510}Ours (3DGS)}}}
 \end{picture}
 \endgroup
-\caption{\textbf{Gaussian maps follow changes within and across visits.} DynaState-Sim from one fixed viewpoint; the dashed line marks the visit boundary, and each map is the next saved snapshot after the reference time.}
+\caption{\textbf{Gaussian maps follow changes within and across visits.} DynaState-Sim from one fixed viewpoint; the dashed line marks the visit boundary.}
 \label{fig:evolution}
 \end{figure*}
 % ===== END figures / evolution_native =====
 
-\subsection{Ablation Studies}
-
-On Flat A$\rightarrow$B, we test the two reconstruction consequences of a change decision: retiring
-outdated geometry and restricting observation contributions (\cref{tab:ablation_variants}). All variants
-use the Gaussian representation and are compared with their matched Full configuration.
-
 % ===== BEGIN tables / ablation =====
-% Generated from experiments_rewrite_20261101/results.json
+\begin{table*}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{7pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{(a) Applying changes to geometry}} \\
+Changes not applied & \ranksecondcell{84.4} & \ranksecondcell{66.7} & \ranksecondcell{68.8} & \ranksecondcell{23.79} & \ranksecondcell{0.91} & \ranksecondcell{0.16} & \ranksecondcell{3.31} \\
+\textbf{Full} & \rankbestcell{90.0} & \rankbestcell{66.8} & \rankbestcell{83.3} & \rankbestcell{27.63} & \rankbestcell{0.95} & \rankbestcell{0.12} & \rankbestcell{0.48} \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
+Unrestricted & 86.2 & \rankbestcell{66.7} & \rankbestcell{83.3} & 22.69 & \ranksecondcell{0.89} & \ranksecondcell{0.17} & 3.66 \\
+Discard whole frames & \ranksecondcell{89.6} & \ranksecondcell{66.6} & \rankbestcell{83.3} & \ranksecondcell{23.43} & 0.86 & 0.24 & \ranksecondcell{1.92} \\
+\textbf{Full} & \rankbestcell{89.8} & 66.5 & \rankbestcell{83.3} & \rankbestcell{27.77} & \rankbestcell{0.95} & \rankbestcell{0.11} & \rankbestcell{0.45} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Mechanism ablations on Flat.} F1 in \%, PSNR in dB, depth L1 in cm. In (b), each variant changes how old keyframes are used during visit B and refinement. Ranking: \ranklegend{} per block.}
+\label{tab:ablation_variants}
+\end{table*}
+% ===== END tables / ablation =====
+
+
+\paragraph{Partial revisits.}
+On the partial revisit of synthetic visit B, our continued maps exceed a native restart by 12.6, 11.2, and
+8.9 mesh F1 points for TSDF, Gaussians, and occupancy (\cref{fig:retention}).
+
+\subsection{Temporal Reconstruction}
+\label{sec:exp_temporal}
+Our TSDF maps improve all four F1 categories over Khronos on both TESSE scenes, and their final maps
+reach higher mesh F1 (\cref{tab:tesse}). Change F1 rises from 46.2 to 78.6 in Office and from 38.6 to
+92.6 in Apartment, and dynamic-object F1 reaches 96.7 and 95.1.
+
+% ===== BEGIN tables / tesse =====
+% SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
+% Objects/change: official TABLES_4D.txt; background: official_tables_at.py 0.05; Mesh: final mesh F1 at 5 cm.
+% Values: wt_takeover_runs/RESULTS_TABLE_20261029.md, TESSE semantic-input table (11-04).
 \begin{table}[t]
 \centering
 \fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{2.0pt}
+\setlength{\tabcolsep}{3.0pt}
 \renewcommand{\arraystretch}{1.08}
 \def\resultrows{
 \toprule
-Variant & Geom.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
+ & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Scene & Method & Bg.$\uparrow$ & Obj.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ \\ \midrule
+Office & Khronos & \ranksecondcell{74.6} & \ranksecondcell{67.4} & \ranksecondcell{84.8} & \ranksecondcell{46.2} & \ranksecondcell{92.8} \\
+ & \textbf{Ours (TSDF)} & \rankbestcell{76.1} & \rankbestcell{69.2} & \rankbestcell{96.7} & \rankbestcell{78.6} & \rankbestcell{94.1} \\
 \midrule
-\multicolumn{6}{@{}l}{\textbf{(a) Geometry retirement}} \\
-w/o retirement & \ranksecondcell{84.4} & \ranksecondcell{66.7} & \ranksecondcell{68.8} & \ranksecondcell{23.79} & \ranksecondcell{3.31} \\
-\textbf{Full} & \rankbestcell{90.0} & \rankbestcell{66.8} & \rankbestcell{83.3} & \rankbestcell{27.63} & \rankbestcell{0.48} \\
-\midrule
-\multicolumn{6}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
-Unrestricted & 86.2 & \rankbestcell{66.7} & \rankbestcell{83.3} & 22.69 & 3.66 \\
-Discard whole frames & \ranksecondcell{89.6} & \ranksecondcell{66.6} & \rankbestcell{83.3} & \ranksecondcell{23.43} & \ranksecondcell{1.92} \\
-\textbf{Full} & \rankbestcell{89.8} & 66.5 & \rankbestcell{83.3} & \rankbestcell{27.77} & \rankbestcell{0.45} \\
+Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecondcell{85.5} & \ranksecondcell{38.6} & \ranksecondcell{86.1} \\
+ & \textbf{Ours (TSDF)} & \rankbestcell{79.8} & \rankbestcell{62.2} & \rankbestcell{95.1} & \rankbestcell{92.6} & \rankbestcell{88.1} \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{lrrrrr}\resultrows\end{tabular}
-\caption{\textbf{Mechanism ablations on Flat.} Matched Full per block; F1 in \%, PSNR in dB, depth L1 in cm. In (b), policies apply during visit B and refinement. Ranking: \ranklegend{} per block; ties share a rank.}
-\label{tab:ablation_variants}
+\sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{llrrrrr}\resultrows\end{tabular}
+\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%). Ranking: \ranklegend{} per scene.}
+\label{tab:tesse}
 \end{table}
-% ===== END tables / ablation =====
+% ===== END tables / tesse =====
+
+
+
+
+\subsection{Gaussian Reconstruction}
+\label{sec:exp_gaussians}
+
+\paragraph{Geometry and changes.}
+Our Gaussian maps exceed GaME in mesh F1 by 4.9 points in the real room and 5.4 in the synthetic
+apartment (\cref{tab:main}), with fewer old-object remnants and duplicated surfaces
+(\cref{fig:gaussian_details}).
+
+% ===== BEGIN tables / rendering =====
+% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\def\resultrows{
+\toprule
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & GaME & \ranksecondcell{24.21} & \ranksecondcell{0.92} & \ranksecondcell{0.16} & \ranksecondcell{1.07} \\
+ & \textbf{Ours} & \rankbestcell{28.12} & \rankbestcell{0.96} & \rankbestcell{0.10} & \rankbestcell{0.39} \\
+\midrule
+Aria room0 & GaME & \ranksecondcell{31.55} & \ranksecondcell{0.95} & \ranksecondcell{0.15} & \rankbestcell{0.69} \\
+ & \textbf{Ours} & \rankbestcell{32.43} & \rankbestcell{0.96} & \rankbestcell{0.14} & \ranksecondcell{0.74} \\
+\midrule
+Aria room1 & GaME & \ranksecondcell{31.97} & \ranksecondcell{0.95} & \ranksecondcell{0.10} & \ranksecondcell{1.80} \\
+ & \textbf{Ours} & \rankbestcell{33.39} & \rankbestcell{0.97} & \rankbestcell{0.09} & \rankbestcell{1.17} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\caption{\textbf{Sharper novel views after scene updates.} PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per scene.}
+\label{tab:rendering}
+\end{table}
+% ===== END tables / rendering =====
+
+\paragraph{Novel-view rendering.}
+Our Gaussian maps render the held-out views of all three scenes better than GaME in PSNR, MS-SSIM, and
+LPIPS, raising PSNR by 3.91\,dB on Flat and by 0.88--1.42\,dB on the Aria rooms (\cref{tab:rendering}).
+
+\paragraph{Changes within and across visits.}
+One Gaussian map follows the furniture changes within and between the two visits of DynaState-Sim,
+while the rest of the room stays reconstructed (\cref{fig:evolution}).
+
+
+\subsection{Ablation Studies}
+
+We ablate the map update on Flat A$\rightarrow$B with Gaussian maps (\cref{tab:ablation_variants}).
+
 
 \paragraph{Applying changes to geometry.}
-Withholding geometry retirement lowers geometry F1 from 90.0 to 84.4, change F1 from 83.3 to 68.8,
-and PSNR by 3.84\,dB. The effect spans geometric and rendering quality: confirmed changes must be applied to the
-stored reconstruction.
+If detected changes are not applied to the map, mesh F1 falls from 90.0 to 84.4, change F1 from 83.3 to 68.8,
+and PSNR by 3.84\,dB.
 
 \paragraph{Old-keyframe reuse.}
-We vary old-keyframe use during mapping and refinement: unrestricted reuse, whole-frame rejection,
-or selective reuse (Full). Unrestricted reuse reduces PSNR by 5.08\,dB and increases depth L1 from 0.45
-to 3.66\,cm. Geometry F1 falls from 89.8 to 86.2, while change F1 stays at 83.3.
-Whole-frame rejection, which drops every keyframe that observed a Gaussian ending later, as GaME's keyframe
-filtering does, lowers PSNR by 4.34\,dB while geometry and change F1 stay at 89.6 and 83.3: the rejected
-frames still held valid observations of the unchanged scene.
+Unrestricted reuse lowers PSNR by 5.08\,dB, raises depth L1 from 0.45 to 3.66\,cm, and lowers mesh F1
+from 89.8 to 86.2. Discarding every keyframe that observed a Gaussian ending later, as GaME does, lowers
+PSNR by 4.34\,dB.
 
 \paragraph{Parameter sensitivity.}
-Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by at most one detected event.
-Fixed priors give similar results.
+Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by at most one detected event,
+and fixed priors perform similarly.
 
 \paragraph{Computational cost.}
-On Flat, mapping and refinement take 2,898\,s against 2,647\,s for GaME on an RTX 5070 Ti, with peak
-memory of 6.6\,GB against 5.9\,GB including retained history.
+On Flat, mapping and refinement take 2,898\,s and 6.6\,GB of peak memory on an RTX 5070 Ti, against
+2,647\,s and 5.9\,GB for GaME.
 % ===== END sec / 5_experiments =====
 % ===== BEGIN sec / 6_limitations =====
 \section{Limitations}
