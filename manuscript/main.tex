@@ -195,7 +195,7 @@ can be queried at past times, partial when past objects are kept without time st
 \section{Related Work}
 \label{sec:related_work}
 
-\vspace{1mm}\noindent\textbf{Dense map representations.}
+\vspace{0mm}\noindent\textbf{Dense map representations.}
 Dense mapping uses signed-distance volumes~\cite{10.1145/237170.237269,6162880,8202315}, surfel
 meshes~\cite{schops2020surfelmeshing}, and probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}.
 Gaussian splatting~\cite{10.1145/3592433} supports joint camera tracking, mapping, and rendering in MonoGS and
@@ -203,7 +203,7 @@ SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each integrates a measurement
 averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. We keep these
 integrations and add to each a shared notion of object state and element lifetime.
 
-\vspace{1mm}\noindent\textbf{Dynamic reconstruction.}
+\vspace{0mm}\noindent\textbf{Dynamic reconstruction.}
 WildGS-SLAM reconstructs the static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}. Co-Fusion,
 MID-Fusion, and EM-Fusion reconstruct objects while they move~\cite{7989518,8794371,9010932}, and DynaSLAM~II and
 DynoSAM estimate camera and object motion jointly~\cite{9385844,11288097}. Dynablox detects moving points as those
@@ -216,7 +216,7 @@ decided online. These methods model motion while it is observed. A change that h
 motion to track. We use the free-space cue of Dynablox to detect visible motion and treat the settled object as a
 new state, so observed and unobserved changes end in one and the same decision.
 
-\vspace{1mm}\noindent\textbf{Updating evolving scenes.}
+\vspace{0mm}\noindent\textbf{Updating evolving scenes.}
 Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
 surfaces~\cite{7989614,9811877}. Removert and ERASOR build static LiDAR maps by removing points that later scans
 see through~\cite{kim2020removert,lim2021erasor}, the cue behind our see-through evidence, applied per point and
@@ -238,7 +238,7 @@ Gaussian and then patch the observations with a rule of their own. Our decision 
 carries, through valid domains and capture-time maps, to every element and every observation in three
 representations.
 
-\vspace{1mm}\noindent\textbf{Object association and scene history.}
+\vspace{0mm}\noindent\textbf{Object association and scene history.}
 RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes reconstructs objects across
 scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks across
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
@@ -275,7 +275,7 @@ Gaussian, and occupancy integration consume the same decisions.}
 \label{fig:method}
 \end{figure*}
 
-\vspace{1mm}\noindent\textbf{Map representation.}
+\vspace{0mm}\noindent\textbf{Map representation.}
 \label{sec:setting}
 A \emph{state} is one configuration of an object. Masks and associations group the observations of each object,
 so further views complete the surface of the same state. State $s$ has a surface $G_s$ and a \emph{state interval}
@@ -299,7 +299,7 @@ decision should come as soon as the evidence suffices, yet repeated views of one
 whole-object change. The same test applies whether the change happens in view, after the camera looks away, or
 between visits.
 
-\vspace{1mm}\noindent\textbf{Surface evidence.}
+\vspace{0mm}\noindent\textbf{Surface evidence.}
 We project surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those
 supported in at least $n_{\min}$ earlier frames and seen at an incidence angle below
 $60^\circ$~\cite{6375037}, and the 5\,cm depth tolerance absorbs noise. A
@@ -309,7 +309,7 @@ left, whereas the sofa in front of the wall only occludes the wall. Occlusions, 
 outside the image contribute no absence evidence. An object hidden by a larger one placed at the same spot is
 therefore only occluded, and its state persists until its surroundings are seen.
 
-\vspace{1mm}\noindent\textbf{Change decisions.}
+\vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is one depth image in which at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$
 are judged, where $\nu_{\mathrm{rel}}$ is the number of reliable samples of the state. At round $i$, let $f_i$ be
 the fraction of the judged samples that are seen through. While the state is in place, $f_i$ follows a Beta
@@ -333,7 +333,7 @@ where $q$ is the probability that the object persists, estimated from its class 
 how many samples a round judges. The minimum of $\min(30,\nu_{\mathrm{rel}})$ judged samples bounds the
 overconfidence this allows.
 
-\vspace{1mm}\noindent\textbf{Successors.}
+\vspace{0mm}\noindent\textbf{Successors.}
 Observations that match no state form candidates. A candidate becomes the \emph{successor} of an earlier state of
 the same object when the current depth supports it, its centroid lies more than 10\,cm from that of the earlier
 state, and later observations support it. The successor starts
@@ -342,7 +342,7 @@ rebuild a moved object from the new observations rather than transform its old g
 partly seen object is unreliable and the settled object is observed anyway.
 A candidate that matches no earlier object starts a new one, and unresolved candidates wait for more evidence.
 
-\vspace{1mm}\noindent\textbf{Observed motion.}
+\vspace{0mm}\noindent\textbf{Observed motion.}
 An object that moves in view is detected in the shared front-end with the object tracking of Khronos and the
 free-space cue of Dynablox, which marks points that fall into known free space as
 moving~\cite{Schmid-RSS-24,10218983}. The free space is read from the current map, after the valid domains of
@@ -361,12 +361,12 @@ would fuse it back, the free space they measured would erase the new sofa, and t
 Gaussians of a scene that no longer exists. These frames cannot simply be dropped, since they also measure the
 unchanged wall. Map update therefore acts on geometry and observations.
 
-\vspace{1mm}\noindent\textbf{Applying changes to geometry.}
+\vspace{0mm}\noindent\textbf{Applying changes to geometry.}
 A decision concerns the whole state, so all elements of the armchair end their lifetimes together, its unseen back
 included. The geometry is \emph{retired}: it leaves the current map and stays available for earlier times. New
 observations reconstruct the sofa and any successor, and continuing states keep growing.
 
-\vspace{1mm}\noindent\textbf{Valid domains.}
+\vspace{0mm}\noindent\textbf{Valid domains.}
 A depth measurement contributes a surface and the free space in front of it. The earlier measurement of the wall
 can still complete the wall, but its free space must stop before the sofa. We express this as the observation's
 \emph{valid domain}. Let observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
@@ -385,14 +385,14 @@ $\lambda_o$ considers object states only, so a changed background surface, such 
 does not stop old free space and is left to the retention test. Every
 state change revises the affected domains.
 
-\vspace{1mm}\noindent\textbf{Capture-time keyframes.}
+\vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 Keyframes follow the same rule in time. A keyframe captured at $t_k$ renders and evaluates its loss on
 $\mathcal{M}(t_k)$, the scene it saw, and optimizes only the elements that were alive at $t_k$ and are alive
 now. The image of the armchair thus still renders the armchair's ended Gaussians, so its loss lands on them and
 not on the current map, while its view of the wall still constrains the current wall. Ended Gaussians are
 rendered but no longer optimized. 
 
-\vspace{1mm}\noindent\textbf{Retaining and replacing surfaces.}
+\vspace{0mm}\noindent\textbf{Retaining and replacing surfaces.}
 \label{sec:memory}
 Not all stale geometry belongs to a state. A window sash that has since been closed and duplicate surfaces left by
 drift have no state that could end, so earlier elements are also tested one by one. An element is retired when the
@@ -402,7 +402,7 @@ since keeping the older copy of a re-measured surface would leave a duplicate be
 Occlusion alone never retires geometry, so unobserved regions stay in the map. All tests use the 5\,cm tolerance,
 so registration error below it is absorbed. 
 
-\vspace{1mm}\noindent\textbf{Handover across visits.}
+\vspace{0mm}\noindent\textbf{Handover across visits.}
 \label{sec:handoff}
 At the end of a visit we save the map, the lifetimes, the state summaries, and the evidence statistics. The next
 visit resumes from them in the shared coordinate frame, so a change discovered on return passes the same tests as
@@ -413,7 +413,7 @@ one discovered after looking away.
 
 Each representation keeps its own integration and applies the shared decisions wherever it uses observations.
 
-\vspace{1mm}\noindent\textbf{TSDF.}
+\vspace{0mm}\noindent\textbf{TSDF.}
 We build on projective fusion~\cite{10.1145/237170.237269,6162880} with the active window, tracking, and object
 extraction of Khronos~\cite{Schmid-RSS-24}. Signed distances are fused only within $\Omega_o(t)$, with the
 truncation band as $T$. Frames are archived as depth images with their masks, and when a decision changes the
@@ -422,14 +422,14 @@ order. The archive and the rebuilds are the cost of valid domains in this branch
 The current mesh contains the faces of alive states and the background faces that pass the retention
 test, and retired faces remain available for queries at earlier times.
 
-\vspace{1mm}\noindent\textbf{3D Gaussians.}
+\vspace{0mm}\noindent\textbf{3D Gaussians.}
 We use the photometric and depth optimization of GaME~\cite{Yugay_2026_CVPR,10.1145/3592433} and assign Gaussians
 to masks with FlashSplat~\cite{10.1007/978-3-031-72670-5_26}. Each keyframe renders and trains $\mathcal{M}(t_k)$.
 Current-visit keyframes optimize new and revisited regions, and replayed earlier keyframes maintain the geometry
 outside the current coverage. Gaussians of an ended state are frozen with an end time, so earlier times keep their
 reconstruction and the current map renders without them, during mapping and during the final refinement.
 
-\vspace{1mm}\noindent\textbf{Occupancy.}
+\vspace{0mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
 Wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}. Cells are associated with states through the masks of
 the observations that measured them. Cells of an ended state leave the current map
