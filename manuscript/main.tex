@@ -380,7 +380,7 @@ after $t_o$, or $\infty$ if there is none. With surface band $T$,
 \end{equation}
 The domain is the band of width $T$ around the measured surface, plus the free space in front of it up to the
 first object that arrived after the observation. The band keeps the wall, and $\lambda_o$ stops the earlier free
-space at the sofa. For the current reconstruction, rays that measured an ended state are dropped whole, free space included, since later views of
+space at the sofa. Rays that measured an ended state are dropped whole, free space included, since later views of
 the vacated region supply that free space and the band would re-fuse the armchair.
 $\lambda_o$ considers object states only, so a changed background surface, such as the window sash below,
 does not stop old free space and is left to the retention test. Every
@@ -501,8 +501,8 @@ Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Me
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} Mesh, object, and change F1 (\%, higher is better)
-for the final map (mesh) and the visit chain (objects and changes); mesh F1 uses a 5\,cm threshold. Each representation is compared with its native
+\caption{\textbf{Dynamic mapping within and across visits.} Mesh, object, and change F1 (\%, higher is better).
+Mesh F1 uses a 5\,cm threshold. Each representation is compared with its native
 update, and bold marks the better of the two.}
 \label{tab:main}
 \end{table*}
@@ -530,13 +530,12 @@ updates. \Cref{sec:ablation} reports predicted masks and geometric association.
 
 \noindent\textbf{Metrics.}
 Mesh F1 evaluates the final visit's map at a 5\,cm distance threshold. In the main comparison and ablations, Gaussian geometry and rendering use the final refined map. The supplement reports every visit.
-The reference includes previously observed regions that the current visit does not see. Following
-Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m, and change F1 scores appearance and
-disappearance events. We weight object snapshots by their duration and pool change events over the visit chain.
+The reference may include previously observed regions that the current visit does not see. Object F1 matches objects within 0.5\,m and weights snapshots by their
+duration~\cite{Schmid-RSS-24}, and change F1 pools appearance and disappearance events over the visit chain.
 3RScan scores are averaged over visits and then over rooms. TESSE uses Khronos's official aggregation over map
 and query times~\cite{Schmid-RSS-24}. For rendering, every tenth frame of the final visit, except the first, is
 held out~\cite{Yugay_2026_CVPR}, and we report PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and the
-L1 error of rendered against valid measured depth after refinement.
+L1 error of rendered against measured depth after refinement.
 
 \noindent\textbf{Implementation.}
 All datasets share a 5\,cm surface tolerance, 5\,cm TSDF voxels and occupancy cells, a 10\,cm truncation band, a
@@ -665,7 +664,7 @@ observations of its resting place.
 % ===== BEGIN tables / tesse =====
 % SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
 % F1 values: wt_takeover_runs/RESULTS_TABLE_20261029.md, TESSE semantic-input table (11-04); main tables are the source of truth.
-% Change P/R/F1: the same semv5 / khronos_sem TABLES_4D.txt outputs, verified 2026-11-05.
+% Change P/R/F1: the same semv5 / khronos_sem TABLES_4D.txt outputs.
 \begin{table}[t]
 \centering
 \fontsize{9}{10.3}\selectfont
@@ -835,10 +834,10 @@ Reusing earlier keyframes without valid domains lowers PSNR by 5.08\,dB and rais
 3.66\,cm, as the old frames rebuild the removed furniture. Allowing this only during refinement is as harmful
 (22.78\,dB). Discarding every keyframe that observed a Gaussian whose lifetime later ends, the whole-frame
 rejection that GaME's own ablation warns against~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and leaves geometry within
-noise. Flat changes between its two visits. Discarding conflicting first-visit keyframes removes outdated
-supervision, while the second visit observes the updated, static scene; it matches Full (27.78 vs.\ 27.77\,dB). Applying whole-frame rejection to the second visit also discards useful observations
-of the updated scene, leaving changed regions under-constrained. Keeping such frames and restricting their
-supervision is what the valid domains do. Evaluating old keyframes on the
+noise. Discarding only the first-visit keyframes that meet this condition costs nothing (27.78\,dB), so the loss comes
+from the current-visit keyframes: a second-visit keyframe that sees the empty floor is the very evidence that ends the
+stale Gaussians, and whole-frame rejection then discards it, which leaves the changed region under-constrained.
+Keeping such frames and restricting them ray by ray is what the valid domains do. Evaluating old keyframes on the
 current map rather than on the map at their capture time changes PSNR by 0.06\,dB. Capture-time evaluation preserves
 historical reconstructions at comparable current-view quality.
 
@@ -855,35 +854,10 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \subsection{Computational Cost}
 \label{sec:cost}
 
-% Cost table, commented out until the TSDF and occupancy rows arrive; the prose below carries the Gaussian numbers.
-% ===== BEGIN tables / cost =====
-% \begin{table}[t]
-% \centering
-% \fontsize{9}{10.3}\selectfont
-% \setlength{\tabcolsep}{5pt}
-% \renewcommand{\arraystretch}{1.08}
-% \begin{tabular}{@{}llrrr@{}}
-% \toprule
-% Map & Method & Time (s) & Memory (GB) & Frames/s \\
-% \midrule
-% TSDF & Khronos & \pend & \pend & \pend \\
-%  & Ours & \pend & \pend & \pend \\
-% 3DGS & GaME & 2,647 & 5.9 & 0.49 \\
-%  & Ours & 2,898 & 6.6 & 0.50 \\
-% Occ. & wavemap & \pend & \pend & \pend \\
-%  & Ours & \pend & \pend & \pend \\
-% \bottomrule
-% \end{tabular}
-% \caption{\textbf{Cost of the state-based update.} Mapping time including refinement, peak GPU memory, and mapping
-% throughput on Flat (Gaussians) and Real C (TSDF, occupancy) on an RTX 5070 Ti.\TODO{TSDF and occupancy rows.}}
-% \label{tab:cost}
-% \end{table}
-% ===== END tables / cost =====
 
 On Flat, our Gaussian branch maps and refines in 2,898\,s with 6.6\,GB of peak memory on an RTX 5070 Ti, against
 2,647\,s and 5.9\,GB for GaME, at 0.50 versus 0.49 frames per second. The current map holds 2.33 million Gaussians,
-compared with 2.37 million for GaME, and 2.60 million with the historical states.\TODO{TSDF and occupancy time
-and memory on Real C, native vs.\ ours, then restore the cost table in the source.}
+compared with 2.37 million for GaME, and 2.60 million with the historical states.
 
 % \begin{table}[t] rows: Khronos, Panoptic, GaME, wavemap, Ours (TSDF/3DGS/Occ); columns: observed / after looking away / across visits F1; latency median / p90 (s). \end{table}
 % ===== END sec / 5_experiments =====
