@@ -79,7 +79,7 @@
 \paragraph{Change decisions.}
 At round $i$, let $f_i=k_i/n_i$ be the fraction of the $n_i$ inspected reliable samples of state $s$ that
 are seen through. We model $f_i$ with a Beta density $p_s(f)$ estimated from in-place observations and use
-a uniform changed-state model; $\ell_s(f_i)$ is their one-sided log-likelihood ratio. In the Page statistic
+a uniform changed-state model; $\ell_s(f_i)$ is their one-sided log-likelihood ratio. In the sequential statistic
 of the main paper, the weight $w_i(j)=\nu_i(j)/\nu_{\mathrm{rel}}$ divides the number $\nu_i(j)$ of reliable
 samples inspected for the first time since the candidate change time $j$ by the number $\nu_{\mathrm{rel}}$
 of all reliable samples of the state, so each sample contributes once per candidate window. Absence is
@@ -107,22 +107,18 @@ surface band, with the same orientation. In a tied case, the current estimate re
 The remaining geometry is retained, including unobserved regions.
 
 \paragraph{Lifetimes and observation times.}
-Element lifetimes follow scene states and may begin before the elements are allocated. A newly allocated
-element can therefore represent a surface already present in an earlier observation. For Gaussian
-optimization, frame selection, map-time selection, and fixed parameters jointly enforce compatibility
-with the state observed by each keyframe. Current-visit frames refine the current estimate in continuing
-regions; for objects that change within the visit, they select the state present at their capture time.
-Earlier keyframes update compatible, unfrozen geometry. Ended Gaussians remain available to historical
-queries with fixed parameters. Updates use observations available at the current processing time.
+Element lifetimes follow scene states and may begin before the elements are allocated. For keyframe
+optimization, frame selection, trainable geometry, and map-time selection jointly enforce that a keyframe
+captured at $t_k$ evaluates its loss on $\mathcal{M}(t_k)$. The current map uses only observations received
+by the current processing time.
 
 \paragraph{Representations.}
 \emph{TSDF.} When a valid domain changes, the affected voxel blocks are rebuilt from archived frames in
 observation order. The current mesh includes the earlier faces that pass the retention test. We use the
 active window, tracking, and object extraction of Khronos~\cite{Schmid-RSS-24}.
 \emph{3D Gaussians.} Current-visit frames optimize new and revisited regions, while historical replay
-maintains compatible earlier geometry, including regions outside the current coverage. These observation
-constraints also apply during final refinement. Earlier Gaussians retired by a state or surface decision
-receive an end time and remain available to earlier queries.
+maintains earlier geometry outside the current coverage. These constraints also apply during final
+refinement. Pruned historical Gaussians receive an end time and remain available to earlier queries.
 \emph{Occupancy.} The replacement condition $C(e)$ retires nearby stale copies, while eligible unobserved
 cells are retained.
 % ===== END sec / method_details =====
@@ -137,7 +133,7 @@ and changes between visits. The visits contain 4,003, 4,041, and 7,216 RGB-D fra
 ORB-SLAM3~\cite{9440682}. We register visits B and C to A using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review,
 with ADE20K classes and 17 persistent object IDs. People are labeled dynamic, and object changes
-are annotated over time by hand. A surface reconstructed at 1\,cm resolution within the room
+are annotated over time by hand, yielding 31 reference change events. A surface reconstructed at 1\,cm resolution within the room
 provides the geometry reference.
 
 \paragraph{DynaState-Sim (Synthetic).}
@@ -145,8 +141,9 @@ We animate objects and camera trajectories in InteriorAgent's kujiale\_0021 apar
 and capture two visits in Isaac Sim. The visits share a world coordinate frame and contain 4,186 and
 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export ground-truth camera poses, semantic and
 instance labels, and per-frame object transforms and visibility. The transforms and original object
-meshes recover scene geometry at each timestamp. Changes occur within and across visits. The second
-visit covers part of the scene, supporting evaluation of retained map completeness.
+meshes recover scene geometry at each timestamp. The two visits contain 72 reference change events, within and across visits. The second
+visit covers part of the scene, supporting evaluation of retained map completeness. Instance labels follow
+the annotated object groups, such as a table together with its contents.
 
 \paragraph{Flat.}
 Flat was introduced with Panoptic Multi-TSDFs~\cite{9811877}. It contains two RGB-D trajectories
@@ -163,14 +160,21 @@ across successive scans in each room. The rescans test object rearrangement unde
 We use the Apartment and Office sequences released with Khronos~\cite{Schmid-RSS-24}. They combine
 moving objects and longer-term object changes during continuous robot trajectories, including revisits
 to previously observed areas. Their scene annotations support Khronos's official evaluation of
-background, static objects, dynamics, and changes over map and query times.
+background, static objects, dynamics, and changes over map and query times. We use this protocol for
+the TSDF comparison with Khronos's official evaluation code.
+
+\paragraph{Aria.}
+We use the room0 and room1 sequences from the Aria Digital Twin data released with
+GaME~\cite{Yugay_2026_CVPR}. Each room contains two recordings with changes between them.
+The release provides posed RGB-D images and framewise SAM masks. We process each pair as consecutive
+visits and evaluate novel-view rendering after updating the map.
 
 \section{Evaluation Protocol}
 
 \paragraph{Visit chains and geometry.}
 The real room contains visits A, B, and C; the simulated apartment and Flat contain visits A and B.
 Each method continues through the chain using its own map updates. Panoptic Multi-TSDFs loads the preceding
-visit's map through its native interface. We evaluate mesh F1 at the end of each visit. The real-room reference is a reconstructed surface at 1\,cm resolution,
+visit's map through its native interface. We evaluate mesh F1 at the end of each visit; the final-visit Gaussian scores use the refined maps. The real-room reference is a reconstructed surface at 1\,cm resolution,
 restricted to the room. The synthetic reference consists of ground-truth surfaces observed up to the evaluation
 time. Thus the reference includes previously observed regions that the current visit does not see.
 \Cref{tab:supp_geometry} reports every visit; \cref{tab:supp_restart} additionally compares native maps rebuilt
@@ -192,14 +196,14 @@ Khronos & 90.8 & 88.9 & 87.7 & 93.6 & 93.1 & 86.0 & 86.9 & 88.8 \\
 Panoptic & 82.6 & 86.2 & 87.3 & 89.2 & 92.4 & 85.1 & 89.4 & 81.0 \\
 Ours (TSDF) & 94.6 & 96.2 & 96.1 & 99.2 & 99.2 & 86.5 & 90.1 & 91.8 \\
 \midrule
-GaME & 91.9 & 88.6 & 90.1 & 94.3 & 91.2 & 86.6 & 87.4 & 87.0 \\
-Ours (3DGS) & 93.5 & 93.1 & 95.0 & 97.7 & 96.6 & 86.3 & 89.8 & 89.7 \\
+GaME & 91.9 & 88.6 & 88.6 & 94.3 & 80.9 & 86.6 & 86.2 & 85.9 \\
+Ours (3DGS) & 93.5 & 93.1 & 95.1 & 97.7 & 96.5 & 86.3 & 89.0 & 89.6 \\
 \midrule
 wavemap & 87.2 & 81.2 & 84.5 & 92.2 & 93.2 & 79.5 & 80.2 & 75.6 \\
 Ours (Occ.) & 87.9 & 89.1 & 91.0 & 92.4 & 94.2 & 79.5 & 82.4 & 79.4 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Mesh F1 at each visit.} F1 (\%) at 5\,cm.}
+\caption{\textbf{Mesh F1 at each visit.} F1 (\%) at 5\,cm; 3RScan uses the room-wise averaging described in the text.}
 \label{tab:supp_geometry}
 \end{table*}
 % ===== END tables / supp_geometry =====
@@ -232,16 +236,17 @@ Synthetic & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
  & Occupancy & B & 96.49 & 76.50 & 85.34 & 94.90 & 93.58 & 94.23 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Restart versus continued mapping.} Precision, recall, and F1 at 5\,cm (\%).}
+\caption{\textbf{Restart versus continued mapping.} Precision, recall, and F1 at 5\,cm (\%). Native restart maps and our continued maps are compared after online mapping using the same visit-specific reference.}
 \label{tab:supp_restart}
 \end{table*}
 % ===== END tables / supp_restart =====
 
 \paragraph{Objects and changes.}
-Object matching uses a 0.5\,m distance threshold throughout. Scores at successive snapshots are weighted by the
+Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold throughout. Scores at successive snapshots are weighted by the
 duration for which each snapshot is current. For 3RScan, scores are first averaged over visits within a room
-and then over eight rooms. Change F1 pools appearance and disappearance events across the
-complete visit chain; 3RScan contains 77 reference events.
+and then over eight rooms. Change F1 pools true positives, false positives, and false negatives across the
+complete chain; 3RScan contains 77 pooled reference events. These include appearances and disappearances
+within visits and between visits.
 The state-based 3RScan evaluator considers a reference state represented when at least half its points lie
 within 10\,cm of a single mapped object surface. An earlier state that is no longer represented supplies
 disappearance evidence; a new represented state supplies appearance evidence. A persistent reference object
@@ -254,14 +259,13 @@ decisions, while Unobserved submaps do not. Object geometry remains available to
 Gaussian and occupancy exports form object components using 26-connectivity on a 10\,cm grid within each
 identity, accepting components of volume 0.005--10\,m$^3$, following the Khronos object construction settings.
 The same export rule is used for a representation's native and proposed updates. State records in the chained
-exports declare appearances.
+exports declare appearances; the exporter does not infer movement by counting closed states.
 
 \paragraph{Inputs and native baselines.}
-Khronos receives annotated instances on the real room, synthetic apartment, and 3RScan; its Flat and
-TESSE runs use semantic input. Real-room and 3RScan tracking uses annotated identities, while synthetic
-tracking uses mask overlap. On TESSE, each method constructs and tracks object regions from semantic
-labels. Panoptic uses its dataset configurations: 5\,cm object resolution and
-10\,cm background resolution for the synthetic apartment, and 5\,cm resolution on the real room and 3RScan.
+Khronos receives annotated instances on the real room, synthetic apartment, and 3RScan; its Flat run
+uses semantic input. Real-room and 3RScan instance tracking uses the supplied identities, while synthetic
+tracking uses mask overlap. Both methods use semantic masks in the TESSE comparison. Panoptic uses
+5\,cm object and background resolution for the synthetic apartment, the real room, and 3RScan.
 GaME and wavemap continue with their native updates for the baseline rows. The GaME 3RScan run uses its
 dataset-adapted implementation. On real RGB-D, invalid depths are excluded from geometry supervision and
 allocation; the synthetic GaME adapter corrects relative-pose keyframe selection and guards sampling termination.
@@ -270,14 +274,11 @@ For 3RScan, evaluation images are 480$\times$270 for both Gaussian methods. In t
 uses 240$\times$135 inputs to fit memory; evaluation remains at 480$\times$270.
 
 \paragraph{Rendering.}
-The main rendering comparison uses Flat and two rooms from GaME's Aria sequences~\cite{Yugay_2026_CVPR}.
-Each room contains two visits with scene changes. Our runs use SAM masks; the GaME Flat reproduction uses
-annotated masks, and its Aria runs use SAM. The room0 baseline is an official-code reproduction, and the
-room1 baseline is the published result. Following GaME, every tenth frame of the final visit is held out,
-except the first frame. PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and depth L1 are averaged over
-held-out frames after refinement. Depth L1 excludes pixels without a measured depth for both methods.
-The room0 final values are 0.711\,cm for GaME and 0.704\,cm for ours. All room1 pixels have measured depth.
-The 3RScan analysis averages over the final visit of each of eight rooms.
+Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit is held out, except the first frame.
+PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and measured-depth L1 are averaged over held-out frames.
+The 3RScan result is the mean over the final visit of each of eight rooms. The additional rendering
+comparison uses our SAM-input Flat reconstruction and the SAM-input Aria runs. Depth L1 is evaluated on
+pixels with valid measured depth in both methods.
 
 \paragraph{Integration settings.}
 The common surface test uses a 5\,cm tolerance, a $60^\circ$ incidence limit~\cite{6375037}, and threshold $\ln 99$.
@@ -285,10 +286,26 @@ Each depth image requires at least $\min(30,\nu_{\mathrm{rel}})$ judged samples.
 threshold is 10\,cm. Our TSDF uses 5\,cm voxels and a 10\,cm truncation band, Gaussian surface tests use a
 5\,cm tolerance floor, and occupancy uses 5\,cm cells. These settings are shared across the reported datasets.
 
+\paragraph{Parameter choices.}
+The surface tolerance is configured at the map resolution, 5\,cm, following the voxel-scale comparison
+convention in Panoptic Multi-TSDFs~\cite{9811877}. The $60^\circ$ incidence limit follows the angular range
+of the depth-noise model in Nguyen et al.~\cite{6375037}. The minimum of $\min(30,\nu_{\mathrm{rel}})$
+judged samples stabilizes the per-round see-through fraction while allowing states with fewer reliable
+samples to be tested. At the maximum sampling budget of 1,500, 30 samples correspond to 2\% of the surface
+samples. The threshold $\ln 99$ follows the nominal Wald boundary $\ln((1-\beta)/\alpha)$ with
+$\alpha=\beta=0.01$~\cite{Wald1945}; the threshold sensitivity study uses $\eta\in\{9,99,999\}$.
+The 10\,cm successor displacement is the spatial tolerance used to distinguish object configurations.
+
+\paragraph{Occupancy near a replaced surface.}
+An occupied measurement updates a finite band behind the measured surface. When a re-observed surface lies
+close to its previous estimate, these occupied updates can continue to support the older copy. Our state
+retirement removes the cells of an ended state together, and the local replacement condition removes the
+stale copy of a re-observed surface. Geometry that is merely occluded remains in the map.
+
 \section{Single-Run Spatio-Temporal Evaluation}
 
 % ===== BEGIN tables / supp_tesse =====
-% SRC: RESULTS_TABLE_20261029.md, 11-04 semantic TESSE table; ours semv5, Khronos semantic 5 cm.
+% Generated from experiments_rewrite_20261101/results.json
 \begin{table*}[t]
 \centering
 \fontsize{9}{10.3}\selectfont
@@ -306,7 +323,7 @@ Apartment & Khronos & 91.9 & 69.0 & 78.0 & 95.1 & 38.0 & 54.8 & 95.5 & 76.5 & 85
  & Ours & 96.5 & 69.3 & 79.8 & 96.5 & 45.5 & 62.2 & 94.9 & 94.0 & 95.1 & 87.0 & 52.8 & 92.6 & 88.1 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Full TESSE evaluation with semantic input.} Temporal precision, recall, and F1 (\%); final mesh F1 at 5\,cm.}
+\caption{\textbf{Full TESSE evaluation with semantic masks.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
 \label{tab:supp_tesse}
 \end{table*}
 % ===== END tables / supp_tesse =====
@@ -338,7 +355,7 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
  & Ours & 98.5 & 64.1 & 77.1 & 74.0 & 84.7 & 77.9 & 99.9 & 57.5 & 73.9 & 75.7 & 32.4 & 59.2 & 89.9 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Independent single-visit runs.} Temporal precision, recall, and F1 (\%); final mesh F1 at 5\,cm.}
+\caption{\textbf{Independent single-visit runs.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
 \label{tab:supp_single}
 \end{table*}
 % ===== END tables / supp_single =====
@@ -358,6 +375,64 @@ of the camera in the synthetic sequences. Background, static objects, dynamics, 
 official query aggregation as TESSE. The mesh F1 column compares the last map with that visit's surface
 reference and therefore differs from the historical background score.
 
+
+\section{Additional Gaussian Rendering Results}
+
+\paragraph{Main-comparison sequences.}
+\Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs used for the
+instance-input mapping comparison on Real, Sim, Flat, and 3RScan. These results complement the shared
+geometry, object, and change metrics in the main comparison.
+
+\paragraph{Flat and Aria.}
+The additional comparison in the main paper uses our SAM-input reconstruction on Flat and both methods'
+SAM-input runs on Aria. Its held-out results are repeated in \cref{tab:supp_additional_rendering}.
+
+\begin{table*}[!t]
+\begin{minipage}[t]{0.49\textwidth}
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$\\
+\midrule
+Real & GaME & 18.22 & 0.758 & 0.454 & 6.03\\
+ & Ours & 19.90 & 0.811 & 0.370 & 4.96\\
+Sim & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
+ & Ours & 24.90 & 0.824 & 0.215 & 15.32\\
+Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
+ & Ours & 27.64 & 0.947 & 0.117 & 0.47\\
+3RScan & GaME & 20.10 & 0.739 & 0.401 & 4.95\\
+ & Ours & 21.06 & 0.774 & 0.366 & 2.79\\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Gaussian rendering on the main-comparison sequences.} Held-out views after refinement;
+PSNR in dB and depth L1 in cm.}
+\label{tab:supp_instance_rendering}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}
+
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$\\
+\midrule
+Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
+ & Ours & 28.12 & 0.957 & 0.103 & 0.39\\
+Aria room0 & GaME & 31.55 & 0.952 & 0.146 & 0.71\\
+ & Ours & 32.43 & 0.958 & 0.141 & 0.70\\
+Aria room1 & GaME & 31.97 & 0.950 & 0.100 & 1.80\\
+ & Ours & 33.39 & 0.969 & 0.091 & 1.17\\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Gaussian rendering on Flat and Aria.} Held-out views after refinement; PSNR in dB and
+depth L1 in cm.}
+\label{tab:supp_additional_rendering}
+\end{minipage}
+\end{table*}
+
 \section{Complete Ablations}
 
 % ===== BEGIN tables / supp_ablations =====
@@ -372,31 +447,31 @@ reference and therefore differs from the historical background score.
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 \multicolumn{8}{@{}l}{\textit{Block a}} \\
 \rowcolor{oursbg!45}
-Full (a) & 90.0 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
-Changes not applied & 84.4 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
+Full (a) & 89.8 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
+Changes not applied & 84.5 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
 Object scope, no handover & 84.4 & 66.8 & 68.8 & 23.68 & 0.91 & 0.16 & 3.32 \\
-Object scope & 89.7 & 66.9 & 83.3 & 27.46 & 0.95 & 0.12 & 0.53 \\
-Local-surface scope & 89.6 & 66.6 & 80.0 & 27.88 & 0.95 & 0.11 & 0.48 \\
-w/o handover & 89.7 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
+Object scope & 89.8 & 66.9 & 83.3 & 27.46 & 0.95 & 0.12 & 0.53 \\
+Local-surface scope & 89.4 & 66.6 & 80.0 & 27.88 & 0.95 & 0.11 & 0.48 \\
+w/o handover & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
 \midrule
 \multicolumn{8}{@{}l}{\textit{Block b}} \\
 \rowcolor{oursbg!45}
-Full (b) & 89.8 & 66.5 & 83.3 & 27.77 & 0.95 & 0.12 & 0.45 \\
-Unrestricted old frames & 86.2 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
-Unrestricted during refinement & 89.8 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
-Discard conflicting frames & 89.6 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
-Discard conflicting frames of visit A & 90.0 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
-Current-time map selection & 90.2 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
+Full (b) & 89.9 & 66.5 & 83.3 & 27.77 & 0.95 & 0.12 & 0.45 \\
+Unrestricted old frames & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
+Unrestricted during refinement & 84.5 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
+Discard conflicting frames & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
+Discard conflicting frames of the first visit & 89.9 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
+Current-time map selection & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
-Odds threshold $9$ & 90.2 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
-Odds threshold $999$ & 90.1 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
-Fixed prior $q=1/4$ & 90.1 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
-Fixed prior $q=1/2$ & 89.9 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
-Fixed prior $q=3/4$ & 90.1 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
+Odds threshold $9$ & 89.9 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
+Odds threshold $999$ & 90.0 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
+Fixed prior $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
+Fixed prior $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
+Fixed prior $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
 Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm. Mesh F1 is measured before refinement; rendering scores are measured after refinement.}
+\caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm.}
 \label{tab:supp_ablations}
 \end{table*}
 % ===== END tables / supp_ablations =====
@@ -408,8 +483,8 @@ priors, and segmentation.
 \paragraph{Decision scope and handover.}
 The object and local-surface variants restrict the application scope of the same change rule.
 Both recover most of the full result on Flat. Removing cross-visit state handover with all rules active changes
-mesh F1 from 90.00 to 89.74 and change F1 from 83.33 to 80.00.
-Within the object-scope variant, removing handover reduces mesh F1 from 89.70 to 84.36 and change F1 from
+mesh F1 from 89.77 to 89.42 and change F1 from 83.33 to 80.00.
+Within the object-scope variant, removing handover reduces mesh F1 from 89.76 to 84.40 and change F1 from
 83.33 to 68.75. Handover carries earlier object states into later decisions; local-surface tests also act on
 the inherited geometry in the full configuration.
 
@@ -417,8 +492,9 @@ the inherited geometry in the full configuration.
 The main table compares three ways to use earlier keyframes while mapping and refining visit B.
 Unrestricted reuse treats an earlier keyframe as a current one: it samples it without replay weights,
 supervises the current map on all pixels, and allows it to optimize currently alive Gaussians.
-Whole-frame rejection drops a keyframe of either visit once it observes a Gaussian whose lifetime
-later ends. A rejected draw is replaced to keep the optimization budget.
+Whole-frame rejection follows GaME's keyframe filtering: a keyframe of either visit is dropped once it
+observes a Gaussian whose lifetime later ends, and a rejected draw is replaced to keep the optimization
+budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
 Unrestricted old-frame reuse reduces PSNR by 5.08\,dB, and applying it only during refinement reduces PSNR
@@ -432,18 +508,21 @@ it discards.
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
 selection and trainable-element restrictions. It yields 27.83\,dB, compared with 27.77 for Full.
-The geometry-only association variant yields 89.95 mesh F1 and 28.14\,dB.
+The geometry-only association variant yields 89.98 mesh F1 and 28.14\,dB. These diagnostics retain the
+other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
+constraints as a whole.
 
 \paragraph{Thresholds and priors.}
 The decision threshold is $\ln\eta$ with $\eta\in\{9,99,999\}$. Across these settings, mesh F1 varies by
-0.36 points and PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
+0.13 points and PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
 reconstruction scores to the learned prior. The $q=1/2$ setting matches Full's change F1; the other fixed
-settings each miss one additional event.
+settings each miss one additional event. These experiments use the same reconstruction and event metrics
+as the main evaluation.
 
 \paragraph{Predicted masks.}
-We predict masks with OneFormer~\cite{Jain_2023_CVPR} Swin-L, ADE20K weights, and confidence threshold 0.5.
+OneFormer~\cite{Jain_2023_CVPR} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
 Predicted instances are associated across frames before reconstruction.
-Mesh F1 before refinement changes from 89.81 to 89.89 and refined PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
+Mesh F1 changes from 89.94 to 89.91 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
 change F1 to 72.73, with three additional missed events and no false positives. The map remains geometrically
 accurate while object-level evaluation reflects segmentation errors.
 
@@ -454,13 +533,6 @@ The current map contains 2.33 million Gaussians, compared with 2.37 million for 
 states gives approximately 2.60 million Gaussians.
 
 \section{Qualitative Comparisons}
-
-\paragraph{Visualization.}
-In \cref{fig:qualitative}, methods in each row share the camera, crop, and scale. TSDF and occupancy surfaces use reference-image
-colors, with occupancy displayed at 2\,cm resolution. Real-room occupancy panels use capture-time maps;
-the remaining panels use final maps. In \cref{fig:supp_temporal}, ground truth uses the indicated time and
-each map uses the next saved snapshot with the same scene configuration. The camera and clipping
-plane are shared.
 % ===== BEGIN figures / qualitative_native =====
 % Original PNG panels; square cropping is applied by graphicx.
 % Crop coordinates and comparison rule: figures/qualitative_crops.json.
@@ -533,8 +605,10 @@ plane are shared.
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png}\\[2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Scene updates across three representations.} Six views from Real, Synthetic, and Flat compare
-native updates with our TSDF, Gaussian, and occupancy maps.}
+\caption{\textbf{Scene updates across three representations.} Six views from the real room, synthetic apartment,
+and Flat, with each method rendered at the image pose. Each row uses the same square crop and scale across methods.
+TSDF and occupancy use reference colors. Real-room occupancy panels use the capture-time maps; other panels
+use final maps. Occupancy is visualized at 2\,cm resolution.}
 \label{fig:qualitative}
 \end{figure*}
 % ===== END figures / qualitative_native =====
@@ -586,8 +660,7 @@ Ours (Occ.) &
 \includegraphics[width=\twidth,trim={0.0000bp 92.0000bp 0.0000bp 10.0000bp},clip]{figures/results_native/temporal/3_visit2_097s/7_ours_occ.png} &
 \includegraphics[width=\twidth,trim={0.0000bp 92.0000bp 0.0000bp 10.0000bp},clip]{figures/results_native/temporal/4_visit2_end/7_ours_occ.png}\\[2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Mapping the evolving scene from a fixed viewpoint.} Columns follow time across two visits;
-rows compare reference scenes, native updates, and ours across three representations.}
+\caption{\textbf{Mapping the evolving scene from a fixed viewpoint.} Columns follow time across two visits. Ground truth is rendered at the indicated time; maps use the next saved snapshot, with no intervening scene change. All panels share the camera and clipping plane.}
 \label{fig:supp_temporal}
 \end{figure*}
 % ===== END figures / temporal_all_native =====

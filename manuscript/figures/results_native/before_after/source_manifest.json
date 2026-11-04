@@ -147,13 +147,13 @@
     "before_box": [
       185,
       251,
-      452,
-      455
+      482,
+      478
     ],
     "right_trim": [
       185,
-      25,
-      188,
+      2,
+      158,
       251
     ],
     "before_source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_floor_retouch_20261104\\flat_before_context_retouch.png",
@@ -186,7 +186,7 @@
       60.0,
       60.0
     ],
-    "framing": "Author-selected crop; more bed surface, less left wall; identical crop for all three methods.",
+    "framing": "Author-selected composition with approximately 10% less magnification; identical crop for all three methods.",
     "ours_result_asset": "figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png",
     "ours_result_input": "SAM",
     "ours_result_checkpoint": "/home/jixian/Desktop/FT/runs/update_layer_game_T1_20261006/flat_sam_5c5092b/ours/checkpoint_b_post_ref.pt.zst"
