@@ -1,0 +1,307 @@
+{
+  "figure": "Dataset overview",
+  "rows": [
+    {
+      "key": "real_within_before",
+      "dataset": "Real",
+      "visit": 3,
+      "session": "c",
+      "frame": 980,
+      "instance": 2,
+      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_c_20260822_182703_387_flat_rgbd_30hz_1080p/000980_color.png",
+      "kind": "Original recorded RGB frame",
+      "file": "real_within_before.png",
+      "sha256": "ed543808479a7016ef8f14eecbff9ceeba78e4c512929f4ff912bb74fed89655",
+      "size": [
+        1920,
+        1080
+      ],
+      "time_s": 32.666666666666664,
+      "bbox": [
+        768,
+        526,
+        1003,
+        1055
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_c/000980_segmentation.png",
+      "mask_pixels": 97663,
+      "display_box": [
+        752,
+        510,
+        1019,
+        1071
+      ],
+      "display_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ]
+    },
+    {
+      "key": "real_within_after",
+      "dataset": "Real",
+      "visit": 3,
+      "session": "c",
+      "frame": 1260,
+      "instance": 2,
+      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_c_20260822_182703_387_flat_rgbd_30hz_1080p/001260_color.png",
+      "kind": "Original recorded RGB frame",
+      "file": "real_within_after.png",
+      "sha256": "e35fd41346a7d4973026c50d9b2b3cb36e5acc516a4aba0c4ede944e4431fc7e",
+      "size": [
+        1920,
+        1080
+      ],
+      "time_s": 42.0,
+      "bbox": [
+        884,
+        544,
+        1088,
+        992
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_c/001260_segmentation.png",
+      "mask_pixels": 74416,
+      "display_box": [
+        868,
+        528,
+        1104,
+        1008
+      ],
+      "display_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ]
+    },
+    {
+      "key": "real_across_before",
+      "dataset": "Real",
+      "visit": 2,
+      "session": "b",
+      "frame": 3120,
+      "instance": 2,
+      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_b_20260810_030502_620_flat_rgbd_30hz_1080p/003120_color.png",
+      "kind": "Original recorded RGB frame",
+      "file": "real_across_before.png",
+      "sha256": "0e2cdf4e8bfd35edb5f2e1801c8a5d7285b568633df76a5d3954fe8cf8386c74",
+      "size": [
+        1920,
+        1080
+      ],
+      "time_s": 104.0,
+      "bbox": [
+        676,
+        458,
+        1046,
+        853
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_b/003120_segmentation.png",
+      "mask_pixels": 107958,
+      "display_box": [
+        660,
+        442,
+        1062,
+        869
+      ],
+      "display_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ]
+    },
+    {
+      "key": "real_across_after",
+      "dataset": "Real",
+      "visit": 3,
+      "session": "c",
+      "frame": 2540,
+      "instance": 10,
+      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_c_20260822_182703_387_flat_rgbd_30hz_1080p/002540_color.png",
+      "kind": "Original recorded RGB frame",
+      "file": "real_across_after.png",
+      "sha256": "e751b32edf742f517509594a566078abb606762cdeba31148f2f0cc34a8ee1f3",
+      "size": [
+        1920,
+        1080
+      ],
+      "time_s": 84.66666666666667,
+      "bbox": [
+        407,
+        427,
+        751,
+        1044
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_c/002540_segmentation.png",
+      "mask_pixels": 124172,
+      "display_box": [
+        391,
+        411,
+        767,
+        1060
+      ],
+      "display_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ]
+    },
+    {
+      "key": "sim_within_before",
+      "dataset": "Sim",
+      "visit": 2,
+      "session": "b",
+      "frame": 920,
+      "instance": 164,
+      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000920_color.png",
+      "kind": "Original simulator RGB frame",
+      "file": "sim_within_before.png",
+      "sha256": "489aa01590cc0a0cad1d356a1e839200204636cc23ce83ae13b8840aebe110db",
+      "size": [
+        680,
+        480
+      ],
+      "time_s": 30.666666666666668,
+      "bbox": [
+        240,
+        277,
+        348,
+        394
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000920_segmentation.png",
+      "mask_pixels": 6717,
+      "display_box": [
+        232,
+        269,
+        356,
+        402
+      ],
+      "display_crop": [
+        0,
+        0,
+        680,
+        480
+      ]
+    },
+    {
+      "key": "sim_within_after",
+      "dataset": "Sim",
+      "visit": 2,
+      "session": "b",
+      "frame": 980,
+      "instance": 164,
+      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000980_color.png",
+      "kind": "Original simulator RGB frame",
+      "file": "sim_within_after.png",
+      "sha256": "433518ada9c691a7c330d00c442014e6fc58204a1594c286ef381609f01c538b",
+      "size": [
+        680,
+        480
+      ],
+      "time_s": 32.666666666666664,
+      "bbox": [
+        405,
+        215,
+        483,
+        295
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000980_segmentation.png",
+      "mask_pixels": 3234,
+      "display_box": [
+        397,
+        207,
+        491,
+        303
+      ],
+      "display_crop": [
+        0,
+        0,
+        680,
+        480
+      ]
+    },
+    {
+      "key": "sim_across_before",
+      "dataset": "Sim",
+      "visit": 1,
+      "session": "a",
+      "frame": 3915,
+      "instance": 68,
+      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_a/rgbd/003915_color.png",
+      "kind": "Original simulator RGB frame",
+      "file": "sim_across_before.png",
+      "sha256": "0341c398843b0bd0363f0a73a7b30aa82693bd031c4f7d7be47fc17761dff0c4",
+      "size": [
+        680,
+        480
+      ],
+      "time_s": 130.5,
+      "bbox": [
+        487,
+        81,
+        635,
+        237
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_a/instance_labels/003915_segmentation.png",
+      "mask_pixels": 6328,
+      "display_box": [
+        479,
+        73,
+        643,
+        245
+      ],
+      "display_crop": [
+        0,
+        0,
+        680,
+        480
+      ]
+    },
+    {
+      "key": "sim_across_after",
+      "dataset": "Sim",
+      "visit": 2,
+      "session": "b",
+      "frame": 900,
+      "instance": 156,
+      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000900_color.png",
+      "kind": "Original simulator RGB frame",
+      "file": "sim_across_after.png",
+      "sha256": "819454ae7f9a681f41fd31d0e7708011078e0e042c7606870f86a972dfb1545e",
+      "size": [
+        680,
+        480
+      ],
+      "time_s": 30.0,
+      "bbox": [
+        413,
+        224,
+        680,
+        376
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000900_segmentation.png",
+      "mask_pixels": 28929,
+      "display_box": [
+        405,
+        216,
+        680,
+        384
+      ],
+      "display_crop": [
+        0,
+        0,
+        680,
+        480
+      ]
+    }
+  ],
+  "pixel_processing": "None; native RGB files embedded individually in LaTeX",
+  "event_sources": [
+    "/mnt/d/3Study/ETH/FT/results/abc_eval_final/gt_objects/human_gt_source.json",
+    "/home/jixian/Desktop/FT/datasets/synthetic_ab/GT_ANIMATION_INTERVALS.csv",
+    "/home/jixian/Desktop/FT/datasets/synthetic_ab/GT_AB_BOUNDARY.csv"
+  ]
+}
