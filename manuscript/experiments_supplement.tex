@@ -107,18 +107,22 @@ surface band, with the same orientation. In a tied case, the current estimate re
 The remaining geometry is retained, including unobserved regions.
 
 \paragraph{Lifetimes and observation times.}
-Element lifetimes follow scene states and may begin before the elements are allocated. For keyframe
-optimization, frame selection, trainable geometry, and map-time selection jointly enforce that a keyframe
-captured at $t_k$ evaluates its loss on $\mathcal{M}(t_k)$. The current map uses only observations received
-by the current processing time.
+Element lifetimes follow scene states and may begin before the elements are allocated. A newly allocated
+element can therefore represent a surface already present in an earlier observation. For Gaussian
+optimization, frame selection, map-time selection, and fixed parameters jointly enforce compatibility
+with the state observed by each keyframe. Current-visit frames refine the current estimate in continuing
+regions; for objects that change within the visit, they select the state present at their capture time.
+Earlier keyframes update compatible, unfrozen geometry. Ended Gaussians remain available to historical
+queries with fixed parameters. Updates use observations available at the current processing time.
 
 \paragraph{Representations.}
 \emph{TSDF.} When a valid domain changes, the affected voxel blocks are rebuilt from archived frames in
 observation order. The current mesh includes the earlier faces that pass the retention test. We use the
 active window, tracking, and object extraction of Khronos~\cite{Schmid-RSS-24}.
 \emph{3D Gaussians.} Current-visit frames optimize new and revisited regions, while historical replay
-maintains earlier geometry outside the current coverage. These constraints also apply during final
-refinement. Pruned historical Gaussians receive an end time and remain available to earlier queries.
+maintains compatible earlier geometry, including regions outside the current coverage. These observation
+constraints also apply during final refinement. Earlier Gaussians retired by a state or surface decision
+receive an end time and remain available to earlier queries.
 \emph{Occupancy.} The replacement condition $C(e)$ retires nearby stale copies, while eligible unobserved
 cells are retained.
 % ===== END sec / method_details =====
@@ -159,8 +163,7 @@ across successive scans in each room. The rescans test object rearrangement unde
 We use the Apartment and Office sequences released with Khronos~\cite{Schmid-RSS-24}. They combine
 moving objects and longer-term object changes during continuous robot trajectories, including revisits
 to previously observed areas. Their scene annotations support Khronos's official evaluation of
-background, static objects, dynamics, and changes over map and query times. We use this protocol for
-the TSDF comparison with Khronos's official evaluation code.
+background, static objects, dynamics, and changes over map and query times.
 
 \section{Evaluation Protocol}
 
@@ -186,7 +189,7 @@ F1$\uparrow$ & \multicolumn{3}{c}{Real} & \multicolumn{2}{c}{Synthetic} & \multi
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
 Method & A & B & C & A & B & A & B & Mean \\ \midrule
 Khronos & 90.8 & 88.9 & 87.7 & 93.6 & 93.1 & 86.0 & 86.9 & 88.8 \\
-Panoptic & 82.6 & 86.2 & 87.3 & 90.3 & 90.5 & 85.1 & 89.4 & 81.0 \\
+Panoptic & 82.6 & 86.2 & 87.3 & 89.2 & 92.4 & 85.1 & 89.4 & 81.0 \\
 Ours (TSDF) & 94.6 & 96.2 & 96.1 & 99.2 & 99.2 & 86.5 & 90.1 & 91.8 \\
 \midrule
 GaME & 91.9 & 88.6 & 90.1 & 94.3 & 91.2 & 86.6 & 87.4 & 87.0 \\
@@ -196,7 +199,7 @@ wavemap & 87.2 & 81.2 & 84.5 & 92.2 & 93.2 & 79.5 & 80.2 & 75.6 \\
 Ours (Occ.) & 87.9 & 89.1 & 91.0 & 92.4 & 94.2 & 79.5 & 82.4 & 79.4 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Mesh F1 at each visit.} F1 (\%) at 5\,cm; 3RScan uses the room-wise averaging described in the text.}
+\caption{\textbf{Mesh F1 at each visit.} F1 (\%) at 5\,cm.}
 \label{tab:supp_geometry}
 \end{table*}
 % ===== END tables / supp_geometry =====
@@ -229,7 +232,7 @@ Synthetic & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
  & Occupancy & B & 96.49 & 76.50 & 85.34 & 94.90 & 93.58 & 94.23 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Restart versus continued mapping.} Precision, recall, and F1 at 5\,cm (\%). Native restart maps and our continued maps use the same visit-specific reference.}
+\caption{\textbf{Restart versus continued mapping.} Precision, recall, and F1 at 5\,cm (\%).}
 \label{tab:supp_restart}
 \end{table*}
 % ===== END tables / supp_restart =====
@@ -237,9 +240,8 @@ Synthetic & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
 \paragraph{Objects and changes.}
 Object matching uses a 0.5\,m distance threshold throughout. Scores at successive snapshots are weighted by the
 duration for which each snapshot is current. For 3RScan, scores are first averaged over visits within a room
-and then over eight rooms. Change F1 pools true positives, false positives, and false negatives across the
-complete chain; 3RScan contains 77 pooled reference events. These include appearances and disappearances
-within visits and between visits.
+and then over eight rooms. Change F1 pools appearance and disappearance events across the
+complete visit chain; 3RScan contains 77 reference events.
 The state-based 3RScan evaluator considers a reference state represented when at least half its points lie
 within 10\,cm of a single mapped object surface. An earlier state that is no longer represented supplies
 disappearance evidence; a new represented state supplies appearance evidence. A persistent reference object
@@ -252,12 +254,13 @@ decisions, while Unobserved submaps do not. Object geometry remains available to
 Gaussian and occupancy exports form object components using 26-connectivity on a 10\,cm grid within each
 identity, accepting components of volume 0.005--10\,m$^3$, following the Khronos object construction settings.
 The same export rule is used for a representation's native and proposed updates. State records in the chained
-exports declare appearances; the exporter does not infer movement by counting closed states.
+exports declare appearances.
 
 \paragraph{Inputs and native baselines.}
-Khronos receives annotated instances on the real room, synthetic apartment, 3RScan, and TESSE; its Flat run
-uses semantic input. Real-room and 3RScan instance tracking uses the supplied identities, while synthetic and
-TESSE tracking uses mask overlap. Panoptic uses its dataset configurations: 5\,cm object resolution and
+Khronos receives annotated instances on the real room, synthetic apartment, and 3RScan; its Flat and
+TESSE runs use semantic input. Real-room and 3RScan tracking uses annotated identities, while synthetic
+tracking uses mask overlap. On TESSE, each method constructs and tracks object regions from semantic
+labels. Panoptic uses its dataset configurations: 5\,cm object resolution and
 10\,cm background resolution for the synthetic apartment, and 5\,cm resolution on the real room and 3RScan.
 GaME and wavemap continue with their native updates for the baseline rows. The GaME 3RScan run uses its
 dataset-adapted implementation. On real RGB-D, invalid depths are excluded from geometry supervision and
@@ -267,9 +270,14 @@ For 3RScan, evaluation images are 480$\times$270 for both Gaussian methods. In t
 uses 240$\times$135 inputs to fit memory; evaluation remains at 480$\times$270.
 
 \paragraph{Rendering.}
-Following GaME~\cite{Yugay_2026_CVPR}, every tenth frame of the final visit is held out, except the first frame.
-PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and measured-depth L1 are averaged over held-out frames.
-The 3RScan result is the mean over the final visit of each of eight rooms.
+The main rendering comparison uses Flat and two rooms from GaME's Aria sequences~\cite{Yugay_2026_CVPR}.
+Each room contains two visits with scene changes. Our runs use SAM masks; the GaME Flat reproduction uses
+annotated masks, and its Aria runs use SAM. The room0 baseline is an official-code reproduction, and the
+room1 baseline is the published result. Following GaME, every tenth frame of the final visit is held out,
+except the first frame. PSNR, MS-SSIM, LPIPS with the AlexNet backbone, and depth L1 are averaged over
+held-out frames after refinement. Depth L1 excludes pixels without a measured depth for both methods.
+The room0 final values are 0.711\,cm for GaME and 0.704\,cm for ours. All room1 pixels have measured depth.
+The 3RScan analysis averages over the final visit of each of eight rooms.
 
 \paragraph{Integration settings.}
 The common surface test uses a 5\,cm tolerance, a $60^\circ$ incidence limit~\cite{6375037}, and threshold $\ln 99$.
@@ -280,7 +288,7 @@ threshold is 10\,cm. Our TSDF uses 5\,cm voxels and a 10\,cm truncation band, Ga
 \section{Single-Run Spatio-Temporal Evaluation}
 
 % ===== BEGIN tables / supp_tesse =====
-% Generated from experiments_rewrite_20261101/results.json
+% SRC: RESULTS_TABLE_20261029.md, 11-04 semantic TESSE table; ours semv5, Khronos semantic 5 cm.
 \begin{table*}[t]
 \centering
 \fontsize{9}{10.3}\selectfont
@@ -291,14 +299,14 @@ threshold is 10\,cm. Our TSDF uses 5\,cm voxels and a 10\,cm truncation band, Ga
 & & \multicolumn{3}{c}{Background} & \multicolumn{3}{c}{Static objects} & \multicolumn{3}{c}{Dynamic objects} & \multicolumn{3}{c}{Changes} & Mesh \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
 Scene & Method & P & R & F1 & P & R & F1 & P & R & F1 & P & R & F1 & F1 \\ \midrule
-Office & Khronos & 93.8 & 66.0 & 74.6 & 99.3 & 57.0 & 69.0 & 97.3 & 75.5 & 84.8 & 9.2 & 49.3 & 43.6 & 92.8 \\
- & Ours & 95.3 & 67.5 & 76.1 & 99.1 & 57.4 & 69.5 & 100.0 & 97.5 & 98.7 & 94.4 & 50.4 & 79.0 & 94.2 \\
+Office & Khronos & 93.8 & 66.0 & 74.6 & 95.7 & 56.0 & 67.4 & 97.3 & 75.5 & 84.8 & 10.8 & 50.2 & 46.2 & 92.8 \\
+ & Ours & 95.3 & 67.5 & 76.1 & 94.7 & 58.2 & 69.2 & 100.0 & 93.7 & 96.7 & 93.3 & 48.8 & 78.6 & 94.1 \\
 \midrule
-Apartment & Khronos & 91.9 & 69.0 & 78.0 & 96.7 & 38.8 & 55.9 & 95.7 & 76.2 & 85.3 & 16.3 & 56.8 & 36.9 & 86.1 \\
- & Ours & 96.5 & 69.3 & 79.9 & 96.7 & 46.7 & 63.3 & 94.9 & 94.0 & 95.1 & 93.3 & 59.2 & 92.7 & 88.1 \\
+Apartment & Khronos & 91.9 & 69.0 & 78.0 & 95.1 & 38.0 & 54.8 & 95.5 & 76.5 & 85.5 & 15.6 & 53.9 & 38.6 & 86.1 \\
+ & Ours & 96.5 & 69.3 & 79.8 & 96.5 & 45.5 & 62.2 & 94.9 & 94.0 & 95.1 & 87.0 & 52.8 & 92.6 & 88.1 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Full TESSE evaluation.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
+\caption{\textbf{Full TESSE evaluation with semantic input.} Temporal precision, recall, and F1 (\%); final mesh F1 at 5\,cm.}
 \label{tab:supp_tesse}
 \end{table*}
 % ===== END tables / supp_tesse =====
@@ -330,7 +338,7 @@ Synthetic B & Khronos & 96.4 & 47.9 & 63.8 & 63.4 & 77.8 & 68.5 & 73.5 & 17.4 & 
  & Ours & 98.5 & 64.1 & 77.1 & 74.0 & 84.7 & 77.9 & 99.9 & 57.5 & 73.9 & 75.7 & 32.4 & 59.2 & 89.9 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Independent single-visit runs.} Precision, recall, and F1 are official query-aggregated percentages. Final meshes are evaluated using the F1 score at 5\,cm.}
+\caption{\textbf{Independent single-visit runs.} Temporal precision, recall, and F1 (\%); final mesh F1 at 5\,cm.}
 \label{tab:supp_single}
 \end{table*}
 % ===== END tables / supp_single =====
@@ -388,7 +396,7 @@ Fixed prior $q=3/4$ & 90.1 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
 Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm.}
+\caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm. Mesh F1 is measured before refinement; rendering scores are measured after refinement.}
 \label{tab:supp_ablations}
 \end{table*}
 % ===== END tables / supp_ablations =====
@@ -409,9 +417,8 @@ the inherited geometry in the full configuration.
 The main table compares three ways to use earlier keyframes while mapping and refining visit B.
 Unrestricted reuse treats an earlier keyframe as a current one: it samples it without replay weights,
 supervises the current map on all pixels, and allows it to optimize currently alive Gaussians.
-Whole-frame rejection follows GaME's keyframe filtering: a keyframe of either visit is dropped once it
-observes a Gaussian whose lifetime later ends, and a rejected draw is replaced to keep the optimization
-budget.
+Whole-frame rejection drops a keyframe of either visit once it observes a Gaussian whose lifetime
+later ends. A rejected draw is replaced to keep the optimization budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
 Unrestricted old-frame reuse reduces PSNR by 5.08\,dB, and applying it only during refinement reduces PSNR
@@ -425,21 +432,18 @@ it discards.
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
 selection and trainable-element restrictions. It yields 27.83\,dB, compared with 27.77 for Full.
-The geometry-only association variant yields 89.95 mesh F1 and 28.14\,dB. These diagnostics retain the
-other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
-constraints as a whole.
+The geometry-only association variant yields 89.95 mesh F1 and 28.14\,dB.
 
 \paragraph{Thresholds and priors.}
 The decision threshold is $\ln\eta$ with $\eta\in\{9,99,999\}$. Across these settings, mesh F1 varies by
 0.36 points and PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
 reconstruction scores to the learned prior. The $q=1/2$ setting matches Full's change F1; the other fixed
-settings each miss one additional event. These experiments use the same reconstruction and event metrics
-as the main evaluation.
+settings each miss one additional event.
 
 \paragraph{Predicted masks.}
-OneFormer~\cite{Jain_2023_CVPR} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
+We predict masks with OneFormer~\cite{Jain_2023_CVPR} Swin-L, ADE20K weights, and confidence threshold 0.5.
 Predicted instances are associated across frames before reconstruction.
-Mesh F1 changes from 89.81 to 89.89 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
+Mesh F1 before refinement changes from 89.81 to 89.89 and refined PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
 change F1 to 72.73, with three additional missed events and no false positives. The map remains geometrically
 accurate while object-level evaluation reflects segmentation errors.
 
@@ -450,6 +454,13 @@ The current map contains 2.33 million Gaussians, compared with 2.37 million for 
 states gives approximately 2.60 million Gaussians.
 
 \section{Qualitative Comparisons}
+
+\paragraph{Visualization.}
+In \cref{fig:qualitative}, methods in each row share the camera, crop, and scale. TSDF and occupancy surfaces use reference-image
+colors, with occupancy displayed at 2\,cm resolution. Real-room occupancy panels use capture-time maps;
+the remaining panels use final maps. In \cref{fig:supp_temporal}, ground truth uses the indicated time and
+each map uses the next saved snapshot with the same scene configuration. The camera and clipping
+plane are shared.
 % ===== BEGIN figures / qualitative_native =====
 % Original PNG panels; square cropping is applied by graphicx.
 % Crop coordinates and comparison rule: figures/qualitative_crops.json.
@@ -522,10 +533,8 @@ states gives approximately 2.60 million Gaussians.
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png}\\[2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Scene updates across three representations.} Six views from the real room, synthetic apartment,
-and Flat, with each method rendered at the image pose. Each row uses the same square crop and scale across methods.
-TSDF and occupancy use reference colors. Real-room occupancy panels use the capture-time maps; other panels
-use final maps. Occupancy is visualized at 2\,cm resolution.}
+\caption{\textbf{Scene updates across three representations.} Six views from Real, Synthetic, and Flat compare
+native updates with our TSDF, Gaussian, and occupancy maps.}
 \label{fig:qualitative}
 \end{figure*}
 % ===== END figures / qualitative_native =====
@@ -577,7 +586,8 @@ Ours (Occ.) &
 \includegraphics[width=\twidth,trim={0.0000bp 92.0000bp 0.0000bp 10.0000bp},clip]{figures/results_native/temporal/3_visit2_097s/7_ours_occ.png} &
 \includegraphics[width=\twidth,trim={0.0000bp 92.0000bp 0.0000bp 10.0000bp},clip]{figures/results_native/temporal/4_visit2_end/7_ours_occ.png}\\[2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Mapping the evolving scene from a fixed viewpoint.} Columns follow time across two visits. Ground truth is rendered at the indicated time; maps use the next saved snapshot, with no intervening scene change. All panels share the camera and clipping plane.}
+\caption{\textbf{Mapping the evolving scene from a fixed viewpoint.} Columns follow time across two visits;
+rows compare reference scenes, native updates, and ours across three representations.}
 \label{fig:supp_temporal}
 \end{figure*}
 % ===== END figures / temporal_all_native =====

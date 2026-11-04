@@ -77,10 +77,9 @@
 \centering
 \includegraphics[width=\linewidth]{figures/teaser_bed_views_wall_clipped_20261103/teaser_with_zooms.pdf}
 \captionsetup{hypcap=false}
-\captionof{figure}{\textbf{A shared update follows scene changes within and across visits.} A robot encounters moving
-objects and discovers changes after looking away or returning. Red marks observed motion; purple marks
-changes discovered against earlier observations. Both lead to the same dynamic update, which reconstructs
-the changed scene and retains valid earlier geometry.}
+\captionof{figure}{\textbf{One map follows changes within and across visits.} Red marks observed motion; purple
+marks changes discovered after looking away or returning. The shared update reconstructs changed regions
+while preserving unchanged geometry.}
 \label{fig:teaser}
 \captionsetup{hypcap=true}
 \end{strip}
@@ -88,8 +87,8 @@ the changed scene and retains valid earlier geometry.}
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
 Reconstructing a changing scene requires updating both its geometry and the observations used to build
-it, because an earlier image can still constrain an unchanged wall while its object and free-space
-measurements conflict with the current scene. A change ends or begins the state of an object, while each
+it. An earlier image can still constrain an unchanged wall after its object and free-space measurements
+become outdated. A change ends or begins the state of an object, while each
 observation remains valid for the states it recorded. We present \ours, a unified method for dynamic mapping
 within and across visits that uses these scene-state intervals to coordinate both updates. Change detection
 checks retained surfaces against current depth to decide which states persist, end, or begin, and map update
@@ -126,18 +125,16 @@ observation use together.
 We introduce \ours, a unified dynamic mapping method that uses scene-state intervals, the periods in which
 an object keeps one configuration, to connect these two updates. \emph{Change detection} checks retained
 surfaces against current depth and combines the evidence with motion cues to determine which states continue,
-end, or begin (\cref{fig:method}). It decides as soon as the evidence suffices, yet repeated views of one
-patch never add up to a whole-object change. \emph{Map update}
+end, or begin (\cref{fig:method}). \emph{Map update}
 uses these decisions to end obsolete geometry and restrict observation contributions to the states and
 regions they describe. New observations reconstruct the changed scene, while compatible measurements
 continue to complete unchanged surfaces.
 
-The same state decisions govern TSDF fusion, Gaussian optimization, and occupancy integration, and each
-representation keeps its native integration. Unlike GaME, which removes the regions of old keyframes that
+The same state decisions govern TSDF fusion, Gaussian optimization, and occupancy integration.
+Unlike GaME, which removes the regions of old keyframes that
 conflict with the current map, our Gaussian map keeps each old image as evidence of its capture time, so the
 image continues to train the Gaussians of the states it recorded. Reconstruction continues across visits from
-the retained map and states, using the same updates for changes observed during mapping and changes
-discovered on return. Occluded or unobserved geometry remains until evidence supports an update, and ended
+the retained map and states. Occluded or unobserved geometry remains until evidence supports an update, and ended
 states remain queryable, a combination that none of the compared systems offers (\cref{tab:capabilities}).
 
 We collect a real and synthetic RGB-D benchmark in which changes within and across visits occur in one map,
@@ -230,101 +227,110 @@ appearance and disappearance hypotheses~\cite{11247086}.
 \section{Method}
 \label{sec:method}
 
-\ours maintains one map from posed RGB-D frames and their segmentation masks, within a visit and across
-visits. Every element of the map carries a lifetime, so the map can be read at any time. Each change is
-first judged and then applied (\cref{fig:method}): \emph{change detection} decides from current depth which
-object states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies each decision to
-the stored geometry and to the observations that keep shaping it (\cref{sec:validity}). We follow one
-example throughout: an armchair is removed, a sofa is placed in front of a wall, and the wall itself does
-not change. Both parts act on object states and capture times rather than on voxels, Gaussians, or cells,
-so the same decisions drive TSDF fusion, Gaussian optimization, and occupancy integration
-(\cref{sec:representations}).
+Given posed RGB-D frames and segmentation masks, \ours updates an existing map as the scene changes
+within and across visits. Camera poses are expressed in a common metric coordinate frame across visits.
+We reconstruct the stable configurations of rigid objects as they appear, move, or disappear in indoor
+scenes. The method has two parts (\cref{fig:method}). \emph{Change detection} determines which object
+states continue, end, or begin (\cref{sec:states}). \emph{Map update} applies these decisions to both the
+stored geometry and the observations used to reconstruct it (\cref{sec:validity}). State intervals connect
+the two parts and provide the same update information to all three map representations.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
-\caption{\textbf{A scene change updates both geometry and observation contributions.} Current observations
-reveal missing (purple) and new (yellow) objects against the retained map. Change detection estimates
-their state intervals; map update ends the old geometry and limits each observation to the states it
-recorded.}
+\caption{\textbf{One change decision updates geometry and observations.} Change detection estimates state
+intervals. Map update uses these intervals to retire outdated geometry and constrain observation
+contributions across TSDF, Gaussian, and occupancy maps.}
 \label{fig:method}
 \end{figure*}
 
-\paragraph{Map representation.}
+\paragraph{Scene states.}
 \label{sec:setting}
-A \emph{state} is one configuration of an object. Segmentation masks (SAM masks in \cref{fig:method}) group
-the observations of each object, and associations link them across frames, so further views complete the
-surface of the same state. State $s$ has a surface $G_s$ and a presence interval $[b_s,d_s)$, which specifies
-both when its geometry belongs in the map and which observations describe it. Each map element $e$, a TSDF
-surface face, a Gaussian, or an occupied cell, carries its object association, if any, and a lifetime
-$[c_e,d_e)$ that follows its state. The map at time $t$ is
+A state describes an object in one spatial configuration. Segmentation masks group observations into
+regions, and geometric associations link observations of the same configuration. Further views complete
+its surface; a new configuration is reconstructed from new measurements. State $s$ stores its surface
+$G_s$ and estimated presence interval $[b_s,d_s)$. Each stored map element $e\in\mathcal{E}$, whether a TSDF surface face,
+Gaussian, or occupied cell, carries an object association when available and a lifetime $[c_e,d_e)$.
+These lifetimes describe when the represented geometry is present. A query at time $t$ selects
 \begin{equation}
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-Ending a state closes the lifetimes of its elements: the armchair leaves $\mathcal{M}(t)$ for later times
-and stays in it for earlier ones.
+An ended state leaves the current map while its geometry remains available at earlier query times.
 
 \subsection{Change Detection}
 \label{sec:states}
 
-Change detection has to be reliable and prompt. The camera sees only part of an object at a time, and an
-unseen surface is not a missing one: the armchair may be hidden behind the sofa or simply out of view.
-A decision should come as soon as the evidence suffices, without waiting for the whole surface to be
-seen, yet repeated views of one patch must not add up to a whole-object change. The same tests apply when
-a change happens in view, after the camera looks away, or between visits.
+A new view provides only partial evidence about a retained object. We therefore distinguish observations
+that contradict its surface from those that merely occlude it, and combine evidence over the surface
+before ending the state.
 
 \paragraph{Surface evidence.}
-We project surface samples of $G_s$ into each new depth image and assign the evidence to states through
-object associations. A sample is \emph{supported} when the depths agree, \emph{seen through} when the
-measurement lies farther along the ray, and \emph{occluded} when it lies closer. Seeing the floor where the armchair stood is evidence that it has left, whereas the sofa in
-front of the wall only occludes the wall. Occlusions, invalid depths, and samples outside the image
-therefore contribute no absence evidence, and a depth tolerance absorbs measurement noise.
+We project samples of $G_s$ into the current depth image. A sample is \emph{supported} when the measured
+depth agrees with the surface, \emph{seen through} when the measurement lies behind it, and
+\emph{occluded} when the measurement lies in front. Thus, observing the floor through a chair's former
+position provides absence evidence, whereas a foreground object leaves the wall behind it unresolved.
+Depth tolerances account for measurement and reconstruction error. Occluded samples, invalid depths, and
+samples outside the image contribute no absence evidence.
 
-\paragraph{Change decisions.}
-Let $f_i$ be the fraction of the samples inspected at round $i$ that are seen through. A Page
-statistic~\cite{11e3eed7-cdc6-3579-8127-4296922d24e9} accumulates the log-likelihood ratio $\ell_s(f_i)$
-of a changed state against the state in place, weighted by the share $w_i(j)$ of the state's reliable
-surface inspected for the first time since a candidate change time $j$:
+\paragraph{Accumulating evidence.}
+Let $f_i$ be the fraction of inspected reliable samples seen through at round $i$. We compare a Beta
+model calibrated from in-place observations with a uniform changed-state model, giving the one-sided
+log-likelihood ratio $\ell_s(f_i)$. To account for partial coverage, $w_i(j)$ is the fraction of the
+state's reliable surface inspected for the first time since a candidate change time $j$. We accumulate
+this evidence with a weighted Page statistic~\cite{11e3eed7-cdc6-3579-8127-4296922d24e9}:
 \begin{equation}
   L_t=\max\!\left(0,\max_{j\leq t}\sum_{i=j}^{t}w_i(j)\,\ell_s(f_i)\right).
   \label{eq:absence}
 \end{equation}
-Because only new coverage adds weight, looking at one patch of the armchair again and again adds little,
-while the score crosses the decision threshold as soon as enough of its surface has been seen through.
-Taking the maximum over $j$ starts the count at the most likely change time, so views from before the
-armchair left do not dilute the evidence gathered after it. The state ends once the threshold is crossed
-and see-through evidence outweighs support.
+Each reliable surface sample contributes once per candidate window.
+The maximum over candidate start times lets evidence of a recent change accumulate without being
+diluted by earlier observations of the unchanged object. We end the state when $L_t$ crosses the decision
+threshold and see-through evidence outweighs support.
 
-Observations that match no state form candidates, and a candidate that is consistent with the current
-surface and supported by later observations becomes a successor, which starts a new state and closes the
-previous one, as when the armchair reappears elsewhere; unresolved candidates wait for more evidence.
-Visible motion is detected with the object tracking and free-space cues of Khronos and
-Dynablox~\cite{Schmid-RSS-24,10218983}, and once the object settles, new observations reconstruct it.
-Motion seen in view and changes discovered against the retained map thus end in the same decisions.
+\paragraph{Updating states.}
+New observations are compared with retained states through surface overlap and supporting or
+contradicting measurements. Consistent observations extend a continuing state's geometry. Observations
+with an unresolved association are retained as candidates for subsequent decisions. For a confirmed
+change of configuration, we close the old interval and reconstruct the new state from current
+measurements. Newly observed objects start their own states; a confirmed disappearance ends a state.
+
+For motion observed directly, object tracking and free-space motion cues from Khronos and
+Dynablox~\cite{Schmid-RSS-24,10218983} identify a change of configuration. Moving observations are kept
+separate from static fusion, and observations after the object settles build its new state. A change
+discovered after looking away is established by the retained-surface tests above. Both cases produce
+state endings and new reconstructions for the same map update.
+\label{sec:handoff}
+Across visits, the retained map, state
+summaries, and evidence statistics initialize these tests in the common coordinate frame.
 
 \subsection{Map Update}
 \label{sec:validity}
 
-A decision helps only if the map follows it completely and without side effects. Removing only the part of
-the armchair that was seen through would leave its back in the map. The side effects come from earlier
-observations: the frames that saw the armchair would fuse it back, the free space they measured in front
-of the wall would erase the new sofa, and their keyframes would keep training Gaussians of a scene that no
-longer exists. These frames cannot simply be dropped, since they also measure the unchanged wall. Map
-update therefore acts on the geometry and on the observations.
+A confirmed change must affect both the geometry in the map and the observations that continue to
+shape it. Ending only the visible part of an object leaves remnants elsewhere; reusing its earlier
+observations for the current scene can reconstruct it again. We use the state intervals to update the
+associated geometry and determine where each observation can still contribute.
 
-\paragraph{Applying changes to geometry.}
-A decision concerns the whole state, including geometry outside the current view, so all elements of the
-armchair close their lifetimes together, its unseen back included. New observations reconstruct the sofa
-and any successor, while continuing states keep accumulating geometry.
+\paragraph{Updating geometry.}
+When a state ends, all associated elements end their lifetimes together, including parts outside the
+current view. New measurements reconstruct new configurations, while observations of continuing states
+complete their existing surfaces. The ended geometry is retained for historical queries through
+\cref{eq:map_at_t}.
 
-\paragraph{Selecting observation contributions.}
-A depth measurement contributes a surface and free space in front of it. The earlier measurement of the
-wall can still complete the wall, but its free space must stop before the sofa, a restriction that we express
-as the observation's \emph{valid domain}. Let observation $o$ have capture time $t_o$ and measured range
-$r_o$; for a point $x$ on its ray, let $\rho_o(x)$ be its range and $\delta_o(x)=r_o-\rho_o(x)$. Let
-$\lambda_o$ be the first intersection with a current object state that began after $t_o$, or $\infty$ if
-there is none. With surface band $T$, the valid domain is
+\paragraph{Observation validity.}
+An observation is valid for the state it recorded. If that state has ended, its measurements no longer
+update the current object, but remain valid for its historical reconstruction. Measurements of unchanged
+surroundings can still improve the current map. This distinction preserves useful parts of an earlier
+frame while preventing its changed regions from constraining a later state.
+
+Depth integration also requires separating a measured surface from the free space in front of it.
+Suppose a chair is placed in front of a previously observed wall. The old wall measurement remains useful,
+but its free-space contribution must stop before the new chair. We express this spatial restriction as
+the observation's \emph{valid domain}. Let $o$ have capture time $t_o$ and measured range $r_o$. For a point
+$x$ on its ray, let $\rho_o(x)$ be its range and $\delta_o(x)=r_o-\rho_o(x)$. Let $\lambda_o$ be the first
+intersection with a current object state that began after $t_o$, or $\infty$ if none exists. With surface
+band $T$, the valid domain for reconstructing the current map at $t$ is
 \begin{equation}
 \begin{split}
 \Omega_o(t)=\{x:\;&\delta_o(x)>-T,\\
@@ -332,42 +338,48 @@ there is none. With surface band $T$, the valid domain is
 \end{split}
 \label{eq:domain}
 \end{equation}
-The surface band keeps the measured surface, while $\lambda_o$ stops earlier free space at newer objects.
-Pixels of ended states are excluded ($\Omega_o(t)=\varnothing$), and state changes revise the affected
-domains. Keyframes follow the same rule in time: a keyframe captured at $t_k$ evaluates its loss on
-$\mathcal{M}(t_k)$, the scene it actually saw. The image of the armchair thus keeps describing the
-armchair's earlier state, while its view of the wall still constrains the current wall.
+The surface band retains the measured wall, while $\lambda_o$ bounds the earlier free-space contribution
+at the new object. Measurements belonging to an ended state have an empty domain for the current map.
+State changes revise the affected domains.
 
 \paragraph{Retaining and replacing surfaces.}
 \label{sec:memory}
-Background surfaces, such as a closed window sash, and copies displaced by depth or alignment errors have
-no state that could end, so earlier elements are also tested individually. An element is removed when
-see-through measurements within valid domains outnumber supporting ones, or, on a tie, when a current
-surface measured just in front of it with the same orientation replaces it; otherwise it remains. Such a
-surface is the same one measured again, so keeping the older copy would leave a duplicate behind it.
-Occlusion alone never removes geometry, so unobserved regions stay in the map.
-
-\paragraph{Continuing across visits.}
-\label{sec:handoff}
-At the end of a visit we save the map, element lifetimes, state summaries, and evidence statistics. The
-next visit resumes from them in the shared coordinate frame, so changes discovered on return pass through
-the same tests.
+Changes also affect background surfaces and geometry without an object association. We test these
+elements directly using support and see-through measurements within valid domains. An element ends when
+see-through evidence exceeds support. On a tie, a nearby, similarly oriented surface measured just in
+front of it replaces the older estimate; otherwise the element is retained. This replacement removes
+nearby stale copies while retaining other occluded surfaces. Unobserved geometry remains available
+until evidence supports an update.
 
 \paragraph{Reconstruction in three representations.}
 \label{sec:representations}
-Each representation keeps its own integration and applies the shared decisions wherever it uses
-observations. In TSDF maps, signed-distance measurements are fused only within $\Omega_o(t)$, with the
-truncation band as $T$, and blocks whose domains change are rebuilt from the stored frames; we build on
-projective fusion~\cite{10.1145/237170.237269,6162880} with the tracking and object extraction of
-Khronos~\cite{Schmid-RSS-24}. In Gaussian maps, each keyframe renders and trains $\mathcal{M}(t_k)$,
-and ended Gaussians are frozen so that earlier times keep their reconstruction; we use the photometric and
-depth optimization of GaME~\cite{Yugay_2026_CVPR,10.1145/3592433} and FlashSplat for mask-to-Gaussian
-assignment~\cite{10.1007/978-3-031-72670-5_26}. In occupancy maps, cells of an ended state leave the
-current map together, and where a newly measured object surface occupies a cell, the free-space
-contribution of the previous visit is withdrawn before integration continues; measurements are integrated
-with the wavelet representation and clamped log odds of wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
+The shared decisions specify which geometry remains active and which observations may update it.
+Each representation applies them through its own fusion or optimization procedure.
+
+\emph{TSDF.} We fuse signed-distance measurements within $\Omega_o(t)$, using the TSDF truncation band
+as $T$. Revised domains are applied by re-integrating archived measurements in capture order. Retained
+surfaces complete regions outside the current coverage. Reconstruction uses projective
+fusion~\cite{10.1145/237170.237269,6162880}, with object extraction and tracking from
+Khronos~\cite{Schmid-RSS-24}.
+
+\emph{3D Gaussians.} State intervals determine which Gaussians are compatible with each keyframe's
+capture time. Keyframe selection, rendering, and trainable parameters enforce this compatibility.
+Earlier frames constrain continuing states they observed, while current frames reconstruct new states
+and refine continuing geometry. Ended Gaussians are frozen and retained for earlier queries.
+We use GaME's photometric and depth
+optimization~\cite{Yugay_2026_CVPR,10.1145/3592433} and FlashSplat for mask-to-Gaussian
+assignment~\cite{10.1007/978-3-031-72670-5_26}.
+
+\emph{Occupancy.} Cells associated with an ended state leave the current map together. Where a new
+object surface occupies a cell, the previous visit's free-space contribution is withdrawn before
+integration continues. The surface-replacement test removes nearby stale occupied copies, while
+unobserved cells are retained. Measurements are integrated using wavemap's wavelet representation and
+clamped log odds~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
+
 \section{Experiments}
 \label{sec:experiments}
+We evaluate dynamic reconstruction across three map representations, then examine temporal accuracy,
+Gaussian rendering, and the contribution of the two map-update operations.
 % Keep the expanded result figures close to their corresponding analyses.
 \setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
 \setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
@@ -414,44 +426,52 @@ Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$
 \subsection{Experimental Setup}
 
 \paragraph{DynaState benchmark.}
-We introduce \emph{DynaState-Real} (Real) and \emph{DynaState-Sim} (Synthetic). Real contains three Azure
-Kinect recordings of one room over nearly two weeks, with ORB-SLAM3~\cite{9440682} poses aligned across
-visits and annotated object changes. Synthetic contains two animated visits to an
-InteriorAgent~\cite{InteriorAgent2025} apartment in Isaac Sim, with ground-truth poses, labels, and
-time-varying geometry. Both include observed motion and changes discovered after looking away or returning.
+We introduce \emph{DynaState-Real} (Real) and \emph{DynaState-Sim} (Synthetic) to evaluate changes within
+and across visits in the same scene. Real contains three Azure Kinect recordings of one room over nearly
+two weeks, with ORB-SLAM3~\cite{9440682} poses aligned across visits and manually annotated object changes.
+Synthetic contains two animated visits to an InteriorAgent~\cite{InteriorAgent2025} apartment in Isaac Sim,
+with ground-truth poses, labels, and time-varying geometry. Both combine observed motion with changes
+discovered after looking away or returning.
 
 \paragraph{Public datasets.}
-Flat~\cite{9811877} contains two synthetic RGB-D recordings with rearranged objects, and we use eight
-room chains of 3RScan~\cite{9010673}, which rescans real rooms. Khronos's TESSE Office and Apartment
-sequences~\cite{Schmid-RSS-24} contain motion and changes within one continuous run. For rendering,
-we use Flat and GaME's two Aria rooms~\cite{Yugay_2026_CVPR}.
+Flat~\cite{9811877} provides two synthetic RGB-D recordings with rearranged objects; eight room chains
+from 3RScan~\cite{9010673} test repeated scans of real rooms. TESSE Office and Apartment~\cite{Schmid-RSS-24}
+test temporal reconstruction during a continuous run. Flat and GaME's two Aria rooms~\cite{Yugay_2026_CVPR}
+evaluate Gaussian rendering after scene changes.
 
-\paragraph{Baselines.}
-We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
-Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and
-wavemap~\cite{Reijgwart-RSS-23} for occupancy. All methods process the same posed sequences and carry
-their maps across visits. Inputs are instance masks in the main comparison, semantic masks on TESSE,
-and framewise SAM masks~\cite{Kirillov_2023_ICCV} on the rendering scenes.
+\paragraph{Baselines and inputs.}
+We compare TSDF maps with Khronos~\cite{Schmid-RSS-24} and Panoptic Multi-TSDFs~\cite{9811877}, Gaussian
+maps with GaME~\cite{Yugay_2026_CVPR}, and occupancy maps with wavemap~\cite{Reijgwart-RSS-23}.
+Methods process the same posed visit chains. The main comparison uses annotated segmentation, and TESSE
+uses semantic masks. Our rendering runs use framewise SAM masks~\cite{Kirillov_2023_ICCV}; GaME uses
+annotated masks on Flat and SAM on Aria. We run the official GaME code on Flat and Aria room0 and use its
+published room1 results.
 
 \paragraph{Metrics.}
-All metrics are computed on the final map, after refinement for Gaussian maps. We evaluate each visit's reconstruction using the mesh F1 score at a 5\,cm distance threshold. Object F1 uses 0.5\,m matching and
-duration-weighted snapshots~\cite{Schmid-RSS-24}, change F1 scores appearance and disappearance events over
-the visit chain, and 3RScan averages over rooms. Every tenth frame of the final visit, except its first, is
-held out~\cite{Yugay_2026_CVPR}, and on these views we measure PSNR, MS-SSIM~\cite{1292216},
-LPIPS~\cite{Zhang_2018_CVPR}, and the L1 error of rendered against measured depth. TESSE uses Khronos's
-official aggregation over map and query times~\cite{Schmid-RSS-24}.
+We measure mesh F1 at a 5\,cm distance threshold after each visit, using refined Gaussian maps; the main
+table reports the final visit.
+Object F1 uses 0.5\,m matching with duration-weighted snapshots~\cite{Schmid-RSS-24}; change F1 scores
+appearance and disappearance events across the visit chain. For 3RScan, mesh and object scores are
+averaged over rooms, and change events are pooled. Partial-revisit evaluation uses surfaces observed across the visit chain.
+TESSE aggregates queries of earlier scene times from each saved map using Khronos's official
+evaluator~\cite{Schmid-RSS-24}.
+For rendering, every tenth frame of the final visit, except its first, is held out~\cite{Yugay_2026_CVPR}.
+After refinement, we average PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1
+over these views. Depth error is evaluated at pixels with measured depth.
 
 \paragraph{Implementation.}
-All datasets share a 5\,cm surface tolerance and the threshold $\ln 99$, and our TSDF and occupancy maps
-use 5\,cm cells.
+All datasets share a 5\,cm surface tolerance and the decision threshold $\ln 99$. Our TSDF and occupancy
+maps use 5\,cm cells; the TESSE baseline uses the same resolution.
 
 \subsection{Unified Dynamic Mapping}
 \label{sec:exp_main}
 
-Our method improves mesh, object, and change F1 scores in all three representations on all four datasets
-(\cref{tab:main}). In the real room, mesh F1 rises from 87.7 to 96.1 over Khronos for TSDF and from
-84.5 to 91.0 over wavemap for occupancy, and both maps remove the stale geometry that the native updates
-keep (\cref{fig:geometry_details}).
+The shared update improves mesh, object, and change F1 in every representation on all four datasets
+(\cref{tab:main}). Real and Synthetic test changes both within and across visits, while Flat and 3RScan
+test rearrangements between visits.
+In Real, TSDF mesh F1 rises from 87.7 to 96.1 over Khronos, and occupancy mesh F1 rises from 84.5 to
+91.0 over wavemap. Object and change scores improve alongside geometry: obsolete objects leave the map
+while the surrounding scene remains reconstructed (\cref{fig:geometry_details}).
 
 % ===== BEGIN figures / qualitative_geometry =====
 % Edit each panel directly below: one original PNG per includegraphics.
@@ -498,46 +518,184 @@ Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
 \end{figure}
 % ===== END tables / restart =====
 
+
+
+
+
+
+
+
+\paragraph{Partial revisits.}
+Updating a changed region also preserves useful geometry beyond the latest coverage. Synthetic visit B
+revisits part of the apartment. Our continued maps exceed a native restart by 12.6, 11.2, and 8.9 mesh F1 points for TSDF, Gaussians, and occupancy
+(\cref{fig:retention}). Previously reconstructed regions remain available as changed objects are updated.
+
+\subsection{Temporal Reconstruction}
+\label{sec:exp_temporal}
+Our TSDF maps improve all four temporal F1 categories over Khronos on TESSE
+(\cref{tab:tesse}). Change F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in Apartment;
+dynamic-object F1 reaches 96.7 and 95.1. Final mesh F1 also improves in both scenes.
+
+% ===== BEGIN tables / tesse =====
+% SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
+% Objects/change: official TABLES_4D.txt; background: official_tables_at.py 0.05; Mesh: final mesh F1 at 5 cm.
+% Values: wt_takeover_runs/RESULTS_TABLE_20261029.md, TESSE semantic-input table (11-04).
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\def\resultrows{
+\toprule
+ & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Scene & Method & Bg.$\uparrow$ & Obj.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ \\ \midrule
+Office & Khronos & \ranksecondcell{74.6} & \ranksecondcell{67.4} & \ranksecondcell{84.8} & \ranksecondcell{46.2} & \ranksecondcell{92.8} \\
+ & \textbf{Ours (TSDF)} & \rankbestcell{76.1} & \rankbestcell{69.2} & \rankbestcell{96.7} & \rankbestcell{78.6} & \rankbestcell{94.1} \\
+\midrule
+Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecondcell{85.5} & \ranksecondcell{38.6} & \ranksecondcell{86.1} \\
+ & \textbf{Ours (TSDF)} & \rankbestcell{79.8} & \rankbestcell{62.2} & \rankbestcell{95.1} & \rankbestcell{92.6} & \rankbestcell{88.1} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{llrrrrr}\resultrows\end{tabular}
+\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%). Ranking: \ranklegend{} per scene.}
+\label{tab:tesse}
+\end{table}
+% ===== END tables / tesse =====
+
+
+
+
+% ===== BEGIN tables / rendering =====
+% SRC: held-out final-visit views after refinement; ours: SAM on all three scenes.
+% GaME: Flat annotated masks (24.21 run), room0 official-code SAM reproduction, room1 published.
+% Aria room0 valid-depth L1: 0.711 / 0.704 cm (GaME / ours), ARIA_RESULTS_20261102.md, 11-04.
+\begin{table}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.08}
+\def\resultrows{
+\toprule
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & GaME & \ranksecondcell{24.21} & \ranksecondcell{0.92} & \ranksecondcell{0.16} & \ranksecondcell{1.07} \\
+ & \textbf{Ours} & \rankbestcell{28.12} & \rankbestcell{0.96} & \rankbestcell{0.10} & \rankbestcell{0.39} \\
+\midrule
+Aria room0 & GaME & \ranksecondcell{31.55} & \ranksecondcell{0.95} & \ranksecondcell{0.15} & \ranksecondcell{0.71} \\
+ & \textbf{Ours} & \rankbestcell{32.43} & \rankbestcell{0.96} & \rankbestcell{0.14} & \rankbestcell{0.70} \\
+\midrule
+Aria room1 & GaME & \ranksecondcell{31.97} & \ranksecondcell{0.95} & \ranksecondcell{0.10} & \ranksecondcell{1.80} \\
+ & \textbf{Ours} & \rankbestcell{33.39} & \rankbestcell{0.97} & \rankbestcell{0.09} & \rankbestcell{1.17} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\caption{\textbf{Sharper novel views after scene updates.} PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per scene.}
+\label{tab:rendering}
+\end{table}
+% ===== END tables / rendering =====
+
 % ===== BEGIN figures / qualitative_gaussians =====
-% Native original images; exact positions and crops are in the companion JSON.
+% Full context images; Flat Before background retouched for illustration. Native LaTeX result crops.
 \begin{figure*}[t]
 \centering
 \begingroup
 \rmfamily
 \setlength{\unitlength}{\dimexpr\linewidth/495\relax}
-\begin{picture}(495,317)
-\put(0.000,308.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\color[HTML]{666666}Reference view}}
-\put(160.000,308.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\color[HTML]{222222}GaME}}
-\put(295.000,308.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\bfseries\color[HTML]{997510}Ours}}
-\put(430.000,308.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\color[HTML]{222222}Reference}}
-\put(230.000,303.000){\color[HTML]{997510}\rule{130.000\unitlength}{0.7pt}}
-\put(0.000,289.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{222222}(a) Real}}
-\put(0.000,234.574){\includegraphics[width=80.000\unitlength,trim={0.0000bp 0.0000bp 0.0000bp 0.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
-\put(7.516,241.422){\color[HTML]{78599e}\linethickness{0.6pt}\framebox(23.382,16.701){}}
-\put(83.000,251.600){\color[HTML]{78599e}\rule{8.000\unitlength}{0.65pt}}
-\put(95.000,205.143){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/4_game.png}}
-\put(230.000,205.143){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png}}
-\put(365.000,205.143){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
-\put(0.000,189.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{222222}(b) Synthetic}}
-\put(0.000,122.529){\includegraphics[width=80.000\unitlength,trim={0.0000bp 0.0000bp 0.0000bp 0.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(16.471,126.059){\color[HTML]{78599e}\linethickness{0.6pt}\framebox(49.412,35.294){}}
-\put(83.000,151.600){\color[HTML]{78599e}\rule{8.000\unitlength}{0.65pt}}
-\put(95.000,105.143){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}
-\put(230.000,105.143){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}
-\put(365.000,105.143){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(0.000,89.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{222222}(c) Flat}}
-\put(0.000,19.000){\includegraphics[width=80.000\unitlength,trim={0.0000bp 0.0000bp 0.0000bp 0.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
-\put(21.250,26.500){\color[HTML]{78599e}\linethickness{0.6pt}\framebox(35.000,25.000){}}
-\put(83.000,51.600){\color[HTML]{78599e}\rule{8.000\unitlength}{0.65pt}}
-\put(95.000,5.143){\includegraphics[width=130.000\unitlength,trim={170.0000bp 60.0000bp 190.0000bp 220.0000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}
-\put(230.000,5.143){\includegraphics[width=130.000\unitlength,trim={170.0000bp 60.0000bp 190.0000bp 220.0000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs.png}}
-\put(365.000,5.143){\includegraphics[width=130.000\unitlength,trim={170.0000bp 60.0000bp 190.0000bp 220.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
+\begin{picture}(495,347.941)
+\put(40.000,340.941){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Scene change}}
+\put(160.000,340.941){\makebox(0,0)[c]{\fontsize{8.5}{9.5}\selectfont\color[HTML]{222222}GaME}}
+\put(295.000,340.941){\makebox(0,0)[c]{\fontsize{8.5}{9.5}\selectfont\bfseries\color[HTML]{997510}Ours}}
+\put(430.000,340.941){\makebox(0,0)[c]{\fontsize{8.5}{9.5}\selectfont\color[HTML]{222222}Reference}}
+\put(0.000,288.941){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/real_before_B003120.png}}
+\put(26.250,297.483){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(17.917,18.542){}}
+\put(0.800,329.441){\makebox(0,0)[l]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\bfseries\color[HTML]{222222}(a) Real}}}
+\put(79.200,329.441){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}Before}}}
+\put(0.000,243.515){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/2_real_02540/0_image.png}}
+\put(79.200,283.441){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}After}}}
+\put(7.516,250.363){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(23.382,16.701){}}
+\put(95.000,242.300){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/4_game.png}}
+\put(95.000,242.300){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(230.000,242.300){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png}}
+\put(230.000,242.300){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(365.000,242.300){\includegraphics[width=130.000\unitlength,trim={90.0000bp 82.0000bp 588.0000bp 250.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
+\put(365.000,242.300){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(0.000,182.470){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/sim_before_Aend_B003065.png}}
+\put(16.471,186.000){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(49.412,35.294){}}
+\put(0.800,234.441){\makebox(0,0)[l]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\bfseries\color[HTML]{222222}(b) Synthetic}}}
+\put(79.200,234.441){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}Before}}}
+\put(0.000,125.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/4_sim_03065/0_image.png}}
+\put(79.200,176.970){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}After}}}
+\put(16.471,128.529){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(49.412,35.294){}}
+\put(95.000,135.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}
+\put(95.000,135.542){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(230.000,135.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}
+\put(230.000,135.542){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(365.000,135.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
+\put(365.000,135.542){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,92.857){}}
+\put(0.000,63.000){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/flat_before_context_retouch.png}}
+\put(23.125,66.125){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(33.375,25.500){}}
+\put(0.800,118.500){\makebox(0,0)[l]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\bfseries\color[HTML]{222222}(c) Flat}}}
+\put(79.200,118.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}Before}}}
+\put(0.000,2.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/5_flat_00270/0_image.png}}
+\put(79.200,57.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{6.7}{7.7}\selectfont\color[HTML]{222222}After}}}
+\put(23.125,5.125){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(33.375,25.500){}}
+\put(95.000,12.837){\includegraphics[width=130.000\unitlength,trim={185.0000bp 25.0000bp 188.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}
+\put(95.000,12.837){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,99.326){}}
+\put(230.000,12.837){\includegraphics[width=130.000\unitlength,trim={185.0000bp 25.0000bp 188.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}
+\put(230.000,12.837){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,99.326){}}
+\put(365.000,12.837){\includegraphics[width=130.000\unitlength,trim={185.0000bp 25.0000bp 188.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
+\put(365.000,12.837){\color[HTML]{377EAA}\linethickness{0.45pt}\framebox(130.000,99.326){}}
 \end{picture}
 \endgroup
-\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Purple boxes mark the crops: old-object residue in the real room, furniture surfaces in the synthetic apartment, and duplicated walls in Flat.}
+\caption{\textbf{Cleaner reconstructions after scene changes.} Ours removes object remnants and preserves nearby structure.}
 \label{fig:gaussian_details}
 \end{figure*}
 % ===== END figures / qualitative_gaussians =====
+
+\subsection{Gaussian Reconstruction}
+\label{sec:exp_gaussians}
+
+\paragraph{Geometry and changes.}
+The same decisions improve Gaussian geometry and appearance. Mesh F1 exceeds GaME by 4.9 points in
+Real and 5.4 in Synthetic (\cref{tab:main}). The qualitative comparisons show fewer remnants at old
+object locations and fewer duplicated surfaces, while preserving nearby structure
+(\cref{fig:gaussian_details}). Across the eight 3RScan room chains, mesh F1 increases from 87.0 to
+89.7 and change F1 from 87.8 to 96.1.
+
+
+
+% ===== BEGIN tables / ablation =====
+\begin{table*}[t]
+\centering
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{7pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{(a) Applying changes to geometry}} \\
+Changes not applied & \ranksecondcell{84.5} &\ranksecondcell{66.7} & \ranksecondcell{68.8} & \ranksecondcell{23.79} & \ranksecondcell{0.91} & \ranksecondcell{0.16} & \ranksecondcell{3.31} \\
+\textbf{Full} & \rankbestcell{89.8} & \rankbestcell{66.8} & \rankbestcell{83.3} & \rankbestcell{27.63} & \rankbestcell{0.95} & \rankbestcell{0.12} & \rankbestcell{0.48} \\
+\midrule
+\multicolumn{8}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
+Unrestricted & 84.7 &\rankbestcell{66.7} & \rankbestcell{83.3} & 22.69 & \ranksecondcell{0.89} & \ranksecondcell{0.17} & 3.66 \\
+Discard whole frames & \ranksecondcell{89.5} &\ranksecondcell{66.6} & \rankbestcell{83.3} & \ranksecondcell{23.43} & 0.86 & 0.24 & \ranksecondcell{1.92} \\
+\textbf{Full} & \rankbestcell{89.9} & 66.5 & \rankbestcell{83.3} & \rankbestcell{27.77} & \rankbestcell{0.95} & \rankbestcell{0.11} & \rankbestcell{0.45} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Mechanism ablations on Flat.} F1 in \%, PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per block.}
+\label{tab:ablation_variants}
+\end{table*}
+% ===== END tables / ablation =====
+
+\paragraph{Novel-view rendering.}
+Our Gaussian reconstructions improve PSNR, MS-SSIM, and LPIPS on all three rendering scenes
+(\cref{tab:rendering}). PSNR increases by 3.91\,dB on Flat and by 0.88--1.42\,dB on the Aria rooms.
 
 % ===== BEGIN figures / evolution_native =====
 % Native original images; exact positions and crops are in the companion JSON.
@@ -593,163 +751,74 @@ Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
 \put(8.000,34.500){\makebox(0,0){\rotatebox{90}{\fontsize{8}{9}\selectfont\color[HTML]{997510}Ours (3DGS)}}}
 \end{picture}
 \endgroup
-\caption{\textbf{Gaussian maps follow changes within and across visits.} DynaState-Sim from one fixed viewpoint; the dashed line marks the visit boundary.}
+\caption{\textbf{Gaussian maps follow changes within and across visits.} Saved maps of DynaState-Sim from one fixed viewpoint; the dashed line marks the visit boundary.}
 \label{fig:evolution}
 \end{figure*}
 % ===== END figures / evolution_native =====
 
-% ===== BEGIN tables / ablation =====
-\begin{table*}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{7pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}lrrrrrrr@{}}
-\toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
-\midrule
-\multicolumn{8}{@{}l}{\textbf{(a) Applying changes to geometry}} \\
-Changes not applied & \ranksecondcell{84.4} & \ranksecondcell{66.7} & \ranksecondcell{68.8} & \ranksecondcell{23.79} & \ranksecondcell{0.91} & \ranksecondcell{0.16} & \ranksecondcell{3.31} \\
-\textbf{Full} & \rankbestcell{90.0} & \rankbestcell{66.8} & \rankbestcell{83.3} & \rankbestcell{27.63} & \rankbestcell{0.95} & \rankbestcell{0.12} & \rankbestcell{0.48} \\
-\midrule
-\multicolumn{8}{@{}l}{\textbf{(b) Old-keyframe reuse}} \\
-Unrestricted & 86.2 & \rankbestcell{66.7} & \rankbestcell{83.3} & 22.69 & \ranksecondcell{0.89} & \ranksecondcell{0.17} & 3.66 \\
-Discard whole frames & \ranksecondcell{89.6} & \ranksecondcell{66.6} & \rankbestcell{83.3} & \ranksecondcell{23.43} & 0.86 & 0.24 & \ranksecondcell{1.92} \\
-\textbf{Full} & \rankbestcell{89.8} & 66.5 & \rankbestcell{83.3} & \rankbestcell{27.77} & \rankbestcell{0.95} & \rankbestcell{0.11} & \rankbestcell{0.45} \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Mechanism ablations on Flat.} F1 in \%, PSNR in dB, depth L1 in cm. In (b), each variant changes how old keyframes are used during visit B and refinement. Ranking: \ranklegend{} per block.}
-\label{tab:ablation_variants}
-\end{table*}
-% ===== END tables / ablation =====
-
-
-\paragraph{Partial revisits.}
-On the partial revisit of synthetic visit B, our continued maps exceed a native restart by 12.6, 11.2, and
-8.9 mesh F1 points for TSDF, Gaussians, and occupancy (\cref{fig:retention}).
-
-\subsection{Temporal Reconstruction}
-\label{sec:exp_temporal}
-Our TSDF maps improve all four F1 categories over Khronos on both TESSE scenes, and their final maps
-reach higher mesh F1 (\cref{tab:tesse}). Change F1 rises from 46.2 to 78.6 in Office and from 38.6 to
-92.6 in Apartment, and dynamic-object F1 reaches 96.7 and 95.1.
-
-% ===== BEGIN tables / tesse =====
-% SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
-% Objects/change: official TABLES_4D.txt; background: official_tables_at.py 0.05; Mesh: final mesh F1 at 5 cm.
-% Values: wt_takeover_runs/RESULTS_TABLE_20261029.md, TESSE semantic-input table (11-04).
-\begin{table}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.0pt}
-\renewcommand{\arraystretch}{1.08}
-\def\resultrows{
-\toprule
- & & \multicolumn{2}{c}{Static} & \multicolumn{2}{c}{Dynamic} & \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}
-Scene & Method & Bg.$\uparrow$ & Obj.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ \\ \midrule
-Office & Khronos & \ranksecondcell{74.6} & \ranksecondcell{67.4} & \ranksecondcell{84.8} & \ranksecondcell{46.2} & \ranksecondcell{92.8} \\
- & \textbf{Ours (TSDF)} & \rankbestcell{76.1} & \rankbestcell{69.2} & \rankbestcell{96.7} & \rankbestcell{78.6} & \rankbestcell{94.1} \\
-\midrule
-Apartment & Khronos & \ranksecondcell{78.0} & \ranksecondcell{54.8} & \ranksecondcell{85.5} & \ranksecondcell{38.6} & \ranksecondcell{86.1} \\
- & \textbf{Ours (TSDF)} & \rankbestcell{79.8} & \rankbestcell{62.2} & \rankbestcell{95.1} & \rankbestcell{92.6} & \rankbestcell{88.1} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{llrrrrr}\resultrows\end{tabular}
-\caption{\textbf{More accurate TSDF reconstructions over time.} TESSE F1 (\%). Ranking: \ranklegend{} per scene.}
-\label{tab:tesse}
-\end{table}
-% ===== END tables / tesse =====
-
-
-
-
-\subsection{Gaussian Reconstruction}
-\label{sec:exp_gaussians}
-
-\paragraph{Geometry and changes.}
-Our Gaussian maps exceed GaME in mesh F1 by 4.9 points in the real room and 5.4 in the synthetic
-apartment (\cref{tab:main}), with fewer old-object remnants and duplicated surfaces
-(\cref{fig:gaussian_details}).
-
-% ===== BEGIN tables / rendering =====
-% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
-\begin{table}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.0pt}
-\renewcommand{\arraystretch}{1.08}
-\def\resultrows{
-\toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & GaME & \ranksecondcell{24.21} & \ranksecondcell{0.92} & \ranksecondcell{0.16} & \ranksecondcell{1.07} \\
- & \textbf{Ours} & \rankbestcell{28.12} & \rankbestcell{0.96} & \rankbestcell{0.10} & \rankbestcell{0.39} \\
-\midrule
-Aria room0 & GaME & \ranksecondcell{31.55} & \ranksecondcell{0.95} & \ranksecondcell{0.15} & \rankbestcell{0.69} \\
- & \textbf{Ours} & \rankbestcell{32.43} & \rankbestcell{0.96} & \rankbestcell{0.14} & \ranksecondcell{0.74} \\
-\midrule
-Aria room1 & GaME & \ranksecondcell{31.97} & \ranksecondcell{0.95} & \ranksecondcell{0.10} & \ranksecondcell{1.80} \\
- & \textbf{Ours} & \rankbestcell{33.39} & \rankbestcell{0.97} & \rankbestcell{0.09} & \rankbestcell{1.17} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
-\caption{\textbf{Sharper novel views after scene updates.} PSNR in dB, depth L1 in cm. Ranking: \ranklegend{} per scene.}
-\label{tab:rendering}
-\end{table}
-% ===== END tables / rendering =====
-
-\paragraph{Novel-view rendering.}
-Our Gaussian maps render the held-out views of all three scenes better than GaME in PSNR, MS-SSIM, and
-LPIPS, raising PSNR by 3.91\,dB on Flat and by 0.88--1.42\,dB on the Aria rooms (\cref{tab:rendering}).
-
 \paragraph{Changes within and across visits.}
-One Gaussian map follows the furniture changes within and between the two visits of DynaState-Sim,
-while the rest of the room stays reconstructed (\cref{fig:evolution}).
+Successive snapshots of one Gaussian mapping run show furniture changes within and between the two
+visits of DynaState-Sim (\cref{fig:evolution}). The fixed viewpoint reveals the changed configurations
+while the rest of the room remains reconstructed.
 
 
 \subsection{Ablation Studies}
 
-We ablate the map update on Flat A$\rightarrow$B with Gaussian maps (\cref{tab:ablation_variants}).
+On Flat A$\rightarrow$B, we test the two operations that apply change decisions to Gaussian maps:
+retiring obsolete geometry and constraining reused observations (\cref{tab:ablation_variants}). Each
+block compares its variants with the corresponding Full configuration. Observation reuse is varied
+during visit B and refinement. Mesh F1 is measured before refinement and rendering scores after
+refinement.
 
 
 \paragraph{Applying changes to geometry.}
-If detected changes are not applied to the map, mesh F1 falls from 90.0 to 84.4, change F1 from 83.3 to 68.8,
-and PSNR by 3.84\,dB.
+We retain geometry marked for removal while keeping change detection active. Mesh F1 falls from 89.8
+to 84.5, change F1 from 83.3 to 68.8, and PSNR by 3.84\,dB. Applying the decisions removes obsolete
+geometry that would otherwise remain in the reconstruction.
 
-\paragraph{Old-keyframe reuse.}
-Unrestricted reuse lowers PSNR by 5.08\,dB, raises depth L1 from 0.45 to 3.66\,cm, and lowers mesh F1
-from 89.8 to 86.2. Discarding every keyframe that observed a Gaussian ending later, as GaME does, lowers
-PSNR by 4.34\,dB.
+\paragraph{Reusing observations.}
+Allowing earlier frames to train the current map without observation constraints lowers PSNR by
+5.08\,dB and raises depth L1 from 0.45 to 3.66\,cm. Change F1 remains 83.3, while incompatible
+observations degrade reconstruction. Discarding each keyframe that
+observes subsequently retired geometry also reduces PSNR, by 4.34\,dB, because useful observations are
+removed with the changed regions. Full preserves their contribution to compatible geometry.
+
+\paragraph{Predicted segmentation.}
+Replacing annotations with OneFormer~\cite{Jain_2023_CVPR} preserves novel-view quality: PSNR changes
+from 27.77 to 27.56\,dB. Object F1 falls from 66.5 to 42.2 and change F1 from 83.3 to 72.7 as segmentation
+errors split objects or assign incorrect classes.
 
 \paragraph{Parameter sensitivity.}
-Decision odds of $9$, $99$, and $999$ yield 27.67--27.81\,dB PSNR and differ by at most one detected event,
-and fixed priors perform similarly.
+Changing the decision odds from $9$ to $99$ to $999$ yields 27.67--27.81\,dB PSNR and changes at most
+one detected event. Fixed priors give similar reconstruction quality.
 
 \paragraph{Computational cost.}
-On Flat, mapping and refinement take 2,898\,s and 6.6\,GB of peak memory on an RTX 5070 Ti, against
-2,647\,s and 5.9\,GB for GaME.
+On an RTX 5070 Ti, Flat mapping and refinement take 2,898\,s versus 2,647\,s for GaME, an increase of
+9.5\%. Peak GPU memory is 6.6 versus 5.9\,GB, including retained historical geometry. The current map
+contains 2.33 million Gaussians, versus 2.37 million for GaME; retaining historical states brings our total
+to 2.60 million.
 % ===== END sec / 5_experiments =====
 % ===== BEGIN sec / 6_limitations =====
 \section{Limitations}
 \label{sec:limitations}
 
-Our method models rigid objects that appear, disappear, or move in indoor scenes, not non-rigid deformation or gradual
-changes such as lighting.
+Our model represents rigid objects through changes of configuration. Continuous deformation requires
+a richer geometric model. Unobserved changes are localized to the interval between supporting and
+contradicting observations. Segmentation errors can split or merge mapped objects, affecting object
+and change scores.
 % ===== END sec / 6_limitations =====
 % ===== BEGIN sec / 7_conclusion =====
 \section{Conclusion}
 \label{sec:conclusion}
 
 We presented \ours, in which one change decision updates both the geometry and the observations of a map
-within and across visits. The same scene-state intervals govern TSDF, Gaussian, and occupancy
-reconstruction, which gain in geometry, completeness, and Gaussian rendering while retaining past states.
+within and across visits. The same scene-state intervals govern TSDF, Gaussian, and occupancy reconstruction. These maps improve
+geometric accuracy and completeness while preserving past states; Gaussian maps also improve novel-view
+rendering.
 % ===== END sec / 7_conclusion =====
 {
 \small
+\FloatBarrier
 \bibliographystyle{ieeenat_fullname}
 \bibliography{main}
 }

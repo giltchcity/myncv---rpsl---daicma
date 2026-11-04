@@ -1,0 +1,66 @@
+{
+  "checkpoint": "/home/jixian/Desktop/FT/runs/update_layer_game_T1_20261006/flat_sam_5c5092b/ours/checkpoint_b_post_ref.pt.zst",
+  "dataset": "flat/sam",
+  "stage": "post_ref",
+  "frame": 270,
+  "camera_and_reference_identical": true,
+  "reference": "SessionSpec(name='flat_b', rgbd=PosixPath('/home/jixian/Desktop/FT/datasets/flat_ab/session_b/rgbd'), instance=PosixPath('/home/jixian/Desktop/FT/datasets/flat_ab/session_b/instance_labels'), semantic=PosixPath('/home/jixian/Desktop/FT/datasets/flat_ab/session_b/semantics'), start_ns=1628857488229302372, T_world_session=array([[1., 0., 0., 0.],\n       [0., 1., 0., 0.],\n       [0., 0., 1., 0.],\n       [0., 0., 0., 1.]]), pixel_offset=0.5, depth_range=(0.1, 15.0), crop_group=())",
+  "scale": 10.0,
+  "final_stamp": 1628857628658935215,
+  "gaussians": 2737541,
+  "active_sh_degree": 3,
+  "K": [
+    [
+      320.0,
+      0.0,
+      319.5
+    ],
+    [
+      0.0,
+      320.0,
+      239.5
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "pose": [
+    [
+      -0.5232753157615662,
+      0.8514221906661987,
+      -0.035526759922504425,
+      21.248531341552734
+    ],
+    [
+      0.03977755829691887,
+      -0.0172404907643795,
+      -0.9990596175193787,
+      9.730803489685059
+    ],
+    [
+      -0.8512341976165771,
+      -0.5241966843605042,
+      -0.024846596643328667,
+      -24.962278366088867
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "frame_psnr": 18.719261169433594,
+  "render_seconds": 18.355688333511353,
+  "published_table_test_psnr": 28.124652067820232,
+  "old_image_run": "verify_flat_5fa93c0/checkpoint_b_post_ref",
+  "renderer": "GaME flashsplat_render; same camera and final-time selection as the rendering evaluation",
+  "display_crop": [
+    185,
+    251,
+    452,
+    455
+  ]
+}
