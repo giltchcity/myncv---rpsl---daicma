@@ -192,6 +192,69 @@ with ADE20K classes and 17 persistent object IDs. People are labeled dynamic, an
 are annotated over time by hand, yielding 31 reference change events. A surface reconstructed at 1\,cm resolution within the room
 provides the geometry reference.
 
+
+
+
+
+
+Figures~\ref{fig:supp_real_stages_1} and~\ref{fig:supp_real_stages_2} show seven scene arrangements across the three real visits from a common overview camera.
+
+% ===== BEGIN figures / real_stages_original =====
+\begin{figure*}[p]
+\centering
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit A: 85.0\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/a_before.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit A: 133.3\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/a_after.png}
+\end{minipage}
+
+\vspace{12pt}
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit B: 34.0\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/b_before.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit B: 134.5\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/b_after.png}
+\end{minipage}
+\caption{\textbf{Changes during the first two real visits.} The luggage appears beside the wall during visit A (top) and moves toward the bed during visit B (bottom). The fixed viewpoint also reveals the room rearrangement between visits.}
+\label{fig:supp_real_stages_1}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit C: 30.0\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/c_before.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit C: 100.0\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/c_middle.png}
+\end{minipage}
+
+\vspace{12pt}
+\begin{minipage}{0.49\linewidth}
+\centering
+{\small\bfseries Visit C: 240.0\,s}\par\smallskip
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/c_after.png}
+\end{minipage}
+\caption{\textbf{Successive changes during the third real visit.} The luggage moves from beside the desk to the clothes rack, then toward the bed. The same viewpoint shows each position within the room.}
+\label{fig:supp_real_stages_2}
+\end{figure*}
+% ===== END figures / real_stages_original =====
+
 \paragraph{DynaState-Sim (Synthetic).}
 We animate objects and camera trajectories in InteriorAgent's kujiale\_0021 apartment~\cite{InteriorAgent2025}
 and capture two visits in Isaac Sim. The visits share a world coordinate frame and contain 4,186 and
@@ -200,6 +263,70 @@ instance labels, and per-frame object transforms and visibility. The transforms 
 meshes recover scene geometry at each timestamp. The two visits contain 72 reference change events, within and across visits. The second
 visit covers part of the scene, supporting evaluation of retained map completeness. Instance labels follow
 the annotated object groups, such as a table together with its contents.
+
+Figures~\ref{fig:supp_sim_stages_1} and~\ref{fig:supp_sim_stages_2} show successive scene arrangements from a fixed overview camera.
+
+% ===== BEGIN figures / sim_stages =====
+\begin{figure*}[p]
+\centering\begingroup
+\setlength{\unitlength}{\dimexpr\linewidth/500\relax}
+\begin{picture}(500,574)
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries DynaState-Sim}}
+\put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont First visit and return}}
+\put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
+\put(0,525){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
+\put(244,525){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 0\,s}}
+\put(0,362.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/a_0000.00_rgb.png}}
+\put(256,525){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{02}\quad After cabinet motion}}
+\put(500,525){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 80\,s}}
+\put(256,362.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/a_0080.00_rgb.png}}
+\put(0,345){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{03}\quad Furniture rearranged}}
+\put(244,345){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 95\,s}}
+\put(0,182.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/a_0095.00_rgb.png}}
+\put(256,345){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{04}\quad Side table moved}}
+\put(500,345){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 125\,s}}
+\put(256,182.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/a_0125.00_rgb.png}}
+\put(0,165){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{05}\quad Chair moved}}
+\put(244,165){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 139.5\,s}}
+\put(0,2.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/a_0139.50_rgb.png}}
+\put(256,165){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{06}\quad Next visit}}
+\put(500,165){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 0\,s / Visit 2}}
+\put(256,2.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0000.00_rgb.png}}
+\end{picture}\endgroup
+\caption{\textbf{Scene changes during a visit and after a return.} Fixed-view Isaac Sim renders show successive arrangements in the first synthetic visit. The final panel shows the start of the next visit, including the rearranged bedroom and living room.}
+\label{fig:supp_sim_stages_1}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering\begingroup
+\setlength{\unitlength}{\dimexpr\linewidth/500\relax}
+\begin{picture}(500,574)
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries DynaState-Sim}}
+\put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont Second visit}}
+\put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
+\put(0,525){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
+\put(244,525){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 0\,s}}
+\put(0,362.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0000.00_rgb.png}}
+\put(256,525){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{02}\quad Side table moved}}
+\put(500,525){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 35\,s}}
+\put(256,362.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0035.00_rgb.png}}
+\put(0,345){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{03}\quad Chair moved}}
+\put(244,345){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 50\,s}}
+\put(0,182.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0050.00_rgb.png}}
+\put(256,345){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{04}\quad Furniture rearranged}}
+\put(500,345){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 65\,s}}
+\put(256,182.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0065.00_rgb.png}}
+\put(0,165){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{05}\quad Cabinet moved}}
+\put(244,165){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 90\,s}}
+\put(0,2.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0090.00_rgb.png}}
+\put(256,165){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{06}\quad Plant moved}}
+\put(500,165){\makebox(0,0)[r]{\color[HTML]{64717E}\fontsize{8}{9.2}\selectfont 118.4\,s}}
+\put(256,2.5){\includegraphics[width=244\unitlength]{figures/dataset_stages/b_0118.40_rgb.png}}
+\end{picture}\endgroup
+\caption{\textbf{Multiple changes within the second visit.} The side table, chairs, cabinet, and plant change position at different times. The common camera keeps their locations directly comparable across the sequence.}
+\label{fig:supp_sim_stages_2}
+\end{figure*}
+% ===== END figures / sim_stages =====
 
 \paragraph{Flat.}
 Flat was introduced with Panoptic Multi-TSDFs~\cite{9811877}. It contains two RGB-D trajectories
