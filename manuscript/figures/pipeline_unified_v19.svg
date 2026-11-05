@@ -841,7 +841,7 @@ iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAUiklEQVR4nO2deXRUVZ7HP7fWrCSExBAg
     <text style="fill: #263747; font: 700 7.2px 'STIXGeneral', serif; text-anchor: middle" x="444.3" y="112.495375" transform="rotate(-0 444.3 112.495375)">Updated map + states</text>
    </g>
    <g id="text_5">
-    <text style="fill: #263747; font: 6.2px 'STIXGeneral', serif; text-anchor: middle" x="44.5" y="120.644406" transform="rotate(-0 44.5 120.644406)">RGB-D · SAM masks · poses</text>
+    <text style="fill: #263747; font: 6.2px 'STIXGeneral', serif; text-anchor: middle" x="44.5" y="120.644406" transform="rotate(-0 44.5 120.644406)">RGB-D · masks · poses</text>
    </g>
    <g id="text_6">
     <text style="fill: #7b5ea7; font: 5.7px 'STIXGeneral', serif; text-anchor: start" x="97.155" y="21.19725" transform="rotate(-0 97.155 21.19725)">Missing obj.</text>
