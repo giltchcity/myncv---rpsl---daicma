@@ -109,7 +109,7 @@ valid per state. A sequential test ends a state once enough of its surface is se
 looking away, or between visits. Map update retires ended geometry and limits each observation to the states and
 regions it still describes. The decisions govern TSDF, Gaussian, and occupancy maps, and ended states stay
 queryable. On a new benchmark, Flat, and 3RScan, all three beat their native updates in mesh, object, and change
-F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.43\,dB
+F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.91\,dB
 higher PSNR than GaME. Code and data will be released.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -150,8 +150,8 @@ evaluate further on Flat, 3RScan, TESSE, and Aria. \discuss{Instance masks are t
 identities on Real and 3RScan; \discuss{semantic masks and framewise SAM regions are also evaluated}. On all four mapping datasets, every representation
 outperforms its native update in mesh, object, and change F1. On TESSE, change F1 rises from
 46.2 to 78.6 and from 38.6 to 92.6. On a partial revisit, continuing our TSDF map raises mesh F1 by 9.3 points
-over restarting it and by 12.6 over a Khronos restart, and our Gaussian maps render 0.88--3.43\,dB higher PSNR
-than GaME on the four mapping datasets and two Aria rooms.
+over restarting it and by 12.6 over a Khronos restart, and our Gaussian maps render 0.88--3.91\,dB higher PSNR
+than GaME on the Flat and Aria scenes it uses.
 
 \noindent
 \textbf{Contributions}:
@@ -270,7 +270,7 @@ placed in front of a wall, and the wall does not change.
 \centering
 \includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
 \caption{\textbf{A scene change updates both geometry and observation contributions.} The inputs are posed RGB-D
-\discuss{frames with instance masks (SAM masks on Aria)}. Current observations reveal a missing (purple)
+\discuss{frames with instance masks (SAM masks on the rendering scenes)}. Current observations reveal a missing (purple)
 and a new (yellow) object against the retained map. Change detection accumulates the surface evidence of each
 state over the rounds $t_1$ to $t_4$ (filled squares supported, crossed seen through, dotted not inspected) and
 ends, keeps, or begins states. Map update retires the geometry of ended states, which remain queryable as past
@@ -514,7 +514,7 @@ update, and bold marks the better of the two.}
 Besides DynaState (\cref{sec:benchmark}), Flat~\cite{9811877} contains two RGB-D recordings of a simulated apartment, between which eight objects move,
 five appear, and four disappear. 3RScan~\cite{9010673} rescans real rooms. We use eight room chains with 77
 reference change events in total. Khronos's TESSE Office and Apartment sequences~\cite{Schmid-RSS-24} contain
-motion and changes within one continuous run. Rendering uses the four main-comparison datasets
+motion and changes within one continuous run. Rendering uses Flat
 and the two Aria rooms used by GaME~\cite{Yugay_2026_CVPR}.
 
 \noindent\textbf{Baselines and protocol.}
@@ -524,7 +524,7 @@ for occupancy. All methods receive the same posed frames and carry their maps ac
 update. Panoptic loads the preceding visit's map through its native interface. \discuss{Inputs are annotated instance masks
 in the main comparison}, with identities supplied on Real and 3RScan and associated by mask overlap elsewhere.
 \discuss{Khronos receives semantic masks on Flat}, both methods
-\discuss{use semantic masks on TESSE}, and \discuss{both methods use framewise SAM masks on Aria}~\cite{Kirillov_2023_ICCV}. Panoptic
+\discuss{use semantic masks on TESSE}, and \discuss{our Gaussian rendering runs use framewise SAM masks}~\cite{Kirillov_2023_ICCV}. Panoptic
 runs its released configurations, with 5\,cm objects and a 5\,cm background on Sim. GaME's 3RScan run uses its
 dataset-adapted implementation, and on real RGB-D both Gaussian methods exclude invalid depths from supervision.
 Objects are exported from Gaussian and occupancy maps with the same connectivity rule for the native and our
@@ -596,7 +596,6 @@ object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0. GaME adds and remo
 measured depth disagree, so an object removed out of view is cut away only where the camera later looks, and the
 remnants render as floating fragments and duplicated walls (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 2.8 and 3.7 mesh F1, but consistent across all three scores.
-The same Gaussian reconstructions also improve novel-view quality (\cref{tab:rendering}).
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest in the real room, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
@@ -733,45 +732,36 @@ Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better of the two
 % ===== END figures / qualitative_gaussians =====
 
 % ===== BEGIN tables / rendering =====
-% Existing held-out results: main-comparison runs and Aria SAM runs.
+% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
 \begin{table}[t]
 \centering
-\fontsize{8.5}{9.8}\selectfont
-\setlength{\tabcolsep}{2.6pt}
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llrrrr@{}}
+\fontsize{9}{10.3}\selectfont
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.15}
+\def\resultrows{
 \toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+ & GaME & 24.21 & 0.92 & 0.16 & 1.07 \\
+\multirow{-2}{*}{Flat} & \textbf{Ours} & \textbf{28.12} & \textbf{0.96} & \textbf{0.10} & \textbf{0.39} \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{Main-comparison sequences}} \\
-\multirow{2}{*}{Real} & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
- & \textbf{Ours} & \textbf{19.90} & \textbf{0.811} & \textbf{0.370} & \textbf{4.96} \\
-\addlinespace[2pt]
-\multirow{2}{*}{Sim} & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
- & \textbf{Ours} & \textbf{24.90} & \textbf{0.824} & \textbf{0.215} & \textbf{15.32} \\
-\addlinespace[2pt]
-\multirow{2}{*}{Flat} & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
- & \textbf{Ours} & \textbf{27.64} & \textbf{0.947} & \textbf{0.117} & \textbf{0.47} \\
-\addlinespace[2pt]
-\multirow{2}{*}{3RScan} & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
- & \textbf{Ours} & \textbf{21.06} & \textbf{0.774} & \textbf{0.366} & \textbf{2.79} \\
+ & GaME & 31.55 & 0.95 & 0.15 & 0.71 \\
+\multirow{-2}{*}{Aria room0} & \textbf{Ours} & \textbf{32.43} & \textbf{0.96} & \textbf{0.14} & \textbf{0.70} \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{Aria}} \\
-\multirow{2}{*}{Room 0} & GaME & 31.55 & 0.952 & 0.146 & 0.71 \\
- & \textbf{Ours} & \textbf{32.43} & \textbf{0.958} & \textbf{0.141} & \textbf{0.70} \\
-\addlinespace[2pt]
-\multirow{2}{*}{Room 1} & GaME & 31.97 & 0.950 & 0.100 & 1.80 \\
- & \textbf{Ours} & \textbf{33.39} & \textbf{0.969} & \textbf{0.091} & \textbf{1.17} \\
+ & GaME & 31.97 & 0.95 & 0.10 & 1.80 \\
+\multirow{-2}{*}{Aria room1} & \textbf{Ours} & \textbf{33.39} & \textbf{0.97} & \textbf{0.09} & \textbf{1.17} \\
 \bottomrule
-\end{tabular*}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
 \caption{\textbf{Sharper novel views after scene updates.} Held-out views of the final visit. PSNR in dB, depth
-L1 in cm. Bold marks the better method.}
+L1 in cm. Our maps use framewise SAM masks. Bold marks the better method.}
 \label{tab:rendering}
 \end{table}
 % ===== END tables / rendering =====
 
-Our Gaussian maps render the held-out views of all evaluated sequences with higher PSNR and MS-SSIM and lower LPIPS than GaME,
-by 0.96--3.43\,dB on the four main-comparison datasets and by 0.88 and 1.42\,dB on the Aria rooms (\cref{tab:rendering}). Depth L1 falls on the four mapping datasets and
+Our Gaussian maps render the held-out views of all three scenes with higher PSNR and MS-SSIM and lower LPIPS than GaME,
+by 3.91\,dB on Flat and by 0.88 and 1.42\,dB on the Aria rooms (\cref{tab:rendering}). Depth L1 falls on Flat and
 room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). The difference lies in the keyframes. GaME masks the stale regions of a
 keyframe and ignores the keyframe once one of its object masks is mostly stale, and the surfaces that keyframe
 also saw lose their supervision. We keep every keyframe for the states it recorded, so the unchanged walls and
