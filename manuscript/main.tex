@@ -109,7 +109,7 @@ valid per state. A sequential test ends a state once enough of its surface is se
 looking away, or between visits. Map update retires ended geometry and limits each observation to the states and
 regions it still describes. The decisions govern TSDF, Gaussian, and occupancy maps, and ended states stay
 queryable. On a new benchmark, Flat, and 3RScan, all three beat their native updates in mesh, object, and change
-F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.91\,dB
+F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.43\,dB
 higher PSNR than GaME. Code and data will be released.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -150,8 +150,8 @@ evaluate further on Flat, 3RScan, TESSE, and Aria. \discuss{Instance masks are t
 identities on Real and 3RScan; \discuss{semantic masks and framewise SAM regions are also evaluated}. On all four mapping datasets, every representation
 outperforms its native update in mesh, object, and change F1. On TESSE, change F1 rises from
 46.2 to 78.6 and from 38.6 to 92.6. On a partial revisit, continuing our TSDF map raises mesh F1 by 9.3 points
-over restarting it and by 12.6 over a Khronos restart, and our Gaussian maps render 0.88--3.91\,dB higher PSNR
-than GaME on the Flat and Aria scenes it uses.
+over restarting it and by 12.6 over a Khronos restart, and our Gaussian maps render 0.88--3.43\,dB higher PSNR
+than GaME on the four mapping datasets and two Aria rooms.
 
 \noindent
 \textbf{Contributions}:
@@ -548,9 +548,8 @@ $60^\circ$ incidence limit, a 10\,cm successor displacement, and the threshold $
 \label{sec:exp_main}
 
 
-\Cref{tab:main} compares each representation with its native update on the four datasets. Ours improves mesh,
-object, and change F1 in all three representations on all four datasets, and \cref{fig:geometry_details} shows
-the stale geometry that only ours retires.
+Ours improves mesh, object, and change F1 over the native update in all three representations and on all four datasets (Tab.~\ref{tab:main}).
+\Cref{fig:geometry_details} shows the stale geometry that only ours retires.
 
 % ===== BEGIN figures / qualitative_geometry =====
 % Edit each panel directly below: one original PNG per includegraphics.
