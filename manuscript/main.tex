@@ -51,6 +51,11 @@
 % Set \draftmodefalse to hide all four for a clean copy.
 % The manuscript preamble already defines \TODO; \providecommand keeps that definition.
 \usepackage{xcolor}
+% Temporary author-discussion highlights. Set \discussionmarksfalse for a clean copy.
+\newif\ifdiscussionmarks
+\discussionmarkstrue
+\DeclareRobustCommand{\discuss}[1]{\ifdiscussionmarks\textcolor{red!70!black}{#1}\else#1\fi}
+
 \usepackage{multirow}
 \newif\ifdraftmode
 \draftmodetrue
@@ -135,14 +140,14 @@ When the chair's state ends, its whole surface leaves the current map, including
 The decision must come from partial views, yet repeated views of one patch do not add up to a whole-object change. We do so with a sequential test in which only the newly inspected surface adds to the evidence.
 
 Khronos comes closest: it keeps object fragments with presence intervals, verifies absence using rays
-connecting reconstructed background vertices to their observing camera poses, and answers queries at past times. We keep that model of the map and change what
+\discuss{connecting reconstructed background vertices to their observing camera poses}, and answers queries at past times. We keep that model of the map and change what
 the decision rests on and what it reaches. A decision retires the whole state, unseen parts included, valid
 domains and capture-time keyframes carry it to the observations, states are handed over across visits, and the
 same rules run in TSDF, Gaussian, and occupancy maps, each keeping its integration rule (\cref{tab:capabilities}).
 
 We collect a real and a synthetic RGB-D benchmark in which these changes occur together in one map, and
-evaluate further on Flat, 3RScan, TESSE, and Aria. Instance masks are the default input, with annotated
-identities on Real and 3RScan; semantic masks and framewise SAM regions are also evaluated. On all four mapping datasets, every representation
+evaluate further on Flat, 3RScan, TESSE, and Aria. \discuss{Instance masks are the default input}, with annotated
+identities on Real and 3RScan; \discuss{semantic masks and framewise SAM regions are also evaluated}. On all four mapping datasets, every representation
 outperforms its native update in mesh, object, and change F1. On TESSE, change F1 rises from
 46.2 to 78.6 and from 38.6 to 92.6. On a partial revisit, continuing our TSDF map raises mesh F1 by 9.3 points
 over restarting it and by 12.6 over a Khronos restart, and our Gaussian maps render 0.88--3.91\,dB higher PSNR
@@ -251,7 +256,7 @@ geometry and its observations enter the map.
 \section{Method}
 \label{sec:method}
 
-\ours maintains one map from posed RGB-D frames with instance masks, within a visit and across visits. Poses come
+\ours maintains one map from \discuss{posed RGB-D frames with instance masks}, within a visit and across visits. Poses come
 from a SLAM system or the dataset, masks from annotations or a segmenter, and associations link the masks of one
 object across frames. Every map element carries a lifetime, so the map can be queried at any
 past time. Each change is first judged and then applied (\cref{fig:method}). \emph{Change detection} decides from
@@ -265,7 +270,7 @@ placed in front of a wall, and the wall does not change.
 \centering
 \includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
 \caption{\textbf{A scene change updates both geometry and observation contributions.} The inputs are posed RGB-D
-frames with instance masks (SAM masks on the rendering scenes). Current observations reveal a missing (purple)
+\discuss{frames with instance masks (SAM masks on the rendering scenes)}. Current observations reveal a missing (purple)
 and a new (yellow) object against the retained map. Change detection accumulates the surface evidence of each
 state over the rounds $t_1$ to $t_4$ (filled squares supported, crossed seen through, dotted not inspected) and
 ends, keeps, or begins states. Map update retires the geometry of ended states, which remain queryable as past
@@ -302,7 +307,7 @@ between visits.
 \vspace{1mm}\noindent\textbf{Surface evidence.}
 We project surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those
 supported in at least $n_{\min}$ earlier frames and seen at an incidence angle below
-$60^\circ$~\cite{6375037}, and a depth tolerance set to the map resolution (5\,cm) absorbs noise. A
+$60^\circ$~\cite{6375037}, and \discuss{a depth tolerance set to the map resolution} (5\,cm) absorbs noise. A
 sample is \emph{supported} when the depths agree, \emph{seen through} when the measurement lies farther along the
 ray, and \emph{occluded} when it lies closer. Seeing the floor where the armchair stood is evidence that it has
 left, whereas the sofa in front of the wall only occludes the wall. Occlusions, invalid depths, and samples
@@ -310,7 +315,7 @@ outside the image contribute no absence evidence. An object hidden by a larger o
 therefore only occluded, and its state persists until its surroundings are seen.
 
 \vspace{1mm}\noindent\textbf{Change decisions.}
-A \emph{round} is one depth image in which at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$
+A \emph{round} is one depth image in which at least $\min(30,\nu_{\mathrm{rel}})$ \discuss{reliable samples of state} $s$
 are judged, where $\nu_{\mathrm{rel}}$ is the number of reliable samples of the state. At round $i$, let $f_i$ be
 the fraction of the judged samples that are seen through. While the state is in place, $f_i$ follows a Beta
 density fitted to the rounds before the earliest open candidate change time. After a change, any fraction is equally likely. Let $\ell_s(f_i)$ be the log-likelihood
@@ -330,8 +335,8 @@ Page's recursion: the candidates are the rounds since the state was last support
 sum per candidate. The state ends once
 $L_{s,n}>\ln\eta$ and the see-through samples since the chosen $j$ outnumber the supported ones. We use $\eta=99$ throughout. On a revisit the statistic starts at $\ln\frac{1-q}{q}$,
 where $q$ is the probability that the object persists, estimated from its class and its own history. The Beta model treats $f_i$ as a fraction regardless of
-how many samples a round judges. The minimum of $\min(30,\nu_{\mathrm{rel}})$ judged samples bounds the
-overconfidence this allows.
+how many samples a round judges. The minimum of $\min(30,\nu_{\mathrm{rel}})$ judged samples \discuss{bounds the
+overconfidence this allows}.
 
 \vspace{1mm}\noindent\textbf{Successors.}
 Observations that match no state form candidates. A candidate becomes the \emph{successor} of an earlier state of
@@ -343,8 +348,8 @@ partly seen object is unreliable and the settled object is observed anyway.
 A candidate that matches no earlier object starts a new one, and unresolved candidates wait for more evidence.
 
 \vspace{1mm}\noindent\textbf{Observed motion.}
-An object that moves in view is detected in the shared front-end with the object tracking of Khronos and the
-free-space cue of Dynablox, which marks points that fall into known free space as
+An object that moves in view is detected in the shared front-end \discuss{with the object tracking of Khronos and the
+free-space cue of Dynablox}, which marks points that fall into known free space as
 moving~\cite{Schmid-RSS-24,10218983}. The free space is read from the current map, after the valid domains of
 \cref{sec:validity} are applied, so stale free space does not flag a new object as moving.
 People are detected as moving and never form states.
@@ -368,7 +373,7 @@ included. The geometry is \emph{retired}: it leaves the current map and stays av
 observations reconstruct the sofa and any successor, and continuing states keep growing.
 
 \vspace{1mm}\noindent\textbf{Valid domains.}
-A depth measurement contributes a surface and the free space in front of it. The earlier measurement of the wall
+\discuss{A depth measurement contributes a surface and the free space in front of it.} The earlier measurement of the wall
 can still complete the wall, but its free space must stop before the sofa. We express this as the observation's
 \emph{valid domain}. Let observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
 point $x$ on the ray, let $\rho_o(x)$ be its range and $\delta_o(x)=r_o-\rho_o(x)$ its distance in front of the
@@ -380,7 +385,7 @@ after $t_o$, or $\infty$ if there is none. With surface band $T$,
 \end{equation}
 The domain is the band of width $T$ around the measured surface, plus the free space in front of it up to the
 first object that arrived after the observation. The band keeps the wall, and $\lambda_o$ stops the earlier free
-space at the sofa. Rays that measured an ended state are dropped whole, free space included, since later views of
+space at the sofa. \discuss{Rays that measured an ended state are dropped whole, free space included}, since later views of
 the vacated region supply that free space and the band would re-fuse the armchair.
 $\lambda_o$ considers object states only, so a changed background surface, such as the window sash below,
 does not stop old free space and is left to the retention test. Every
@@ -401,7 +406,7 @@ see-through measurements within valid domains outnumber the supporting ones. On 
 current surface measured just in front of it, within the surface band and with the same orientation, replaces it,
 since keeping the older copy of a re-measured surface would leave a duplicate behind it. Otherwise it remains.
 Occlusion alone never retires geometry, so unobserved regions stay in the map. All tests use the 5\,cm tolerance,
-so registration error below it is absorbed.
+\discuss{so registration error below it is absorbed}.
 
 \vspace{1mm}\noindent\textbf{Handover across visits.}
 \label{sec:handoff}
@@ -446,8 +451,8 @@ record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in wh
 change after the camera looks away, and change between visits, with reference geometry at every time.
 
 \noindent\textbf{Real.}
-Three Azure Kinect visits A, B, and C to one room over nearly two weeks, with 4,003, 4,041, and 7,216 RGB-D
-frames at 30\,Hz. ORB-SLAM3~\cite{9440682} provides the poses, which are registered across visits. Masks carry
+Three Azure Kinect visits A, B, and C to one room over nearly two weeks, \discuss{with 4,003, 4,041, and 7,216 RGB-D
+frames at 30}\,Hz. ORB-SLAM3~\cite{9440682} provides the poses, which are registered across visits. Masks carry
 17 persistent object identities, people are labeled as dynamic, and object changes are annotated by hand over
 time, yielding 31 reference change events. An O3D reconstruction of the room at 1\,cm resolution serves as the geometry reference.
 
@@ -519,10 +524,10 @@ and the two Aria rooms used by GaME~\cite{Yugay_2026_CVPR}.
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and wavemap~\cite{Reijgwart-RSS-23}
 for occupancy. All methods receive the same posed frames and carry their maps across visits with their own
-update. Panoptic loads the preceding visit's map through its native interface. Inputs are annotated instance masks
-in the main comparison, with identities supplied on Real and 3RScan and associated by mask overlap elsewhere.
-Khronos receives semantic masks on Flat, both methods
-use semantic masks on TESSE, and our Gaussian rendering runs use framewise SAM masks~\cite{Kirillov_2023_ICCV}. Panoptic
+update. Panoptic loads the preceding visit's map through its native interface. \discuss{Inputs are annotated instance masks
+in the main comparison}, with identities supplied on Real and 3RScan and associated by mask overlap elsewhere.
+\discuss{Khronos receives semantic masks on Flat}, both methods
+\discuss{use semantic masks on TESSE}, and \discuss{our Gaussian rendering runs use framewise SAM masks}~\cite{Kirillov_2023_ICCV}. Panoptic
 runs its released configurations, with 5\,cm objects and a 5\,cm background on Sim. GaME's 3RScan run uses its
 dataset-adapted implementation, and on real RGB-D both Gaussian methods exclude invalid depths from supervision.
 Objects are exported from Gaussian and occupancy maps with the same connectivity rule for the native and our
@@ -530,10 +535,10 @@ updates. \Cref{sec:ablation} reports predicted masks and geometric association.
 
 \noindent\textbf{Metrics.}
 Mesh F1 evaluates the final visit's map at a 5\,cm distance threshold. In the main comparison and ablations, Gaussian geometry and rendering use the final refined map. The supplement reports every visit.
-The reference may include previously observed regions that the current visit does not see. Object F1 matches objects within 0.5\,m and weights snapshots by their
-duration~\cite{Schmid-RSS-24}, and change F1 pools appearance and disappearance events over the visit chain.
-3RScan scores are averaged over visits and then over rooms. TESSE uses Khronos's official aggregation over map
-and query times~\cite{Schmid-RSS-24}. For rendering, every tenth frame of the final visit, except the first, is
+The reference may include previously observed regions that the current visit does not see. Object F1 matches objects within 0.5\,m and \discuss{weights snapshots by their
+duration}~\cite{Schmid-RSS-24}, and change F1 pools appearance and disappearance events over the visit chain.
+3RScan scores are averaged over visits and then over rooms. \discuss{TESSE uses Khronos's official aggregation over map
+and query times}~\cite{Schmid-RSS-24}. For rendering, every tenth frame of the final visit, except the first, is
 held out~\cite{Yugay_2026_CVPR}, and we report PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and the
 L1 error of rendered against measured depth after refinement.
 
@@ -834,12 +839,12 @@ Reusing earlier keyframes without valid domains lowers PSNR by 5.08\,dB and rais
 3.66\,cm, as the old frames rebuild the removed furniture. Allowing this only during refinement is as harmful
 (22.78\,dB). Discarding every keyframe that observed a Gaussian whose lifetime later ends, the whole-frame
 rejection that GaME's own ablation warns against~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and leaves geometry within
-noise. Discarding only the first-visit keyframes that meet this condition costs nothing (27.78\,dB), so the loss comes
-from the current-visit keyframes: a second-visit keyframe that sees the empty floor is the very evidence that ends the
+noise. \discuss{Discarding only the first-visit keyframes} that meet this condition costs nothing (27.78\,dB), so the loss comes
+from the current-visit keyframes: \discuss{a second-visit keyframe that sees the empty floor} is the very evidence that ends the
 stale Gaussians, and whole-frame rejection then discards it, which leaves the changed region under-constrained.
 Keeping such frames and restricting them ray by ray is what the valid domains do. Evaluating old keyframes on the
-current map rather than on the map at their capture time changes PSNR by 0.06\,dB. Capture-time evaluation preserves
-historical reconstructions at comparable current-view quality.
+current map rather than on the map at their capture time changes PSNR by 0.06\,dB. \discuss{Capture-time evaluation preserves
+historical reconstructions at comparable current-view quality.}
 
 \noindent\textbf{Masks and association.}
 Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
