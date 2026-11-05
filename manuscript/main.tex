@@ -270,7 +270,7 @@ placed in front of a wall, and the wall does not change.
 \centering
 \includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
 \caption{\textbf{A scene change updates both geometry and observation contributions.} The inputs are posed RGB-D
-\discuss{frames with instance masks (SAM masks on the rendering scenes)}. Current observations reveal a missing (purple)
+\discuss{frames with instance masks (SAM masks on Aria)}. Current observations reveal a missing (purple)
 and a new (yellow) object against the retained map. Change detection accumulates the surface evidence of each
 state over the rounds $t_1$ to $t_4$ (filled squares supported, crossed seen through, dotted not inspected) and
 ends, keeps, or begins states. Map update retires the geometry of ended states, which remain queryable as past
@@ -491,15 +491,12 @@ Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Me
 \midrule
  & Khronos~\cite{Schmid-RSS-24} & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
  & Panoptic~\cite{9811877} & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
-\rowcolor{oursbg}
 \multirow{-3}{*}{TSDF} & \textbf{Ours} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} & \textbf{99.2} & \textbf{83.6} & \textbf{97.9} & \textbf{90.1} & \textbf{50.7} & \textbf{76.5} & \textbf{91.8} & \textbf{68.6} & \textbf{80.5} \\
 \midrule
  & GaME~\cite{Yugay_2026_CVPR} & 88.6 & 76.9 & 96.7 & 80.9 & 72.6 & 82.9 & 86.2 & 65.2 & 76.5 & 85.9 & 77.5 & 87.8 \\
-\rowcolor{oursbg}
 \multirow{-2}{*}{3DGS} & \textbf{Ours} & \textbf{95.1} & \textbf{94.0} & \textbf{98.4} & \textbf{96.5} & \textbf{84.0} & \textbf{97.9} & \textbf{89.0} & \textbf{67.1} & \textbf{83.3} & \textbf{89.6} & \textbf{82.6} & \textbf{96.1} \\
 \midrule
  & wavemap~\cite{Reijgwart-RSS-23} & 84.5 & 80.0 & 89.7 & 93.2 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 & 75.6 & 79.5 & 95.3 \\
-\rowcolor{oursbg}
 \multirow{-2}{*}{Occupancy} & \textbf{Ours} & \textbf{91.0} & \textbf{93.8} & \textbf{100.0} & \textbf{94.2} & \textbf{86.5} & \textbf{98.6} & \textbf{82.4} & \textbf{55.4} & \textbf{95.0} & \textbf{79.4} & \textbf{80.6} & \textbf{97.4} \\
 \bottomrule
 }
@@ -517,7 +514,7 @@ update, and bold marks the better of the two.}
 Besides DynaState (\cref{sec:benchmark}), Flat~\cite{9811877} contains two RGB-D recordings of a simulated apartment, between which eight objects move,
 five appear, and four disappear. 3RScan~\cite{9010673} rescans real rooms. We use eight room chains with 77
 reference change events in total. Khronos's TESSE Office and Apartment sequences~\cite{Schmid-RSS-24} contain
-motion and changes within one continuous run. Rendering uses Flat
+motion and changes within one continuous run. Rendering uses the four main-comparison datasets
 and the two Aria rooms used by GaME~\cite{Yugay_2026_CVPR}.
 
 \noindent\textbf{Baselines and protocol.}
@@ -527,11 +524,11 @@ for occupancy. All methods receive the same posed frames and carry their maps ac
 update. Panoptic loads the preceding visit's map through its native interface. \discuss{Inputs are annotated instance masks
 in the main comparison}, with identities supplied on Real and 3RScan and associated by mask overlap elsewhere.
 \discuss{Khronos receives semantic masks on Flat}, both methods
-\discuss{use semantic masks on TESSE}, and \discuss{our Gaussian rendering runs use framewise SAM masks}~\cite{Kirillov_2023_ICCV}. Panoptic
+\discuss{use semantic masks on TESSE}, and \discuss{both methods use framewise SAM masks on Aria}~\cite{Kirillov_2023_ICCV}. Panoptic
 runs its released configurations, with 5\,cm objects and a 5\,cm background on Sim. GaME's 3RScan run uses its
 dataset-adapted implementation, and on real RGB-D both Gaussian methods exclude invalid depths from supervision.
 Objects are exported from Gaussian and occupancy maps with the same connectivity rule for the native and our
-updates. \Cref{sec:ablation} reports predicted masks and geometric association.
+updates. The supplement reports predicted masks and geometric association.
 
 \noindent\textbf{Metrics.}
 Mesh F1 evaluates the final visit's map at a 5\,cm distance threshold. In the main comparison and ablations, Gaussian geometry and rendering use the final refined map. The supplement reports every visit.
@@ -567,21 +564,18 @@ the stale geometry that only ours retires.
 \newcommand{\geowidth}{\dimexpr(\linewidth-12pt)/3\relax}
 \begin{tabular}{@{}ccc@{}}
 Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
-\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(a) TSDF / Khronos}\hfill\textcolor{resultgray}{Real}}}\\[3pt]
 \includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
 \includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
 \includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}\\[7pt]
-\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(b) TSDF / Khronos}\hfill\textcolor{resultgray}{Flat}}}\\[3pt]
 \includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/1_khronos.png} &
 \includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/3_ours_tsdf.png} &
 \includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/0_image.png}\\[7pt]
-\multicolumn{3}{@{}l@{}}{\makebox[\linewidth][l]{\textbf{(c) Occupancy / wavemap}\hfill\textcolor{resultgray}{Sim}}}\\[3pt]
 \includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/6_wavemap.png} &
 \includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/7_ours_occ.png} &
 \includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/0_image.png}\\
 \end{tabular}
 \endgroup
-\caption{\textbf{Native updates keep stale geometry that ours retires.} Khronos vs.\ our TSDF (a, b) and wavemap vs.\ our occupancy (c), rendered at the pose of the reference image after the last visit. Geometry of removed objects survives in the native maps wherever no later measurement crosses it. Ours retires it with the ended state.}
+\caption{\textbf{Native updates keep stale geometry that ours retires.} Khronos vs.\ our TSDF on Real and Flat (top two rows), and wavemap vs.\ our occupancy on Sim (bottom), rendered at the pose of the reference image after the last visit. Geometry of removed objects survives in the native maps wherever no later measurement crosses it. Ours retires it with the ended state.}
 \label{fig:geometry_details}
 \end{figure}
 % ===== END figures / qualitative_geometry =====
@@ -590,7 +584,7 @@ Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
 The gains are largest where the scene changes most. In the real room, mesh F1 rises from 87.7 to 96.1 over
 Khronos continuing its map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Khronos confirms
 absence only where the rays it stored see through, so the parts of a removed object that no ray crosses stay in
-its mesh (\cref{fig:geometry_details}a, b), and nothing stops the free space of earlier frames from carving into
+its mesh (\cref{fig:geometry_details}), and nothing stops the free space of earlier frames from carving into
 objects that arrived later. Ending a state retires the whole object, and the valid domains stop the old free space
 at the new objects, which raises precision and recall together. Panoptic Multi-TSDFs compares whole submaps against
 the active ones and marks a submap absent when enough of its points conflict. Under the changing coverage of
@@ -603,12 +597,13 @@ object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0. GaME adds and remo
 measured depth disagree, so an object removed out of view is cut away only where the camera later looks, and the
 remnants render as floating fragments and duplicated walls (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 2.8 and 3.7 mesh F1, but consistent across all three scores.
+The same Gaussian reconstructions also improve novel-view quality (\cref{tab:rendering}).
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest in the real room, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
 smallest on the synthetic scenes, within 2.2 mesh F1 on Sim and Flat. wavemap's clamped log-odds overwrite a
 changed cell after enough contradicting measurements, which the clean depth of a synthetic sequence supplies
-quickly. Real depth is noisy and partial (\cref{fig:geometry_details}c), so stale cells survive until a whole state
+quickly. Real depth is noisy and partial, so stale cells survive until a whole state
 is retired.
 
 \noindent\textbf{The gain is not a cross-visit effect.}
@@ -622,7 +617,7 @@ Real A and 99.2 vs.\ 93.6 on Sim A, see the supplement), so the within-visit dec
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{2.6pt}
 \renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}ll rr>{\columncolor{oursbg}}r rr>{\columncolor{oursbg}}r@{}}
+\begin{tabular}{@{}ll rrr rrr@{}}
 \toprule
 & & \multicolumn{3}{c}{Real, visit C (full)} & \multicolumn{3}{c}{Sim, visit B (partial)} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}
@@ -681,11 +676,9 @@ observations of its resting place.
 \cmidrule(lr){4-5}\cmidrule(lr){6-8}
 Scene & Method & F1 & Static & Dyn. & P & R & F1 & F1 \\ \midrule
  & Khronos & 74.6 & 67.4 & 84.8 & 10.8 & \textbf{50.2} & 46.2 & 92.8 \\
-\rowcolor{oursbg}
 \multirow{-2}{*}{Office} & \textbf{Ours} & \textbf{76.1} & \textbf{69.2} & \textbf{96.7} & \textbf{93.3} & 48.8 & \textbf{78.6} & \textbf{94.1} \\
 \midrule
  & Khronos & 78.0 & 54.8 & 85.5 & 15.6 & \textbf{53.9} & 38.6 & 86.1 \\
-\rowcolor{oursbg}
 \multirow{-2}{*}{Apartment} & \textbf{Ours} & \textbf{79.8} & \textbf{62.2} & \textbf{95.1} & \textbf{87.0} & 52.8 & \textbf{92.6} & \textbf{88.1} \\
 \bottomrule
 }
@@ -717,7 +710,6 @@ Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better of the two
 \put(230.000,253.000){\color[HTML]{997510}\rule{130.000\unitlength}{0.7pt}}
 \put(0.000,192.471){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/sim_before_Aend_B003065.png}}
 \put(0.000,135.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(0.800,244.441){\makebox(0,0)[l]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.8}{8.8}\selectfont\bfseries\color[HTML]{222222}(a) Sim}}}
 \put(79.200,244.441){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}Before}}}
 \put(79.200,186.971){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}After}}}
 \put(16.471,196.000){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(49.412,35.294){}}
@@ -727,7 +719,6 @@ Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better of the two
 \put(365.000,145.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
 \put(0.000,63.000){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/flat_before_context_retouch.png}}
 \put(0.000,2.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/5_flat_00270/0_image.png}}
-\put(0.800,118.500){\makebox(0,0)[l]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.8}{8.8}\selectfont\bfseries\color[HTML]{222222}(b) Flat}}}
 \put(79.200,118.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}Before}}}
 \put(79.200,57.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}After}}}
 \put(23.125,63.250){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(37.125,28.375){}}
@@ -737,45 +728,51 @@ Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better of the two
 \put(365.000,12.820){\includegraphics[width=130.000\unitlength,trim={185.0000bp 2.0000bp 158.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
 \end{picture}
 \endgroup
-\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Before and After show the scene changes. Purple boxes mark the crops: furniture surfaces in the synthetic apartment and duplicated walls in Flat. The real room is in the supplement. GaME removes Gaussians only where rendered and measured depth disagree and loses the supervision of the keyframes it masks. Ours retires the ended states and keeps every keyframe for the states it saw, so the walls stay constrained.}
+\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Before and After show the scene changes. Purple boxes mark the crops: furniture surfaces in the synthetic apartment (top) and duplicated walls in Flat (bottom). The real room is in the supplement. GaME removes Gaussians only where rendered and measured depth disagree and loses the supervision of the keyframes it masks. Ours retires the ended states and keeps every keyframe for the states it saw, so the walls stay constrained.}
 \label{fig:gaussian_details}
 \end{figure*}
 % ===== END figures / qualitative_gaussians =====
 
 % ===== BEGIN tables / rendering =====
-% SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
+% Existing held-out results: main-comparison runs and Aria SAM runs.
 \begin{table}[t]
 \centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.0pt}
-\renewcommand{\arraystretch}{1.15}
-\def\resultrows{
+\fontsize{8.5}{9.8}\selectfont
+\setlength{\tabcolsep}{2.6pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llrrrr@{}}
 \toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
- & GaME & 24.21 & 0.92 & 0.16 & 1.07 \\
-\rowcolor{oursbg}
-\multirow{-2}{*}{Flat} & \textbf{Ours} & \textbf{28.12} & \textbf{0.96} & \textbf{0.10} & \textbf{0.39} \\
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
 \midrule
- & GaME & 31.55 & 0.95 & 0.15 & 0.71 \\
-\rowcolor{oursbg}
-\multirow{-2}{*}{Aria room0} & \textbf{Ours} & \textbf{32.43} & \textbf{0.96} & \textbf{0.14} & \textbf{0.70} \\
+\multicolumn{6}{@{}l}{\textit{Main-comparison sequences}} \\
+\multirow{2}{*}{Real} & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
+ & \textbf{Ours} & \textbf{19.90} & \textbf{0.811} & \textbf{0.370} & \textbf{4.96} \\
+\addlinespace[2pt]
+\multirow{2}{*}{Sim} & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
+ & \textbf{Ours} & \textbf{24.90} & \textbf{0.824} & \textbf{0.215} & \textbf{15.32} \\
+\addlinespace[2pt]
+\multirow{2}{*}{Flat} & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
+ & \textbf{Ours} & \textbf{27.64} & \textbf{0.947} & \textbf{0.117} & \textbf{0.47} \\
+\addlinespace[2pt]
+\multirow{2}{*}{3RScan} & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
+ & \textbf{Ours} & \textbf{21.06} & \textbf{0.774} & \textbf{0.366} & \textbf{2.79} \\
 \midrule
- & GaME & 31.97 & 0.95 & 0.10 & 1.80 \\
-\rowcolor{oursbg}
-\multirow{-2}{*}{Aria room1} & \textbf{Ours} & \textbf{33.39} & \textbf{0.97} & \textbf{0.09} & \textbf{1.17} \\
+\multicolumn{6}{@{}l}{\textit{Aria}} \\
+\multirow{2}{*}{Room 0} & GaME & 31.55 & 0.952 & 0.146 & 0.71 \\
+ & \textbf{Ours} & \textbf{32.43} & \textbf{0.958} & \textbf{0.141} & \textbf{0.70} \\
+\addlinespace[2pt]
+\multirow{2}{*}{Room 1} & GaME & 31.97 & 0.950 & 0.100 & 1.80 \\
+ & \textbf{Ours} & \textbf{33.39} & \textbf{0.969} & \textbf{0.091} & \textbf{1.17} \\
 \bottomrule
-}
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\end{tabular*}
 \caption{\textbf{Sharper novel views after scene updates.} Held-out views of the final visit. PSNR in dB, depth
-L1 in cm. Our maps use framewise SAM masks. Bold marks the better method.}
+L1 in cm. Bold marks the better method.}
 \label{tab:rendering}
 \end{table}
 % ===== END tables / rendering =====
 
-Our Gaussian maps render the held-out views of all three scenes with higher PSNR, MS-SSIM, and LPIPS than GaME,
-by 3.91\,dB on Flat and by 0.88 and 1.42\,dB on the Aria rooms (\cref{tab:rendering}). Depth L1 falls on Flat and
+Our Gaussian maps render the held-out views of all evaluated sequences with higher PSNR and MS-SSIM and lower LPIPS than GaME,
+by 0.96--3.43\,dB on the four main-comparison datasets and by 0.88 and 1.42\,dB on the Aria rooms (\cref{tab:rendering}). Depth L1 falls on the four mapping datasets and
 room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). The difference lies in the keyframes. GaME masks the stale regions of a
 keyframe and ignores the keyframe once one of its object masks is mostly stale, and the surfaces that keyframe
 also saw lose their supervision. We keep every keyframe for the states it recorded, so the unchanged walls and
@@ -784,42 +781,32 @@ this effect. \Cref{fig:gaussian_details} shows the consequences at changed locat
 apartment and duplicated walls in Flat, and the supplement adds the old-object residue in the real room.
 
 % ===== BEGIN tables / ablation =====
-% Values: supplement Table S5 (experiments_rewrite_20261101/results.json); blocks (a) and (b) are separate full runs.
-\begin{table*}[t]
+% The two Full rows retain their original independent reference runs.
+\begin{table}[t]
 \centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{7pt}
+\fontsize{8.5}{9.8}\selectfont
+\setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}lrrrrrrr@{}}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
+Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
-\multicolumn{8}{@{}l}{\textit{(a) Applying changes}} \\
-\rowcolor{oursbg}
-\textbf{Full} & 89.8 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
-Changes not applied & 84.5 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
-No handover across visits & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
-\addlinespace[2pt]
-\multicolumn{8}{@{}l}{\textit{(b) Keyframe policy}} \\
-\rowcolor{oursbg}
-\textbf{Full} (valid domains, capture-time maps) & 89.9 & 66.5 & 83.3 & 27.77 & 0.95 & 0.12 & 0.45 \\
-Old keyframes unrestricted & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
-Old keyframes unrestricted during refinement only & 84.5 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
-Discard conflicting keyframes of both visits & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
-Discard conflicting keyframes of the first visit & 89.9 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
-Old keyframes evaluated on the current map & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
-\addlinespace[2pt]
-\multicolumn{8}{@{}l}{\textit{(c) Masks and association} (reference: Full of block b)} \\
-Geometric association instead of identities & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
-Predicted masks (OneFormer) & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
+\multicolumn{5}{@{}l}{\textit{Geometry update}} \\
+\textbf{Full (a)} & \textbf{89.8} & \textbf{83.3} & \textbf{27.63} & \textbf{0.48} \\
+No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
+\textbf{Full (b)} & \textbf{89.9} & 83.3 & \textbf{27.77} & \textbf{0.45} \\
+Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
+Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \caption{\textbf{Mechanism ablations over two consecutive visits of Flat with Gaussian maps.} F1 in \%, PSNR in dB, depth L1
-in cm. Shaded rows are the full method. Blocks (a) and (b) come from two runs of the full method. Their
+in cm. Full denotes our complete method. Blocks (a) and (b) come from two runs of the full method. Their
 difference, 0.2 mesh F1 and 0.14\,dB, is the run-to-run variation. Keyframe variants change how earlier keyframes
 are used while mapping and refining the second visit.}
 \label{tab:ablation_variants}
-\end{table*}
+\end{table}
 % ===== END tables / ablation =====
 
 \subsection{Ablations}
@@ -831,30 +818,12 @@ variation, and effects within it are design choices.
 
 \noindent\textbf{Applying changes to geometry.}
 If detected changes are not applied, mesh F1 falls from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by
-3.84\,dB, since the stale furniture stays in the map and renders into the held-out views. Without the handover of
-states across visits, change F1 drops by one event, to 80.0, and the geometry is unchanged.
+3.84\,dB, since the stale furniture stays in the map and renders into the held-out views.
 
 \noindent\textbf{Keyframe policy.}
 Reusing earlier keyframes without valid domains lowers PSNR by 5.08\,dB and raises depth L1 from 0.45 to
-3.66\,cm, as the old frames rebuild the removed furniture. Allowing this only during refinement is as harmful
-(22.78\,dB). Discarding every keyframe that observed a Gaussian whose lifetime later ends, the whole-frame
-rejection that GaME's own ablation warns against~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and leaves geometry within
-noise. \discuss{Discarding only the first-visit keyframes} that meet this condition costs nothing (27.78\,dB), so the loss comes
-from the current-visit keyframes: \discuss{a second-visit keyframe that sees the empty floor} is the very evidence that ends the
-stale Gaussians, and whole-frame rejection then discards it, which leaves the changed region under-constrained.
-Keeping such frames and restricting them ray by ray is what the valid domains do. Evaluating old keyframes on the
-current map rather than on the map at their capture time changes PSNR by 0.06\,dB. \discuss{Capture-time evaluation preserves
-historical reconstructions at comparable current-view quality.}
-
-\noindent\textbf{Masks and association.}
-Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
-28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 and PSNR
-unchanged (89.9 and 27.56\,dB) but lower object F1 to 42.2 and change F1 to 72.7: three events are missed and none
-is invented, so segmentation errors cost completeness at the object level without corrupting the map.
-
-\noindent\textbf{Threshold and priors.}
-Thresholds $\eta\in\{9,99,999\}$ yield 27.67--27.81\,dB and differ by at most one detected event, and fixed
-revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
+3.66\,cm, as the old frames rebuild the removed furniture. Discarding every keyframe that observed a Gaussian whose lifetime later ends, the whole-frame
+rejection that GaME's own ablation warns against~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and changes mesh F1 by 0.4 points. Keeping such frames and restricting them ray by ray is what the valid domains do.
 
 \subsection{Computational Cost}
 \label{sec:cost}
@@ -870,17 +839,14 @@ Method & Time (s) & RAM & VRAM & FPS \\
 \midrule
 \multicolumn{5}{l}{\textit{TSDF: Real C, single visit}} \\
 Khronos & 765.8 & 30.14 & 0.00 & 9.42 \\
-\rowcolor{oursbg}
 \textbf{Ours} & 798.6 & 10.94 & 0.00 & 9.04 \\
 \midrule
 \multicolumn{5}{l}{\textit{Gaussians: Flat, two visits}} \\
 GaME & 2647.0 & 10.85 & 5.90 & 0.49 \\
-\rowcolor{oursbg}
 \textbf{Ours} & 2898.0 & 10.46 & 6.60 & 0.50 \\
 \midrule
 \multicolumn{5}{l}{\textit{Occupancy: Real C, continued map}} \\
 wavemap & 74.2 & 1.96 & 0.28 & 97.25 \\
-\rowcolor{oursbg}
 \textbf{Ours} & 106.8 & 3.12 & 3.47 & 67.57 \\
 \bottomrule
 \end{tabular}
@@ -916,7 +882,7 @@ historical queries. Non-rigid objects and segmentation in the loop are the natur
 %
 \ours models rigid objects that appear, disappear, or move indoors, not deformation or gradual changes such as
 lighting. Masks, associations, and poses come from outside, and the main comparison uses annotated instances
-(predicted masks cost 24 points of object F1, \cref{sec:ablation}). An object hidden by a larger one at the same
+(predicted masks cost 24 points of object F1; see supplement). An object hidden by a larger one at the same
 spot is never seen through, so its state persists until its surroundings are seen. The Gaussian branch runs at
 0.5 frames per second, and the real benchmark covers one room.
 

@@ -567,8 +567,9 @@ instance-input mapping comparison on Real, Sim, Flat, and 3RScan. These results 
 geometry, object, and change metrics in the main comparison.
 
 \paragraph{Flat and Aria.}
-The additional comparison in the main paper uses our SAM-input reconstruction on Flat and both methods'
-SAM-input runs on Aria. Its held-out results are repeated in \cref{tab:supp_additional_rendering}.
+The main paper reports the four mapping sequences and both methods' SAM-input runs on Aria.
+\Cref{tab:supp_additional_rendering} additionally reports our SAM-input reconstruction on Flat alongside
+GaME's main-comparison result.
 
 \begin{table*}[!t]
 \begin{minipage}[t]{0.49\textwidth}
@@ -629,22 +630,20 @@ depth L1 in cm.}
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 \multicolumn{8}{@{}l}{\textit{Block a}} \\
-\rowcolor{oursbg!45}
 Full (a) & 89.8 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
-Changes not applied & 84.5 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
+No retirement & 84.5 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
 Object scope, no handover & 84.4 & 66.8 & 68.8 & 23.68 & 0.91 & 0.16 & 3.32 \\
 Object scope & 89.8 & 66.9 & 83.3 & 27.46 & 0.95 & 0.12 & 0.53 \\
 Local-surface scope & 89.4 & 66.6 & 80.0 & 27.88 & 0.95 & 0.11 & 0.48 \\
-w/o handover & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
+No handover & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
 \midrule
 \multicolumn{8}{@{}l}{\textit{Block b}} \\
-\rowcolor{oursbg!45}
 Full (b) & 89.9 & 66.5 & 83.3 & 27.77 & 0.95 & 0.12 & 0.45 \\
-Unrestricted old frames & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
-Unrestricted during refinement & 84.5 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
-Discard conflicting frames & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
-Discard conflicting frames of the first visit & 89.9 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
-Current-time map selection & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
+Unrestricted reuse & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
+Unrestricted refinement & 84.5 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
+Whole-frame rejection & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
+First-visit rejection & 89.9 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
+Current-map rendering & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
 Odds threshold $9$ & 89.9 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
 Odds threshold $999$ & 90.0 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
@@ -659,14 +658,14 @@ Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \end{table*}
 % ===== END tables / supp_ablations =====
 
-All ablations use Flat A$\rightarrow$B and the Gaussian representation. Block (a) of \cref{tab:supp_ablations}
+All ablations use two consecutive visits of Flat and the Gaussian representation. Block (a) of \cref{tab:supp_ablations}
 studies decisions and cross-visit handover, and block (b) studies observation reuse, association, thresholds,
 priors, and segmentation.
 
 \paragraph{Decision scope and handover.}
 The object and local-surface variants restrict the application scope of the same change rule.
-Both recover most of the full result on Flat. Removing cross-visit state handover with all rules active changes
-mesh F1 from 89.77 to 89.42 and change F1 from 83.33 to 80.00.
+Both recover most of the full result on Flat. Without the handover of
+states across visits, change F1 drops by one event, to 80.0, and the geometry is unchanged.
 Within the object-scope variant, removing handover reduces mesh F1 from 89.76 to 84.40 and change F1 from
 83.33 to 68.75. Handover carries earlier object states into later decisions; local-surface tests also act on
 the inherited geometry in the full configuration.
@@ -680,34 +679,34 @@ observes a Gaussian whose lifetime later ends, and a rejected draw is replaced t
 budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
-Unrestricted old-frame reuse reduces PSNR by 5.08\,dB, and applying it only during refinement reduces PSNR
-by 4.99\,dB.
-Whole-frame rejection reaches 23.43\,dB, 4.34\,dB
-below Full, while geometry, object, and change F1 stay close to Full: the dropped frames still held valid
-observations. Restricting the rejection to visit-A keyframes that observe at least 50 pixels of ended
-geometry reaches 27.78\,dB: the loss under whole-frame rejection comes mainly from the visit-B keyframes
-it discards.
+Unrestricted old-frame reuse reduces PSNR by 5.08\,dB. Allowing this only during refinement is as harmful
+(22.78\,dB).
+First-visit rejection applies the test only to visit-A keyframes that observe at least 50 pixels of ended geometry.
+Discarding only the first-visit keyframes that meet this condition costs nothing (27.78\,dB), so the loss comes
+from the current-visit keyframes: a second-visit keyframe that sees the empty floor is the very evidence that ends the
+stale Gaussians, and whole-frame rejection then discards it, which leaves the changed region under-constrained.
 
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
-selection and trainable-element restrictions. It yields 27.83\,dB, compared with 27.77 for Full.
+selection and trainable-element restrictions. Evaluating old keyframes on the
+current map rather than on the map at their capture time changes PSNR by 0.06\,dB. Capture-time evaluation preserves
+historical reconstructions at comparable current-view quality.
 The geometry-only association variant yields 89.98 mesh F1 and 28.14\,dB. These diagnostics retain the
 other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
 constraints as a whole.
 
-\paragraph{Thresholds and priors.}
-The decision threshold is $\ln\eta$ with $\eta\in\{9,99,999\}$. Across these settings, mesh F1 varies by
-0.13 points and PSNR by 0.14\,dB. Fixed priors $q\in\{1/4,1/2,3/4\}$ give similar
-reconstruction scores to the learned prior. The $q=1/2$ setting matches Full's change F1; the other fixed
-settings each miss one additional event. These experiments use the same reconstruction and event metrics
-as the main evaluation.
+\paragraph{Masks and association.}
+Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
+28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 and PSNR
+unchanged (89.9 and 27.56\,dB) but lower object F1 to 42.2 and change F1 to 72.7: three events are missed and none
+is invented, so segmentation errors cost completeness at the object level without corrupting the map.
 
-\paragraph{Predicted masks.}
-OneFormer~\cite{Jain_2023_CVPR} Swin-L with ADE20K weights and confidence threshold 0.5 supplies masks without reading annotations.
-Predicted instances are associated across frames before reconstruction.
-Mesh F1 changes from 89.94 to 89.91 and PSNR from 27.77 to 27.56\,dB. Object F1 drops to 42.17 and
-change F1 to 72.73, with three additional missed events and no false positives. The map remains geometrically
-accurate while object-level evaluation reflects segmentation errors.
+OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5; predicted instances are associated
+across frames before reconstruction.
+
+\paragraph{Thresholds and priors.}
+Thresholds $\eta\in\{9,99,999\}$ yield 27.67--27.81\,dB and differ by at most one detected event, and fixed
+revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
 
 % ===== BEGIN tables / real_gaussian_vram =====
 \begin{table}[t]
