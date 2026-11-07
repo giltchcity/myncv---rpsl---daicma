@@ -31,6 +31,16 @@
       "file": "0_image.png",
       "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\03080\\0_image.png",
       "sha256": "c91d16b3fe6e2459b12c5c37437701644e9130e7402d93e7c0dba69c89d53e55"
+    },
+    {
+      "file": "3_ours_tsdf.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\03080\\3_ours_tsdf.png",
+      "sha256": "67b484ba421fed4c0ad4939042358482881fcc61db4781ee621ff429e06f972e"
+    },
+    {
+      "file": "7_ours_occ.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\03080\\7_ours_occ.png",
+      "sha256": "f6de8f16376a574895c8fb3fb3cd5228a702eb055327982ee33fbf694b299dec"
     }
   ],
   "camera": {

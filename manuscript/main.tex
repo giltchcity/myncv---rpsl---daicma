@@ -442,41 +442,7 @@ reconstruction and the current map renders without them, during mapping and duri
 
 
 
-% ===== BEGIN figures / dataset_overview_main =====
-\begin{figure*}[!t]
-\centering
-\begin{minipage}{0.64\textwidth}
-\centering
-\begingroup
-\definecolor{datasetboxcolor}{HTML}{773CB0}
-\setlength{\unitlength}{\dimexpr\linewidth/476\relax}
-\newcommand{\dsbox}[4]{%
-  \put(#1,#2){\color{datasetboxcolor}\linethickness{1.2pt}\framebox(#3,#4){}}%
-}
-\begin{picture}(476,189.250)%
-% Real recordings: previous visit, current visit before and after the change.
-\put(0,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_across_before.png}}%
-\dsbox{53.625}{118.644}{32.663}{34.694}%
-\put(160,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_before.png}}%
-\dsbox{221.100}{102.231}{21.694}{45.581}%
-\put(320,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_after.png}}%
-\dsbox{390.525}{107.350}{19.175}{39.000}%
-% Simulated apartment: the same fixed camera at three scene times.
-\put(0,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_previous.png}}%
-\dsbox{44.972}{41.681}{31.688}{29.372}%
-\put(160,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_before.png}}%
-\dsbox{232.150}{14.137}{74.222}{40.341}%
-\put(320,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_after.png}}%
-\dsbox{328.288}{6.581}{59.475}{52.772}%
-\end{picture}%
-\endgroup
-\caption{\textbf{Scene changes across and within visits.}
-Each sequence shows the previous visit and a change during the current visit.
-Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
-\label{fig:dataset_changes}
-\end{minipage}
-\end{figure*}
-% ===== END figures / dataset_overview_main =====
+
 
 \vspace{1mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
@@ -492,6 +458,43 @@ copies next to a re-measured surface, and unobserved cells remain.
 Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
 record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
 change after the camera looks away, and change between visits (\cref{fig:dataset_changes}).
+
+% ===== BEGIN figures / dataset_overview_main =====
+\begin{figure}[!ht]
+\centering
+\begingroup
+\definecolor{datasetboxcolor}{HTML}{773CB0}
+\setlength{\unitlength}{\dimexpr\linewidth/476\relax}
+\newcommand{\dsbox}[4]{%
+  \put(#1,#2){\color{datasetboxcolor}\linethickness{0.9pt}\framebox(#3,#4){}}%
+}
+\begin{picture}(476,203.348)%
+% real_across_before.png; source crop (210, 0, 1650, 1080)
+\put(0,86.348){\includegraphics[width=156\unitlength,trim={210bp 0bp 270bp 0bp},clip]{figures/dataset_overview/real_across_before.png}}%
+\dsbox{48.750}{109.206}{43.550}{46.258}%
+% real_within_before.png; source crop (210, 0, 1650, 1080)
+\put(160,86.348){\includegraphics[width=156\unitlength,trim={210bp 0bp 270bp 0bp},clip]{figures/dataset_overview/real_within_before.png}}%
+\dsbox{218.717}{87.323}{28.925}{60.775}%
+% real_within_after.png; source crop (210, 0, 1650, 1080)
+\put(320,86.348){\includegraphics[width=156\unitlength,trim={210bp 0bp 270bp 0bp},clip]{figures/dataset_overview/real_within_after.png}}%
+\dsbox{391.283}{94.148}{25.567}{52.000}%
+% sim_furniture_previous.png; source crop (48, 165, 1232, 790)
+\put(0,0.000){\includegraphics[width=156\unitlength,trim={48bp 10bp 48bp 165bp},clip]{figures/dataset_overview/sim_furniture_previous.png}}%
+\dsbox{42.294}{43.743}{34.257}{31.753}%
+% sim_furniture_before.png; source crop (48, 165, 1232, 790)
+\put(160,0.000){\includegraphics[width=156\unitlength,trim={48bp 10bp 48bp 165bp},clip]{figures/dataset_overview/sim_furniture_before.png}}%
+\dsbox{231.676}{13.966}{80.240}{43.611}%
+% sim_furniture_after.png; source crop (48, 165, 1232, 790)
+\put(320,0.000){\includegraphics[width=156\unitlength,trim={48bp 10bp 48bp 165bp},clip]{figures/dataset_overview/sim_furniture_after.png}}%
+\dsbox{322.635}{5.797}{64.297}{57.051}%
+\end{picture}%
+\endgroup
+\caption{\textbf{Scene changes across and within visits.}
+Each sequence shows the previous visit and a change during the current visit.
+Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
+\label{fig:dataset_changes}
+\end{figure}
+% ===== END figures / dataset_overview_main =====
 
 
 
@@ -636,12 +639,12 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 \put(426,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/5_ours_3dgs.png}}%
 \put(529,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/0_image.png}}%
 \put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{Synthetic B}}}%
-\put(14,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png}}%
-\put(117,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png}}%
-\put(220,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/6_wavemap.png}}%
-\put(323,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/4_game.png}}%
-\put(426,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/5_ours_3dgs.png}}%
-\put(529,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png}}%
+\put(14,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/2_panoptic.png}}%
+\put(117,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png}}%
+\put(220,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png}}%
+\put(323,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}%
+\put(426,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}%
+\put(529,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}%
 \put(4,50){\makebox(0,0){\rotatebox[origin=c]{90}{Flat B}}}%
 \put(14,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png}}%
 \put(117,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png}}%
