@@ -97,38 +97,6 @@
       ]
     },
     {
-      "dataset": "Real C",
-      "method": "GaME",
-      "files": [
-        "figures/dataset_overview/real_within_after.png",
-        "figures/results_native/qual_compact/game_real_05480.png",
-        "figures/results_native/qual_compact/ours_gs_real_05480.png",
-        "figures/results_native/qual_compact/real_C05480_rgb.png"
-      ],
-      "crops": [
-        [
-          650,
-          380,
-          650
-        ],
-        [
-          120,
-          200,
-          340
-        ],
-        [
-          120,
-          200,
-          340
-        ],
-        [
-          240,
-          400,
-          680
-        ]
-      ]
-    },
-    {
       "dataset": "Sim B",
       "method": "GaME",
       "files": [
@@ -164,16 +132,16 @@
       "dataset": "Flat B",
       "method": "GaME",
       "files": [
-        "figures/results_native/before_after/flat_before_A000283.png",
+        "figures/results_native/qual_compact/flat_before_same_view.png",
         "figures/results_native/qual/5_flat_00270/4_game.png",
         "figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png",
         "figures/results_native/qual/5_flat_00270/0_image.png"
       ],
       "crops": [
         [
-          305,
-          190,
-          250
+          185,
+          181,
+          297
         ],
         [
           185,
@@ -243,9 +211,16 @@
       "file": "figures/results_native/qual_compact/real_C05480_rgb.png",
       "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\real_C005480_rgb.png",
       "sha256": "5f44e0ead63c10dfbd6ae444079d3a0ca06d15e4058a53187b57759500d1ae7f"
+    },
+    {
+      "file": "figures/results_native/qual_compact/flat_before_same_view.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_flat_clean_20261104\\flat_before_clean.png",
+      "sha256": "e9d42a3f5d01425ef2483d310ec3e54246893b95cf56922843eb6b80b4ce0b1b",
+      "kind": "Same-camera reference reprojection from Flat RGB-D and GT geometry",
+      "reference_report": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_flat_clean_20261104\\render_report.json"
     }
   ],
-  "source_commit": "fca2e469e0ca8661d928c1e03df0e02704c59514",
+  "source_commit": "ac29f65f47a71ded85bef12de30ff784ba2d93f7",
   "source_images_unmodified": true,
   "isaac_renders": [
     {
@@ -412,7 +387,10 @@
       "Ours",
       "GT After"
     ],
-    "rows": 6,
-    "single_column": true
-  }
+    "rows": 5,
+    "single_column": true,
+    "method_labels": "Horizontal, above baseline image",
+    "left_row_labels": false
+  },
+  "removed_row": "Real C, GaME, frame 5480"
 }
