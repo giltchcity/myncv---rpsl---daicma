@@ -440,38 +440,7 @@ Current-visit keyframes optimize new and revisited regions, and replayed earlier
 outside the current coverage. Gaussians of an ended state are frozen with an end time, so earlier times keep their
 reconstruction and the current map renders without them, during mapping and during the final refinement.
 
-% ===== BEGIN figures / dataset_overview_main =====
-\begin{figure*}[!t]
-\centering
-\begingroup
-\definecolor{datasetboxcolor}{HTML}{773CB0}
-\setlength{\unitlength}{\dimexpr\linewidth/500\relax}
-\newcommand{\dsbox}[4]{%
-  \put(#1,#2){\color{datasetboxcolor}\linethickness{1.75pt}\framebox(#3,#4){}}%
-}
-\begin{picture}(500,194.250)%
-% Real recordings: previous visit, current visit before and after the change.
-\put(0,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_across_before.png}}%
-\dsbox{53.625}{123.644}{32.663}{34.694}%
-\put(172,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_before.png}}%
-\dsbox{233.100}{107.231}{21.694}{45.581}%
-\put(344,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_after.png}}%
-\dsbox{414.525}{112.350}{19.175}{39.000}%
-% Simulated apartment: the same fixed camera at three scene times.
-\put(0,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_previous.png}}%
-\dsbox{44.972}{41.681}{31.688}{29.372}%
-\put(172,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_before.png}}%
-\dsbox{244.150}{14.137}{74.222}{40.341}%
-\put(344,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_after.png}}%
-\dsbox{352.288}{6.581}{59.475}{52.772}%
-\end{picture}%
-\endgroup
-\caption{\textbf{Scene changes across and within visits.}
-Each sequence shows the previous visit and a change during the current visit.
-Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
-\label{fig:dataset_changes}
-\end{figure*}
-% ===== END figures / dataset_overview_main =====
+
 
 \vspace{1mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
@@ -487,6 +456,39 @@ copies next to a re-measured surface, and unobserved cells remain.
 Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
 record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
 change after the camera looks away, and change between visits (\cref{fig:dataset_changes}).
+
+% ===== BEGIN figures / dataset_overview_main =====
+\begin{figure}[!ht]
+\centering
+\begingroup
+\definecolor{datasetboxcolor}{HTML}{773CB0}
+\setlength{\unitlength}{\dimexpr\linewidth/476\relax}
+\newcommand{\dsbox}[4]{%
+  \put(#1,#2){\color{datasetboxcolor}\linethickness{0.9pt}\framebox(#3,#4){}}%
+}
+\begin{picture}(476,189.250)%
+% Real recordings: previous visit, current visit before and after the change.
+\put(0,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_across_before.png}}%
+\dsbox{53.625}{118.644}{32.663}{34.694}%
+\put(160,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_before.png}}%
+\dsbox{221.100}{102.231}{21.694}{45.581}%
+\put(320,101.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_after.png}}%
+\dsbox{390.525}{107.350}{19.175}{39.000}%
+% Simulated apartment: the same fixed camera at three scene times.
+\put(0,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_previous.png}}%
+\dsbox{44.972}{41.681}{31.688}{29.372}%
+\put(160,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_before.png}}%
+\dsbox{232.150}{14.137}{74.222}{40.341}%
+\put(320,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_after.png}}%
+\dsbox{328.288}{6.581}{59.475}{52.772}%
+\end{picture}%
+\endgroup
+\caption{\textbf{Scene changes across and within visits.}
+Each sequence shows the previous visit and a change during the current visit.
+Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
+\label{fig:dataset_changes}
+\end{figure}
+% ===== END figures / dataset_overview_main =====
 
 \noindent\textbf{Real-world recordings.}
 We recorded three visits to the same room over two weeks
