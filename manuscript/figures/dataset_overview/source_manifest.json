@@ -1,6 +1,42 @@
 {
-  "figure": "Dataset overview",
-  "rows": [
+  "panels": [
+    {
+      "key": "real_across_before",
+      "dataset": "Real",
+      "visit": 2,
+      "session": "b",
+      "frame": 3120,
+      "instance": 2,
+      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_b_20260810_030502_620_flat_rgbd_30hz_1080p/003120_color.png",
+      "kind": "Original recorded RGB frame",
+      "file": "real_across_before.png",
+      "sha256": "0e2cdf4e8bfd35edb5f2e1801c8a5d7285b568633df76a5d3954fe8cf8386c74",
+      "size": [
+        1920,
+        1080
+      ],
+      "time_s": 104.0,
+      "bbox": [
+        676,
+        458,
+        1046,
+        853
+      ],
+      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_b/003120_segmentation.png",
+      "mask_pixels": 107958,
+      "display_box": [
+        660,
+        442,
+        1062,
+        869
+      ],
+      "display_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ]
+    },
     {
       "key": "real_within_before",
       "dataset": "Real",
@@ -76,232 +112,242 @@
       ]
     },
     {
-      "key": "real_across_before",
-      "dataset": "Real",
-      "visit": 2,
-      "session": "b",
-      "frame": 3120,
-      "instance": 2,
-      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_b_20260810_030502_620_flat_rgbd_30hz_1080p/003120_color.png",
-      "kind": "Original recorded RGB frame",
-      "file": "real_across_before.png",
-      "sha256": "0e2cdf4e8bfd35edb5f2e1801c8a5d7285b568633df76a5d3954fe8cf8386c74",
-      "size": [
-        1920,
-        1080
-      ],
-      "time_s": 104.0,
-      "bbox": [
-        676,
-        458,
-        1046,
-        853
-      ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_b/003120_segmentation.png",
-      "mask_pixels": 107958,
-      "display_box": [
-        660,
-        442,
-        1062,
-        869
-      ],
-      "display_crop": [
-        0,
-        0,
-        1920,
-        1080
-      ]
-    },
-    {
-      "key": "real_across_after",
-      "dataset": "Real",
-      "visit": 3,
-      "session": "c",
-      "frame": 2540,
-      "instance": 10,
-      "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_c_20260822_182703_387_flat_rgbd_30hz_1080p/002540_color.png",
-      "kind": "Original recorded RGB frame",
-      "file": "real_across_after.png",
-      "sha256": "e751b32edf742f517509594a566078abb606762cdeba31148f2f0cc34a8ee1f3",
-      "size": [
-        1920,
-        1080
-      ],
-      "time_s": 84.66666666666667,
-      "bbox": [
-        407,
-        427,
-        751,
-        1044
-      ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/local_ab/instance_labels/session_c/002540_segmentation.png",
-      "mask_pixels": 124172,
-      "display_box": [
-        391,
-        411,
-        767,
-        1060
-      ],
-      "display_crop": [
-        0,
-        0,
-        1920,
-        1080
-      ]
-    },
-    {
-      "key": "sim_within_before",
-      "dataset": "Sim",
-      "visit": 2,
-      "session": "b",
-      "frame": 920,
-      "instance": 164,
-      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000920_color.png",
-      "kind": "Original simulator RGB frame",
-      "file": "sim_within_before.png",
-      "sha256": "489aa01590cc0a0cad1d356a1e839200204636cc23ce83ae13b8840aebe110db",
-      "size": [
-        680,
-        480
-      ],
-      "time_s": 30.666666666666668,
-      "bbox": [
-        240,
-        277,
-        348,
-        394
-      ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000920_segmentation.png",
-      "mask_pixels": 6717,
-      "display_box": [
-        232,
-        269,
-        356,
-        402
-      ],
-      "display_crop": [
-        0,
-        0,
-        680,
-        480
-      ]
-    },
-    {
-      "key": "sim_within_after",
-      "dataset": "Sim",
-      "visit": 2,
-      "session": "b",
-      "frame": 980,
-      "instance": 164,
-      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000980_color.png",
-      "kind": "Original simulator RGB frame",
-      "file": "sim_within_after.png",
-      "sha256": "433518ada9c691a7c330d00c442014e6fc58204a1594c286ef381609f01c538b",
-      "size": [
-        680,
-        480
-      ],
-      "time_s": 32.666666666666664,
-      "bbox": [
-        405,
-        215,
-        483,
-        295
-      ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000980_segmentation.png",
-      "mask_pixels": 3234,
-      "display_box": [
-        397,
-        207,
-        491,
-        303
-      ],
-      "display_crop": [
-        0,
-        0,
-        680,
-        480
-      ]
-    },
-    {
-      "key": "sim_across_before",
-      "dataset": "Sim",
-      "visit": 1,
+      "file": "sim_furniture_previous.png",
+      "camera": "room",
+      "phase": "previous",
       "session": "a",
-      "frame": 3915,
-      "instance": 68,
-      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_a/rgbd/003915_color.png",
-      "kind": "Original simulator RGB frame",
-      "file": "sim_across_before.png",
-      "sha256": "0341c398843b0bd0363f0a73a7b30aa82693bd031c4f7d7be47fc17761dff0c4",
+      "time_s": 130.55000000000004,
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0A.usd",
       "size": [
-        680,
-        480
+        1280,
+        800
       ],
-      "time_s": 130.5,
       "bbox": [
-        487,
-        81,
-        635,
-        237
+        376,
+        224,
+        622,
+        451
       ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_a/instance_labels/003915_segmentation.png",
-      "mask_pixels": 6328,
+      "T_camera_to_world": [
+        [
+          -0.09053574604251848,
+          0.43303541951280483,
+          -0.8968186015777626,
+          9.5
+        ],
+        [
+          0.9958932064677037,
+          0.039366856319345875,
+          -0.08152896377979656,
+          -2.7
+        ],
+        [
+          0.0,
+          -0.9005168383050375,
+          -0.43482114015891515,
+          2.05
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "fx": 844.8000000000001,
+      "object": "/Root/Meshes/livingroom_377/GROUP_smaller_sofa_CTRL/sofa_0001",
+      "bounds_world": [
+        [
+          4.063779923407275,
+          -4.286557843117643,
+          -0.006763489049975814
+        ],
+        [
+          5.8556240074130805,
+          -3.3205497704982023,
+          0.6574475410335101
+        ]
+      ],
+      "rendered_time_s": 130.55000000000004,
+      "requested_time_s": 130.5,
+      "key": "sim_across_before",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\dataset_triptych_20261107\\isaac_furniture_final\\room_previous.png",
+      "sha256": "8a0f89cc9c3f676ec134adbc76c5f393d86d70fda83c7d57f60162df477bfea0",
+      "kind": "Native Isaac rendering of a static scene arrangement",
       "display_box": [
-        479,
-        73,
-        643,
-        245
+        369,
+        217,
+        629,
+        458
       ],
       "display_crop": [
         0,
         0,
-        680,
-        480
+        1280,
+        800
       ]
     },
     {
-      "key": "sim_across_after",
-      "dataset": "Sim",
-      "visit": 2,
+      "file": "sim_furniture_before.png",
+      "camera": "room",
+      "phase": "before",
       "session": "b",
-      "frame": 900,
-      "instance": 156,
-      "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/000900_color.png",
-      "kind": "Original simulator RGB frame",
-      "file": "sim_across_after.png",
-      "sha256": "819454ae7f9a681f41fd31d0e7708011078e0e042c7606870f86a972dfb1545e",
+      "time_s": 55.05,
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0B.usd",
       "size": [
-        680,
-        480
+        1280,
+        800
       ],
-      "time_s": 30.0,
       "bbox": [
-        413,
-        224,
-        680,
-        376
+        599,
+        360,
+        1194,
+        677
       ],
-      "mask_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/instance_labels/000900_segmentation.png",
-      "mask_pixels": 28929,
+      "T_camera_to_world": [
+        [
+          -0.09053574604251848,
+          0.43303541951280483,
+          -0.8968186015777626,
+          9.5
+        ],
+        [
+          0.9958932064677037,
+          0.039366856319345875,
+          -0.08152896377979656,
+          -2.7
+        ],
+        [
+          0.0,
+          -0.9005168383050375,
+          -0.43482114015891515,
+          2.05
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "fx": 844.8000000000001,
+      "object": "/Root/Meshes/livingroom_377/sofa_0001_CTRL/sofa_0001",
+      "bounds_world": [
+        [
+          6.2569959637615415,
+          -3.0359220319514715,
+          -0.006763489049935291
+        ],
+        [
+          7.223004036380983,
+          -1.2440779479456667,
+          0.6574475410335506
+        ]
+      ],
+      "rendered_time_s": 55.05,
+      "requested_time_s": 55.0,
+      "key": "sim_within_before",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\dataset_triptych_20261107\\isaac_furniture_final\\room_before.png",
+      "sha256": "6510100492e1660c002b5b33e3f0d4cc3435081a712c1ea1bb397c50ae6857bd",
+      "kind": "Native Isaac rendering of a static scene arrangement",
       "display_box": [
-        405,
-        216,
-        680,
-        384
+        592,
+        353,
+        1201,
+        684
       ],
       "display_crop": [
         0,
         0,
-        680,
-        480
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "sim_furniture_after.png",
+      "camera": "room",
+      "phase": "after",
+      "session": "b",
+      "time_s": 65.0,
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0B.usd",
+      "size": [
+        1280,
+        800
+      ],
+      "bbox": [
+        75,
+        320,
+        549,
+        739
+      ],
+      "T_camera_to_world": [
+        [
+          -0.09053574604251848,
+          0.43303541951280483,
+          -0.8968186015777626,
+          9.5
+        ],
+        [
+          0.9958932064677037,
+          0.039366856319345875,
+          -0.08152896377979656,
+          -2.7
+        ],
+        [
+          0.0,
+          -0.9005168383050375,
+          -0.43482114015891515,
+          2.05
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "fx": 844.8000000000001,
+      "object": "/Root/Meshes/livingroom_377/sofa_0001_CTRL/sofa_0001",
+      "bounds_world": [
+        [
+          5.894778268552298,
+          -4.458980335041843,
+          -0.006763489049935285
+        ],
+        [
+          7.687914141925304,
+          -3.4844238028040593,
+          0.6574475410335503
+        ]
+      ],
+      "rendered_time_s": 65.0,
+      "requested_time_s": 65.0,
+      "key": "sim_within_after",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\dataset_triptych_20261107\\isaac_furniture_final\\room_after.png",
+      "sha256": "a2186beb07a5b522f625b45561b44e43dc8f1cc85a4bb9e959287913097b2f21",
+      "kind": "Native Isaac rendering of a static scene arrangement",
+      "display_box": [
+        68,
+        313,
+        556,
+        746
+      ],
+      "display_crop": [
+        0,
+        0,
+        1280,
+        800
       ]
     }
   ],
-  "pixel_processing": "None; native RGB files embedded individually in LaTeX",
-  "event_sources": [
-    "/mnt/d/3Study/ETH/FT/results/abc_eval_final/gt_objects/human_gt_source.json",
-    "/home/jixian/Desktop/FT/datasets/synthetic_ab/GT_ANIMATION_INTERVALS.csv",
-    "/home/jixian/Desktop/FT/datasets/synthetic_ab/GT_AB_BOUNDARY.csv"
-  ]
+  "box_color": "#773CB0",
+  "line_width_pt": 1.75,
+  "layout": "3 columns, 2 rows; previous visit, current visit before, current visit after",
+  "pixels": "Original images embedded individually without pixel edits or cropping",
+  "sim_sofa_across_visits_displacement_m": 2.43656980062682,
+  "sim_sofa_current_visit_change_frames": [
+    1806,
+    1807
+  ],
+  "issues": []
 }

@@ -128,54 +128,27 @@ cells are retained.
 \label{sec:supp_datasets}
 
 % ===== BEGIN figures / dataset_overview =====
-% Original RGB assets; coordinates and acquisition sources: figures/dataset_overview/source_manifest.json.
 \begin{figure*}[t]
 \centering
-\begingroup
-\rmfamily
-\setlength{\unitlength}{\dimexpr\linewidth/500\relax}
-\begin{picture}(500,245)(0,-10)
-\put(120.000,228.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\bfseries\color[HTML]{222222}Within a visit}}
-\put(380.000,228.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\bfseries\color[HTML]{222222}Across visits}}
-\put(0,219){\color[HTML]{AAB4BF}\rule{240\unitlength}{0.5pt}}
-\put(260,219){\color[HTML]{AAB4BF}\rule{240\unitlength}{0.5pt}}
-\put(0.000,207.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{222222}(a) DynaState-Real}}
-\put(0.000,103.000){\makebox(0,0)[l]{\fontsize{8}{9}\selectfont\bfseries\color[HTML]{222222}(b) DynaState-Sim}}
-\put(0.000,128.750){\includegraphics[width=116\unitlength]{figures/dataset_overview/real_within_before.png}}
-\put(58.000,199.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}Before}}
-\put(58.000,121.750){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 3, 32.7\,s}}
-\put(45.433,129.294){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(16.131,33.894){}}
-\put(124.000,128.750){\includegraphics[width=116\unitlength]{figures/dataset_overview/real_within_after.png}}
-\put(182.000,199.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}After}}
-\put(182.000,121.750){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 3, 42.0\,s}}
-\put(176.442,133.100){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(14.258,29.000){}}
-\put(260.000,128.750){\includegraphics[width=116\unitlength]{figures/dataset_overview/real_across_before.png}}
-\put(318.000,199.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}Before}}
-\put(318.000,121.750){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 2, 104.0\,s}}
-\put(299.875,141.498){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(24.288,25.798){}}
-\put(384.000,128.750){\includegraphics[width=116\unitlength]{figures/dataset_overview/real_across_after.png}}
-\put(442.000,199.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}After}}
-\put(442.000,121.750){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 3, 84.7\,s}}
-\put(407.623,129.958){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(22.717,39.210){}}
-\put(0.000,8.118){\includegraphics[width=116\unitlength]{figures/dataset_overview/sim_within_before.png}}
-\put(58.000,95.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}Before}}
-\put(58.000,1.118){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 2, 30.7\,s}}
-\put(39.576,21.424){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(21.153,22.688){}}
-\put(124.000,8.118){\includegraphics[width=116\unitlength]{figures/dataset_overview/sim_within_after.png}}
-\put(182.000,95.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}After}}
-\put(182.000,1.118){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 2, 32.7\,s}}
-\put(191.724,38.312){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(16.035,16.376){}}
-\put(260.000,8.118){\includegraphics[width=116\unitlength]{figures/dataset_overview/sim_across_before.png}}
-\put(318.000,95.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}Before}}
-\put(318.000,1.118){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 1, 130.5\,s}}
-\put(341.712,48.206){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(27.976,29.341){}}
-\put(384.000,8.118){\includegraphics[width=116\unitlength]{figures/dataset_overview/sim_across_after.png}}
-\put(442.000,95.000){\makebox(0,0)[c]{\fontsize{7.5}{8.5}\selectfont\color[HTML]{5F6670}After}}
-\put(442.000,1.118){\makebox(0,0)[c]{\fontsize{7.2}{8.2}\selectfont\color[HTML]{5F6670}Visit 2, 30.0\,s}}
-\put(453.088,24.494){\color[HTML]{78599E}\linethickness{0.7pt}\framebox(46.912,28.659){}}
-\end{picture}
-\endgroup
-\caption{\textbf{Scene changes within and across visits.} DynaState-Real (top) and DynaState-Sim (bottom) contain object motion during recording (left) and rearrangements between visits (right). Boxes highlight changing objects; each view is labeled by its visit and time within that visit.}
+\begingroup%
+\rmfamily%
+\setlength{\unitlength}{\dimexpr\linewidth/500\relax}%
+\begin{picture}(500,194.250)%
+\put(0.000,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_across_before.png}}%
+\put(53.625,123.644){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(32.663,34.694){}}%
+\put(172.000,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_before.png}}%
+\put(233.100,107.231){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(21.694,45.581){}}%
+\put(344.000,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_after.png}}%
+\put(414.525,112.350){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(19.175,39.000){}}%
+\put(0.000,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_previous.png}}%
+\put(44.972,41.681){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(31.688,29.372){}}%
+\put(172.000,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_before.png}}%
+\put(244.150,14.137){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(74.222,40.341){}}%
+\put(344.000,0.000){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_after.png}}%
+\put(352.288,6.581){\color[HTML]{773CB0}\linethickness{1.75pt}\framebox(59.475,52.772){}}%
+\end{picture}%
+\endgroup%
+\caption{\textbf{Scene changes across and within visits.} Each sequence shows the previous visit and a change during the current visit. Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
 \label{fig:supp_dataset_overview}
 \end{figure*}
 % ===== END figures / dataset_overview =====

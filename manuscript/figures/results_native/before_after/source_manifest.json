@@ -1,194 +1,49 @@
 [
   {
-    "key": "real",
-    "label": "(a) Real",
-    "before_id": 3120,
-    "before_name": "real_before_B003120.png",
-    "row": "2_real_02540",
-    "before_crop": [
-      0,
-      0,
-      1920,
-      1080
-    ],
-    "after_crop": [
-      0,
-      0,
-      958,
-      532
-    ],
-    "before_box": [
-      630,
-      430,
-      1060,
-      875
-    ],
-    "right_trim": [
-      90,
-      82,
-      588,
-      250
-    ],
-    "before_source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_b_20260810_030502_620_flat_rgbd_30hz_1080p/003120_color.png",
-    "before_camera_distance_m": 0.17953085018045517,
-    "before_camera_angle_deg": 17.062136610878216,
-    "after_dataset_source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_c_20260822_182703_387_flat_rgbd_30hz_1080p/002540_color.png",
-    "after_paper_image": "figures/results_native/qual/2_real_02540/0_image.png",
-    "before_asset": "figures/results_native/before_after/real_before_B003120.png",
+    "case": "TSDF Real",
+    "before": "real_before_B003120.png",
+    "source": "/home/jixian/Desktop/FT/datasets/local_ab/rgbd/session_b_20260810_030502_620_flat_rgbd_30hz_1080p/003120_color.png",
+    "after": "qual/2_real_02540/0_image.png",
+    "type": "Original recorded RGB frame",
     "before_sha256": "0e2cdf4e8bfd35edb5f2e1801c8a5d7285b568633df76a5d3954fe8cf8386c74",
-    "note": "Before and After are real captured/rendered RGB frames from successive visits. They are not pixel-aligned. Result columns use the same later camera and unchanged crop.",
-    "sizes": [
-      1920,
-      1080,
-      958,
-      532
-    ],
-    "context_h": [
-      45.0,
-      44.4258872651357
-    ]
+    "context_display": "Full source frame, no crop; layout and boxes in LaTeX."
   },
   {
-    "key": "sim",
-    "label": "(b) Synthetic",
-    "before_name": "sim_before_Aend_B003065.png",
-    "row": "4_sim_03065",
-    "before_crop": [
-      0,
-      0,
-      680,
-      480
-    ],
-    "after_crop": [
-      0,
-      0,
-      680,
-      480
-    ],
-    "before_box": [
-      140,
-      150,
-      560,
-      450
-    ],
-    "right_trim": [
-      140,
-      30,
-      120,
-      150
-    ],
-    "before_source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_same_view_20261104\\isaac_a\\sim_before_rgb.png",
-    "before_camera_distance_m": 0.0,
-    "before_camera_angle_deg": 0.0,
-    "after_dataset_source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_b/rgbd/003065_color.png",
-    "after_paper_image": "figures/results_native/qual/4_sim_03065/0_image.png",
-    "before_asset": "figures/results_native/before_after/sim_before_Aend_B003065.png",
+    "case": "TSDF Flat",
+    "before": "flat_before_A000187.png",
+    "source": "/home/jixian/Desktop/FT/datasets/panoptic_mapping/flat_dataset/run1/000187_color.png",
+    "after": "qual/7_flat_00190/0_image.png",
+    "type": "Original dataset RGB frame",
+    "before_sha256": "b909875a347449d7d3b84116c4f20d4f57c13af62088796c47d4bc80b79d21d5",
+    "context_display": "Full source frame, no crop; layout and boxes in LaTeX."
+  },
+  {
+    "case": "Occupancy Sim",
+    "before": "sim_before_A001800.png",
+    "source": "/home/jixian/Desktop/FT/datasets/synthetic_ab/session_a/rgbd/001800_color.png",
+    "after": "qual/8_sim_02495/0_image.png",
+    "type": "Original dataset RGB frame",
+    "before_sha256": "6fea07339b4d4f1df572d00705e470e7d09a61dc3dc3238182a18a04e23d4d35",
+    "context_display": "Full source frame, no crop; layout and boxes in LaTeX."
+  },
+  {
+    "case": "Gaussians Sim",
+    "before": "sim_before_Aend_B003065.png",
+    "source": "D:/3Study/ETH/FT/CVPR/FF/qual_same_view_20261104/isaac_a/sim_before_rgb.png",
+    "after": "qual/4_sim_03065/0_image.png",
+    "type": "Native Isaac RGB render",
+    "scene_time_s": 139.5,
+    "camera": "session_b/rgbd/003065_pose.txt",
     "before_sha256": "c1654171eb63fd8d6b19e50cf2afc9b4dc8118072d64e18c5a04ded1b4703631",
-    "note": "Before and After use exactly the same optical camera, intrinsics and displayed crop. Right-hand result images are unchanged.",
-    "source_kind": "Isaac GT render",
-    "scene_state": "visit A final frame 4185, time 139.5 s",
-    "camera": "visit B frame 3065, optical pose and original intrinsics",
-    "scene": "D:/3Study/ETH/FT/Synthetic_ABC/assets/InteriorAgent/kujiale_0021/0A.usd",
-    "time_s": 139.5,
-    "camera_pose": [
-      [
-        -0.554508258628,
-        0.259676550868,
-        -0.790625499236,
-        7.76164863502
-      ],
-      [
-        0.832177121562,
-        0.174575153222,
-        -0.526312411241,
-        -0.423443420503
-      ],
-      [
-        0.00135257604053,
-        -0.949785030839,
-        -0.312900248851,
-        1.50848863207
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ]
-    ],
-    "sizes": [
-      680,
-      480,
-      680,
-      480
-    ],
-    "context_h": [
-      56.470588235294116,
-      56.470588235294116
-    ]
+    "context_display": "Full source frame, no crop; layout and boxes in LaTeX."
   },
   {
-    "key": "flat",
-    "label": "(c) Flat",
-    "before_name": "flat_before_context_retouch.png",
-    "row": "5_flat_00270",
-    "before_crop": [
-      0,
-      0,
-      640,
-      480
-    ],
-    "after_crop": [
-      0,
-      0,
-      640,
-      480
-    ],
-    "before_box": [
-      185,
-      251,
-      482,
-      478
-    ],
-    "right_trim": [
-      185,
-      2,
-      158,
-      251
-    ],
-    "before_source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_floor_retouch_20261104\\flat_before_context_retouch.png",
-    "before_camera_distance_m": 0.0,
-    "before_camera_angle_deg": 0.0,
-    "after_dataset_source": "/home/jixian/Desktop/FT/datasets/panoptic_mapping/flat_dataset/run2/000270_color.png",
-    "after_paper_image": "figures/results_native/qual/5_flat_00270/0_image.png",
-    "before_asset": "figures/results_native/before_after/flat_before_context_retouch.png",
-    "before_sha256": "5f02ce5a67decd4fcd8ed6f8349656ae5f7dbc00cf35cc70c572504b7c28d2b7",
-    "note": "Complete original camera framing; floor retouched for context illustration. This image is not a method output, GT appearance reference, or evaluation input.",
-    "source_kind": "illustrative RGB-D reprojection with retouched floor",
-    "scene_state": "static scene of run 1",
-    "camera": "run 2 frame 270, original optical pose and intrinsics",
-    "reprojection_manifest": {
-      "base": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_flat_clean_20261104\\flat_before_clean.png",
-      "retouch_tool": "built-in imagegen, then exact floor-mask compositing",
-      "changed_outside_floor": 0,
-      "width": 640,
-      "height": 480
-    },
-    "rendered_coverage_in_context": 1.0,
-    "rendering": "Retouched illustrative context view. All non-floor pixels exactly match the preceding reprojection.",
-    "sizes": [
-      640,
-      480,
-      640,
-      480
-    ],
-    "context_h": [
-      60.0,
-      60.0
-    ],
-    "framing": "Author-selected composition with approximately 10% less magnification; identical crop for all three methods.",
-    "ours_result_asset": "figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png",
-    "ours_result_input": "SAM",
-    "ours_result_checkpoint": "/home/jixian/Desktop/FT/runs/update_layer_game_T1_20261006/flat_sam_5c5092b/ours/checkpoint_b_post_ref.pt.zst"
+    "case": "Gaussians Flat",
+    "before": "flat_before_A000283.png",
+    "source": "/home/jixian/Desktop/FT/datasets/panoptic_mapping/flat_dataset/run1/000283_color.png",
+    "after": "qual/5_flat_00270/0_image.png",
+    "type": "Original dataset RGB frame",
+    "before_sha256": "bf23394c96abfe1428013065774d9372d6c9125872c6aa3dcd514c4df8b67897",
+    "context_display": "Full source frame, no crop; layout and boxes in LaTeX."
   }
 ]

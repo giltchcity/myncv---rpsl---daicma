@@ -453,7 +453,7 @@ copies next to a re-measured surface, and unobserved cells remain.
 
 Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
 record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
-change after the camera looks away, and change between visits.
+change after the camera looks away, and change between visits (\cref{fig:dataset_changes}).
 
 \noindent\textbf{Real-world recordings.}
 We recorded three visits to the same room over two weeks
@@ -472,6 +472,39 @@ camera poses, object labels, and scene geometry over time.
 The second visit covers only part of the apartment, which tests
 whether a continued map keeps what the revisit does not see.
 The two visits contain 72 reference change events (38 within visits and 34 between visits).
+
+% ===== BEGIN figures / dataset_overview_main =====
+\begin{figure*}[t]
+\centering
+\begingroup
+\definecolor{datasetboxcolor}{HTML}{773CB0}
+\setlength{\unitlength}{\dimexpr\linewidth/500\relax}
+\newcommand{\dsbox}[4]{%
+  \put(#1,#2){\color{datasetboxcolor}\linethickness{1.75pt}\framebox(#3,#4){}}%
+}
+\begin{picture}(500,194.250)%
+% Real recordings: previous visit, current visit before and after the change.
+\put(0,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_across_before.png}}%
+\dsbox{53.625}{123.644}{32.663}{34.694}%
+\put(172,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_before.png}}%
+\dsbox{233.100}{107.231}{21.694}{45.581}%
+\put(344,106.500){\includegraphics[width=156\unitlength]{figures/dataset_overview/real_within_after.png}}%
+\dsbox{414.525}{112.350}{19.175}{39.000}%
+% Simulated apartment: the same fixed camera at three scene times.
+\put(0,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_previous.png}}%
+\dsbox{44.972}{41.681}{31.688}{29.372}%
+\put(172,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_before.png}}%
+\dsbox{244.150}{14.137}{74.222}{40.341}%
+\put(344,0){\includegraphics[width=156\unitlength]{figures/dataset_overview/sim_furniture_after.png}}%
+\dsbox{352.288}{6.581}{59.475}{52.772}%
+\end{picture}%
+\endgroup
+\caption{\textbf{Scene changes across and within visits.}
+Each sequence shows the previous visit and a change during the current visit.
+Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
+\label{fig:dataset_changes}
+\end{figure*}
+% ===== END figures / dataset_overview_main =====
 
 \section{Experiments}
 \label{sec:experiments}
@@ -556,33 +589,56 @@ Gaussian geometry and rendering are evaluated after refinement.
 Ours improves mesh, object, and change F1 over the native update in all three representations and on all four datasets (Tab.~\ref{tab:main}).
 \Cref{fig:geometry_details} shows the stale geometry that only ours retires.
 
-% ===== BEGIN figures / qualitative_geometry =====
-% Edit each panel directly below: one original PNG per includegraphics.
-% graphicx performs the crop; labels and layout are native LaTeX.
-\begin{figure}[t]
+% ===== BEGIN figures / qualitative_combined =====
+% One source image per panel; crops and layout are editable here.
+\begin{figure*}[t]
 \centering
 \begingroup
-\fontsize{8}{9}\selectfont
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{0}
-\newcommand{\geowidth}{\dimexpr(\linewidth-12pt)/3\relax}
-\begin{tabular}{@{}ccc@{}}
-Baseline & \textcolor{resultgold}{\textbf{Ours}} & Reference\\[5pt]
-\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
-\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
-\includegraphics[width=\geowidth,trim={100.0000bp 27.0000bp 508.0000bp 255.0000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}\\[7pt]
-\includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/1_khronos.png} &
-\includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/3_ours_tsdf.png} &
-\includegraphics[width=\geowidth,trim={20.0000bp 0.0000bp 60.0000bp 80.0000bp},clip]{figures/results_native/qual/7_flat_00190/0_image.png}\\[7pt]
-\includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/6_wavemap.png} &
-\includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/7_ours_occ.png} &
-\includegraphics[width=\geowidth,trim={80.0000bp 0.0000bp 40.0000bp 80.0000bp},clip]{figures/results_native/qual/8_sim_02495/0_image.png}\\
-\end{tabular}
+\setlength{\unitlength}{\dimexpr0.82\linewidth/422\relax}
+\begin{picture}(422,576)
+\put(80.000,464.000){\includegraphics[width=112.000\unitlength,trim={100.000bp 2.000bp 508.000bp 180.000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}
+\put(195.000,464.000){\includegraphics[width=112.000\unitlength,trim={100.000bp 2.000bp 508.000bp 180.000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png}}
+\put(310.000,464.000){\includegraphics[width=112.000\unitlength,trim={100.000bp 2.000bp 508.000bp 180.000bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}
+\put(0.000,534.938){\includegraphics[width=73.000\unitlength]{figures/results_native/before_after/real_before_B003120.png}}
+\put(23.953,542.732){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(16.349,16.919){}}
+\put(0.000,464.000){\includegraphics[width=73.000\unitlength]{figures/results_native/qual/2_real_02540/0_image.png}}
+\put(7.620,464.152){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(26.670,26.670){}}
+\put(80.000,348.000){\includegraphics[width=112.000\unitlength,trim={90.000bp 0.000bp 120.000bp 50.000bp},clip]{figures/results_native/qual/7_flat_00190/1_khronos.png}}
+\put(195.000,348.000){\includegraphics[width=112.000\unitlength,trim={90.000bp 0.000bp 120.000bp 50.000bp},clip]{figures/results_native/qual/7_flat_00190/3_ours_tsdf.png}}
+\put(310.000,348.000){\includegraphics[width=112.000\unitlength,trim={90.000bp 0.000bp 120.000bp 50.000bp},clip]{figures/results_native/qual/7_flat_00190/0_image.png}}
+\put(0.000,405.250){\includegraphics[width=73.000\unitlength]{figures/results_native/before_after/flat_before_A000187.png}}
+\put(12.775,406.048){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(58.172,41.633){}}
+\put(0.000,348.000){\includegraphics[width=73.000\unitlength]{figures/results_native/qual/7_flat_00190/0_image.png}}
+\put(10.266,348.000){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(49.047,49.047){}}
+\put(80.000,232.000){\includegraphics[width=112.000\unitlength,trim={130.000bp 0.000bp 130.000bp 60.000bp},clip]{figures/results_native/display_bright/6_wavemap.png}}
+\put(195.000,232.000){\includegraphics[width=112.000\unitlength,trim={130.000bp 0.000bp 130.000bp 60.000bp},clip]{figures/results_native/display_bright/7_ours_occ.png}}
+\put(310.000,232.000){\includegraphics[width=112.000\unitlength,trim={130.000bp 0.000bp 130.000bp 60.000bp},clip]{figures/results_native/display_bright/0_image.png}}
+\put(0.000,292.471){\includegraphics[width=73.000\unitlength]{figures/results_native/before_after/sim_before_A001800.png}}
+\put(1.610,293.544){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(68.169,37.574){}}
+\put(0.000,232.000){\includegraphics[width=73.000\unitlength]{figures/results_native/qual/8_sim_02495/0_image.png}}
+\put(13.956,232.000){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(45.088,45.088){}}
+\put(80.000,116.000){\includegraphics[width=112.000\unitlength,trim={140.000bp 0.000bp 120.000bp 60.000bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}
+\put(195.000,116.000){\includegraphics[width=112.000\unitlength,trim={140.000bp 0.000bp 120.000bp 60.000bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}
+\put(310.000,116.000){\includegraphics[width=112.000\unitlength,trim={140.000bp 0.000bp 120.000bp 60.000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
+\put(0.000,176.471){\includegraphics[width=73.000\unitlength]{figures/results_native/before_after/sim_before_Aend_B003065.png}}
+\put(15.029,176.471){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(45.088,45.088){}}
+\put(0.000,116.000){\includegraphics[width=73.000\unitlength]{figures/results_native/qual/4_sim_03065/0_image.png}}
+\put(15.029,116.000){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(45.088,45.088){}}
+\put(80.000,0.000){\includegraphics[width=112.000\unitlength,trim={185.000bp 2.000bp 158.000bp 181.000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}
+\put(195.000,0.000){\includegraphics[width=112.000\unitlength,trim={185.000bp 2.000bp 158.000bp 181.000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}
+\put(310.000,0.000){\includegraphics[width=112.000\unitlength,trim={185.000bp 2.000bp 158.000bp 181.000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
+\put(0.000,57.250){\includegraphics[width=73.000\unitlength]{figures/results_native/before_after/flat_before_A000283.png}}
+\put(34.789,58.961){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(28.516,37.641){}}
+\put(0.000,0.000){\includegraphics[width=73.000\unitlength]{figures/results_native/qual/5_flat_00270/0_image.png}}
+\put(21.102,0.228){\color[HTML]{773CB0}\linethickness{0.65pt}\framebox(33.877,33.877){}}
+\end{picture}
 \endgroup
-\caption{\textbf{Native updates keep stale geometry that ours retires.} Khronos vs.\ our TSDF on Real and Flat (top two rows), and wavemap vs.\ our occupancy on Sim (bottom), rendered at the pose of the reference image after the last visit. Geometry of removed objects survives in the native maps wherever no later measurement crosses it. Ours retires it with the ended state.}
+
+\caption{\textbf{Cleaner reconstructions after scene changes.} Results compare native updates (left), ours (middle), and reference images (right). From top: Khronos vs.\ our TSDF on Real and Flat, wavemap vs.\ our occupancy on Sim, and GaME vs.\ our Gaussians on Sim and Flat. The small images show the original scene views before (top) and after (bottom) each change. Purple boxes highlight the changing regions.}
 \label{fig:geometry_details}
-\end{figure}
-% ===== END figures / qualitative_geometry =====
+\label{fig:gaussian_details}
+\end{figure*}
+% ===== END figures / qualitative_combined =====
 
 \noindent\textbf{TSDF.}
 The gains are largest where the scene changes most. In the real room, mesh F1 rises from 87.7 to 96.1 over
@@ -666,43 +722,7 @@ Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better of the two
 \subsection{Gaussian Maps and Novel Views}
 \label{sec:exp_gaussians}
 
-% ===== BEGIN figures / qualitative_gaussians =====
-% Context and result images remain separate native LaTeX assets.
-\begin{figure*}[t]
-\centering
-\begingroup
-\rmfamily
-\setlength{\unitlength}{\dimexpr0.8\linewidth/495\relax}
-\begin{picture}(495,267)
-\put(40.000,258.000){\makebox(0,0)[c]{\fontsize{8}{9}\selectfont\color[HTML]{222222}Scene change}}
-\put(160.000,258.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\color[HTML]{222222}GaME}}
-\put(295.000,258.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\bfseries\color[HTML]{997510}Ours}}
-\put(430.000,258.000){\makebox(0,0)[c]{\fontsize{9}{10}\selectfont\color[HTML]{222222}Reference}}
-\put(230.000,253.000){\color[HTML]{997510}\rule{130.000\unitlength}{0.7pt}}
-\put(0.000,192.471){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/sim_before_Aend_B003065.png}}
-\put(0.000,135.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(79.200,244.441){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}Before}}}
-\put(79.200,186.971){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}After}}}
-\put(16.471,196.000){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(49.412,35.294){}}
-\put(16.471,138.529){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(49.412,35.294){}}
-\put(95.000,145.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}
-\put(230.000,145.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}
-\put(365.000,145.542){\includegraphics[width=130.000\unitlength,trim={140.0000bp 30.0000bp 120.0000bp 150.0000bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}
-\put(0.000,63.000){\includegraphics[width=80.000\unitlength]{figures/results_native/before_after/flat_before_context_retouch.png}}
-\put(0.000,2.000){\includegraphics[width=80.000\unitlength]{figures/results_native/qual/5_flat_00270/0_image.png}}
-\put(79.200,118.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}Before}}}
-\put(79.200,57.500){\makebox(0,0)[r]{\setlength{\fboxsep}{0.65pt}\colorbox{white}{\fontsize{7.1}{8.1}\selectfont\color[HTML]{222222}After}}}
-\put(23.125,63.250){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(37.125,28.375){}}
-\put(23.125,2.250){\color[HTML]{78599e}\linethickness{0.5pt}\framebox(37.125,28.375){}}
-\put(95.000,12.820){\includegraphics[width=130.000\unitlength,trim={185.0000bp 2.0000bp 158.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}
-\put(230.000,12.820){\includegraphics[width=130.000\unitlength,trim={185.0000bp 2.0000bp 158.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}
-\put(365.000,12.820){\includegraphics[width=130.000\unitlength,trim={185.0000bp 2.0000bp 158.0000bp 251.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}
-\end{picture}
-\endgroup
-\caption{\textbf{Cleaner Gaussian reconstructions at changed locations.} Before and After show the scene changes. Purple boxes mark the crops: furniture surfaces in the synthetic apartment (top) and duplicated walls in Flat (bottom). The real room is in the supplement. GaME removes Gaussians only where rendered and measured depth disagree and loses the supervision of the keyframes it masks. Ours retires the ended states and keeps every keyframe for the states it saw, so the walls stay constrained.}
-\label{fig:gaussian_details}
-\end{figure*}
-% ===== END figures / qualitative_gaussians =====
+
 
 % ===== BEGIN tables / rendering =====
 % SRC: held-out views of the final visit after refinement; GaME evaluation code; framewise SAM masks.
