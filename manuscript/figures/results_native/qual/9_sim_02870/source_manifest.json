@@ -1,0 +1,81 @@
+{
+  "dataset": "Synthetic B",
+  "frame": 2870,
+  "images": [
+    {
+      "file": "2_panoptic.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\2_panoptic.png",
+      "sha256": "10f51caf5f865e2611781e571e91b7ff169200fa6410ec639f66efc57247d343"
+    },
+    {
+      "file": "1_khronos.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\1_khronos.png",
+      "sha256": "627c809edd472ca3542aef295a9877acff19003afd1af6d6dda034a6f9eb489c"
+    },
+    {
+      "file": "6_wavemap.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\6_wavemap.png",
+      "sha256": "ffb44305321c4650cbd2639e25b7032f3077ae39a1c7525d6741a71ddf50f3a2"
+    },
+    {
+      "file": "4_game.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\4_game.png",
+      "sha256": "a468b7d53cb8c6c6af145a37dfdc684943d89663b4d4fea37d8914c4c213aac7"
+    },
+    {
+      "file": "5_ours_3dgs.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\5_ours_3dgs.png",
+      "sha256": "a8e16282b049353bcdaa1fe3121efab08863ec5e0ad10752e020b808b541f83e"
+    },
+    {
+      "file": "0_image.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_sim_candidates_20261108\\02870\\0_image.png",
+      "sha256": "cc1cd8550ad315641824bf0fb5458f20781511f44c37b12abbbe5428b2e298ba"
+    }
+  ],
+  "camera": {
+    "camera": [
+      [
+        -0.406527237795,
+        0.226659136427,
+        -0.885076968859,
+        12.9450170325
+      ],
+      [
+        0.913551846772,
+        0.114197656801,
+        -0.390361266573,
+        -0.543461429286
+      ],
+      [
+        0.0125947683565,
+        -0.967256186879,
+        -0.253489330652,
+        1.65232915255
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "intrinsics": [
+      [
+        588.897289890142,
+        0.0,
+        339.5
+      ],
+      [
+        0.0,
+        588.897289890142,
+        239.5
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  }
+}

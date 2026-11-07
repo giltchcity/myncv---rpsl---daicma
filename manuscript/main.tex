@@ -442,29 +442,16 @@ reconstruction and the current map renders without them, during mapping and duri
 
 
 
-\vspace{1mm}\noindent\textbf{Occupancy.}
-We integrate measurements with the wavelet representation and clamped log-odds of
-Wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}. Cells are associated with states through the masks of
-the observations that measured them. Cells of an ended state leave the current map
-together. The free-space contribution of each visit is kept separately, so where a newly measured object occupies
-a cell, the previous visit's contribution is subtracted before the clamped update continues. The replacement rule retires stale
-copies next to a re-measured surface, and unobserved cells remain.
-
-\section{The DynaState Benchmark}
-\label{sec:benchmark}
-
-Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
-record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
-change after the camera looks away, and change between visits (\cref{fig:dataset_changes}).
-
 % ===== BEGIN figures / dataset_overview_main =====
-\begin{figure}[!ht]
+\begin{figure*}[!t]
+\centering
+\begin{minipage}{0.64\textwidth}
 \centering
 \begingroup
 \definecolor{datasetboxcolor}{HTML}{773CB0}
 \setlength{\unitlength}{\dimexpr\linewidth/476\relax}
 \newcommand{\dsbox}[4]{%
-  \put(#1,#2){\color{datasetboxcolor}\linethickness{0.9pt}\framebox(#3,#4){}}%
+  \put(#1,#2){\color{datasetboxcolor}\linethickness{1.2pt}\framebox(#3,#4){}}%
 }
 \begin{picture}(476,189.250)%
 % Real recordings: previous visit, current visit before and after the change.
@@ -487,8 +474,26 @@ change after the camera looks away, and change between visits (\cref{fig:dataset
 Each sequence shows the previous visit and a change during the current visit.
 Boxes follow the suitcases in the real room (top) and the sofa in the simulated apartment (bottom).}
 \label{fig:dataset_changes}
-\end{figure}
+\end{minipage}
+\end{figure*}
 % ===== END figures / dataset_overview_main =====
+
+\vspace{1mm}\noindent\textbf{Occupancy.}
+We integrate measurements with the wavelet representation and clamped log-odds of
+Wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}. Cells are associated with states through the masks of
+the observations that measured them. Cells of an ended state leave the current map
+together. The free-space contribution of each visit is kept separately, so where a newly measured object occupies
+a cell, the previous visit's contribution is subtracted before the clamped update continues. The replacement rule retires stale
+copies next to a re-measured surface, and unobserved cells remain.
+
+\section{The DynaState Benchmark}
+\label{sec:benchmark}
+
+Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
+record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
+change after the camera looks away, and change between visits (\cref{fig:dataset_changes}).
+
+
 
 \noindent\textbf{Real-world recordings.}
 We recorded three visits to the same room over two weeks
@@ -596,47 +601,58 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
 % To switch: comment the active option and uncomment the other with Ctrl+/.
-% ===== OPTION A: HORIZONTAL / 4 rows x 6 columns / two-column width =====
+% ===== OPTION A: HORIZONTAL / 5 rows x 6 columns / two-column width =====
 \begin{figure*}[!t]
 \centering
 \begingroup%
 \rmfamily\fontsize{8}{9}\selectfont%
-\setlength{\unitlength}{\dimexpr\linewidth/615\relax}%
-\begin{picture}(615,431)%
-\put(50,421){\makebox(0,0){Panoptic}}%
-\put(153,421){\makebox(0,0){Khronos}}%
-\put(256,421){\makebox(0,0){wavemap}}%
-\put(359,421){\makebox(0,0){GaME}}%
-\put(462,421){\makebox(0,0){\textbf{Ours (3DGS)}}}%
-\put(565,421){\makebox(0,0){Ground Truth}}%
-\put(0,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png}}%
-\put(103,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png}}%
-\put(206,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png}}%
-\put(309,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/4_game.png}}%
-\put(412,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png}}%
-\put(515,309){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png}}%
-\put(0,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png}}%
-\put(103,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}%
-\put(206,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png}}%
-\put(309,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/4_game.png}}%
-\put(412,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png}}%
-\put(515,206){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}%
-\put(0,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/2_panoptic.png}}%
-\put(103,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png}}%
-\put(206,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png}}%
-\put(309,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}%
-\put(412,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}%
-\put(515,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}%
-\put(0,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png}}%
-\put(103,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png}}%
-\put(206,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png}}%
-\put(309,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}%
-\put(412,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}%
-\put(515,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}%
+\setlength{\unitlength}{\dimexpr\linewidth/629\relax}%
+\begin{picture}(629,534)%
+\put(64,524){\makebox(0,0){Panoptic~\cite{9811877}}}%
+\put(167,524){\makebox(0,0){Khronos~\cite{Schmid-RSS-24}}}%
+\put(270,524){\makebox(0,0){wavemap~\cite{Reijgwart-RSS-23}}}%
+\put(373,524){\makebox(0,0){GaME~\cite{Yugay_2026_CVPR}}}%
+\put(476,524){\makebox(0,0){\textbf{Ours (3DGS)}}}%
+\put(579,524){\makebox(0,0){Ground Truth}}%
+\put(4,462){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
+\put(14,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png}}%
+\put(117,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png}}%
+\put(220,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png}}%
+\put(323,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/4_game.png}}%
+\put(426,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png}}%
+\put(529,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png}}%
+\put(4,359){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
+\put(14,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png}}%
+\put(117,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}%
+\put(220,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png}}%
+\put(323,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/4_game.png}}%
+\put(426,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png}}%
+\put(529,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}%
+\put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{Synthetic B}}}%
+\put(14,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/2_panoptic.png}}%
+\put(117,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/1_khronos.png}}%
+\put(220,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/6_wavemap.png}}%
+\put(323,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/4_game.png}}%
+\put(426,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/5_ours_3dgs.png}}%
+\put(529,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/0_image.png}}%
+\put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{Synthetic B}}}%
+\put(14,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png}}%
+\put(117,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png}}%
+\put(220,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/6_wavemap.png}}%
+\put(323,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/4_game.png}}%
+\put(426,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/5_ours_3dgs.png}}%
+\put(529,103){\includegraphics[width=100\unitlength,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png}}%
+\put(4,50){\makebox(0,0){\rotatebox[origin=c]{90}{Flat B}}}%
+\put(14,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png}}%
+\put(117,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png}}%
+\put(220,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png}}%
+\put(323,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}%
+\put(426,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}%
+\put(529,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}%
 \end{picture}%
 \endgroup%
 
-\caption{\textbf{Reconstructing scenes after changes.} Panoptic, Khronos, wavemap, GaME, and our Gaussian maps are shown from the same viewpoint alongside the ground-truth image. The first two rows show the real room, followed by the synthetic apartment and Flat.}
+\caption{\textbf{Reconstructing scenes after changes.} Panoptic, Khronos, wavemap, GaME, and our Gaussian maps are shown from the same viewpoint alongside the ground-truth image.}
 \label{fig:geometry_details}
 \label{fig:gaussian_details}
 \end{figure*}
@@ -650,7 +666,7 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % \setlength{\unitlength}{\dimexpr\linewidth/412\relax}%
 % \begin{picture}(412,600)%
 % \put(50,590){\makebox(0,0){GT Before (Real)}}%
-% \put(154,590){\makebox(0,0){Khronos}}%
+% \put(154,590){\makebox(0,0){Khronos~\cite{Schmid-RSS-24}}}%
 % \put(258,590){\makebox(0,0){Ours (TSDF)}}%
 % \put(362,590){\makebox(0,0){GT After (Real)}}%
 % \put(0,480){\includegraphics[width=100\unitlength,trim={650bp 50bp 620bp 380bp},clip]{figures/dataset_overview/real_within_after.png}}%
@@ -658,7 +674,7 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % \put(208,480){\includegraphics[width=100\unitlength,trim={210bp 0bp 216bp 0bp},clip]{figures/results_native/qual/1_real_05320/3_ours_tsdf.png}}%
 % \put(312,480){\includegraphics[width=100\unitlength,trim={210bp 0bp 216bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png}}%
 % \put(50,470){\makebox(0,0){GT Before (Sim)}}%
-% \put(154,470){\makebox(0,0){Panoptic}}%
+% \put(154,470){\makebox(0,0){Panoptic~\cite{9811877}}}%
 % \put(258,470){\makebox(0,0){Ours (TSDF)}}%
 % \put(362,470){\makebox(0,0){GT After (Sim)}}%
 % \put(0,360){\includegraphics[width=100\unitlength,trim={150bp 35bp 100bp 15bp},clip]{figures/results_native/qual_compact/panoptic_sim_before.png}}%
@@ -666,7 +682,7 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % \put(208,360){\includegraphics[width=100\unitlength,trim={150bp 35bp 100bp 15bp},clip]{figures/results_native/qual/3_sim_02850/3_ours_tsdf.png}}%
 % \put(312,360){\includegraphics[width=100\unitlength,trim={150bp 35bp 100bp 15bp},clip]{figures/results_native/qual_compact/panoptic_sim_after.png}}%
 % \put(50,350){\makebox(0,0){GT Before (Real)}}%
-% \put(154,350){\makebox(0,0){wavemap}}%
+% \put(154,350){\makebox(0,0){wavemap~\cite{Reijgwart-RSS-23}}}%
 % \put(258,350){\makebox(0,0){Ours (Occupancy)}}%
 % \put(362,350){\makebox(0,0){GT After (Real)}}%
 % \put(0,240){\includegraphics[width=100\unitlength,trim={600bp 80bp 720bp 400bp},clip]{figures/results_native/before_after/real_before_B003120.png}}%
@@ -674,7 +690,7 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % \put(208,240){\includegraphics[width=100\unitlength,trim={240bp 0bp 336bp 150bp},clip]{figures/results_native/qual_compact/ours_occ_real_02630.png}}%
 % \put(312,240){\includegraphics[width=100\unitlength,trim={240bp 0bp 336bp 150bp},clip]{figures/results_native/qual_compact/real_C02630_rgb.png}}%
 % \put(50,230){\makebox(0,0){GT Before (Sim)}}%
-% \put(154,230){\makebox(0,0){GaME}}%
+% \put(154,230){\makebox(0,0){GaME~\cite{Yugay_2026_CVPR}}}%
 % \put(258,230){\makebox(0,0){Ours (3DGS)}}%
 % \put(362,230){\makebox(0,0){GT After (Sim)}}%
 % \put(0,120){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual_compact/gaussian_sim_before.png}}%
@@ -682,7 +698,7 @@ Ours improves mesh, object, and change F1 over the native update in all three re
 % \put(208,120){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}%
 % \put(312,120){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual_compact/gaussian_sim_after.png}}%
 % \put(50,110){\makebox(0,0){GT Before (Flat)}}%
-% \put(154,110){\makebox(0,0){GaME}}%
+% \put(154,110){\makebox(0,0){GaME~\cite{Yugay_2026_CVPR}}}%
 % \put(258,110){\makebox(0,0){Ours (3DGS)}}%
 % \put(362,110){\makebox(0,0){GT After (Flat)}}%
 % \put(0,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual_compact/flat_before_same_view.png}}%
