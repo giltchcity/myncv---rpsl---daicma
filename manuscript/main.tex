@@ -461,7 +461,7 @@ using an Azure Kinect. Objects move within visits and are rearranged
 between visits, while moving people, depth noise, and partial views
 introduce the challenges of real-world mapping.
 Camera poses are estimated with ORB-SLAM3~\cite{9440682}. We annotate object identities and changes over time,
-yielding 31 reference change events (5 within visits and 26 between visits),
+yielding 31 reference change events in total(5 within visits and 26 between visits),
 and provide a reference reconstruction for geometric evaluation.
 
 \noindent\textbf{Simulated sequences.}
@@ -471,7 +471,7 @@ within and between visits. The simulator provides ground-truth
 camera poses, object labels, and scene geometry over time.
 The second visit covers only part of the apartment, which tests
 whether a continued map keeps what the revisit does not see.
-The two visits contain 72 reference change events (38 within visits and 34 between visits).
+The two visits contain 72 reference change events in total (38 within visits and 34 between visits).
 
 % ===== BEGIN figures / dataset_overview_main =====
 \begin{figure*}[t]
