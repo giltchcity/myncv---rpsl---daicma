@@ -1,0 +1,418 @@
+{
+  "rows": [
+    {
+      "dataset": "Real C",
+      "method": "Khronos",
+      "files": [
+        "figures/dataset_overview/real_within_after.png",
+        "figures/results_native/qual/1_real_05320/1_khronos.png",
+        "figures/results_native/qual/1_real_05320/3_ours_tsdf.png",
+        "figures/results_native/qual/1_real_05320/0_image.png"
+      ],
+      "crops": [
+        [
+          650,
+          380,
+          650
+        ],
+        [
+          210,
+          0,
+          532
+        ],
+        [
+          210,
+          0,
+          532
+        ],
+        [
+          210,
+          0,
+          532
+        ]
+      ]
+    },
+    {
+      "dataset": "Sim B",
+      "method": "Panoptic",
+      "files": [
+        "figures/results_native/qual_compact/panoptic_sim_before.png",
+        "figures/results_native/qual/3_sim_02850/2_panoptic.png",
+        "figures/results_native/qual/3_sim_02850/3_ours_tsdf.png",
+        "figures/results_native/qual_compact/panoptic_sim_after.png"
+      ],
+      "crops": [
+        [
+          150,
+          15,
+          430
+        ],
+        [
+          150,
+          15,
+          430
+        ],
+        [
+          150,
+          15,
+          430
+        ],
+        [
+          150,
+          15,
+          430
+        ]
+      ]
+    },
+    {
+      "dataset": "Real C",
+      "method": "wavemap",
+      "files": [
+        "figures/results_native/before_after/real_before_B003120.png",
+        "figures/results_native/qual_compact/wavemap_real_02630.png",
+        "figures/results_native/qual_compact/ours_occ_real_02630.png",
+        "figures/results_native/qual_compact/real_C02630_rgb.png"
+      ],
+      "crops": [
+        [
+          600,
+          400,
+          600
+        ],
+        [
+          240,
+          150,
+          382
+        ],
+        [
+          240,
+          150,
+          382
+        ],
+        [
+          240,
+          150,
+          382
+        ]
+      ]
+    },
+    {
+      "dataset": "Real C",
+      "method": "GaME",
+      "files": [
+        "figures/dataset_overview/real_within_after.png",
+        "figures/results_native/qual_compact/game_real_05480.png",
+        "figures/results_native/qual_compact/ours_gs_real_05480.png",
+        "figures/results_native/qual_compact/real_C05480_rgb.png"
+      ],
+      "crops": [
+        [
+          650,
+          380,
+          650
+        ],
+        [
+          120,
+          200,
+          340
+        ],
+        [
+          120,
+          200,
+          340
+        ],
+        [
+          240,
+          400,
+          680
+        ]
+      ]
+    },
+    {
+      "dataset": "Sim B",
+      "method": "GaME",
+      "files": [
+        "figures/results_native/qual_compact/gaussian_sim_before.png",
+        "figures/results_native/qual/4_sim_03065/4_game.png",
+        "figures/results_native/qual/4_sim_03065/5_ours_3dgs.png",
+        "figures/results_native/qual_compact/gaussian_sim_after.png"
+      ],
+      "crops": [
+        [
+          140,
+          60,
+          420
+        ],
+        [
+          140,
+          60,
+          420
+        ],
+        [
+          140,
+          60,
+          420
+        ],
+        [
+          140,
+          60,
+          420
+        ]
+      ]
+    },
+    {
+      "dataset": "Flat B",
+      "method": "GaME",
+      "files": [
+        "figures/results_native/before_after/flat_before_A000283.png",
+        "figures/results_native/qual/5_flat_00270/4_game.png",
+        "figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png",
+        "figures/results_native/qual/5_flat_00270/0_image.png"
+      ],
+      "crops": [
+        [
+          305,
+          190,
+          250
+        ],
+        [
+          185,
+          181,
+          297
+        ],
+        [
+          185,
+          181,
+          297
+        ],
+        [
+          185,
+          181,
+          297
+        ]
+      ]
+    }
+  ],
+  "new_assets": [
+    {
+      "file": "figures/results_native/qual_compact/panoptic_sim_before.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\isaac_gt\\panoptic_before.png",
+      "sha256": "643f56fcd9dfa9becd854bff52ce98a2d5b667f9a6b0ed526e866d8575ccfd9b"
+    },
+    {
+      "file": "figures/results_native/qual_compact/panoptic_sim_after.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\isaac_gt\\panoptic_after.png",
+      "sha256": "dfee2b7b5abde1ec76806f4528d560d1d0e4212f4078686a109b19d2c0d9b677"
+    },
+    {
+      "file": "figures/results_native/qual_compact/gaussian_sim_before.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\isaac_gt\\gaussian_before.png",
+      "sha256": "bed207db1e69afef9e23234094bc78d8a22e45061086609201ec7ea9f2836777"
+    },
+    {
+      "file": "figures/results_native/qual_compact/gaussian_sim_after.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\isaac_gt\\gaussian_after.png",
+      "sha256": "9807b5289236855caefa95d6b985779b0df3fb0c9b077b6390326afd5c65ef83"
+    },
+    {
+      "file": "figures/results_native/qual_compact/wavemap_real_02630.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\real_room_visit3\\02630\\Occ_2_wavemap_2cm_20261030.png",
+      "sha256": "7f183823b27b40669264d303049c508be122e1a9d48c4929f872456c8628bade"
+    },
+    {
+      "file": "figures/results_native/qual_compact/ours_occ_real_02630.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\real_room_visit3\\02630\\Occ_3_Ours_2cm_20261030.png",
+      "sha256": "376ca4c2d375f73f4a96c7653019e3b2bc696607389933de31c032978cf92246"
+    },
+    {
+      "file": "figures/results_native/qual_compact/real_C02630_rgb.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\real_room_visit3\\02630\\00_image.png",
+      "sha256": "b9e0ae2fae5430a741e6815c64740c527eda76f9056b3a40db630c35caf7169b"
+    },
+    {
+      "file": "figures/results_native/qual_compact/game_real_05480.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\real_room_visit3\\05480\\GS_2_GaME.png",
+      "sha256": "63b8bb93c4d7739571116634e2c89185d60c6c8cac7ab8e69103446f9ae0326c"
+    },
+    {
+      "file": "figures/results_native/qual_compact/ours_gs_real_05480.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\Main-result\\real_room_visit3\\05480\\GS_3_Ours.png",
+      "sha256": "69973bf847ae024abbd445bf2d3e62947990316f65921ebad109b2498a9df477"
+    },
+    {
+      "file": "figures/results_native/qual_compact/real_C05480_rgb.png",
+      "source": "D:\\3Study\\ETH\\FT\\CVPR\\FF\\qual_single_column_20261108\\real_C005480_rgb.png",
+      "sha256": "5f44e0ead63c10dfbd6ae444079d3a0ca06d15e4058a53187b57759500d1ae7f"
+    }
+  ],
+  "source_commit": "fca2e469e0ca8661d928c1e03df0e02704c59514",
+  "source_images_unmodified": true,
+  "isaac_renders": [
+    {
+      "name": "gaussian_before",
+      "session": "a",
+      "time_s": 139.5,
+      "T_world_camera": [
+        [
+          -0.554508258628,
+          0.259676550868,
+          -0.790625499236,
+          7.76164863502
+        ],
+        [
+          0.832177121562,
+          0.174575153222,
+          -0.526312411241,
+          -0.423443420503
+        ],
+        [
+          0.00135257604053,
+          -0.949785030839,
+          -0.312900248851,
+          1.50848863207
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "camera_source": "session_b/rgbd/003065_pose.txt",
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0A.usd",
+      "rendered_time_s": 139.5,
+      "size": [
+        680,
+        480
+      ],
+      "file": "gaussian_before.png"
+    },
+    {
+      "name": "panoptic_before",
+      "session": "b",
+      "time_s": 30.0,
+      "T_world_camera": [
+        [
+          -0.173653539734,
+          0.221351751046,
+          -0.959608175479,
+          13.4456894537
+        ],
+        [
+          0.984806583039,
+          0.0383736018453,
+          -0.169361922177,
+          -0.860009644664
+        ],
+        [
+          -0.000664935981081,
+          -0.974438745633,
+          -0.22465237339,
+          1.61211540443
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "camera_source": "session_b/rgbd/002850_pose.txt",
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0B.usd",
+      "rendered_time_s": 30.0,
+      "size": [
+        680,
+        480
+      ],
+      "file": "panoptic_before.png"
+    },
+    {
+      "name": "panoptic_after",
+      "session": "b",
+      "time_s": 95.0,
+      "T_world_camera": [
+        [
+          -0.173653539734,
+          0.221351751046,
+          -0.959608175479,
+          13.4456894537
+        ],
+        [
+          0.984806583039,
+          0.0383736018453,
+          -0.169361922177,
+          -0.860009644664
+        ],
+        [
+          -0.000664935981081,
+          -0.974438745633,
+          -0.22465237339,
+          1.61211540443
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "camera_source": "session_b/rgbd/002850_pose.txt",
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0B.usd",
+      "rendered_time_s": 95.0,
+      "size": [
+        680,
+        480
+      ],
+      "file": "panoptic_after.png"
+    },
+    {
+      "name": "gaussian_after",
+      "session": "b",
+      "time_s": 102.16666666666667,
+      "T_world_camera": [
+        [
+          -0.554508258628,
+          0.259676550868,
+          -0.790625499236,
+          7.76164863502
+        ],
+        [
+          0.832177121562,
+          0.174575153222,
+          -0.526312411241,
+          -0.423443420503
+        ],
+        [
+          0.00135257604053,
+          -0.949785030839,
+          -0.312900248851,
+          1.50848863207
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "camera_source": "session_b/rgbd/003065_pose.txt",
+      "scene": "D:\\3Study\\ETH\\FT\\Synthetic_ABC\\assets\\InteriorAgent\\kujiale_0021\\0B.usd",
+      "rendered_time_s": 102.16666666666667,
+      "size": [
+        680,
+        480
+      ],
+      "file": "gaussian_after.png"
+    }
+  ],
+  "layout": {
+    "columns": [
+      "GT Before",
+      "Baseline",
+      "Ours",
+      "GT After"
+    ],
+    "rows": 6,
+    "single_column": true
+  }
+}
