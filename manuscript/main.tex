@@ -11,6 +11,11 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{placeins}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+
 \usepackage{cuted} % Official two-column teaser support.
 % Retain annotation helpers for working copies; no annotation is used in the main text.
 \newcommand{\red}[1]{{\color{red}#1}}
@@ -448,26 +453,31 @@ copies next to a re-measured surface, and unobserved cells remain.
 
 Public datasets offer either motion within a run or changes between scans, not both in one map. We therefore
 record \emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed,
-change after the camera looks away, and change between visits, with reference geometry at every time.
+change after the camera looks away, and change between visits.
 
-\noindent\textbf{Real.}
-Three Azure Kinect visits A, B, and C to one room over nearly two weeks, \discuss{with 4,003, 4,041, and 7,216 RGB-D
-frames at 30}\,Hz. ORB-SLAM3~\cite{9440682} provides the poses, which are registered across visits. Masks carry
-17 persistent object identities, people are labeled as dynamic, and object changes are annotated by hand over
-time, yielding 31 reference change events. An O3D reconstruction of the room at 1\,cm resolution serves as the geometry reference.
+\noindent\textbf{Real-world recordings.}
+We recorded three visits to the same room over two weeks
+using an Azure Kinect. Objects move within visits and are rearranged
+between visits, while moving people, depth noise, and partial views
+introduce the challenges of real-world mapping.
+Camera poses are estimated with ORB-SLAM3~\cite{9440682}. We annotate object identities and changes over time,
+yielding 31 reference change events (5 within visits and 26 between visits),
+and provide a reference reconstruction for geometric evaluation.
 
-\noindent\textbf{Sim.}
-Two animated visits A and B, with 4,186 and 3,555 frames, to an InteriorAgent apartment~\cite{InteriorAgent2025}
-rendered in Isaac Sim, with ground-truth poses, labels, and per-frame object transforms that recover the scene
-geometry at every time. Visit B covers only part of the apartment, which tests whether a continued map keeps
-what the revisit does not see. The two visits contain 72 reference change events. See Supplementary Fig.~S1.
-
+\noindent\textbf{Simulated sequences.}
+We rendered two animated visits to an InteriorAgent
+apartment~\cite{InteriorAgent2025} in Isaac Sim, with object changes
+within and between visits. The simulator provides ground-truth
+camera poses, object labels, and scene geometry over time.
+The second visit covers only part of the apartment, which tests
+whether a continued map keeps what the revisit does not see.
+The two visits contain 72 reference change events (38 within visits and 34 between visits).
 
 \section{Experiments}
 \label{sec:experiments}
 
-We evaluate current-map accuracy across the three representations, reconstruction of changes over time,
-and Gaussian novel-view quality. Ablations then examine how changes are applied to geometry and observations.
+We evaluate map accuracy across representations, and quality of changes over time,
+also Gaussian's novel-view quality. Ablations then examine how changes are applied.
 % Keep the expanded result figures close to their corresponding analyses.
 \setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
 \setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
@@ -511,37 +521,32 @@ update, and bold marks the better of the two.}
 % ===== END tables / main_results =====
 
 \noindent\textbf{Datasets.}
-Besides DynaState (\cref{sec:benchmark}), Flat~\cite{9811877} contains two RGB-D recordings of a simulated apartment, between which eight objects move,
-five appear, and four disappear. 3RScan~\cite{9010673} rescans real rooms. We use eight room chains with 77
-reference change events in total. Khronos's TESSE Office and Apartment sequences~\cite{Schmid-RSS-24} contain
-motion and changes within one continuous run. Rendering uses Flat
-and the two Aria rooms used by GaME~\cite{Yugay_2026_CVPR}.
+Besides DynaState (\cref{sec:benchmark}), For changes across visits, we use Flat~\cite{9811877},
+a simulated apartment, and real-world recordings from
+3RScan~\cite{9010673} and Aria~\cite{Yugay_2026_CVPR}.
+For changes within a visit, we use Khronos's TESSE Office
+and Apartment sequences~\cite{Schmid-RSS-24}.
 
 \noindent\textbf{Baselines and protocol.}
-We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
-Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and wavemap~\cite{Reijgwart-RSS-23}
-for occupancy. All methods receive the same posed frames and carry their maps across visits with their own
-update. Panoptic loads the preceding visit's map through its native interface. \discuss{Inputs are annotated instance masks
-in the main comparison}, with identities supplied on Real and 3RScan and associated by mask overlap elsewhere.
-\discuss{Khronos receives semantic masks on Flat}, both methods
-\discuss{use semantic masks on TESSE}, and \discuss{our Gaussian rendering runs use framewise SAM masks}~\cite{Kirillov_2023_ICCV}. Panoptic
-runs its released configurations, with 5\,cm objects and a 5\,cm background on Sim. GaME's 3RScan run uses its
-dataset-adapted implementation, and on real RGB-D both Gaussian methods exclude invalid depths from supervision.
-Objects are exported from Gaussian and occupancy maps with the same connectivity rule for the native and our
-updates. The supplement reports predicted masks and geometric association.
+We compare each representation with its native update:
+Khronos~\cite{Schmid-RSS-24} and Panoptic Multi-TSDFs~\cite{9811877}
+for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians,
+and wavemap~\cite{Reijgwart-RSS-23} for occupancy.
+Within each table, all methods receive the same input.
+
 
 \noindent\textbf{Metrics.}
-Mesh F1 evaluates the final visit's map at a 5\,cm distance threshold. In the main comparison and ablations, Gaussian geometry and rendering use the final refined map. The supplement reports every visit.
-The reference may include previously observed regions that the current visit does not see. Object F1 matches objects within 0.5\,m and \discuss{weights snapshots by their
-duration}~\cite{Schmid-RSS-24}, and change F1 pools appearance and disappearance events over the visit chain.
-3RScan scores are averaged over visits and then over rooms. \discuss{TESSE uses Khronos's official aggregation over map
-and query times}~\cite{Schmid-RSS-24}. For rendering, every tenth frame of the final visit, except the first, is
-held out~\cite{Yugay_2026_CVPR}, and we report PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and the
-L1 error of rendered against measured depth after refinement.
-
-\noindent\textbf{Implementation.}
-All datasets share a 5\,cm surface tolerance, 5\,cm TSDF voxels and occupancy cells, a 10\,cm truncation band, a
-$60^\circ$ incidence limit, a 10\,cm successor displacement, and the threshold $\eta=99$.
+We evaluate geometric accuracy and completeness using
+mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold.
+For Gaussian maps, we extract meshes by TSDF fusion
+of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}.
+Following Khronos~\cite{Schmid-RSS-24}, we use object F1 to measure
+the accuracy and completeness of mapped objects, and change F1
+to evaluate the detection of object appearances and disappearances.
+Rendering is evaluated on held-out views following GaME~\cite{Yugay_2026_CVPR},
+using PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR},
+and depth L1.
+Gaussian geometry and rendering are evaluated after refinement.
 
 
 \subsection{Dynamic Mapping within and across Visits}
@@ -608,41 +613,9 @@ is retired.
 Run on a single visit from an empty map, our TSDF already exceeds Khronos by 3.6 to 5.6 mesh F1 (94.5 vs.\ 90.9 on
 Real A and 99.2 vs.\ 93.6 on Sim A, see the supplement), so the within-visit decisions carry most of the improvement.
 
-% ===== BEGIN tables / retention =====
-% Mesh F1 from supplement Table S2 (native restart, ours continued) and Table 2 (native continued).
-\begin{table}[t]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{2.6pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}ll rrr rrr@{}}
-\toprule
-& & \multicolumn{3}{c}{Real, visit C (full)} & \multicolumn{3}{c}{Sim, visit B (partial)} \\
-\cmidrule(lr){3-5}\cmidrule(lr){6-8}
-Map & Native & Restart & Cont. & \textbf{Ours} & Restart & Cont. & \textbf{Ours} \\
-\midrule
-TSDF & Khronos & 94.8 & 87.7 & \textbf{96.1} & 86.6 & 93.1 & \textbf{99.2} \\
-3DGS & GaME & \textbf{95.3} & 90.1 & 95.0 & 85.4 & 91.2 & \textbf{96.6} \\
-Occ. & wavemap & 89.0 & 84.5 & \textbf{91.0} & 85.3 & 93.2 & \textbf{94.2} \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Continuing a map is safe with ours and pays off on partial revisits.} Mesh F1 at 5\,cm (\%) on
-the last visit after online mapping: native method restarted from an empty map, native map continued across visits, and our continued
-map. Bold marks the best per row and revisit. The supplement adds precision and recall for every visit.}
-\label{tab:retention}
-\end{table}
-% ===== END tables / retention =====
 
-\noindent\textbf{Continuing across visits.}
-\Cref{tab:retention} compares three ways to map a revisit: restarting the native method from an empty map,
-continuing the native map, and continuing ours. On the full revisit of the real room, continuing a native map
-costs 4.5 to 7.1 mesh F1 relative to a restart, because the continued map keeps geometry of the earlier visits that
-a restart never sees. Our continued TSDF map stays within 0.9 of our own restart, our Gaussian map within 0.3 of
-the native restart, and our occupancy map exceeds it. On the partial revisit of the synthetic apartment, a restart
-never sees part of the scene and its recall falls to 77--79\%, whereas our continued maps keep 94--99\% recall at
-similar precision. They exceed the native restart by 8.9 to 12.6 F1 and the native continued map by 1.0 to 6.1.
-The supplement shows one Gaussian map that follows the furniture changes within and between the two visits of
-Sim while the rest of the room stays reconstructed.
+
+
 
 \subsection{Changes within a Single Run}
 \label{sec:exp_temporal}
