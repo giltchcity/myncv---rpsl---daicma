@@ -814,7 +814,10 @@ Khronos's TESSE sequences contain observed motion and changes after looking away
 its official evaluator queries the map at earlier times and scores the background, static objects, dynamic
 objects, and changes. With the same semantic mask inputs, our TSDF maps improve all four categories on both scenes and reach higher final mesh F1
 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
-Apartment. Dynamic-object F1
+Apartment. Khronos confirms absence when 60\% of the rays stored with its
+observations see through within a 5\,s window, and this test also fires on objects that are still there, so its
+change precision is 10.8--15.6\%.
+Our state-based change detection reaches 87.0--93.3\% precision at similar recall. Dynamic-object F1
 rises from 84.8 to 96.7 and from 85.5 to 95.1. Our front end retains motion
 candidates that static-class filtering would discard; once an object settles,
 new observations reconstruct its successor state.
