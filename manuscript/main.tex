@@ -94,7 +94,9 @@
 % ===== BEGIN figures / teaser_front =====
 \begin{strip}
 \centering
+\vspace{-10mm}
 \includegraphics[width=\linewidth]{figures/teaser_bed_views_wall_clipped_20261103/teaser_with_zooms.pdf}
+\vspace{-5mm}
 \captionsetup{hypcap=false}
 \captionof{figure}{\textbf{One map follows scene changes within and across visits.} A robot sees objects move (red)
 and later discovers, after looking away or after returning days later, that objects are missing or new (purple).
@@ -107,15 +109,12 @@ so the map can also be queried at any past time.}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
-An earlier image of a chair and a later one of the empty floor are both correct, yet both cannot build the
-current map: geometry must follow the change, and old observations must stop contributing where they conflict.
-In \ours, one decision drives both. A change ends or begins an object state, and elements and observations are
-valid per state. A sequential test ends a state once enough of its surface is seen through, in view, after
-looking away, or between visits. Map update retires ended geometry and limits each observation to the states and
-regions it still describes. The decisions govern TSDF, Gaussian, and occupancy maps, and ended states stay
-queryable. On a new benchmark, Flat, and 3RScan, all three beat their native updates in mesh, object, and change
-F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.91\,dB
-higher PSNR than GaME. Code and data will be released.
+Robots working in human spaces over weeks need one map that updates what changes, keeps what persists, and recalls past layouts at any time. 
+Objects move in view, shift out of view, and rearrange across visits, yet prior mappers address isolated cases: keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses static walls. 
+Here we introduce \ours, where one decision resolves both conflicts by starting or ending an object
+state. A coverage-weighted sequential test ends a state once new views see through enough surface, retiring its whole geometry (unseen parts included) while valid domains and capture-time keyframes restrict past observations in TSDF, Gaussian, and occupancy maps. Across our benchmark, Flat, and 3RScan, all three beat native updates in mesh, object, and change F1. 
+TESSE change F1 reaches $2.4\times$ Khronos, and PSNR rises 0.88--3.91\,dB over GaME. Binding
+observations to state lifetimes keeps lifelong maps accurate. Code and data will be released.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
