@@ -94,7 +94,9 @@
 % ===== BEGIN figures / teaser_front =====
 \begin{strip}
 \centering
+\vspace{-10mm}
 \includegraphics[width=\linewidth]{figures/teaser_bed_views_wall_clipped_20261103/teaser_with_zooms.pdf}
+\vspace{-5mm}
 \captionsetup{hypcap=false}
 \captionof{figure}{\textbf{One map follows scene changes within and across visits.} A robot sees objects move (red)
 and later discovers, after looking away or after returning days later, that objects are missing or new (purple).
@@ -107,15 +109,12 @@ so the map can also be queried at any past time.}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
-An earlier image of a chair and a later one of the empty floor are both correct, yet both cannot build the
-current map: geometry must follow the change, and old observations must stop contributing where they conflict.
-In \ours, one decision drives both. A change ends or begins an object state, and elements and observations are
-valid per state. A sequential test ends a state once enough of its surface is seen through, in view, after
-looking away, or between visits. Map update retires ended geometry and limits each observation to the states and
-regions it still describes. The decisions govern TSDF, Gaussian, and occupancy maps, and ended states stay
-queryable. Across our DynaState benchmark, Flat, and 3RScan, all three representations outperform their native updates in mesh, object, and change
-F1. On TESSE, change F1 reaches up to 2.4 times that of Khronos, and our Gaussian maps render 0.88--3.91\,dB
-higher PSNR than GaME. Code and data will be released.
+Robots working in human spaces over weeks need one map that updates what changes, keeps what persists, and recalls past layouts at any time.
+Objects move in view, shift out of view, and rearrange across visits, yet prior mappers address isolated cases: keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses static walls.
+Here we introduce \ours, where one decision resolves both conflicts by starting or ending an object
+state. A coverage-weighted sequential test ends a state once new views see through enough surface, retiring its whole geometry (unseen parts included) while valid domains and capture-time keyframes restrict past observations in TSDF, Gaussian, and occupancy maps. Across our benchmark, Flat, and 3RScan, all three beat native updates in mesh, object, and change F1.
+TESSE change F1 reaches $2.4\times$ Khronos, and PSNR rises 0.88--3.91\,dB over GaME. Binding
+observations to state lifetimes keeps lifelong maps accurate. Code and data will be released.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -279,20 +278,19 @@ current depth which object states continue, end, or begin (\cref{sec:states}). \
 decision to the stored geometry and to the observations that keep shaping it (\cref{sec:validity}). Both use object states and capture times, so the same decisions
 govern TSDF, Gaussian, and occupancy updates
 (\cref{sec:representations}).
-In \cref{fig:method}, an armchair is removed and a sofa appears
-in front of an unchanged wall.
+In \cref{fig:method}, an old sofa disappears, a new sofa appears,
+and a screen remains unchanged.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/pipeline_unified_v19.pdf}
-\caption{\textbf{A scene change updates both geometry and observation contributions.} The inputs are posed RGB-D
-frames and segmentation masks. Current observations reveal a missing (purple)
-and a new (yellow) object against the retained map. Change detection accumulates the surface evidence of each
-state over the rounds $t_1$ to $t_4$ (filled squares supported, crossed seen through, dotted not inspected) and
-ends, keeps, or begins states. Map update retires the geometry of ended states, which remain queryable as past
-states, and limits each observation to the states and regions it still describes: the free space of an old
-observation stops at the new sofa, and the old chair's observations keep describing its past state. TSDF,
-Gaussian, and occupancy integration consume the same decisions.}
+\includegraphics[width=\textwidth]{figures/pipeline_halfgrid_operations.pdf}
+\caption{\textbf{A scene change updates both geometry and observation contributions.}
+RGB-D frames, masks, and poses provide evidence against the retained map.
+Accumulated absence evidence ends the old sofa's state (purple), while depth
+agreement and later observations validate the new sofa (yellow).
+Map update removes the old geometry from the current map, keeps the screen,
+and adds the new sofa. These decisions govern Gaussian, TSDF, and occupancy
+updates, while state lifetimes preserve earlier maps for historical queries.}
 \label{fig:method}
 \end{figure*}
 
