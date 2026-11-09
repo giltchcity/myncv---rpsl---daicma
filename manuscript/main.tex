@@ -367,7 +367,7 @@ For each candidate $j$, a surface sample contributes weight only on its first in
 so repeated views of one patch do not count as new coverage.
 The maximum over $j$ allows a later candidate to use samples already inspected before the change. The state ends once
 $L_{s,n}>\ln\eta$ and the see-through samples since the chosen $j$
-outnumber the supported ones. We set \(\eta=99\), following the nominal likelihood-ratio threshold for a 1% error budget in Wald's sequential test~\cite{Wald1945}.
+outnumber the supported ones. We set $\eta=99$ as an evidence threshold motivated by Wald's sequential likelihood-ratio test~\cite{Wald1945}.
 The persistence probability $q$ combines object and class histories with Beta smoothing.
 On a revisit, $\ln\frac{1-q}{q}$ biases only the candidate that spans the gap
 between visits; candidates for changes during the new visit start without this bias.
@@ -493,10 +493,10 @@ We use differentiable Gaussian rendering~\cite{10.1145/3592433} and Gaussian-to-
 \vspace{1mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
 wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}. Cells are associated with states through the masks of
-the observations that measured them. Cells of an ended state leave the current map
-together. The free-space contribution of each visit is kept separately, so where a newly measured object occupies
-a cell, the previous visit's contribution is subtracted before the clamped update continues. The replacement rule retires stale
-copies next to a re-measured surface, and unobserved cells remain.
+the observations that measured them. Cells of an ended state are retired together, without waiting for
+contradictory observations to clear them. The free-space contribution of each visit is kept separately, so where a newly measured object occupies
+a cell, the previous visit's contribution is subtracted before the clamped update continues. The local replacement rule removes stale occupied copies behind re-measured surfaces,
+preventing accumulated layers from thickening walls while preserving other unobserved cells.
 
 \section{The DynaState Benchmark}
 \label{sec:benchmark}
