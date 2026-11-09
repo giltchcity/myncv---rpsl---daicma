@@ -155,7 +155,7 @@ and the resulting state transition governs both operations within and across vis
 Khronos stores object fragments with presence intervals,
 tests absence along rays between reconstructed background
 vertices and camera poses, and supports historical queries.
-DynaState extends dynamic map maintenance across visits
+DynaState maintains object states across visits
 and unifies state transitions across TSDF, Gaussian,
 and occupancy maps. Each transition governs both geometry
 and observation validity, preventing historical
@@ -391,8 +391,8 @@ unresolved candidates wait for more evidence.
 \vspace{1mm}\noindent\textbf{Observed motion.}
 We detect motion candidates
 where new measurements enter previously observed empty space and
-track them across frames. We additionally retain candidates from
-static semantic classes that lack an instance association ~\cite{10218983,Schmid-RSS-24}, and use
+track them across frames~\cite{10218983,Schmid-RSS-24}. We additionally retain candidates from
+static semantic classes that lack an instance association, and use
 tracked displacement to confirm their motion.
 People are detected as moving and never form states.
 The moving object's state ends, a successor begins once it settles,
@@ -453,7 +453,8 @@ Each representation keeps its own integration and applies the shared decisions w
 
 \vspace{1mm}\noindent\textbf{TSDF.}
 We restrict projective fusion~\cite{10.1145/237170.237269,6162880}
-to each depth observation's valid domain ~\cite{Schmid-RSS-24}.
+to each depth observation's state-dependent valid domain.
+For object extraction, we use the procedure of Khronos~\cite{Schmid-RSS-24}.
 A depth measurement identifies a surface and the empty space along the ray before it. The earlier measurement of the wall
 can still complete the wall, but its free space must stop before the sofa. We express this as the observation's
 \emph{valid domain}. Let depth observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
@@ -487,7 +488,7 @@ both Gaussian mapping and refinement. At each training step, lifetimes
 select the Gaussians rendered for the keyframe and restrict gradients
 to those that remain active. Retired Gaussians are frozen for historical
 rendering, while earlier views still constrain unchanged surfaces.
-We use differentiable Gaussian rendering~\cite{10.1145/3592433} and Gaussian-to-mask association ~\cite{Yugay_2026_CVPR} from FlashSplat~\cite{10.1007/978-3-031-72670-5_26}.
+We use differentiable Gaussian rendering~\cite{10.1145/3592433} and Gaussian-to-mask association from FlashSplat~\cite{10.1007/978-3-031-72670-5_26}, as in GaME~\cite{Yugay_2026_CVPR}.
 
 \vspace{1mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
@@ -617,8 +618,8 @@ update, and bold marks the better of the two.}
 
 \noindent\textbf{Datasets.}
 Besides DynaState (\cref{sec:benchmark}), we evaluate changes across visits on
-Flat~\cite{9811877}, a simulated apartment, and real-world recordings from
-3RScan~\cite{9010673} and Aria~\cite{Yugay_2026_CVPR}.
+Flat~\cite{9811877}, a simulated apartment, eight real-world rooms from
+3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}.
 For changes within a visit, we use Khronos's TESSE Office
 and Apartment sequences~\cite{Schmid-RSS-24}.
 
