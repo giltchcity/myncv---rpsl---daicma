@@ -139,7 +139,7 @@ intact, whereas discarding whole keyframes strips supervision from the static wa
 Khronos and Panoptic Multi-TSDFs stop at geometry: old frames retain unrestricted influence.
 
 We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
-half-open time interval; its geometry belongs in the map during that interval, and each observation constrains only the
+half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state therefore determines both geometry and observation validity. When the
 chair's state ends, its entire surface retires from the current map, unseen back included. Rays in earlier frames that
 hit the chair stop contributing to the current volume, whereas rays that hit the wall behind it keep their surface band
@@ -150,11 +150,10 @@ likelihood ratio test weighted by newly inspected surface coverage.
 Khronos is our closest precursor: it stores object fragments with presence intervals, tests absence along rays between
 reconstructed background vertices and camera poses, and supports historical queries. We retain this temporal map model
 but change both the evidence for a decision and its reach. Surface-coverage evidence retires entire states without
-false alarms from repeated views; valid domains and capture-time keyframes propagate state decisions to observations;
-state handover links visits seamlessly; and the same state engine drives projective TSDF, 3D Gaussian, and wavelet
+false alarms from repeated views. Valid domains and capture-time keyframes propagate state decisions to observations. State handover links visits seamlessly. And the same state engine drives projective TSDF, 3D Gaussian, and wavelet
 occupancy maps without altering each representation's native integration rule.
 
-Because public datasets isolate either in-view motion or cross-visit changes, we introduce \emph{DynaState-Real} and
+Since public datasets isolate either in-view motion or cross-visit changes, we introduce \emph{DynaState-Real} and
 \emph{DynaState-Sim}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit rearrangements
 in a single map, and evaluate further on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
 Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. Across Real, Sim, Flat, and 3RScan, \ours improves mesh, object, and change
@@ -367,9 +366,8 @@ overconfidence this allows}.
 Observations that match no state form candidates. A candidate becomes the \emph{successor} of an earlier state of
 the same object when the current depth supports it, its centroid lies more than 10\,cm from that of the earlier
 state, and later observations support it. The successor starts
-a new state and ends the earlier one without the sequential test, as when the armchair reappears elsewhere. We
-rebuild a moved object from the new observations rather than transform its old geometry, since the motion of a
-partly seen object is unreliable and the settled object is observed anyway.
+a new state and ends the earlier one without the sequential test, as when the armchair reappears elsewhere. We reconstruct the settled object from new observations,
+since its motion is unreliable when only partially observed or the settled object is observed anyway.
 A candidate that matches no earlier object starts a new one, and unresolved candidates wait for more evidence.
 
 \vspace{1mm}\noindent\textbf{Observed motion.}
@@ -389,18 +387,19 @@ A decision helps only if the map follows it completely and earlier observations 
 part of the armchair that was seen through would leave its back in the map. The frames that saw the armchair
 would fuse it back, the free space they measured would erase the new sofa, and their keyframes would keep training
 Gaussians of a scene that no longer exists. These frames cannot simply be dropped, since they also measure the
-unchanged wall. Map update therefore acts on geometry and observations. Depth fusion restricts surface and
-free-space contributions; Gaussian optimization restricts which elements receive keyframe supervision.
+unchanged wall. Map update therefore acts on geometry and observations.
+The same decisions impose spatial restrictions on depth integration
+and temporal restrictions on Gaussian optimization.
 
 \vspace{1mm}\noindent\textbf{Applying changes to geometry.}
 A decision concerns the whole state, so all elements of the armchair end their lifetimes together, its unseen back
 included. The geometry is \emph{retired}: it leaves the current map and stays available for earlier times. New
 observations reconstruct the sofa and any successor, and continuing states keep growing.
 
-\vspace{1mm}\noindent\textbf{Valid domains.}
+\vspace{1mm}\noindent\textbf{Valid domains for depth integration.}
 \discuss{A depth measurement contributes a surface and the free space in front of it.} The earlier measurement of the wall
 can still complete the wall, but its free space must stop before the sofa. We express this as the observation's
-\emph{valid domain}. Let observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
+\emph{valid domain}. Let depth observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
 point $x$ on the ray, let $\rho_o(x)$ be its range and $\delta_o(x)=r_o-\rho_o(x)$ its distance in front of the
 measured surface, and let $\lambda_o$ be the range at which the ray first meets a current object state that began
 after $t_o$, or $\infty$ if there is none. With surface band $T$,
@@ -416,22 +415,24 @@ $\lambda_o$ considers object states only, so a changed background surface, such 
 does not stop old free space and is left to the retention test. Every
 state change revises the affected domains.
 
-\vspace{1mm}\noindent\textbf{Capture-time keyframes.}
-Keyframes follow the same rule in time. A keyframe captured at $t_k$ renders and evaluates its loss on
-$\mathcal{M}(t_k)$, the scene it saw, and optimizes only the elements that were alive at $t_k$ and are alive
-now. The image of the armchair thus still renders the armchair's ended Gaussians, so its loss lands on them and
-not on the current map, while its view of the wall still constrains the current wall. Ended Gaussians are
-rendered but no longer optimized.
+\noindent\textbf{Capture-time keyframes.}
+Keyframes follow the same validity principle in time.
+A keyframe captured at $t_k$ renders and evaluates its loss on
+$\mathcal{M}(t_k)$, the scene it observed, and optimizes only
+elements that were alive at $t_k$ and remain alive now.
+Retired Gaussians reproduce the armchair in earlier views and
+remain frozen, while observations of the unchanged wall continue
+to constrain its active Gaussians.
 
 \vspace{1mm}\noindent\textbf{Retaining and replacing surfaces.}
 \label{sec:memory}
-Not all stale geometry belongs to a state. A window sash that has since been closed and duplicate surfaces left by
-drift have no state that could end, so earlier elements are also tested one by one. An element is retired when the
+Not all stale geometry belongs to an object state.
+A closed window sash or duplicate geometry from earlier observations
+may therefore require element-level updates. An element is retired when the
 see-through measurements within valid domains outnumber the supporting ones. On a tie it is retired only if a
 current surface measured just in front of it, within the surface band and with the same orientation, replaces it,
 since keeping the older copy of a re-measured surface would leave a duplicate behind it. Otherwise it remains.
-Occlusion alone never retires geometry, so unobserved regions stay in the map. All tests use the 5\,cm tolerance,
-\discuss{so registration error below it is absorbed}.
+Occlusion alone never retires geometry, so unobserved regions stay in the map.
 
 \vspace{1mm}\noindent\textbf{Handover across visits.}
 \label{sec:handoff}
@@ -445,20 +446,27 @@ one discovered after looking away.
 Each representation keeps its own integration and applies the shared decisions wherever it uses observations.
 
 \vspace{1mm}\noindent\textbf{TSDF.}
-We build on projective fusion~\cite{10.1145/237170.237269,6162880} with the active window, tracking, and object
-extraction of Khronos~\cite{Schmid-RSS-24}. Signed distances are fused only within $\Omega_o(t)$, with the
+Our TSDF integration fuses signed distances only within
+$\Omega_o(t)$, with $T$ as the truncation band.
+We use projective fusion~\cite{10.1145/237170.237269,6162880}
+with the tracking and object extraction of Khronos~\cite{Schmid-RSS-24}. Signed distances are fused only within $\Omega_o(t)$, with the
 truncation band as $T$. Frames are archived as depth images with their masks, and when a decision changes the
 valid domains of a voxel block, the block is rebuilt from the archived frames that observed it, in observation
 order. The archive and the rebuilds are the cost of valid domains in this branch.
 The current mesh contains the faces of alive states and the background faces that pass the retention
 test, and retired faces remain available for queries at earlier times.
 
-\vspace{1mm}\noindent\textbf{3D Gaussians.}
-We use the photometric and depth optimization of GaME~\cite{Yugay_2026_CVPR,10.1145/3592433} and assign Gaussians
-to masks with FlashSplat~\cite{10.1007/978-3-031-72670-5_26}. Each keyframe renders and trains $\mathcal{M}(t_k)$.
-Current-visit keyframes optimize new and revisited regions, and replayed earlier keyframes maintain the geometry
-outside the current coverage. Gaussians of an ended state are frozen with an end time, so earlier times keep their
-reconstruction and the current map renders without them, during mapping and during the final refinement.
+\noindent\textbf{3D Gaussians.}
+We enforce state lifetimes and observation validity throughout
+Gaussian mapping and refinement.
+Current-visit keyframes optimize new and revisited regions,
+while earlier keyframes maintain geometry outside the current coverage.
+Gaussians of an ended state remain available for historical rendering
+and are excluded from current views.
+We retain GaME's photometric and depth optimization
+\cite{Yugay_2026_CVPR,10.1145/3592433}
+and use FlashSplat for Gaussian-to-mask association
+\cite{10.1007/978-3-031-72670-5_26}.
 
 
 
