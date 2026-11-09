@@ -2,6 +2,10 @@
 % References: main.bib.
 % Official CVPR2027-v1 author kit; teaser uses the official strip pattern.
 \documentclass[10pt,twocolumn,letterpaper]{article}
+% Lossless export: compress PDF objects and retain full-resolution visible pixels.
+\ifdefined\pdfminorversion\pdfminorversion=7\fi
+\ifdefined\pdfcompresslevel\pdfcompresslevel=9\fi
+\ifdefined\pdfobjcompresslevel\pdfobjcompresslevel=3\fi
 \usepackage[review]{cvpr}
 % ===== BEGIN preamble =====
 % Explicit dependencies used by the manuscript (not reviewer-facing definitions).
@@ -95,7 +99,7 @@
 \begin{strip}
 \centering
 \vspace{-10mm}
-\includegraphics[width=\linewidth]{figures/teaser_bed_views_wall_clipped_20261103/teaser_with_zooms.pdf}
+\includegraphics[width=\linewidth]{figures/export_lossless/teaser_with_zooms.pdf}
 \vspace{-5mm}
 \captionsetup{hypcap=false}
 \captionof{figure}{\textbf{One map follows scene changes within and across visits.} A robot sees objects move (red)
@@ -283,7 +287,7 @@ and a screen remains unchanged.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/pipeline_halfgrid_operations.pdf}
+\includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
 \caption{\textbf{A scene change updates both geometry and observation contributions.}
 RGB-D frames, masks, and poses provide evidence against the retained map.
 Accumulated absence evidence ends the old sofa's state (purple), while depth
@@ -518,22 +522,22 @@ change after the camera looks away, and change between visits (\cref{fig:dataset
 }
 \begin{picture}(476,316)%
 % real_across_before.png; square source crop [420, 0, 1500, 1080]
-\put(0,160){\includegraphics[width=156\unitlength,trim={420bp 0bp 420bp 0bp},clip]{figures/dataset_overview/real_across_before.png}}%
+\put(0,160){\includegraphics[width=156\unitlength]{figures/export_lossless/real_across_before_9a1e1fb8.png}}%
 \dsbox{34.667}{190.478}{58.067}{61.678}%
 % real_within_before.png; square source crop [420, 0, 1500, 1080]
-\put(160,160){\includegraphics[width=156\unitlength,trim={420bp 0bp 420bp 0bp},clip]{figures/dataset_overview/real_within_before.png}}%
+\put(160,160){\includegraphics[width=156\unitlength]{figures/export_lossless/real_within_before_f9def6d3.png}}%
 \dsbox{207.956}{161.300}{38.567}{81.033}%
 % real_within_after.png; square source crop [420, 0, 1500, 1080]
-\put(320,160){\includegraphics[width=156\unitlength,trim={420bp 0bp 420bp 0bp},clip]{figures/dataset_overview/real_within_after.png}}%
+\put(320,160){\includegraphics[width=156\unitlength]{figures/export_lossless/real_within_after_d2dd288b.png}}%
 \dsbox{384.711}{170.400}{34.089}{69.333}%
 % sim_furniture_previous.png; square source crop [200, 0, 1000, 800]
-\put(0,0){\includegraphics[width=156\unitlength,trim={200bp 0bp 280bp 0bp},clip]{figures/dataset_overview/sim_furniture_previous.png}}%
+\put(0,0){\includegraphics[width=156\unitlength]{figures/export_lossless/sim_furniture_previous_758651d2.png}}%
 \dsbox{32.955}{66.690}{50.700}{46.995}%
 % sim_furniture_before.png; square source crop [430, 0, 1230, 800]
-\put(160,0){\includegraphics[width=156\unitlength,trim={430bp 0bp 50bp 0bp},clip]{figures/dataset_overview/sim_furniture_before.png}}%
+\put(160,0){\includegraphics[width=156\unitlength]{figures/export_lossless/sim_furniture_before_28b28c6d.png}}%
 \dsbox{191.590}{22.620}{118.755}{64.545}%
 % sim_furniture_after.png; square source crop [20, 0, 820, 800]
-\put(320,0){\includegraphics[width=156\unitlength,trim={20bp 0bp 460bp 0bp},clip]{figures/dataset_overview/sim_furniture_after.png}}%
+\put(320,0){\includegraphics[width=156\unitlength]{figures/export_lossless/sim_furniture_after_09e4278e.png}}%
 \dsbox{329.360}{10.530}{95.160}{84.435}%
 \end{picture}%
 \endgroup
@@ -668,40 +672,40 @@ and change F1 over the native updates under the same instance-mask inputs
 \put(476,524){\makebox(0,0){\textbf{Ours (3DGS)}}}%
 \put(579,524){\makebox(0,0){Ground Truth}}%
 \put(4,462){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
-\put(14,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png}}%
-\put(117,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png}}%
-\put(220,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png}}%
-\put(323,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/4_game.png}}%
-\put(426,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png}}%
-\put(529,412){\includegraphics[width=100\unitlength,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png}}%
+\put(14,412){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_a8edd3e3.png}}%
+\put(117,412){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_a9f68713.png}}%
+\put(220,412){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_ac73dda5.png}}%
+\put(323,412){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_519ea7a8.png}}%
+\put(426,412){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_3e673e58.png}}%
+\put(529,412){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_b5dac36e.png}}%
 \put(4,359){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
-\put(14,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png}}%
-\put(117,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png}}%
-\put(220,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png}}%
-\put(323,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/4_game.png}}%
-\put(426,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png}}%
-\put(529,309){\includegraphics[width=100\unitlength,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/0_image.png}}%
+\put(14,309){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_70c53c8a.png}}%
+\put(117,309){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_6aa9b730.png}}%
+\put(220,309){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_41c23c24.png}}%
+\put(323,309){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_227900b4.png}}%
+\put(426,309){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_0081864f.png}}%
+\put(529,309){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_1983d228.png}}%
 \put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{Sim B}}}%
-\put(14,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/2_panoptic.png}}%
-\put(117,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/1_khronos.png}}%
-\put(220,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/6_wavemap.png}}%
-\put(323,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/4_game.png}}%
-\put(426,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/5_ours_3dgs.png}}%
-\put(529,206){\includegraphics[width=100\unitlength,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/0_image.png}}%
+\put(14,206){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_0c07267f.png}}%
+\put(117,206){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_285f7d36.png}}%
+\put(220,206){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_32bae90a.png}}%
+\put(323,206){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_5ac6469c.png}}%
+\put(426,206){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_051deed0.png}}%
+\put(529,206){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_4a8dffdc.png}}%
 \put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{Sim B}}}%
-\put(14,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/2_panoptic.png}}%
-\put(117,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png}}%
-\put(220,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png}}%
-\put(323,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png}}%
-\put(426,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png}}%
-\put(529,103){\includegraphics[width=100\unitlength,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png}}%
+\put(14,103){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_9914928d.png}}%
+\put(117,103){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_008ec86c.png}}%
+\put(220,103){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_98d063c5.png}}%
+\put(323,103){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_deced8d4.png}}%
+\put(426,103){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_8ed4723d.png}}%
+\put(529,103){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_82504eaf.png}}%
 \put(4,50){\makebox(0,0){\rotatebox[origin=c]{90}{Flat B}}}%
-\put(14,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png}}%
-\put(117,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png}}%
-\put(220,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png}}%
-\put(323,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png}}%
-\put(426,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs_sam_final.png}}%
-\put(529,0){\includegraphics[width=100\unitlength,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png}}%
+\put(14,0){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_2bf4a7ac.png}}%
+\put(117,0){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_2eb98554.png}}%
+\put(220,0){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_f2d21301.png}}%
+\put(323,0){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_ba3706c3.png}}%
+\put(426,0){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_sam_final_7afc0d8c.png}}%
+\put(529,0){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_7d65e6a8.png}}%
 \end{picture}%
 \endgroup%
 
