@@ -113,12 +113,15 @@ so the map can also be queried at any past time.}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
-Robots working in human spaces over weeks need one map that updates what changes, keeps what persists, and recalls past layouts at any time.
-Objects move in view, shift out of view, and rearrange across visits, yet prior mappers address isolated cases: keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses static walls.
-Here we introduce \ours, where one decision resolves both conflicts by starting or ending an object
-state. Surface evidence confirms each change; the same decision retires the ended geometry, including unseen parts, and restricts historical observations to the states and regions they still describe. This mechanism governs TSDF, Gaussian, and occupancy updates while preserving past maps for historical queries. Across DynaState, Flat, and 3RScan, all three representations outperform their native updates in mesh, object, and change F1.
-TESSE change F1 reaches $2.4\times$ Khronos, and PSNR rises 0.88--3.91\,dB over GaME. Binding
-observations to state lifetimes keeps lifelong maps accurate. Code and data will be released.
+Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
+layouts at any time. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle
+isolated cases: keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses
+static walls. Here we introduce \ours, where one decision resolves both conflicts by starting or ending an object
+state. Surface-coverage evidence confirms each change from partial views. That decision retires ended geometry, unseen
+parts included, to queryable history and restricts past observations to the states and regions they still describe in
+TSDF, 3D Gaussian, and occupancy maps. Across public benchmarks and our new one, all three surpass native updates in
+mesh, object, and change F1, with up to $2.4\times$ change F1 and +3.9\,dB PSNR. Binding observations to state lifetimes
+keeps lifelong maps accurate. Code and data will be released.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -126,8 +129,7 @@ observations to state lifetimes keeps lifelong maps accurate. Code and data will
 \label{sec:intro}
 
 The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). Long-term operation demands a single map that updates what changes,
-retains what persists, and recalls what stood where at any past time.
+rearrange between visits (\cref{fig:teaser}). These changes pose a central challenge for lifelong mapping: maintaining one consistent map within and across visits that updates what changes, retains what persists, and supports historical queries.
 
 Existing mappers solve fragments of this problem within isolated representations (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
@@ -363,8 +365,7 @@ For each candidate $j$, a surface sample contributes weight only on its first in
 so repeated views of one patch do not count as new coverage.
 The maximum over $j$ allows a later candidate to use samples already inspected before the change. The state ends once
 $L_{s,n}>\ln\eta$ and the see-through samples since the chosen $j$
-outnumber the supported ones. We use $\eta=99$ as the evidence threshold;
-the supplement reports sensitivity to $\eta$ and the revisit prior.
+outnumber the supported ones. We set \(\eta=99\), following the nominal likelihood-ratio threshold for a 1% error budget in Wald's sequential test~\cite{Wald1945}.
 The persistence probability $q$ combines object and class histories with Beta smoothing.
 On a revisit, $\ln\frac{1-q}{q}$ biases only the candidate that spans the gap
 between visits; candidates for changes during the new visit start without this bias.
@@ -846,7 +847,7 @@ Scene & Method & F1 & Static & Dyn. & F1 & F1 \\ \midrule
 \sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
-\caption{\textbf{Reconstructing changes within a single run.} TESSE F1 scores (\%) from Khronos's official evaluator. Mesh F1 is evaluated on the final map at 5\,cm. Bold marks the better result per scene.}
+\caption{\textbf{Reconstructing changes within a single run.} TESSE F1 scores (\%) from Khronos's official evaluator. Bold marks the better result per scene.}
 \label{tab:tesse}
 \end{table}
 % ===== END tables / tesse =====
