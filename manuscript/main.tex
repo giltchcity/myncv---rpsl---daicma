@@ -168,7 +168,7 @@ in a single map, and evaluate further on Flat~\cite{9811877}, 3RScan~\cite{90106
 Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. Across Real, Sim, Flat, and 3RScan, \ours improves mesh, object, and change
 F1 over the native update of all three representations. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from
 38.6 to 92.6 in Apartment. On a partial revisit in Sim, continuing our TSDF map improves mesh F1 by 9.3 points over
-restarting our mapper and by 12.6 points over restarting Khronos (see supplementary material). On Flat and Aria, our Gaussian maps exceed GaME by
+restarting our mapper and by 12.6 points over restarting Khronos . On Flat and Aria, our Gaussian maps exceed GaME by
 0.88--3.91\,dB PSNR.
 
 \vspace{1mm}\noindent\textbf{Contributions:}
@@ -381,7 +381,7 @@ reconstruction differences. A candidate supported at the existing site extends
 that state. A spatially distinct, supported candidate of the same object can
 become its \emph{successor} when the old site has no current support.
 For inherited states, the comparison also accounts for persistence and the
-candidate's own observation history; the supplement gives the decision rule. The successor starts
+candidate's own observation history. The successor starts
 a new state and ends the earlier one, as when the armchair reappears
 elsewhere. We reconstruct the settled object from its new observations.
 A candidate that matches no earlier object starts a new one, and
@@ -787,7 +787,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 2.8 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves on these instance-input runs; the full rendering table is in the supplement.
+3RScan are smaller, 2.8 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves on these instance-input runs.
 On Real, Sim, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 3.43, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.030, and 0.035.
@@ -943,8 +943,6 @@ lifetime later ends, the whole-frame rejection examined by
 GaME~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and changes mesh F1 by 0.4 points.
 Keeping these frames while restricting their supervision to compatible states
 and active Gaussians preserves their useful observations.
-The supplement also evaluates thresholds, persistence priors, geometric association,
-and predicted segmentation.
 
 % BEGIN temporarily disabled Computational Cost
 % \subsection{Computational Cost}
