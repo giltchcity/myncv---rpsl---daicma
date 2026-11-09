@@ -141,7 +141,7 @@ a removed chair would fuse the chair back, their free-space rays would carve awa
 keyframes would train Gaussians for a vanished layout, yet those same frames also observed the unchanged wall behind
 the chair. GaME expands removal through historical object masks and masks stale keyframe regions,
 while volumetric systems update object submaps and free-space evidence.
-These operations address the conflict within individual representations.
+These operations address the conflict within individual representations and a past observation can become invalid for a changed object while remaining valid for unchanged surfaces.
 We seek one change decision that governs both geometry and observation contributions across representations.
 
 We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
