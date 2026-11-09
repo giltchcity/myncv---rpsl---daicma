@@ -152,13 +152,15 @@ hit the chair stop contributing to the current volume, whereas rays that hit the
 but stop their free space before the newly arrived sofa. Surface evidence confirms the change from partial views,
 and the resulting state transition governs both operations within and across visits.
 
-Khronos stores object fragments with presence intervals, tests absence along rays between
-reconstructed background vertices and camera poses, and supports historical queries.
-Our approach couples temporal map states with observation validity, so a confirmed change
-governs both the stored geometry and the observations that continue to shape it.
-Valid domains and capture-time keyframes propagate these decisions to observations,
-and state handover carries the map and its evidence across visits.
-The same mechanism governs projective TSDF, 3D Gaussian, and wavelet occupancy updates.
+Khronos stores object fragments with presence intervals,
+tests absence along rays between reconstructed background
+vertices and camera poses, and supports historical queries.
+DynaState extends dynamic map maintenance across visits
+and unifies state transitions across TSDF, Gaussian,
+and occupancy maps. Each transition governs both geometry
+and observation validity, preventing historical
+observations from corrupting the updated map.
+
 
 Since public datasets isolate either in-view motion or cross-visit changes, we introduce \emph{DynaState-Real} and
 \emph{DynaState-Sim}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit rearrangements
@@ -174,7 +176,7 @@ restarting our mapper and by 12.6 points over restarting Khronos (see supplement
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, Gaussian, and occupancy maps.
   \item \textbf{Representation-agnostic observation validity:} We bound historical observation influence via volumetric
-  valid domains and capture-time Gaussian keyframes, driving TSDF, 3DGS, and occupancy back-ends with their native
+  valid domains and capture-time Gaussian keyframes, driving TSDF, 3DGS, and occupancy with their native
   integration rules intact.
   \item \textbf{Joint dynamic benchmark and evaluation:} We release DynaState-Real and DynaState-Sim, uniting in-view,
   out-of-view, and cross-visit changes, and demonstrate consistent gains across six benchmarks.
@@ -387,11 +389,10 @@ unresolved candidates wait for more evidence.
 
 \begingroup\clubpenalty=10000
 \vspace{1mm}\noindent\textbf{Observed motion.}
-Following the geometric motion detection and tracking of Dynablox
-and Khronos~\cite{10218983,Schmid-RSS-24}, we detect motion candidates
+We detect motion candidates
 where new measurements enter previously observed empty space and
 track them across frames. We additionally retain candidates from
-static semantic classes that lack an instance association, and use
+static semantic classes that lack an instance association ~\cite{10218983,Schmid-RSS-24}, and use
 tracked displacement to confirm their motion.
 People are detected as moving and never form states.
 The moving object's state ends, a successor begins once it settles,
@@ -452,8 +453,7 @@ Each representation keeps its own integration and applies the shared decisions w
 
 \vspace{1mm}\noindent\textbf{TSDF.}
 We restrict projective fusion~\cite{10.1145/237170.237269,6162880}
-to each depth observation's valid domain, using the object extraction
-of Khronos~\cite{Schmid-RSS-24}.
+to each depth observation's valid domain ~\cite{Schmid-RSS-24}.
 A depth measurement identifies a surface and the empty space along the ray before it. The earlier measurement of the wall
 can still complete the wall, but its free space must stop before the sofa. We express this as the observation's
 \emph{valid domain}. Let depth observation $o$ be one pixel ray captured at time $t_o$ with measured range $r_o$. For a
@@ -487,10 +487,7 @@ both Gaussian mapping and refinement. At each training step, lifetimes
 select the Gaussians rendered for the keyframe and restrict gradients
 to those that remain active. Retired Gaussians are frozen for historical
 rendering, while earlier views still constrain unchanged surfaces.
-We implement these changes in GaME's reconstruction
-framework~\cite{Yugay_2026_CVPR}, with differentiable Gaussian
-rendering~\cite{10.1145/3592433} and Gaussian-to-mask association
-from FlashSplat~\cite{10.1007/978-3-031-72670-5_26}.
+We use differentiable Gaussian rendering~\cite{10.1145/3592433} and Gaussian-to-mask association ~\cite{Yugay_2026_CVPR} from FlashSplat~\cite{10.1007/978-3-031-72670-5_26}.
 
 \vspace{1mm}\noindent\textbf{Occupancy.}
 We integrate measurements with the wavelet representation and clamped log-odds of
