@@ -844,8 +844,6 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
-\rowcolor{oursbg}
-
 Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
 Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
 \bottomrule
@@ -864,21 +862,22 @@ Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
 \subsection{Ablations}
 \label{sec:ablation}
 
-We ablate the map update over two consecutive visits of Flat with Gaussian maps
-(\cref{tab:ablation_variants}), comparing each variant with its corresponding full-method run.
+We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps
+(\cref{tab:ablation_variants}).
 
 \noindent\textbf{Applying changes to geometry.}
-Without retiring ended states, mesh F1 drops from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 3.84\,dB, as
+With change detection intact, disabling object- and element-level retirement reduces mesh F1 from 89.8 to 84.5,
+change F1 from 83.3 to 68.8, and PSNR by 3.84\,dB, as
 stale furniture stays in the map and renders into novel views.
 
 \noindent\textbf{Observation validity.}
-Reusing earlier keyframes without observation-validity constraints lowers PSNR
-by 4.94\,dB and raises depth L1 from 0.48 to 3.66\,cm, as old frames rebuild
-removed furniture. Discarding every keyframe that observed a Gaussian whose
-lifetime later ends, the whole-frame rejection examined by
-GaME~\cite{Yugay_2026_CVPR}, costs 4.20\,dB and changes mesh F1 by 0.3 points.
-Keeping these frames while restricting their supervision to compatible states
-and active Gaussians preserves their useful observations.
+Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 4.94\,dB
+and raising depth L1 from 0.48 to 3.66\,cm as old frames rebuild removed furniture.
+GaME's whole-frame rejection~\cite{Yugay_2026_CVPR} discards keyframes from either
+visit that observed subsequently retired Gaussians, costing 4.20\,dB PSNR and
+0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
+unchanged surfaces while excluding ended states. Change F1 remains 83.3
+across the observation-reuse variants.
 
 % BEGIN temporarily disabled Computational Cost
 %\subsection{Computational Cost}
