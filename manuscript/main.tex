@@ -704,8 +704,8 @@ official evaluator queries the map at earlier times to score background, static 
 With the same semantic mask inputs, our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
 Apartment. Khronos confirms absence when 60\% of the rays stored with its observations see through within a 5\,s
-window, firing on objects still in place (10.8--15.6\% precision), whereas our state-based test reaches 87.0--93.3\%
-precision at similar recall. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
+window, firing on objects still in place, whereas our state-based test waits for coverage of the object's own
+surface. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
 candidates that static-class filters drop, and each object is reconstructed once it settles in place.
 
 % ===== BEGIN tables / tesse =====
