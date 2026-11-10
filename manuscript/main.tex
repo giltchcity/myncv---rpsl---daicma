@@ -21,10 +21,6 @@
 
 
 \usepackage{cuted} % Official two-column teaser support.
-% Retain annotation helpers for working copies; no annotation is used in the main text.
-\newcommand{\red}[1]{{\color{red}#1}}
-\newcommand{\todo}[1]{{\color{red}#1}}
-\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
 \usepackage{colortbl}
 \definecolor{oursbg}{RGB}{236,236,236} % light-gray background of our rows
 \definecolor{resultgold}{RGB}{153,117,16}
@@ -56,42 +52,8 @@
 \newcommand{\ranksecondcell}[1]{\begingroup\setlength{\fboxsep}{1.5pt}\colorbox{ranksecond}{\kern1.2pt#1\kern1.2pt}\endgroup}
 \newcommand{\ranklegend}{\begingroup\setlength{\fboxsep}{0.7pt}\colorbox{rankbest}{best}/\colorbox{ranksecond}{second}\endgroup}
 % ===== END preamble =====
-% ===== BEGIN draft_macros =====
-% Draft markers for the Method/Experiments drafts (draft-marker-discipline).
-% \TODO       an unresolved factual or sourcing question (a number, a run, a protocol)
-% \note       editorial remark addressed to the authors
-% \directive  a change this passage must receive, and why
-% \superseded text replaced by a decision, kept visible in draft mode
-% Set \draftmodefalse to hide all four for a clean copy.
-% The manuscript preamble already defines \TODO; \providecommand keeps that definition.
 \usepackage{xcolor}
-% Temporary author-discussion highlights. Set \discussionmarksfalse for a clean copy.
-\newif\ifdiscussionmarks
-\discussionmarkstrue
-\DeclareRobustCommand{\discuss}[1]{\ifdiscussionmarks\textcolor{red!70!black}{#1}\else#1\fi}
-
 \usepackage{multirow}
-\newif\ifdraftmode
-\draftmodetrue
-\providecommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
-% \prov{x}   a provisional number: the best value available now, to be replaced by the final runs (source in the
-%            % SRC comment next to it). Draft mode prints it in brown; clean mode prints it plainly.
-% \pend      a table cell whose run or scoring is still pending: a red dash in draft mode, -- in the clean copy.
-\ifdraftmode
-  \newcommand{\prov}[1]{{\color{brown}#1}}
-  \newcommand{\pend}{{\color{red}--}}
-  \newcommand{\note}[1]{{\color{blue}[Note: #1]}}
-  \newcommand{\directive}[1]{\par\noindent\fbox{\parbox{0.95\linewidth}{\small\textbf{Directive:} #1}}\par}
-  \newcommand{\superseded}[1]{{\color{gray}#1}}
-\else
-  \newcommand{\prov}[1]{#1}
-  \newcommand{\pend}{\nev}
-  \renewcommand{\TODO}[1]{}
-  \newcommand{\note}[1]{}
-  \newcommand{\directive}[1]{}
-  \newcommand{\superseded}[1]{}
-\fi
-% ===== END draft_macros =====
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
 \def\confName{CVPR}
@@ -424,7 +386,7 @@ at once.
 
 Frames are archived as depth images with their masks. When a decision changes the valid domains of a voxel block, the
 block rebuilds from the archived frames that observed it, in capture order; this archive and rebuild are the cost of
-valid domains here. The current mesh holds faces of live states and background faces passing the retention test,
+valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and object meshes are extracted with the
 procedure of Khronos~\cite{Schmid-RSS-24}.
 
@@ -720,7 +682,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves on these instance-input runs.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks.
 On Real, Sim, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 3.43, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.030, and 0.035.
@@ -743,8 +705,8 @@ With the same semantic mask inputs, our TSDF maps improve all four categories on
 mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
 Apartment. Khronos confirms absence when 60\% of the rays stored with its observations see through within a 5\,s
 window, firing on objects still in place (10.8--15.6\% precision), whereas our state-based test reaches 87.0--93.3\%
-precision at similar recall. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our front end keeps
-motion candidates that static-class filters drop and reconstructs each object once it settles in place.
+precision at similar recall. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
+candidates that static-class filters drop, and each object is reconstructed once it settles in place.
 
 % ===== BEGIN tables / tesse =====
 % SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
