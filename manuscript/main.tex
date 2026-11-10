@@ -724,7 +724,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 2.8 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves on these instance-input runs.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves on these instance-input runs.
 On Real, Sim, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 3.43, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.030, and 0.035.
@@ -829,7 +829,6 @@ contributions to ended states stay confined to past views (\cref{sec:ablation}; 
 and Flat).
 
 % ===== BEGIN tables / ablation =====
-% The two Full rows retain their original independent reference runs.
 \begin{table}[t]
 \centering
 \small
@@ -841,7 +840,7 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Geometry update}} \\
 \rowcolor{oursbg}
-\textbf{Full (a)} & \textbf{89.8} & \textbf{83.3} & \textbf{27.63} & \textbf{0.48} \\
+\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{27.63} & \textbf{0.48} \\
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
@@ -856,8 +855,7 @@ Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
 \caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh (5\,cm) and change (Chg.) F1
-(\%), PSNR (dB), and depth L1 (cm). Full~(a, b) are independent runs of \ours (shaded); bold marks the unique best per
-block.}
+(\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
@@ -875,10 +873,10 @@ stale furniture stays in the map and renders into novel views.
 
 \noindent\textbf{Observation validity.}
 Reusing earlier keyframes without observation-validity constraints lowers PSNR
-by 5.08\,dB and raises depth L1 from 0.45 to 3.66\,cm, as old frames rebuild
+by 4.94\,dB and raises depth L1 from 0.48 to 3.66\,cm, as old frames rebuild
 removed furniture. Discarding every keyframe that observed a Gaussian whose
 lifetime later ends, the whole-frame rejection examined by
-GaME~\cite{Yugay_2026_CVPR}, costs 4.34\,dB and changes mesh F1 by 0.4 points.
+GaME~\cite{Yugay_2026_CVPR}, costs 4.20\,dB and changes mesh F1 by 0.3 points.
 Keeping these frames while restricting their supervision to compatible states
 and active Gaussians preserves their useful observations.
 
