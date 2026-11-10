@@ -876,8 +876,6 @@ visit that observed subsequently retired Gaussians, costing 4.20\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-\subsection{Computational Cost}
-\label{sec:cost}
 
 \begin{table}[t]
 \centering
@@ -907,6 +905,7 @@ Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \vspace{-2mm}
 \end{table}
 
+\noindent\textbf{Computational cost.}\label{sec:cost}
 On Flat (\cref{tab:cost}), \ours maps faster and with less peak RAM than Khronos for TSDF and GaME for 3DGS,
 while our occupancy branch adds 2.3\,s and 0.6\,GB over Wavemap.
 
