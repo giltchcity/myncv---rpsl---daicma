@@ -319,8 +319,8 @@ the new sofa or out of view. A decision should come once evidence suffices, yet 
 add up to a full change. One test handles changes in view, out of view, and across visits.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count: those supported
-by at least \textcolor{red}{X} earlier depth observations and seen below $60^\circ$ incidence, since grazing views
+We project up to 1,500 surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while in place,
+and only rays below $60^\circ$ incidence see through them, since grazing views
 of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
 size~\cite{9811877}; Gaussian maps use a 5\,cm scale. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
@@ -330,12 +330,10 @@ a larger one at the same spot stays in place until its site comes back into view
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$,
-where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of our 1,500-sample
-budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. While the object
+where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. While the object
 is in place, $f_i$ follows a Beta density fitted to earlier in-place rounds and regularized toward pooled
 statistics; after a change, any fraction is equally likely. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
-changed model against the in-place model, with fractions below the in-place mean evaluated at that mean
-\textcolor{red}{[Is $\ell_s$ evaluated at the mean here, or clipped at zero?]}, and let $w_i(j)$ be the share of
+changed model against the in-place model, with fractions below the in-place mean evaluated at that mean, and let $w_i(j)$ be the share of
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums this evidence and keeps the candidate change time $j$ with the
 largest total score seen so far,
@@ -361,8 +359,7 @@ state; unresolved ones wait until more new depth views arrive.
 
 \vspace{0mm}\noindent\textbf{Observed motion.}
 Motion candidates arise where new measurements enter space previously seen empty, and we track them across
-frames~\cite{10218983,Schmid-RSS-24}. Empty space comes from the current map after applying the valid domains of
-\cref{sec:validity}, so stale free space never flags a newly placed object as moving. Static-class candidates without
+frames~\cite{10218983,Schmid-RSS-24}. Static-class candidates without
 instance association are kept and confirmed by tracked displacement; people count as moving and never form states. A
 moving object's state ends, a successor starts once it settles, and new views reconstruct it in place, driving the same
 map update as changes out of view or across visits.
@@ -394,11 +391,10 @@ unchanged wall behind the armchair as before.
 \vspace{0mm}\noindent\textbf{Retaining and replacing surfaces.}\label{sec:memory}
 Not every stale surface belongs to a state: a closed window sash or drift duplicate has no state to end. Background
 elements are thus tested one by one within valid domains. We retire an element when see-through views outnumber
-supporting ones; on a tie, a current surface right in front, within the surface band and matching in normal, replaces
-the old copy, while occluded parts remain in the map.
+supporting ones; on a tie, a current surface right in front, within the surface band and matching in normal, replaces the old copy. Otherwise it remains, occluded geometry included.
 
 \vspace{0mm}\noindent\textbf{Handover across visits.}\label{sec:handoff}
-At the end of a visit we save the map, lifetimes, state summaries, evidence statistics, and archives of each branch.
+At the end of a visit we save the map, lifetimes, state summaries, evidence statistics, and observation archives of each representation.
 The next visit resumes in the shared frame, so any change found on return passes the same tests as one found after
 looking away.
 
@@ -429,8 +425,8 @@ at once.
 Frames are archived as depth images with their masks. When a decision changes the valid domains of a voxel block, the
 block rebuilds from the archived frames that observed it, in capture order; this archive and rebuild are the cost of
 valid domains here. The current mesh holds faces of live states and background faces passing the retention test,
-retired faces stay available at past times, and Khronos~\cite{Schmid-RSS-24} extracts the mesh of each object in the
-map.
+retired faces stay available at past times, and object meshes are extracted with the
+procedure of Khronos~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
@@ -838,9 +834,10 @@ and Flat).
 \toprule
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
-\multicolumn{5}{@{}l}{\textit{Geometry update}} \\
 \rowcolor{oursbg}
 \textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{27.63} & \textbf{0.48} \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Geometry update}} \\
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
@@ -891,29 +888,27 @@ across the observation-reuse variants.
 Method & Time (s)$\downarrow$ & RAM (GiB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \midrule
 \multicolumn{4}{l}{\textit{TSDF}} \\
-Khronos & 264.5 & 15.16 & 0.00 \\
-\textbf{Ours} & \textbf{250.8} & \textbf{7.25} & 0.00 \\
+Khronos & 264.5 & 15.16 & \nev \\
+\oursname & \ob{250.8} & \ob{7.25} & \oc{\nev} \\
 \midrule
 \multicolumn{4}{l}{\textit{3DGS}} \\
 GaME & 1543.6 & 11.38 & 5.60 \\
-\textbf{Ours} & \textbf{1249.1} & \textbf{8.10} & \textbf{3.94} \\
+\oursname & \ob{1249.1} & \ob{8.10} & \ob{3.94} \\
 \midrule
 \multicolumn{4}{l}{\textit{Occupancy}} \\
-\textbf{Wavemap} & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
-Ours & 7.6 & 2.47 & 0.32 \\
+Wavemap & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
+\oursname & \oc{7.6} & \oc{2.47} & \oc{0.32} \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost on Flat (visits A--B).}
-Time sums both visits; peak RAM and VRAM are the maxima across visits.
-Ryzen 7 9700X / RTX 5070 Ti. TSDF runs on CPU.}
+\caption{\textbf{Computational cost on Flat (visits A--B).} Total time over both visits and peak RAM and VRAM on a
+Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \label{tab:cost}
 \vspace{-2mm}
 \end{table}
 
-On Flat, \ours reduces mapping time and peak RAM over Khronos for TSDF
-and GaME for 3DGS, while the occupancy branch incurs additional cost
-relative to Wavemap (\cref{tab:cost}).
+On Flat (\cref{tab:cost}), \ours maps faster and with less peak RAM than Khronos for TSDF and GaME for 3DGS,
+while our occupancy branch adds 2.3\,s and 0.6\,GiB over Wavemap.
 
 
 % ===== END sec / 5_experiments =====

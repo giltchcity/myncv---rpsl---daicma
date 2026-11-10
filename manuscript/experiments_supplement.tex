@@ -608,7 +608,6 @@ depth L1 in cm.}
 \begin{tabular}{@{}l*{7}{r}@{}}
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-\multicolumn{8}{@{}l}{\textit{Block a}} \\
 Full & 89.8 & 66.8 & 83.3 & 27.63 & 0.95 & 0.12 & 0.48 \\
 No retirement & 84.5 & 66.7 & 68.8 & 23.79 & 0.91 & 0.16 & 3.31 \\
 Object scope, no handover & 84.4 & 66.8 & 68.8 & 23.68 & 0.91 & 0.16 & 3.32 \\
@@ -636,9 +635,9 @@ Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \end{table*}
 % ===== END tables / supp_ablations =====
 
-All ablations use two consecutive visits of Flat and the Gaussian representation. Block (a) of \cref{tab:supp_ablations}
-studies decisions and cross-visit handover, and block (b) studies observation reuse, association, thresholds,
-priors, and segmentation.
+All ablations use two consecutive visits of Flat and the Gaussian representation. \Cref{tab:supp_ablations}
+first varies decisions and cross-visit handover, then observation reuse, association, thresholds, priors, and
+segmentation.
 
 \paragraph{Decision scope and handover.}
 The object and local-surface variants restrict the application scope of the same change rule.
@@ -715,16 +714,16 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 Method & Time (s)$\downarrow$ & RAM (GiB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \midrule
 \multicolumn{4}{l}{\textit{TSDF}} \\
-Khronos & 264.5 & 15.16 & 0.00 \\
-\textbf{Ours} & \textbf{250.8} & \textbf{7.25} & 0.00 \\
+Khronos & 264.5 & 15.16 & \nev \\
+\textbf{Ours} & \textbf{250.8} & \textbf{7.25} & \nev \\
 \midrule
 \multicolumn{4}{l}{\textit{3DGS}} \\
 GaME & 1543.6 & 11.38 & 5.60 \\
 \textbf{Ours} & \textbf{1249.1} & \textbf{8.10} & \textbf{3.94} \\
 \midrule
 \multicolumn{4}{l}{\textit{Occupancy}} \\
-\textbf{Wavemap} & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
-Ours & 7.6 & 2.47 & 0.32 \\
+Wavemap & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
+\textbf{Ours} & 7.6 & 2.47 & 0.32 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Computational cost on Flat (visits A--B).}
