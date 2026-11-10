@@ -879,50 +879,43 @@ visit that observed subsequently retired Gaussians, costing 4.20\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-% BEGIN temporarily disabled Computational Cost
-%\subsection{Computational Cost}
-% \label{sec:cost}
-%
-% % % ===== BEGIN tables / computational_cost =====
+\subsection{Computational Cost}
+\label{sec:cost}
+
 \begin{table}[t]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrr}
 \toprule
-Method & Time (s) & RAM & VRAM & FPS \\
+Method & Time (s)$\downarrow$ & RAM (GiB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \midrule
-\multicolumn{5}{l}{\textit{TSDF: Real C, single visit}} \\
-Khronos & 765.8 & 30.14 & 0.00 & 9.42 \\
-\textbf{Ours} & 798.6 & 10.94 & 0.00 & 9.04 \\
+\multicolumn{4}{l}{\textit{TSDF}} \\
+Khronos & 264.5 & 15.16 & 0.00 \\
+\textbf{Ours} & \textbf{250.8} & \textbf{7.25} & 0.00 \\
 \midrule
-\multicolumn{5}{l}{\textit{Gaussians: Flat, two visits}} \\
-GaME & 2647.0 & 10.85 & 5.90 & 0.49 \\
-\textbf{Ours} & 2898.0 & 10.46 & 6.60 & 0.50 \\
+\multicolumn{4}{l}{\textit{3DGS}} \\
+GaME & 1543.6 & 11.38 & 5.60 \\
+\textbf{Ours} & \textbf{1249.1} & \textbf{8.10} & \textbf{3.94} \\
 \midrule
-\multicolumn{5}{l}{\textit{Occupancy: Real C, continued map}} \\
-Wavemap & 74.2 & 1.96 & 0.28 & 97.25 \\
-\textbf{Ours} & 106.8 & 3.12 & 3.47 & 67.57 \\
+\multicolumn{4}{l}{\textit{Occupancy}} \\
+\textbf{Wavemap} & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
+Ours & 7.6 & 2.47 & 0.32 \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost.} Ryzen 7 9700X / RTX 5070 Ti; peak RAM in GiB and VRAM in GB. RAM and FPS cover mapping. TSDF runs on CPU with a 5\,cm voxel grid.}
+\caption{\textbf{Computational cost on Flat (visits A--B).}
+Time sums both visits; peak RAM and VRAM are the maxima across visits.
+Ryzen 7 9700X / RTX 5070 Ti. TSDF runs on CPU.}
 \label{tab:cost}
 \vspace{-2mm}
 \end{table}
-% % % ===== END tables / computational_cost =====
-%
-%
-%
-%
-\noindent\textbf{Runtime.}
-On Flat, our Gaussian branch maps and refines in 2,898\,s with 6.6\,GB of peak memory on an RTX 5070 Ti, against
-2,647\,s and 5.9\,GB for GaME, at 0.50 versus 0.49 frames per second. The current map holds 2.33 million Gaussians,
-compared with 2.37 million for GaME, and 2.60 million with the historical states.
-%
 
-% % \begin{table}[t] rows: Khronos, Panoptic, GaME, Wavemap, Ours (TSDF/3DGS/Occ); columns: observed / after looking away / across visits F1; latency median / p90 (s). \end{table}
-% END temporarily disabled Computational Cost
+On Flat, \ours reduces mapping time and peak RAM over Khronos for TSDF
+and GaME for 3DGS, while the occupancy branch incurs additional cost
+relative to Wavemap (\cref{tab:cost}).
+
+
 % ===== END sec / 5_experiments =====
 % ===== BEGIN sec / 6_limitations =====
 
