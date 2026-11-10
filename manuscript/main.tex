@@ -210,7 +210,7 @@ only). \emph{After looking away}: retires the whole absent object within a visit
 only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
 states). \emph{Observation validity}: restricts past observations per state and region (\cappart{}: freezes submaps or
 drops/masks keyframes). \emph{Historical queries}: queries the map at past times (\cappart{}: keeps undated objects).
-$^{\dagger}$From the 3DGS branch.}
+$^{\dagger}$With 3DGS maps.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
@@ -907,7 +907,7 @@ Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 
 \noindent\textbf{Computational cost.}\label{sec:cost}
 On Flat (\cref{tab:cost}), \ours maps faster and with less peak RAM than Khronos for TSDF and GaME for 3DGS,
-while our occupancy branch adds 2.3\,s and 0.6\,GB over Wavemap.
+while for occupancy it adds 2.3\,s and 0.6\,GB over Wavemap.
 
 
 % ===== END sec / 5_experiments =====
