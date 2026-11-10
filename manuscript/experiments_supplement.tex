@@ -657,7 +657,7 @@ observes a Gaussian whose lifetime later ends, and a rejected draw is replaced t
 budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
-Unrestricted old-frame reuse reduces PSNR by 5.08\,dB. Allowing this only during refinement is as harmful
+Unrestricted old-frame reuse reduces PSNR by 4.94\,dB. Allowing this only during refinement is as harmful
 (22.78\,dB).
 First-visit rejection applies the test only to visit-A keyframes that observe at least 50 pixels of ended geometry.
 Discarding only the first-visit keyframes that meet this condition costs nothing (27.78\,dB), so the loss comes
@@ -667,7 +667,7 @@ stale Gaussians, and whole-frame rejection then discards it, which leaves the ch
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
 selection and trainable-element restrictions. Evaluating old keyframes on the
-current map rather than on the map at their capture time changes PSNR by 0.06\,dB. Capture-time evaluation preserves
+current map rather than on the map at their capture time changes PSNR by 0.20\,dB. Capture-time evaluation preserves
 historical reconstructions at comparable current-view quality.
 The geometry-only association variant yields 89.98 mesh F1 and 28.14\,dB. These diagnostics retain the
 other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
@@ -683,7 +683,7 @@ OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5; predicted ins
 across frames before reconstruction.
 
 \paragraph{Thresholds and priors.}
-Thresholds $\eta\in\{9,99,999\}$ yield 27.67--27.81\,dB and differ by at most one detected event, and fixed
+Thresholds $\eta\in\{9,99,999\}$ yield 27.63--27.81\,dB and differ by at most one detected event, and fixed
 revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
 
 % ===== BEGIN tables / real_gaussian_vram =====
