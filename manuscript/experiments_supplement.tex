@@ -685,58 +685,6 @@ across frames before reconstruction.
 Thresholds $\eta\in\{9,99,999\}$ yield 27.63--27.81\,dB and differ by at most one detected event, and fixed
 revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
 
-% % ===== BEGIN tables / real_gaussian_vram =====
-% \begin{table}[t]
-% \centering
-% \small
-% \setlength{\tabcolsep}{6pt}
-% \begin{tabular}{lrrr}
-% \toprule
-% Visit & GaME (GB) & Ours (GB) & Increase \\
-% \midrule
-% A & 2.32 & 3.86 & +66.4\% \\
-% B & 3.07 & 4.78 & +55.7\% \\
-% C & 3.04 & 5.62 & +84.9\% \\
-% \bottomrule
-% \end{tabular}
-% \caption{\textbf{Gaussian memory across the three real visits.} Peak CUDA allocation during mapping for each visit of the continuous A--B--C run. The increase is relative to GaME.}
-% \label{tab:supp_real_vram}
-% \end{table}
-% % ===== END tables / real_gaussian_vram =====
-
-% ===== BEGIN tables / supp_flat_cost =====
-\begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{lrrr}
-\toprule
-Method & Time (s)$\downarrow$ & RAM (GiB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
-\midrule
-\multicolumn{4}{l}{\textit{TSDF}} \\
-Khronos & 264.5 & 15.16 & \nev \\
-\textbf{Ours} & \textbf{250.8} & \textbf{7.25} & \nev \\
-\midrule
-\multicolumn{4}{l}{\textit{3DGS}} \\
-GaME & 1543.6 & 11.38 & 5.60 \\
-\textbf{Ours} & \textbf{1249.1} & \textbf{8.10} & \textbf{3.94} \\
-\midrule
-\multicolumn{4}{l}{\textit{Occupancy}} \\
-Wavemap & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
-\textbf{Ours} & 7.6 & 2.47 & 0.32 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Computational cost on Flat (visits A--B).}
-Time sums both visits; peak RAM and VRAM are the maxima across visits.
-TSDF runs on CPU.}
-\label{tab:supp_flat_cost}
-\end{table}
-% ===== END tables / supp_flat_cost =====
-
-\paragraph{Time and memory.}
-\Cref{tab:supp_flat_cost} reports total mapping time and the maximum
-per-visit memory usage for Flat A--B across all three representations.
-
 \section{Qualitative Comparisons}
 % ===== BEGIN figures / qualitative_native =====
 % Original PNG panels; square cropping is applied by graphicx.

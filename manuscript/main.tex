@@ -885,19 +885,19 @@ across the observation-reuse variants.
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{lrrr}
 \toprule
-Method & Time (s)$\downarrow$ & RAM (GiB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
+Method & Time (s)$\downarrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \midrule
 \multicolumn{4}{l}{\textit{TSDF}} \\
-Khronos & 264.5 & 15.16 & \nev \\
-\oursname & \ob{250.8} & \ob{7.25} & \oc{\nev} \\
+Khronos & 264.5 & 16.28 & \nev \\
+\oursname & \ob{250.8} & \ob{7.78} & \oc{\nev} \\
 \midrule
 \multicolumn{4}{l}{\textit{3DGS}} \\
-GaME & 1543.6 & 11.38 & 5.60 \\
-\oursname & \ob{1249.1} & \ob{8.10} & \ob{3.94} \\
+GaME & 1543.6 & 12.22 & 5.60 \\
+\oursname & \ob{1249.1} & \ob{8.70} & \ob{3.94} \\
 \midrule
 \multicolumn{4}{l}{\textit{Occupancy}} \\
-Wavemap & \textbf{5.3} & \textbf{1.89} & \textbf{0.30} \\
-\oursname & \oc{7.6} & \oc{2.47} & \oc{0.32} \\
+Wavemap & \textbf{5.3} & \textbf{2.03} & \textbf{0.30} \\
+\oursname & \oc{7.6} & \oc{2.65} & \oc{0.32} \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
@@ -908,7 +908,7 @@ Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \end{table}
 
 On Flat (\cref{tab:cost}), \ours maps faster and with less peak RAM than Khronos for TSDF and GaME for 3DGS,
-while our occupancy branch adds 2.3\,s and 0.6\,GiB over Wavemap.
+while our occupancy branch adds 2.3\,s and 0.6\,GB over Wavemap.
 
 
 % ===== END sec / 5_experiments =====
@@ -929,8 +929,6 @@ segmentation are natural next steps. Code will be published.
 %
 \ours assumes rigid indoor objects, stable lighting, and external poses, masks, and associations. Objects hidden behind
 larger replacements persist until seen through, and our real benchmark covers one room.
-% Runtime limitation temporarily hidden together with Computational Cost:
-% The Gaussian branch runs at 0.5 frames per second.
 
 % ===== END sec / 7_conclusion =====
 {
