@@ -172,7 +172,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
-New are the state-lifetime model, the coverage-weighted test under partial views, valid domains, and capture-time keyframes; other components are standard and cited where used.
+New are the state-lifetime model, the coverage-weighted test under partial views, valid domains, and capture-time keyframes; the rest is standard and cited where used.
 
 \begin{figure*}[t]
 \centering
@@ -196,8 +196,7 @@ historical queries.}
 Dense mapping uses signed-distance volumes~\cite{10.1145/237170.237269,6162880,8202315}, surfel
 meshes~\cite{schops2020surfelmeshing}, and probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}.
 Gaussian splatting~\cite{10.1145/3592433} supports joint camera tracking, mapping, and rendering in MonoGS and
-SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each of them integrates a measurement in its own way, by weighted
-averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. Our decisions act within these integrations: shared object states decide online which observations each may still integrate.
+SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each integrates a measurement by weighted averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. Our decisions act within these integrations: shared object states decide online which observations each may still integrate.
 
 \vspace{0mm}\noindent\textbf{Dynamic reconstruction.}
 WildGS-SLAM reconstructs static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}. Co-Fusion,
@@ -298,7 +297,7 @@ largest total score seen so far,
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, whereas $f_i$ uses all judged samples to stay a measurement; staring at one patch thus adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ in all experiments, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
+samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, typically the first to see the change, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -307,7 +306,7 @@ Observations matching no state form candidates. Spatial extent and surface agree
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
 \emph{successor} once no sample at the old site is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
-history also count. The successor starts a new state at that round and ends the earlier one, as when the armchair reappears
+history also count. The successor, dated from its first view, ends the earlier state at that round, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object simply ends at its old site and starts anew at its new one.
 
@@ -336,9 +335,7 @@ the first object that arrived later (\cref{eq:domain}). For Gaussian optimizatio
 
 \vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
-only elements alive both at $t_k$ and at the current time. Retired Gaussians still reproduce the armchair
-in earlier views, but they stay frozen, while the same frames keep constraining the active Gaussians of the
-unchanged wall behind the armchair as before.
+only elements alive both at $t_k$ and at the current time. Retired Gaussians reproduce the armchair in earlier views but stay frozen, while the same frames keep constraining the wall, even where the sofa now hides it.
 
 \vspace{0mm}\noindent\textbf{Retaining and replacing surfaces.}\label{sec:memory}
 Not every stale surface belongs to a state: a closed window sash or drift duplicate has no state to end. Background
@@ -389,8 +386,8 @@ splats.
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once, keeping them for past times.
-The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted, removing the earlier visits' free space there, before the clamped update continues. Local replacement clears stale occupied copies behind
-re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
+The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted, removing the earlier visits' free space there, while clamping caps free space gathered since. Local replacement clears stale occupied copies behind
+re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
 
@@ -492,10 +489,9 @@ mapping. Camera poses come from ORB-SLAM3~\cite{9440682}. We annotate object ide
 evaluation.
 
 \noindent\textbf{Simulated sequences.}
-We rendered two animated visits to an InteriorAgent apartment~\cite{InteriorAgent2025} in Isaac Sim, with object
-changes within and between visits. The simulator supplies exact camera poses, object labels, and scene geometry over
+We rendered two animated visits to an InteriorAgent apartment~\cite{InteriorAgent2025} in Isaac Sim, with 72 change events (38 within visits and 34 between visits). The simulator supplies exact camera poses, object labels, and scene geometry over
 time. The second visit covers only part of the apartment, testing whether a continued map keeps what the revisit leaves
-unseen. The two visits contain 72 change events (38 within visits and 34 between visits).
+unseen.
 
 
 
@@ -655,11 +651,11 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+GaME's DSA detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
-smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Across visits, our state decisions retire absent objects, and local replacement clears the stale layers that new surfaces would otherwise reinforce behind shifted walls.
+smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Across visits, our state decisions retire absent objects, and local replacement clears the stale layers that new surfaces would reinforce behind shifted walls.
 
 \subsection{Changes within a Single Run and 4D on TESSE}
 \label{sec:exp_temporal}
@@ -733,7 +729,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria, with GaME's released poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
+\caption{\textbf{Novel-view synthesis after scene updates.} Final-visit views on Flat and Aria, with GaME's released poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
 \label{tab:rendering}
 \vspace{-2mm}
 \end{table}
@@ -741,7 +737,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.42\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME masks stale pixels and rejects a keyframe once its object mask is mostly stale, losing that frame's view of unchanged surfaces; our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
+Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME's KM masks stale pixels and rejects a keyframe once its object mask is mostly stale, losing that frame's view of unchanged surfaces; our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
@@ -791,8 +787,7 @@ Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 5
 and raising depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
-0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
-unchanged surfaces while excluding ended states. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
+0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
 
 With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented: weaker identities mainly cost object-level scores.
 
@@ -841,7 +836,7 @@ while it adds 2.3\,s and 0.6\,GB over Wavemap.
 We presented \ours, where one object-state transition governs geometry retirement and observation validity within and
 across visits. Valid domains and capture-time keyframes restrict past observations to unchanged surfaces, realizing one mechanism within native TSDF, Gaussian, and occupancy integration. Across six datasets, \ours beats map-specific baselines,
 retains unvisited rooms on partial revisits, and keeps history queryable. Modeling non-rigid motion and joint
-segmentation are natural next steps. Code will be published.
+segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
 %
