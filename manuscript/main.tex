@@ -521,7 +521,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional 
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap objects follow mask identities. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap objects follow mask identities. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -530,8 +530,7 @@ refinement.
 \label{sec:exp_main}
 
 
-Across all three representations and four datasets, \ours improves mesh, object, and change F1 over native updates
-(\cref{tab:main}); \cref{fig:geometry_details} shows the maps after scene changes.
+With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details} shows the maps after scene changes.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -803,8 +802,7 @@ and raising depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furnitu
 Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
-unchanged surfaces while excluding ended states. Change F1 remains 83.3
-across the observation-reuse variants.
+unchanged surfaces while excluding ended states. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states.
 
 With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops.
 
