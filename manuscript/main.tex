@@ -561,35 +561,35 @@ changes.
 \put(373,524){\makebox(0,0){GaME~\cite{Yugay_2026_CVPR}}}%
 \put(476,524){\makebox(0,0){\textbf{Ours (3DGS)}}}%
 \put(579,524){\makebox(0,0){Ground Truth}}%
-\put(4,462){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
+\put(4,462){\makebox(0,0){\rotatebox[origin=c]{90}{Real}}}%
 \put(14,412){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_a8edd3e3.png}}%
 \put(117,412){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_a9f68713.png}}%
 \put(220,412){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_ac73dda5.png}}%
 \put(323,412){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_519ea7a8.png}}%
 \put(426,412){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_3e673e58.png}}%
 \put(529,412){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_b5dac36e.png}}%
-\put(4,359){\makebox(0,0){\rotatebox[origin=c]{90}{Real C}}}%
+\put(4,359){\makebox(0,0){\rotatebox[origin=c]{90}{Real}}}%
 \put(14,309){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_70c53c8a.png}}%
 \put(117,309){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_6aa9b730.png}}%
 \put(220,309){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_41c23c24.png}}%
 \put(323,309){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_227900b4.png}}%
 \put(426,309){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_0081864f.png}}%
 \put(529,309){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_1983d228.png}}%
-\put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{Sim B}}}%
+\put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{Sim}}}%
 \put(14,206){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_0c07267f.png}}%
 \put(117,206){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_285f7d36.png}}%
 \put(220,206){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_32bae90a.png}}%
 \put(323,206){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_5ac6469c.png}}%
 \put(426,206){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_051deed0.png}}%
 \put(529,206){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_4a8dffdc.png}}%
-\put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{Sim B}}}%
+\put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{Sim}}}%
 \put(14,103){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_9914928d.png}}%
 \put(117,103){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_008ec86c.png}}%
 \put(220,103){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_98d063c5.png}}%
 \put(323,103){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_deced8d4.png}}%
 \put(426,103){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_8ed4723d.png}}%
 \put(529,103){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_82504eaf.png}}%
-\put(4,50){\makebox(0,0){\rotatebox[origin=c]{90}{Flat B}}}%
+\put(4,50){\makebox(0,0){\rotatebox[origin=c]{90}{Flat}}}%
 \put(14,0){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_2bf4a7ac.png}}%
 \put(117,0){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_2eb98554.png}}%
 \put(220,0){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_f2d21301.png}}%
@@ -599,7 +599,7 @@ changes.
 \end{picture}%
 \endgroup%
 \vspace{-2mm}
-\caption{\textbf{Reconstructions after scene changes.} Final-visit views on Real (Visit~C) and Sim/Flat (Visit~B)
+\caption{\textbf{Reconstructions after scene changes.} Final-visit views on Real, Sim, and Flat
 beside the ground-truth image: baselines keep ghost geometry or erode new furniture, while \ours (3DGS) retires absent
 objects cleanly.}
 \label{fig:geometry_details}
@@ -808,7 +808,7 @@ Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
 Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Mask inputs}} \\
-Predicted masks & 89.9 & 72.7 & 27.56 & 0.50 \\
+Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
@@ -842,7 +842,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.9, while object and change F1 drop to 42.2 and 72.7.
+With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.8, while object and change F1 drop to 42.2 and 72.7.
 
 
 \begin{table}[t]
