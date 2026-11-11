@@ -594,7 +594,7 @@ Odds threshold $999$ & 90.0 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
 Fixed prior $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
 Fixed prior $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
 Fixed prior $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
-Predicted masks & 89.9 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
+Predicted masks & 89.8 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Complete Flat ablations.} F1 in \%, PSNR in dB, depth L1 in cm.}
@@ -641,7 +641,7 @@ constraints as a whole.
 
 \paragraph{Masks and association.}
 Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
-28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 nearly unchanged (89.9) but lower PSNR to 27.56\,dB,
+28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 unchanged (89.8) but lower PSNR to 27.56\,dB,
 object F1 to 42.2, and change F1 to 72.7: three events are missed and none
 is invented, so segmentation errors cost completeness at the object level without corrupting the map.
 
@@ -665,7 +665,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 & & \multicolumn{3}{c}{TSDF} & \multicolumn{2}{c}{3D Gaussians} & \multicolumn{2}{c}{Occupancy}\\[3pt]
 & Image & Khronos & Panoptic & Ours & GaME & Ours & Wavemap & Ours\\[3pt]
 % 1_real_05320 [165, 72, 615, 522]
-\rotatebox{90}{Real C} &
+\rotatebox{90}{Real} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png} &
@@ -675,7 +675,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/7_ours_occ.png}\\[2pt]
 % 2_real_02540 [105, 80, 550, 525]
-\rotatebox{90}{Real C} &
+\rotatebox{90}{Real} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/privacy/face_redacted_5.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png} &
@@ -685,7 +685,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png}\\[2pt]
 % 3_sim_02850 [150, 15, 580, 445]
-\rotatebox{90}{Sim B} &
+\rotatebox{90}{Sim} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/0_image.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/2_panoptic.png} &
@@ -695,7 +695,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/7_ours_occ.png}\\[2pt]
 % 10_sim_03080 [100, 0, 580, 480]
-\rotatebox{90}{Sim B} &
+\rotatebox{90}{Sim} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png} &
@@ -705,7 +705,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/7_ours_occ.png}\\[2pt]
 % 5_flat_00270 [160, 90, 550, 480]
-\rotatebox{90}{Flat B} &
+\rotatebox{90}{Flat} &
 \includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png} &
 \includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png} &
@@ -715,7 +715,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/7_ours_occ.png}\\[2pt]
 % 6_flat_00225 [100, 30, 525, 455]
-\rotatebox{90}{Flat B} &
+\rotatebox{90}{Flat} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png} &
