@@ -827,14 +827,14 @@ We ablate geometry retirement and observation reuse over two visits of Flat with
 
 \noindent\textbf{Applying changes to geometry.}
 With change detection intact, disabling object- and element-level retirement reduces mesh F1 from 89.8 to 84.5,
-change F1 from 83.3 to 68.8, and PSNR by 3.84\,dB, as
+change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, as
 stale furniture stays in the map and renders into novel views.
 
 \noindent\textbf{Observation validity.}
-Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 4.94\,dB
+Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 5.74\,dB
 and raising depth L1 from 0.48 to 3.66\,cm as old frames rebuild removed furniture.
 Whole-frame rejection discards keyframes from either
-visit that observed subsequently retired Gaussians, costing 4.20\,dB PSNR and
+visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
