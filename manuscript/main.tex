@@ -834,7 +834,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while the instance-level change F1 drops.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops; the other variants keep object F1 within 0.5.
 
 
 \begin{table}[t]
@@ -859,7 +859,7 @@ Wavemap & \textbf{5.3} & \textbf{1.94} & \textbf{0.30} \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost on Flat (visits A--B).} Total mapping time over both visits and peak RAM and VRAM on a
+\caption{\textbf{Computational cost on Flat (visits A--B).} Total time over both visits and peak RAM and VRAM on a
 Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \label{tab:cost}
 \vspace{-2mm}
@@ -887,7 +887,7 @@ segmentation are natural next steps. Code will be published.
 \noindent\textbf{Limitations.}
 %
 \ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Objects hidden behind
-larger replacements persist until seen through, and our real benchmark covers one room.
+larger replacements persist until seen through, and our benchmark remains room-scale.
 
 % ===== END sec / 7_conclusion =====
 {
