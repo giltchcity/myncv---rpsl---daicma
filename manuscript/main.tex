@@ -297,7 +297,7 @@ a larger one at the same spot stays in place until its site comes back into view
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$,
-where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
+where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of the 1,500 samples, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
 model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
 after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
 changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}. Let $w_i(j)$ be the share of
@@ -311,7 +311,7 @@ largest total score seen so far,
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ as in Wald's boundary~\cite{Wald1945}, and see-through
-samples since the chosen $j$ outnumber supported ones. On a revisit, only the candidate spanning the gap between visits
+samples since the chosen $j$ outnumber supported ones; $d_s$ is round $n$, an upper bound on the change time, so changes between visits are dated on return. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -453,7 +453,7 @@ representation (bold).}
 \section{The ReviScene Benchmark}
 \label{sec:benchmark}
 
-Public datasets offer either motion within a run or changes between scans, never both. We therefore record
+Public datasets offer either motion within a run or changes between scans, rarely both. We therefore record
 \emph{ReviScene-bedRoom} and render \emph{ReviScene-Home}, in which objects move while observed, change after
 the camera looks away, and rearrange between visits (\cref{fig:dataset_changes}).
 
@@ -685,7 +685,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves (see the supplement).
 On ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 4.22, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.038, and 0.035.
@@ -773,7 +773,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria
+\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria with SAM masks
 (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
 \label{tab:rendering}
 \vspace{-2mm}
@@ -814,7 +814,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth masks).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
+\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth masks unless noted).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
 across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
@@ -841,7 +841,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.8, while object and change F1, which also check each surface's instance, drop to 42.2 and 72.7.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 stays at 89.8, while object and change F1, which also check each surface's instance, drop to 42.2 and 72.7.
 
 
 \begin{table}[t]
