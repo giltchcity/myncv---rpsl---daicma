@@ -16,7 +16,6 @@
 \usepackage{microtype}
 \usepackage{placeins}
 
-\usepackage{graphicx}
 \usepackage{xcolor}
 
 
@@ -39,7 +38,6 @@
 \usepackage{pifont} % check and cross marks for the capability table
 \usepackage{tikz}   % half-filled circle for partial support
 \definecolor{capgreen}{RGB}{46,125,50}
-\definecolor{capgreen}{RGB}{46,125,50}
 \definecolor{capamber}{RGB}{222,140,22}
 \DeclareRobustCommand{\capyes}{\textcolor{capgreen}{\ding{51}}}
 \DeclareRobustCommand{\capno}{\textcolor{black!28}{\ding{55}}}
@@ -52,7 +50,6 @@
 \newcommand{\ranksecondcell}[1]{\begingroup\setlength{\fboxsep}{1.5pt}\colorbox{ranksecond}{\kern1.2pt#1\kern1.2pt}\endgroup}
 \newcommand{\ranklegend}{\begingroup\setlength{\fboxsep}{0.7pt}\colorbox{rankbest}{best}/\colorbox{ranksecond}{second}\endgroup}
 % ===== END preamble =====
-\usepackage{xcolor}
 \usepackage{multirow}
 \definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
@@ -126,7 +123,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \end{tabular}
 \caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; 3DGS: 3D Gaussian
 splatting. \emph{In view}: detects moving objects and reconstructs them once settled (\cappart{}: overwrites cells
-only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: updates re-observed parts
+only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts or across visits
 only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
 states). \emph{Observation validity}: restricts past observations per state and region (\cappart{}: freezes submaps or
 drops/masks keyframes). \emph{Historical queries}: queries the map at past times (\cappart{}: keeps undated objects).
@@ -286,7 +283,7 @@ allocation time.
 
 The camera sees only part of an object at once, and an unseen surface is not a missing one: the armchair may sit behind
 the new sofa or out of view. A decision should come once evidence suffices, yet repeated views of one patch must not
-add up to a full change. One test handles changes in view, out of view, and across visits.
+add up to a full change. One test handles changes out of view and across visits; tracked motion handles those in view.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
 We project up to 1,500 surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while in place,
@@ -389,7 +386,7 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Frames of the current visit are archived in compressed form, and earlier visits are carried by the map itself. When a decision
+Each visit fuses its own frames, archived in compressed form; earlier visits enter as surfaces without their free space. When a decision
 changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from the archived frames, in
 capture order; this archive and re-integration are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
@@ -536,7 +533,7 @@ and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap objects follow mask identities. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -682,7 +679,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 abov
 supplement).
 
 \noindent\textbf{3D Gaussians.}
-Our Gaussian maps exceed GaME in mesh F1 by 6.5 points in the real room and 15.6 in the synthetic apartment, in
+Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on bedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
 GaME propagates local rendering conflicts through historical object masks to remove stale geometry.
 Our state decisions apply jointly to geometry and observation validity;
@@ -690,14 +687,14 @@ the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves.
 On ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan, PSNR increases by
-1.68, 3.05, 3.43, and 0.96\,dB, respectively.
+1.68, 3.05, 4.22, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.030, and 0.035.
 LPIPS decreases by 0.084, 0.098, 0.047, and 0.035,
 and depth L1 decreases by 1.07, 8.62, 0.60, and 2.16\,cm.
 
 \noindent\textbf{Occupancy.}
-Occupancy gains are largest in the real room, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
-smallest on the synthetic scenes, within 2.2 mesh F1 on ReviScene-Home and Flat. Wavemap's clamped log-odds overwrite a changed
+Occupancy gains are largest on bedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
+smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Wavemap's clamped log-odds overwrite a changed
 cell when new rays contradict it, and its sensor model assigns occupancy to a band behind each surface. Across visits,
 old occupied layers stay behind shifted surfaces where free space cannot reach; our state decisions retire absent
 objects and local replacement clears those stale layers behind each wall.
@@ -817,7 +814,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
+\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth masks).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
 across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
@@ -844,7 +841,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.8, while object and change F1 drop to 42.2 and 72.7.
+With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.8, while object and change F1, which also check each surface's instance, drop to 42.2 and 72.7.
 
 
 \begin{table}[t]
