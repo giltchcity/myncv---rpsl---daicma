@@ -286,7 +286,7 @@ the new sofa or out of view. A decision should come once evidence suffices, yet 
 add up to a full change. One test handles changes out of view and across visits; tracked motion handles those in view.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project up to 1,500 surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while in place,
+We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while in place,
 and only rays below $60^\circ$ incidence see through them, since grazing views
 of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
 size~\cite{9811877}; Gaussian maps use a 5\,cm scale. A sample is \emph{supported} when depths agree,

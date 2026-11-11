@@ -402,7 +402,7 @@ The 3RScan result is the mean over the final visit of each of eight rooms. Depth
 pixels with valid measured depth in both methods.
 
 \paragraph{Evidence and state comparison.}
-Surface tolerance follows the map resolution, with a 5\,cm reference scale for Gaussians.
+Surface tolerance follows the map resolution, with a 5\,cm reference scale for Gaussians. Each depth image tests at most 1,500 surface samples per state.
 The $60^\circ$ incidence filter applies to noisy real-world depth, and the minimum of
 $\min(30,\nu_{\mathrm{rel}})$ judged samples applies to every round, as described in the main paper.
 We report threshold sensitivity for $\eta\in\{9,99,999\}$ below.
