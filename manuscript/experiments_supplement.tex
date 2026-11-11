@@ -599,8 +599,8 @@ Predicted masks & 89.8 & 42.2 & 72.7 & 27.56 & 0.95 & 0.12 & 0.50 \\
 \end{table*}
 % ===== END tables / supp_ablations =====
 
-All ablations use two consecutive visits of Flat and the Gaussian representation. \Cref{tab:supp_ablations}
-first varies decisions and cross-visit handover, then observation reuse, association, thresholds, priors, and
+The ablations in \cref{tab:supp_ablations} use two consecutive visits of Flat and the Gaussian representation. They
+first vary decisions and cross-visit handover, then observation reuse, association, thresholds, priors, and
 segmentation.
 
 \paragraph{Decision scope and handover.}
@@ -648,6 +648,34 @@ across frames before reconstruction.
 \paragraph{Thresholds and priors.}
 Thresholds $\eta\in\{9,99,999\}$ yield 27.67--28.43\,dB and differ by at most one detected event, and fixed
 revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Valid domains & Mesh A$\uparrow$ & Mesh B$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+\midrule
+On (full) & 99.2 & 99.2 & 83.6 & 97.9 \\
+Off & 98.0 & 98.4 & 83.4 & 82.8 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Valid domains on ReviScene-Home (TSDF).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
+\label{tab:supp_valid_domains}
+\end{table}
+
+\paragraph{Valid domains.}
+With valid domains off, every archived frame contributes its full ray, and state changes no longer rebuild voxel
+blocks; all other components stay unchanged. \Cref{tab:supp_valid_domains} compares both settings for TSDF maps on
+ReviScene-Home, where objects also move during visits. Change F1 falls from 97.9 to 82.8 (true positives, false
+positives, and false negatives change from 69/0/3 to 53/3/19). Mesh F1 falls by 1.2 and 0.8 points after visits A
+and B; in visit A, precision and recall drop by 0.55 and 1.81 points. Two effects cause the drop. Frames that saw a
+moved object at its old site fuse it back: for changes after looking away, the mean residual at the old site rises
+from 5.8\% to 45.0\%, and the median time until the site is cleared, an upper bound, grows from 16.2 to 27.1\,s.
+Frames captured before an object arrived carve its new site with free space, and new-site coverage falls from
+99.7\% to 78.3\%. Object F1 changes by 0.2 points: objects are still found, but their geometry is wrong. On Flat,
+where all changes occur between visits, both settings give identical mesh, object, and change scores.
 
 \section{Qualitative Comparisons}
 % ===== BEGIN figures / qualitative_native =====
