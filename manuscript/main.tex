@@ -153,7 +153,7 @@ seek one change decision that governs both geometry and past views across all th
 
 
 
-Given posed RGB-D frames, masks, and associations, we treat every discrete scene change as a transition of \emph{object
+We treat every discrete scene change as a transition of \emph{object
 state}. An object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
@@ -303,7 +303,7 @@ A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}}
 where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
 model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
 after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
-changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}, and let $w_i(j)$ be the share of
+changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}. Let $w_i(j)$ be the share of
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums this evidence and keeps the candidate change time $j$ with the
 largest total score seen so far,
@@ -337,9 +337,7 @@ map update as changes out of view or across visits.
 \subsection{Map Update}
 \label{sec:validity}
 
-A decision helps only if the map follows it and past views do not undo it. Removing just the seen-through part of the
-armchair leaves its back in place, and old frames of the armchair would re-fuse it, carve the sofa with stale free
-space, and train Gaussians for a vanished layout; yet those frames also saw the static wall and cannot be dropped. Map
+A decision helps only if the map follows it and past views do not undo it. Map
 update thus acts on geometry and past views alike, in space for depth fusion and in time for Gaussians.
 
 \vspace{0mm}\noindent\textbf{Applying changes to geometry.}
@@ -391,9 +389,9 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Frames of the current visit are archived in compressed form, and earlier visits persist through the map. When a decision
-changes the valid domains of a voxel block, the voxels whose updates change are refolded from the archived frames, in
-capture order; this archive and rebuild are the cost of
+Frames of the current visit are archived in compressed form, and earlier visits are carried by the map itself. When a decision
+changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from the archived frames, in
+capture order; this archive and re-integration are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and object meshes are extracted with the
 procedure of Khronos~\cite{Schmid-RSS-24}.
@@ -408,7 +406,7 @@ splats just as in GaME~\cite{Yugay_2026_CVPR}.
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once.
-Each visit starts from a stored map; where the visit's object readings first reach a cell stored as free, the cell's stored log-odds value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
+The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
 re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
@@ -529,7 +527,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy. POCD, CL-Splats, and GaussianUpdate have no complete public implementation. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
+occupancy; POCD, CL-Splats, and GaussianUpdate lack complete public implementations. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
 ORB-SLAM3 poses on ReviScene-bedRoom~\cite{9440682}; TESSE and Flat/Aria rendering use the released poses
 and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively.
 
@@ -808,12 +806,10 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.48} \\
 \midrule
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
-\addlinespace[2pt]
-\multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
+\midrule
 Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
 Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
-\addlinespace[2pt]
-\multicolumn{5}{@{}l}{\textit{Mask inputs}} \\
+\midrule
 Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \bottomrule
 }
