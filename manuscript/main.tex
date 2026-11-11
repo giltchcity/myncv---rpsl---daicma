@@ -122,11 +122,11 @@ views and drives both updates within and across visits. \ours carries these stat
 transitions to TSDF, Gaussian, and occupancy maps, so old views can never harm our updated map.
 
 Public datasets isolate either in-view motion or cross-visit changes. We therefore introduce \emph{ReviScene-bedRoom} and
-\emph{ReviScene-Apartment}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
+\emph{ReviScene-Home}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
 rearrangements, and evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
 Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
 F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
-to 92.6 in Apartment. On the partial revisit of ReviScene-Apartment, continuing our TSDF map improves mesh F1 by 9.3 points
+to 92.6 in Apartment. On the partial revisit of ReviScene-Home, continuing our TSDF map improves mesh F1 by 9.3 points
 over restarting our mapper and 12.6 over restarting Khronos. On Flat and Aria, our Gaussian maps render novel
 views at 0.88 to 3.91\,dB higher PSNR than GaME.
 
@@ -137,7 +137,7 @@ views at 0.88 to 3.91\,dB higher PSNR than GaME.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
   it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, while
   keeping each map's native integration intact.
-  \item \textbf{Joint dynamic benchmark and evaluation:} We release ReviScene-bedRoom and ReviScene-Apartment, which unite
+  \item \textbf{Joint dynamic benchmark and evaluation:} We release ReviScene-bedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes, and demonstrate consistent gains across six datasets.
 \end{itemize}
 
@@ -424,7 +424,7 @@ re-measured surfaces, keeping walls from thickening while all other unobserved c
 \toprule
 & & \multicolumn{6}{c}{\textbf{Within and across visits}} & \multicolumn{6}{c}{\textbf{Across visits}} \\
 \cmidrule(lr){3-8}\cmidrule(lr){9-14}
-& & \multicolumn{3}{c}{ReviScene-bedRoom} & \multicolumn{3}{c}{ReviScene-Apartment} & \multicolumn{3}{c}{Flat} & \multicolumn{3}{c}{3RScan} \\
+& & \multicolumn{3}{c}{ReviScene-bedRoom} & \multicolumn{3}{c}{ReviScene-Home} & \multicolumn{3}{c}{Flat} & \multicolumn{3}{c}{3RScan} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
 Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. \\
 \midrule
@@ -443,7 +443,7 @@ Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Me
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
 \caption{\textbf{Dynamic mapping within and across visits.} Final-visit mesh F1 (5\,cm); object (Obj.) and change (Chg.)
-F1 over the visit chain (\%; higher is better) on ReviScene-bedRoom, ReviScene-Apartment, Flat, and 3RScan. \ours (shaded) leads every baseline per
+F1 over the visit chain (\%; higher is better) on ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan. \ours (shaded) leads every baseline per
 representation (bold).}
 \label{tab:main}
 \end{table*}
@@ -453,7 +453,7 @@ representation (bold).}
 \label{sec:benchmark}
 
 Public datasets offer either motion within a run or changes between scans, never both. We therefore record
-\emph{ReviScene-bedRoom} and render \emph{ReviScene-Apartment}, in which objects move while observed, change after
+\emph{ReviScene-bedRoom} and render \emph{ReviScene-Home}, in which objects move while observed, change after
 the camera looks away, and rearrange between visits (\cref{fig:dataset_changes}).
 
 % ===== BEGIN figures / dataset_overview_main =====
@@ -491,7 +491,7 @@ the camera looks away, and rearrange between visits (\cref{fig:dataset_changes})
 \end{picture}%
 \endgroup
 \caption{\textbf{Changes within and across visits.} Left: earlier visit; middle and right: before and after an in-visit
-change, tracking suitcases in ReviScene-bedRoom (top) and a sofa in ReviScene-Apartment (bottom).}
+change, tracking suitcases in ReviScene-bedRoom (top) and a sofa in ReviScene-Home (bottom).}
 \label{fig:dataset_changes}
 \end{figure}
 % ===== END figures / dataset_overview_main =====
@@ -577,14 +577,14 @@ changes.
 \put(323,309){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_227900b4.png}}%
 \put(426,309){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_0081864f.png}}%
 \put(529,309){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_1983d228.png}}%
-\put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{ReviScene-Apartment}}}%
+\put(4,256){\makebox(0,0){\rotatebox[origin=c]{90}{ReviScene-Home}}}%
 \put(14,206){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_0c07267f.png}}%
 \put(117,206){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_285f7d36.png}}%
 \put(220,206){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_32bae90a.png}}%
 \put(323,206){\includegraphics[width=100\unitlength]{figures/export_lossless/4_game_5ac6469c.png}}%
 \put(426,206){\includegraphics[width=100\unitlength]{figures/export_lossless/5_ours_3dgs_051deed0.png}}%
 \put(529,206){\includegraphics[width=100\unitlength]{figures/export_lossless/0_image_4a8dffdc.png}}%
-\put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{ReviScene-Apartment}}}%
+\put(4,153){\makebox(0,0){\rotatebox[origin=c]{90}{ReviScene-Home}}}%
 \put(14,103){\includegraphics[width=100\unitlength]{figures/export_lossless/2_panoptic_9914928d.png}}%
 \put(117,103){\includegraphics[width=100\unitlength]{figures/export_lossless/1_khronos_008ec86c.png}}%
 \put(220,103){\includegraphics[width=100\unitlength]{figures/export_lossless/6_wavemap_98d063c5.png}}%
@@ -601,7 +601,7 @@ changes.
 \end{picture}%
 \endgroup%
 \vspace{-2mm}
-\caption{\textbf{Reconstructions after scene changes.} Final-visit views on ReviScene-bedRoom, ReviScene-Apartment, and Flat
+\caption{\textbf{Reconstructions after scene changes.} Final-visit views on ReviScene-bedRoom, ReviScene-Home, and Flat
 beside the ground-truth image: baselines keep ghost geometry or erode new furniture, while \ours (3DGS) retires absent
 objects cleanly.}
 \label{fig:geometry_details}
@@ -674,7 +674,7 @@ reconstructed background vertices and camera poses. We assess absence from new d
 and apply a confirmed change to its full geometry. Valid domains also stop earlier free space at new objects, so old
 observations do not carve away newly added geometry, raising precision and recall together. Panoptic Multi-TSDFs
 compares whole submaps against active ones and marks a submap absent when enough points conflict: on 3RScan, its change
-F1 is 44.6 versus our 80.5. Continuing the map also pays off on partial revisits: on ReviScene-Apartment Visit~B, our continued TSDF
+F1 is 44.6 versus our 80.5. Continuing the map also pays off on partial revisits: on ReviScene-Home Visit~B, our continued TSDF
 map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 above a fresh restart of Khronos (see the
 supplement).
 
@@ -686,7 +686,7 @@ Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves.
-On ReviScene-bedRoom, ReviScene-Apartment, Flat, and 3RScan, PSNR increases by
+On ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 3.43, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.030, and 0.035.
 LPIPS decreases by 0.084, 0.098, 0.047, and 0.035,
@@ -694,7 +694,7 @@ and depth L1 decreases by 1.07, 8.62, 0.60, and 2.16\,cm.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest in the real room, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
-smallest on the synthetic scenes, within 2.2 mesh F1 on ReviScene-Apartment and Flat. Wavemap's clamped log-odds overwrite a changed
+smallest on the synthetic scenes, within 2.2 mesh F1 on ReviScene-Home and Flat. Wavemap's clamped log-odds overwrite a changed
 cell when new rays contradict it, and its sensor model assigns occupancy to a band behind each surface. Across visits,
 old occupied layers stay behind shifted surfaces where free space cannot reach; our state decisions retire absent
 objects and local replacement clears those stale layers behind each wall.
@@ -786,7 +786,7 @@ Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs
 removes stale content from current views, while observation validity prevents earlier images from reconstructing it
 again. GaME masks stale keyframe regions and can reject a whole keyframe when an object mask becomes mostly stale, also
 losing its observations of unchanged surfaces. Our keyframes continue to constrain static walls and floors while their
-contributions to ended states stay confined to past views (\cref{sec:ablation}; see \cref{fig:gaussian_details} on ReviScene-Apartment
+contributions to ended states stay confined to past views (\cref{sec:ablation}; see \cref{fig:gaussian_details} on ReviScene-Home
 and Flat).
 
 % ===== BEGIN tables / ablation =====
