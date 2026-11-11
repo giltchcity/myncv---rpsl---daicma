@@ -83,7 +83,7 @@ layouts. Objects move in view, shift out of view, and rearrange across visits, y
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
+queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
 the proposed \ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 score on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
@@ -285,8 +285,7 @@ a larger one at the same spot stays in place until its site comes back into view
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples~\cite{9811877} of state $s$,
 where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
-model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
-after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
+model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics (supplement), and use a uniform model after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
 changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}. Let $w_i(j)$ be the share of
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums this evidence and keeps the candidate change time $j$ with the
@@ -774,8 +773,7 @@ across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \subsection{Ablations}
 \label{sec:ablation}
 
-We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps
-(\cref{tab:ablation_variants}).
+We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps (\cref{tab:ablation_variants}); the supplement varies thresholds and priors.
 
 \noindent\textbf{Applying changes to geometry.}
 With change detection intact, disabling object- and element-level retirement reduces mesh F1 from 89.8 to 84.5,
@@ -845,7 +843,7 @@ segmentation are natural next steps.
 % ===== END sec / 7_conclusion =====
 
 \section*{LLM Usage Statement}
-We used LLM assistants, mainly Claude Code, to help implement and debug code, run and summarize experiments, prepare figures, and edit the text. The authors designed the method, verified all reported results, and reviewed every change.
+We used LLM assistants, mainly Claude Code, to help implement and debug code, run and summarize experiments, prepare figures, and edit the text, following the CVPR 2027 policy on large language models. The authors designed the method, verified all reported results, and reviewed every change.
 
 {
 \small
