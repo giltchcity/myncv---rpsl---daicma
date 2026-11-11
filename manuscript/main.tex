@@ -296,8 +296,8 @@ the wall. Occlusions, invalid depths, and out-of-image samples add no absence ev
 a larger one at the same spot stays in place until its site comes back into view.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
-A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$,
-where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30 is the common large-sample rule of thumb~\cite{diez2012openintro}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
+A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples~\cite{9811877} of state $s$,
+where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
 model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
 after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
 changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}. Let $w_i(j)$ be the share of
