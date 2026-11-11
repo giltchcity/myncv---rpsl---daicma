@@ -656,7 +656,7 @@ objects cleanly.}
 \noindent\textbf{TSDF.}
 Gains are largest where the scene changes most. On BedRoom, mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
 map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. Testing each old surface directly in new depth closes this gap, and retiring its full geometry and stopping earlier free space at new objects keep removed and added geometry correct. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes against our 21. Continuing the map also pays off on partial revisits: on Home Visit~B, our continued TSDF
-map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 above a fresh restart of Khronos, since surfaces the revisit never sees stay from Visit~A (see the supplement).
+map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfaces the revisit never sees stay from Visit~A (see the supplement).
 
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
