@@ -245,7 +245,7 @@ with surface evidence to update both geometry and past views in the map.
 Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames and instance masks with consistent identities, \emph{change
+lifetimes and historical observation validity. Given posed RGB-D frames and instance masks with identities consistent across frames and visits, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
@@ -387,7 +387,7 @@ splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
-We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once.
+We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once, keeping them for past times.
 The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
 re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
@@ -794,7 +794,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
 unchanged surfaces while excluding ended states. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented.
 
 
 \begin{table}[t]
@@ -846,7 +846,7 @@ segmentation are natural next steps. Code will be published.
 \noindent\textbf{Limitations.}
 %
 \ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Objects hidden behind
-larger replacements persist until seen through, and our benchmark remains room-scale.
+larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
 
 % ===== END sec / 7_conclusion =====
 
