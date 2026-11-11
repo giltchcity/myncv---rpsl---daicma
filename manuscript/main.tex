@@ -683,12 +683,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks.
-On BedRoom, Home, Flat, and 3RScan, PSNR increases by
-1.68, 3.05, 4.22, and 0.96\,dB, respectively.
-The corresponding MS-SSIM gains are 0.053, 0.067, 0.038, and 0.035.
-LPIPS decreases by 0.084, 0.098, 0.057, and 0.035,
-and depth L1 decreases by 1.07, 8.62, 0.66, and 2.16\,cm.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks: on all four datasets, PSNR and MS-SSIM rise and LPIPS and depth L1 fall.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
@@ -839,7 +834,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while the instance-level object and change F1 drop.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while the instance-level change F1 drops.
 
 
 \begin{table}[t]
@@ -864,7 +859,7 @@ Wavemap & \textbf{5.3} & \textbf{1.94} & \textbf{0.30} \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost on Flat (visits A--B).} Total time over both visits and peak RAM and VRAM on a
+\caption{\textbf{Computational cost on Flat (visits A--B).} Total mapping time over both visits and peak RAM and VRAM on a
 Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \label{tab:cost}
 \vspace{-2mm}
