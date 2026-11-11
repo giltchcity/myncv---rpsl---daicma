@@ -297,7 +297,7 @@ largest total score seen so far,
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, whereas $f_i$ uses all judged samples to stay a measurement; staring at one patch thus adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ in all experiments, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, typically the first to see the change, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
+samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -306,7 +306,7 @@ Observations matching no state form candidates. Spatial extent and surface agree
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
 \emph{successor} once no sample at the old site is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
-history also count. The successor, dated from its first view, ends the earlier state at that round, as when the armchair reappears
+history also count. From its first view, the successor replaces the earlier state, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object simply ends at its old site and starts anew at its new one.
 
@@ -840,8 +840,7 @@ segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
 %
-\ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Objects hidden behind
-larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
+\ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Change times follow the confirming evidence, objects hidden behind larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
 
 % ===== END sec / 7_conclusion =====
 
