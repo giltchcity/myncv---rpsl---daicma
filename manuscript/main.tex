@@ -503,7 +503,7 @@ unseen. The two visits contain 72 change events (38 within visits and 34 between
 \label{sec:experiments}
 
 \noindent\textbf{Datasets.}
-Besides ReviScene (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877} (a simulated apartment), eight real-world rooms from 3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}. For changes
+Besides ReviScene (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877} (a simulated apartment), eight real-world rooms from 3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}, which lack object annotations and serve rendering, as in GaME. For changes
 within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite{Schmid-RSS-24}.
 
 \noindent\textbf{Baselines and protocol.}
@@ -516,7 +516,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static im
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects, so their Gaussians and cells are grouped by mask identity, as ours are. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects, so their Gaussians and cells are grouped by mask identity, as ours are. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -741,7 +741,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.42\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. Where GaME rejects a keyframe whose object mask is mostly stale and loses its view of unchanged surfaces, our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
+Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME masks stale pixels and rejects a keyframe once its object mask is mostly stale, losing that frame's view of unchanged surfaces; our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
@@ -794,7 +794,7 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
 unchanged surfaces while excluding ended states. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented: weaker identities lower object-level scores, not map accuracy.
 
 
 \begin{table}[t]
