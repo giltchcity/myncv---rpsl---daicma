@@ -172,6 +172,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
+New are the state-lifetime model, the coverage-weighted test under partial views, valid domains, and capture-time keyframes; other components are standard and cited where used.
 
 \begin{figure*}[t]
 \centering
@@ -654,8 +655,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
