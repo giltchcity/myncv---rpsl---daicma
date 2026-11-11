@@ -250,7 +250,7 @@ with surface evidence to update both geometry and past views in the map.
 Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames and instance masks, \emph{change
+lifetimes and historical observation validity. Given posed RGB-D frames and instance masks with consistent identities, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
