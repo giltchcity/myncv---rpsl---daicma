@@ -144,8 +144,7 @@ GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and
 overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
-behind it. GaME marks stale regions of old keyframes as wrong and stops using them, and volumetric
-systems let new rays vote old surfaces out. Yet a past view was correct when it was taken: it still describes the changed object at its capture time and every static surface. We therefore
+behind it. Khronos confirms absence along rays from background vertices, Wavemap reinforces stale copies behind each new surface, and GaME discards stale keyframe pixels for good. Yet an observation can be correct about the past without being valid for the present. We therefore
 seek one change decision that governs both geometry and past views across all three map types.
 
 
@@ -156,8 +155,7 @@ half-open time interval. Its geometry belongs in the map during that interval, a
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
 armchair's state ends, we retire its entire surface from the current map, unseen back included. Rays in earlier frames
 that hit the armchair stop contributing to the current volume, whereas rays that hit the wall behind it still support
-the wall but stop their free space before the newly arrived sofa. Surface evidence confirms the change from partial
-views and drives both updates within and across visits. \ours carries these states across visits and applies the same
+the wall but stop their free space before the newly arrived sofa. New depth tests old surfaces directly, confirms changes from partial views, and drives both updates within and across visits. \ours carries these states across visits and applies the same
 transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
@@ -236,9 +234,7 @@ change cues online~\cite{galappaththige2026changes}, and 3DGS-CD detects rearran
 masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. GaME detects changes from rendering conflicts, expands removal through
 historical masks, and masks stale keyframe regions, dropping a keyframe once a mask is mostly
 stale~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
-and GS-Diff detects changes between Gaussian maps~\cite{galappaththige2026gsdiff}. These systems decide changes per
-submap, ray, or splat and patch views with custom rules; we decide per object state and carry it via valid domains and
-capture-time keyframes to every element in all three map types.
+and GS-Diff detects changes between Gaussian maps~\cite{galappaththige2026gsdiff}.
 
 \vspace{0mm}\noindent\textbf{Object association and scene history.}
 RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes reconstructs objects across
@@ -667,10 +663,7 @@ objects cleanly.}
 
 \noindent\textbf{TSDF.}
 Gains are largest where the scene changes most. On BedRoom, mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
-map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Khronos verifies absence using rays between
-reconstructed background vertices and camera poses. We assess absence from new depth images at the object's own surface
-and apply a confirmed change to its full geometry. Valid domains also stop earlier free space at new objects, so old
-observations do not carve away newly added geometry. Panoptic Mapping
+map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. Testing each old surface directly in new depth closes this gap, and retiring its full geometry and stopping earlier free space at new objects keep removed and added geometry correct. Panoptic Mapping
 compares whole submaps against active ones and marks a submap absent when enough points conflict: on 3RScan, its change
 F1 is 44.6 versus our 80.5 and Khronos's 73.3. Continuing the map also pays off on partial revisits: on Home Visit~B, our continued TSDF
 map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 above a fresh restart of Khronos (see the
@@ -679,18 +672,12 @@ supplement).
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME propagates local rendering conflicts through historical object masks to remove stale geometry.
-Our state decisions apply jointly to geometry and observation validity;
-the resulting maps have fewer residual surfaces in the illustrated scene changes
-(\cref{fig:gaussian_details}). The gains on Flat and
+GaME detects change from rendering conflicts, which can miss parts of a moved object, and keeps a keyframe until most of an object mask is stale, so the remaining stale pixels can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
-smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Wavemap's clamped log-odds overwrite a changed
-cell when new rays contradict it, and its sensor model assigns occupancy to a band behind each surface. Across visits,
-old occupied layers stay behind shifted surfaces where free space cannot reach; our state decisions retire absent
-objects and local replacement clears those stale layers behind each wall.
+smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Across visits, our state decisions retire absent objects, and local replacement clears the stale layers that new surfaces would otherwise reinforce behind shifted walls.
 
 \subsection{Changes within a Single Run and 4D on TESSE}
 \label{sec:exp_temporal}
@@ -699,9 +686,7 @@ Khronos's TESSE sequences contain observed motion and changes after looking away
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
 Our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
-Apartment. Khronos confirms absence when 60\% of its stored rays see through within a 5\,s
-window, firing on objects still in place, whereas our state-based test waits for coverage of the object's own
-surface. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
+Apartment. Because the evaluator queries the map at every earlier time, these gains cover the full history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
 candidates that static-class filters drop, and each object is reconstructed once it settles in place.
 
 % ===== BEGIN tables / tesse =====
@@ -775,12 +760,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.42\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement
-removes stale content from current views, while observation validity prevents earlier images from reconstructing it
-again. GaME masks stale keyframe regions and can reject a whole keyframe when an object mask becomes mostly stale, also
-losing its observations of unchanged surfaces. Our keyframes continue to constrain static walls and floors while their
-contributions to ended states stay confined to past views (\cref{sec:ablation}; see \cref{fig:gaussian_details} on Home
-and Flat).
+Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. Where GaME rejects a keyframe whose object mask is mostly stale and loses its view of unchanged surfaces, our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
