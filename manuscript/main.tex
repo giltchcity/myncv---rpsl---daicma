@@ -83,7 +83,7 @@ layouts. Objects move in view, shift out of view, and rearrange across visits, y
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one method drives TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
+queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
 the proposed \ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 score on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
@@ -168,8 +168,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, while
-  keeping each map's native integration intact.
+  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, realizing one mechanism within each map's native integration.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
@@ -197,8 +196,7 @@ Dense mapping uses signed-distance volumes~\cite{10.1145/237170.237269,6162880,8
 meshes~\cite{schops2020surfelmeshing}, and probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}.
 Gaussian splatting~\cite{10.1145/3592433} supports joint camera tracking, mapping, and rendering in MonoGS and
 SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each of them integrates a measurement in its own way, by weighted
-averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. We keep these
-integrations unchanged and drive all map updates online via shared object states and element lifetimes in the map.
+averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. Our decisions act within these integrations: shared object states decide online which observations each may still integrate.
 
 \vspace{0mm}\noindent\textbf{Dynamic reconstruction.}
 WildGS-SLAM reconstructs static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}. Co-Fusion,
@@ -353,7 +351,7 @@ return are therefore judged by the same rule as changes found after looking away
 \subsection{Reconstruction in Three Representations}
 \label{sec:representations}
 
-Each representation keeps its own integration and applies the shared decisions wherever it uses observations.
+Each representation realizes the shared decisions within its own integration, wherever it uses observations.
 
 \vspace{0mm}\noindent\textbf{TSDF.}
 We restrict projective fusion~\cite{10.1145/237170.237269,6162880} to each depth observation's \emph{valid
@@ -841,8 +839,7 @@ while it adds 2.3\,s and 0.6\,GB over Wavemap.
 \label{sec:conclusion}
 
 We presented \ours, where one object-state transition governs geometry retirement and observation validity within and
-across visits. Valid domains and capture-time keyframes restrict past observations to unchanged surfaces while keeping
-native TSDF, Gaussian, and occupancy integration intact. Across six datasets, \ours beats map-specific baselines,
+across visits. Valid domains and capture-time keyframes restrict past observations to unchanged surfaces, realizing one mechanism within native TSDF, Gaussian, and occupancy integration. Across six datasets, \ours beats map-specific baselines,
 retains unvisited rooms on partial revisits, and keeps history queryable. Modeling non-rigid motion and joint
 segmentation are natural next steps. Code will be published.
 
