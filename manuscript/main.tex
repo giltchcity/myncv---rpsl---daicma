@@ -83,63 +83,20 @@ element lifetimes for queries at any past time.}
 \begin{abstract}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
 layouts. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle isolated cases:
-keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses static walls.
+keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
 queryable history and limits past observations to the states and regions they still describe. Acting on states, not
 voxels, splats, or cells, one method drives TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
-\ours beats the best map-specific baseline (Khronos, GaME, Wavemap) in mesh, object, and change F1 on public
-benchmarks and ours, with up to $2.4\times$ change F1 and +3.9\,dB PSNR. We will release our code and data.
+the proposed \ours beats the best map-specific baseline (Khronos, GaME, Wavemap) in mesh, object, and change F1 score on public
+benchmarks and ours, with up to $2.4\times$ change F1 and +3.9\,dB PSNR. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
 \section{Introduction}
 \label{sec:intro}
 
-The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). Lifelong mapping must therefore maintain one consistent map within and
-across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
-Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
-Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
-Multi-TSDFs~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
-in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
-GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
-overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
-frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
-their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
-behind it. GaME expands removal via historical masks and excludes stale keyframe regions; volumetric
-systems update object submaps and free-space evidence. Each remedy is map-specific, yet the conflict is shared: a past view is invalid for a changed object and remains valid for static surfaces. We therefore
-seek one change decision that governs both geometry and past views across all three map types.
-
-We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
-half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
-states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. Rays in earlier frames
-that hit the armchair stop contributing to the current volume, whereas rays that hit the wall behind it still support
-the wall but stop their free space before the newly arrived sofa. Surface evidence confirms the change from partial
-views and drives both updates within and across visits. \ours carries these states across visits and applies the same
-transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
-
-Public datasets isolate either in-view motion or cross-visit changes. We therefore introduce \emph{ReviScene-bedRoom} and
-\emph{ReviScene-Home}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
-rearrangements, and evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
-Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
-F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
-to 92.6 in Apartment. On the partial revisit of ReviScene-Home, continuing our TSDF map improves mesh F1 by 9.3 points
-over restarting our mapper and 12.6 over restarting Khronos. On Flat and Aria, our Gaussian maps render novel
-views at 0.88 to 3.91\,dB higher PSNR than GaME.
-
-\vspace{0mm}\noindent\textbf{Contributions:}
-\begin{itemize}
-  \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
-  transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
-  \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, while
-  keeping each map's native integration intact.
-  \item \textbf{Joint dynamic benchmark and evaluation:} We release ReviScene-bedRoom and ReviScene-Home, which unite
-  in-view, out-of-view, and cross-visit changes, and demonstrate consistent gains across six datasets.
-\end{itemize}
 
 % ===== BEGIN tables / capabilities =====
 \begin{table*}[t]
@@ -177,6 +134,67 @@ $^{\dagger}$With 3DGS maps.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
+
+The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
+rearrange between visits (\cref{fig:teaser}). Lifelong mapping must therefore maintain one consistent map within and
+across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
+
+Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
+Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
+Multi-TSDFs~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
+in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
+GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
+overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
+frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
+their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
+behind it. GaME expands removal via historical masks and excludes stale keyframe regions; volumetric
+systems update object submaps and free-space evidence. Each remedy is map-specific, yet the conflict is shared: a past view is invalid for a changed object and remains valid for static surfaces. We therefore
+seek one change decision that governs both geometry and past views across all three map types.
+
+
+
+We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
+half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
+states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
+armchair's state ends, we retire its entire surface from the current map, unseen back included. Rays in earlier frames
+that hit the armchair stop contributing to the current volume, whereas rays that hit the wall behind it still support
+the wall but stop their free space before the newly arrived sofa. Surface evidence confirms the change from partial
+views and drives both updates within and across visits. \ours carries these states across visits and applies the same
+transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
+
+Public datasets isolate either in-view motion or cross-visit changes. We therefore introduce \emph{ReviScene-bedRoom} and
+\emph{ReviScene-Home}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
+rearrangements, and evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
+Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
+F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
+to 92.6 in Apartment. On the partial revisit of ReviScene-Home, continuing our TSDF map improves mesh F1 by 9.3 points
+over restarting our mapper and 12.6 over restarting Khronos. On Flat and Aria, our Gaussian maps render novel
+views at 0.88 to 3.91\,dB higher PSNR than GaME.
+
+\vspace{0mm}\noindent\textbf{Contributions:}
+\begin{itemize}
+  \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
+  transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
+  \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
+  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, while
+  keeping each map's native integration intact.
+  \item \textbf{Joint dynamic benchmark and evaluation:} We release ReviScene-bedRoom and ReviScene-Home, which unite
+  in-view, out-of-view, and cross-visit changes, and demonstrate consistent gains across six datasets.
+\end{itemize}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
+\vspace{-4mm}
+\caption{\textbf{State transitions update both geometry and observations.} Incoming RGB-D frames, masks, and poses are
+tested against the retained map: surface see-through evidence ends the absent armchair's state (purple), and consistent
+depth confirms the new sofa (yellow). The update retires the whole armchair, restricts earlier observations to preserve
+the unchanged wall, and adds the sofa across TSDF, Gaussian, and occupancy maps, while element lifetimes support
+historical queries.}
+\label{fig:method}
+\vspace{-4mm}
+\end{figure*}
+
 % ===== END sec / 1_intro =====
 % ===== BEGIN sec / 2_related_work =====
 \section{Related Work}
@@ -247,19 +265,6 @@ transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
 example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and
 the wall stays where it is.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
-\vspace{-4mm}
-\caption{\textbf{State transitions update both geometry and observations.} Incoming RGB-D frames, masks, and poses are
-tested against the retained map: surface see-through evidence ends the absent armchair's state (purple), and consistent
-depth confirms the new sofa (yellow). The update retires the whole armchair, restricts earlier observations to preserve
-the unchanged wall, and adds the sofa across TSDF, Gaussian, and occupancy maps, while element lifetimes support
-historical queries.}
-\label{fig:method}
-\vspace{-4mm}
-\end{figure*}
 
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
 A \emph{state} is one object configuration; masks and associations group its observations, so new views complete its
