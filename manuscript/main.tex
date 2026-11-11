@@ -119,7 +119,7 @@ armchair's state ends, we retire its entire surface from the current map, unseen
 that hit the armchair stop contributing to the current volume, whereas rays that hit the wall behind it still support
 the wall but stop their free space before the newly arrived sofa. Surface evidence confirms the change from partial
 views and drives both updates within and across visits. \ours carries these states across visits and applies the same
-transitions to TSDF, Gaussian, and occupancy maps, so old views can never harm our updated map.
+transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
 
 Public datasets isolate either in-view motion or cross-visit changes. We therefore introduce \emph{ReviScene-bedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
@@ -238,14 +238,15 @@ with surface evidence to update both geometry and past views in the map.
 \section{Method}
 \label{sec:method}
 
-\ours maintains one map within and across visits from posed RGB-D frames with instance masks; semantic masks and
-SAM segments~\cite{Kirillov_2023_ICCV} are handled by front-end adaptation. Poses come from a SLAM system or from
-the dataset, masks from annotations or from a segmenter, and associations link the masks of one object across frames. Each
-change is first judged and then applied to the map (\cref{fig:method}): \emph{change detection} decides from current depth which object states continue, end,
-or begin (\cref{sec:states}), and \emph{map update} applies the decision to the stored geometry and to the
-observations that keep shaping it (\cref{sec:validity}). Both act on object states and on capture times, so one set of
-decisions drives TSDF, Gaussian, and occupancy maps alike (\cref{sec:representations}). One example runs through this
-section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and the wall stays where it is.
+Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
+earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
+frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
+lifetimes and historical observation validity. Given posed RGB-D frames, masks, and associations, \emph{change
+detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
+transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
+each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
+example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and
+the wall stays where it is.
 
 \begin{figure*}[t]
 \centering
@@ -293,10 +294,11 @@ a larger one at the same spot stays in place until its site comes back into view
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$,
-where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. While the object
-is in place, $f_i$ follows a Beta density fitted to earlier in-place rounds and regularized toward pooled
-statistics; after a change, any fraction is equally likely. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
-changed model against the in-place model, with fractions below the in-place mean evaluated at that mean, and let $w_i(j)$ be the share of
+where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
+model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
+after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
+changed model against the in-place model, with fractions clamped between the in-place mean and just below one, as in occupancy
+mapping~\cite{10.1007/s10514-012-9321-0}, and let $w_i(j)$ be the share of
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums this evidence and keeps the candidate change time $j$ with the
 largest total score seen so far,
@@ -306,7 +308,7 @@ largest total score seen so far,
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends once $L_{s,n}>\ln\eta$, with $\eta=99$ following Wald's boundary~\cite{Wald1945}, and see-through
+The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ as in Wald's boundary~\cite{Wald1945}, and see-through
 samples since the chosen $j$ outnumber supported ones. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all candidates within the new visit start at zero.
@@ -357,9 +359,8 @@ elements are thus tested one by one within valid domains. We retire an element w
 supporting ones; on a tie, a current surface right in front, within the surface band and matching in normal, replaces the old copy. Otherwise it remains, occluded geometry included.
 
 \vspace{0mm}\noindent\textbf{Handover across visits.}\label{sec:handoff}
-At the end of a visit we save the map, lifetimes, state summaries, evidence statistics, and observation archives of each representation.
-The next visit resumes in the shared frame, so any change found on return passes the same tests as one found after
-looking away.
+Each revisit resumes the previous map and object-state evidence in a shared coordinate frame. Changes observed on
+return are therefore judged by the same rule as changes found after looking away.
 
 \subsection{Reconstruction in Three Representations}
 \label{sec:representations}
@@ -399,12 +400,12 @@ uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/97
 splats just as in GaME~\cite{Yugay_2026_CVPR}.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
-We integrate with the wavelet representation and clamped log-odds of
-Wavemap~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}. Cells take their states from the masks of the observations
-that measured them, and cells of an ended state retire at once instead of waiting for contradicting rays to clear them.
-Each visit's free-space contribution is stored separately, so where a new object occupies a cell, the prior visit's
-free space is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
-re-measured surfaces, keeping walls from thickening while all other unobserved cells stay in the current map.
+A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
+We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once.
+Each visit starts from a stored map; where the visit's object readings first reach a cell stored as free, its stored
+value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
+re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
+updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
 
 % Keep the expanded result figures close to their corresponding analyses.
@@ -533,7 +534,7 @@ and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -674,7 +675,7 @@ reconstructed background vertices and camera poses. We assess absence from new d
 and apply a confirmed change to its full geometry. Valid domains also stop earlier free space at new objects, so old
 observations do not carve away newly added geometry, raising precision and recall together. Panoptic Multi-TSDFs
 compares whole submaps against active ones and marks a submap absent when enough points conflict: on 3RScan, its change
-F1 is 44.6 versus our 80.5. Continuing the map also pays off on partial revisits: on ReviScene-Home Visit~B, our continued TSDF
+F1 is 44.6 versus our 80.5 and Khronos's 73.3. Continuing the map also pays off on partial revisits: on ReviScene-Home Visit~B, our continued TSDF
 map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 above a fresh restart of Khronos (see the
 supplement).
 
