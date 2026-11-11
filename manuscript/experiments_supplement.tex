@@ -122,7 +122,7 @@ cells are retained.
 
 Figure~\ref{fig:supp_dataset_overview} shows representative changes from our real and simulated sequences.
 
-\paragraph{ReviScene-bedRoom.}
+\paragraph{ReviScene-BedRoom.}
 We record three Azure Kinect visits to one room over nearly two weeks, capturing motion during mapping
 and changes between visits. The visits contain 4,003, 4,041, and 7,216 RGB-D frames (15,260 total) at
 1920$\times$1080 and 30\,Hz. Depth is aligned to RGB; camera poses are estimated with
@@ -211,7 +211,7 @@ Figures~\ref{fig:supp_sim_stages_1} and~\ref{fig:supp_sim_stages_2} show success
 \centering\begingroup
 \setlength{\unitlength}{\dimexpr\linewidth/500\relax}
 \begin{picture}(500,574)
-\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Home}}
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries Home}}
 \put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont First visit and return}}
 \put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
 \put(0,525){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
@@ -241,7 +241,7 @@ Figures~\ref{fig:supp_sim_stages_1} and~\ref{fig:supp_sim_stages_2} show success
 \centering\begingroup
 \setlength{\unitlength}{\dimexpr\linewidth/500\relax}
 \begin{picture}(500,574)
-\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Home}}
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries Home}}
 \put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont Second visit}}
 \put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
 \put(0,525){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
@@ -295,7 +295,7 @@ visits and evaluate novel-view rendering after updating the map.
 \section{Evaluation Protocol}
 
 \paragraph{Visit chains and geometry.}
-ReviScene-bedRoom contains visits A, B, and C; ReviScene-Home and Flat contain visits A and B.
+BedRoom contains visits A, B, and C; Home and Flat contain visits A and B.
 Each method continues through the chain using its own map updates. Panoptic Mapping loads the preceding
 visit's map through its native interface. We evaluate mesh F1 at the end of each visit; the final-visit Gaussian scores use the refined maps. The real-room reference is a reconstructed surface at 1\,cm resolution,
 restricted to the room. The synthetic reference consists of ground-truth surfaces observed up to the evaluation
@@ -312,7 +312,7 @@ from scratch with our continuously updated maps.
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}l*{8}{r}@{}}
 \toprule
-F1$\uparrow$ & \multicolumn{3}{c}{ReviScene-bedRoom} & \multicolumn{2}{c}{ReviScene-Home} & \multicolumn{2}{c}{Flat} & 3RScan \\
+F1$\uparrow$ & \multicolumn{3}{c}{BedRoom} & \multicolumn{2}{c}{Home} & \multicolumn{2}{c}{Flat} & 3RScan \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
 Method & A & B & C & A & B & A & B & Mean \\ \midrule
 Khronos & 90.9 & 88.9 & 87.7 & 93.6 & 93.1 & 86.0 & 86.9 & 88.8 \\
@@ -341,7 +341,7 @@ Ours (Occ.) & 87.9 & 89.1 & 91.0 & 92.4 & 94.2 & 79.5 & 82.4 & 79.4 \\
 \toprule
 & & & \multicolumn{3}{c}{Native restart} & \multicolumn{3}{c}{Ours, continued} \\ \cmidrule(lr){4-6}\cmidrule(lr){7-9}
 Dataset & Map & Visit & P & R & F1 & P & R & F1 \\ \midrule
-ReviScene-bedRoom & TSDF & A & 85.62 & 96.87 & 90.90 & 93.22 & 95.94 & 94.56 \\
+BedRoom & TSDF & A & 85.62 & 96.87 & 90.90 & 93.22 & 95.94 & 94.56 \\
  & TSDF & B & 93.71 & 98.28 & 95.94 & 94.93 & 97.47 & 96.18 \\
  & TSDF & C & 91.33 & 98.62 & 94.83 & 93.62 & 98.81 & 96.14 \\
  & 3DGS & A & 95.53 & 91.00 & 93.21 & 95.98 & 91.19 & 93.52 \\
@@ -351,7 +351,7 @@ ReviScene-bedRoom & TSDF & A & 85.62 & 96.87 & 90.90 & 93.22 & 95.94 & 94.56 \\
  & Occupancy & B & 86.79 & 90.84 & 88.77 & 85.44 & 93.10 & 89.11 \\
  & Occupancy & C & 82.41 & 96.66 & 88.97 & 84.72 & 98.36 & 91.03 \\
 \midrule
-ReviScene-Home & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
+Home & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
  & TSDF & B & 98.10 & 77.57 & 86.63 & 99.80 & 98.66 & 99.23 \\
  & 3DGS & A & 94.02 & 95.85 & 94.92 & 97.01 & 98.49 & 97.74 \\
  & 3DGS & B & 93.30 & 78.72 & 85.39 & 97.15 & 95.99 & 96.57 \\
@@ -385,7 +385,7 @@ The same export rule is used for a representation's native and proposed updates.
 exports declare appearances; the exporter does not infer movement by counting closed states.
 
 \paragraph{Inputs and native baselines.}
-Khronos receives annotated instances on ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan. ReviScene-bedRoom and 3RScan instance tracking uses the supplied identities, while synthetic
+Khronos receives annotated instances on BedRoom, Home, Flat, and 3RScan. BedRoom and 3RScan instance tracking uses the supplied identities, while synthetic
 tracking uses mask overlap. Panoptic uses
 5\,cm object and background resolution for the synthetic apartment, the real room, and 3RScan.
 GaME and Wavemap continue with their native updates as baselines. The GaME 3RScan run uses its
@@ -467,19 +467,19 @@ The official evaluator omits queries with zero true positives from the F1 averag
 \toprule
 & & Background & Static objects & Dynamic objects & Changes & Mesh \\
 Scene & Method & F1 & F1 & F1 & F1 & F1 \\ \midrule
-ReviScene-bedRoom A & Khronos & 80.6 & 94.3 & -- & 54.2 & 90.9 \\
+BedRoom A & Khronos & 80.6 & 94.3 & -- & 54.2 & 90.9 \\
  & Ours & 84.6 & 96.4 & 96.0 & 97.0 & 94.6 \\
 \midrule
-ReviScene-bedRoom B & Khronos & 86.6 & 92.4 & 28.2 & 42.0 & 95.9 \\
+BedRoom B & Khronos & 86.6 & 92.4 & 28.2 & 42.0 & 95.9 \\
  & Ours & 87.7 & 95.9 & 88.4 & 66.7 & 97.4 \\
 \midrule
-ReviScene-bedRoom C & Khronos & 86.7 & 84.1 & 3.3 & 46.0 & 94.8 \\
+BedRoom C & Khronos & 86.7 & 84.1 & 3.3 & 46.0 & 94.8 \\
  & Ours & 88.9 & 93.3 & 97.0 & 85.7 & 97.0 \\
 \midrule
-ReviScene-Home A & Khronos & 77.0 & 69.5 & 0.9 & 63.5 & 93.6 \\
+Home A & Khronos & 77.0 & 69.5 & 0.9 & 63.5 & 93.6 \\
  & Ours & 92.1 & 77.0 & 73.6 & 71.3 & 99.2 \\
 \midrule
-ReviScene-Home B & Khronos & 63.8 & 68.5 & 27.4 & 43.7 & 86.6 \\
+Home B & Khronos & 63.8 & 68.5 & 27.4 & 43.7 & 86.6 \\
  & Ours & 77.1 & 77.9 & 73.9 & 59.2 & 89.9 \\
 \bottomrule
 \end{tabular}
@@ -507,7 +507,7 @@ reference and therefore differs from the historical background score.
 
 \paragraph{Main-comparison sequences.}
 \Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs used for the
-mapping comparison with instance masks on ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan. These results complement the shared
+mapping comparison with instance masks on BedRoom, Home, Flat, and 3RScan. These results complement the shared
 geometry, object, and change metrics in the main comparison.
 
 \paragraph{Flat and Aria.}
@@ -522,9 +522,9 @@ The Flat and Aria held-out results are repeated in \cref{tab:supp_additional_ren
 \toprule
 Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$\\
 \midrule
-ReviScene-bedRoom & GaME & 18.22 & 0.758 & 0.454 & 6.03\\
+BedRoom & GaME & 18.22 & 0.758 & 0.454 & 6.03\\
  & Ours & 19.90 & 0.811 & 0.370 & 4.96\\
-ReviScene-Home & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
+Home & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
  & Ours & 24.90 & 0.824 & 0.215 & 15.32\\
 Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
  & Ours & 28.43 & 0.955 & 0.107 & 0.41\\
@@ -660,14 +660,14 @@ On (full) & 99.2 & 99.2 & 83.6 & 97.9 \\
 Off & 98.0 & 98.4 & 83.4 & 82.8 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Valid domains on ReviScene-Home (TSDF).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
+\caption{\textbf{Valid domains on Home (TSDF).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
 \label{tab:supp_valid_domains}
 \end{table}
 
 \paragraph{Valid domains.}
 With valid domains off, every archived frame contributes its full ray, and state changes no longer rebuild voxel
 blocks; all other components stay unchanged. \Cref{tab:supp_valid_domains} compares both settings for TSDF maps on
-ReviScene-Home, where objects also move during visits. Change F1 falls from 97.9 to 82.8 (true positives, false
+Home, where objects also move during visits. Change F1 falls from 97.9 to 82.8 (true positives, false
 positives, and false negatives change from 69/0/3 to 53/3/19). Mesh F1 falls by 1.2 and 0.8 points after visits A
 and B; in visit A, precision and recall drop by 0.55 and 1.81 points. Two effects cause the drop. Frames that saw a
 moved object at its old site fuse it back: for changes after looking away, the mean residual at the old site rises
@@ -689,7 +689,7 @@ where all changes occur between visits, both settings give identical mesh, objec
 & & \multicolumn{3}{c}{TSDF} & \multicolumn{2}{c}{3D Gaussians} & \multicolumn{2}{c}{Occupancy}\\[3pt]
 & Image & Khronos & Panoptic & Ours & GaME & Ours & Wavemap & Ours\\[3pt]
 % 1_real_05320 [165, 72, 615, 522]
-\rotatebox{90}{ReviScene-bedRoom} &
+\rotatebox{90}{BedRoom} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png} &
@@ -699,7 +699,7 @@ where all changes occur between visits, both settings give identical mesh, objec
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/7_ours_occ.png}\\[2pt]
 % 2_real_02540 [105, 80, 550, 525]
-\rotatebox{90}{ReviScene-bedRoom} &
+\rotatebox{90}{BedRoom} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/privacy/face_redacted_5.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png} &
@@ -709,7 +709,7 @@ where all changes occur between visits, both settings give identical mesh, objec
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png}\\[2pt]
 % 3_sim_02850 [150, 15, 580, 445]
-\rotatebox{90}{ReviScene-Home} &
+\rotatebox{90}{Home} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/0_image.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/2_panoptic.png} &
@@ -719,7 +719,7 @@ where all changes occur between visits, both settings give identical mesh, objec
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/7_ours_occ.png}\\[2pt]
 % 10_sim_03080 [100, 0, 580, 480]
-\rotatebox{90}{ReviScene-Home} &
+\rotatebox{90}{Home} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png} &
@@ -751,7 +751,7 @@ where all changes occur between visits, both settings give identical mesh, objec
 \end{tabular}\endgroup
 \caption{\textbf{Scene updates across three representations.} Six views from the real room, synthetic apartment,
 and Flat, with each method rendered at the image pose. Each row uses the same square crop and scale across methods.
-TSDF and occupancy use reference colors. ReviScene-bedRoom occupancy panels use the capture-time maps; other panels
+TSDF and occupancy use reference colors. BedRoom occupancy panels use the capture-time maps; other panels
 use final maps. Occupancy is visualized at 2\,cm resolution.}
 \label{fig:qualitative}
 \end{figure*}
