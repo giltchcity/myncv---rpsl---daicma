@@ -404,14 +404,13 @@ pixels with valid measured depth in both methods.
 
 \paragraph{Evidence and state comparison.}
 Surface tolerance follows the map resolution, with a 5\,cm reference scale for Gaussians.
-The $60^\circ$ incidence filter and minimum of $\min(30,\nu_{\mathrm{rel}})$
-judged samples apply to noisy real-world depth observations, as described in the main paper.
+The $60^\circ$ incidence filter applies to noisy real-world depth, and the minimum of
+$\min(30,\nu_{\mathrm{rel}})$ judged samples applies to every round, as described in the main paper.
 We report threshold sensitivity for $\eta\in\{9,99,999\}$ below.
 
 Sparse in-place histories use pooled statistics; object-specific moments are
 shrunk toward that pool, with a variance floor and a minimum Beta concentration
-to prevent a degenerate density. Fractions below the fitted mean are evaluated
-at the mean before computing the log-density ratio.
+to prevent a degenerate density. Fractions are clamped between the fitted mean and just below one before computing the log-density ratio.
 
 Persistence is estimated from unchanged and moved outcomes using a Beta prior
 from the object's class, with the class estimate smoothed toward its mobility group.

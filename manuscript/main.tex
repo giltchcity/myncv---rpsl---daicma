@@ -89,7 +89,7 @@ confirmed by surface-coverage evidence from partial views. It retires ended geom
 queryable history and limits past observations to the states and regions they still describe. Acting on states, not
 voxels, splats, or cells, one method drives TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
 the proposed \ours beats the best map-specific baseline (Khronos, GaME, Wavemap) in mesh, object, and change F1 score on public
-benchmarks and ours, with up to $2.4\times$ change F1 and +3.9\,dB PSNR. We will release the code and data.
+benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.9\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -153,7 +153,8 @@ seek one change decision that governs both geometry and past views across all th
 
 
 
-We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
+Given posed RGB-D frames, masks, and associations, we treat every discrete scene change as a transition of \emph{object
+state}. An object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
 armchair's state ends, we retire its entire surface from the current map, unseen back included. Rays in earlier frames
@@ -302,8 +303,7 @@ A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}}
 where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of this budget, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
 model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
 after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
-changed model against the in-place model, with fractions clamped between the in-place mean and just below one, as in occupancy
-mapping~\cite{10.1007/s10514-012-9321-0}, and let $w_i(j)$ be the share of
+changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}, and let $w_i(j)$ be the share of
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums this evidence and keeps the candidate change time $j$ with the
 largest total score seen so far,
@@ -316,13 +316,13 @@ patch adds no coverage, and the maximum over $j$ lets a later candidate reuse sa
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ as in Wald's boundary~\cite{Wald1945}, and see-through
 samples since the chosen $j$ outnumber supported ones. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
-Beta smoothing; all candidates within the new visit start at zero.
+Beta smoothing; all later candidates start at zero.
 
 \vspace{0mm}\noindent\textbf{Successors.}
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
-\emph{successor} once the old site lacks current support. For states carried across visits, persistence and candidate
+\emph{successor} once no sample at the old site is supported. For states carried across visits, persistence and candidate
 history also count. The successor starts a new state and ends the earlier one, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive.
@@ -391,8 +391,9 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Frames are archived as depth images with their masks. When a decision changes the valid domains of a voxel block, the
-block rebuilds from the archived frames that observed it, in capture order; this archive and rebuild are the cost of
+Frames of the current visit are archived in compressed form, and earlier visits persist through the map. When a decision
+changes the valid domains of a voxel block, the voxels whose updates change are refolded from the archived frames, in
+capture order; this archive and rebuild are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and object meshes are extracted with the
 procedure of Khronos~\cite{Schmid-RSS-24}.
@@ -407,8 +408,7 @@ splats just as in GaME~\cite{Yugay_2026_CVPR}.
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once.
-Each visit starts from a stored map; where the visit's object readings first reach a cell stored as free, its stored
-value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
+Each visit starts from a stored map; where the visit's object readings first reach a cell stored as free, the cell's stored log-odds value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
 re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
@@ -435,7 +435,7 @@ updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. \\
 \midrule
  & Khronos~\cite{Schmid-RSS-24} & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
- & Panoptic~\cite{9811877} & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
+  & Panoptic Mapping~\cite{9811877} & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
 \multirow{-3}{*}{TSDF} & \oursname & \ob{96.1} & \ob{96.6} & \ob{98.4} & \ob{99.2} & \ob{83.6} & \ob{97.9} & \ob{90.1} & \ob{50.7} & \ob{76.5} & \ob{91.8} & \ob{68.6} & \ob{80.5} \\
 \midrule
  & GaME~\cite{Yugay_2026_CVPR} & 88.6 & 76.9 & 96.7 & 80.9 & 72.6 & 82.9 & 86.2 & 65.2 & 76.5 & 85.9 & 77.5 & 87.8 \\
@@ -523,14 +523,13 @@ unseen. The two visits contain 72 change events (38 within visits and 34 between
 \label{sec:experiments}
 
 \noindent\textbf{Datasets.}
-Besides ReviScene (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877}, a simulated
-apartment, eight real-world rooms from 3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}. For changes
+Besides ReviScene (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877} (a simulated apartment), eight real-world rooms from 3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}. For changes
 within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite{Schmid-RSS-24}.
 
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
+occupancy. POCD, CL-Splats, and GaussianUpdate have no complete public implementation. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
 ORB-SLAM3 poses on ReviScene-bedRoom~\cite{9440682}; TESSE and Flat/Aria rendering use the released poses
 and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively.
 
@@ -563,7 +562,7 @@ changes.
 \rmfamily\fontsize{8}{9}\selectfont%
 \setlength{\unitlength}{\dimexpr\linewidth/629\relax}%
 \begin{picture}(629,534)%
-\put(64,524){\makebox(0,0){Panoptic~\cite{9811877}}}%
+\put(64,524){\makebox(0,0){Panoptic Mapping~\cite{9811877}}}%
 \put(167,524){\makebox(0,0){Khronos~\cite{Schmid-RSS-24}}}%
 \put(270,524){\makebox(0,0){Wavemap~\cite{Reijgwart-RSS-23}}}%
 \put(373,524){\makebox(0,0){GaME~\cite{Yugay_2026_CVPR}}}%
