@@ -58,7 +58,9 @@
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
 \def\confName{CVPR}
 \def\confYear{2027}
-\title{DynaState: Unified Dynamic Mapping within and across Visits}
+\title{REEL:
+Unified 4D Mapping of Evolving Scenes Within and Across Visits and Representations}
+% Revisiting Evolving Environments with Lifelong Maps
 \author{Anonymous Authors}
 \begin{document}
 \maketitle
@@ -104,11 +106,10 @@ Multi-TSDFs~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persi
 in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
 GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
 overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
-frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed in its spot, and
+frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
 behind it. GaME expands removal via historical masks and excludes stale keyframe regions; volumetric
-systems update object submaps and free-space evidence. Each remedy is specific to one map type, yet the conflict
-is shared: a past view is invalid for a changed object yet stays valid for static surfaces. We therefore
+systems update object submaps and free-space evidence. Each remedy is map-specific, yet the conflict is shared: a past view is invalid for a changed object and remains valid for static surfaces. We therefore
 seek one change decision that governs both geometry and past views across all three map types.
 
 We treat every discrete scene change as a transition of \emph{object state}. An object holds one configuration over a
@@ -448,11 +449,11 @@ representation (bold).}
 \end{table*}
 % ===== END tables / main_results =====
 
-\section{The DynaState Benchmark}
+\section{The ReviScene Benchmark}
 \label{sec:benchmark}
 
 Public datasets offer either motion within a run or changes between scans, never both. We therefore record
-\emph{DynaState-Real} (Real) and render \emph{DynaState-Sim} (Sim), in which objects move while observed, change after
+\emph{ReviScene-bedRoom} (Real) and render \emph{ReviScene-Apartment} (Sim), in which objects move while observed, change after
 the camera looks away, and rearrange between visits (\cref{fig:dataset_changes}).
 
 % ===== BEGIN figures / dataset_overview_main =====
@@ -516,7 +517,7 @@ unseen. The two visits contain 72 change events (38 within visits and 34 between
 \label{sec:experiments}
 
 \noindent\textbf{Datasets.}
-Besides DynaState (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877}, a simulated
+Besides ReviScene (\cref{sec:benchmark}), we evaluate changes across visits on Flat~\cite{9811877}, a simulated
 apartment, eight real-world rooms from 3RScan~\cite{9010673}, and Aria recordings~\cite{Yugay_2026_CVPR}. For changes
 within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite{Schmid-RSS-24}.
 
