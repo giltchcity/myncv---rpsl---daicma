@@ -83,9 +83,8 @@ layouts. Objects move in view, shift out of view, and rearrange across visits, y
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, not
-voxels, splats, or cells, one method drives TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
-the proposed \ours beats the best map-specific baseline (Khronos, GaME, Wavemap) in mesh, object, and change F1 score on public
+queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one method drives TSDF, 3D Gaussian, and occupancy maps alike. In each map type,
+the proposed \ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 score on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -112,7 +111,7 @@ POCD~\cite{Qian-RSS-22} & TSDF & \capno & \capyes & \capyes & \cappart & \capno 
 Khronos~\cite{Schmid-RSS-24} & TSDF & \capyes & \cappart & \cappart & \capno & \capyes & \capno \\
 \addlinespace[2pt]
 CL-Splats~\cite{Ackermann_2025_ICCV} & 3DGS & \capno & \cappart & \capyes & \cappart & \capyes & \capyes \\
-GaussianUpdate~\cite{Zeng_2025_ICCV} & 3DGS & \capno & \cappart & \capyes & \cappart & \cappart & \capyes \\
+GaussianUpdate~\cite{Zeng_2025_ICCV} & 3DGS & \capno & \cappart & \capyes & \cappart & \capyes & \capyes \\
 GaME~\cite{Yugay_2026_CVPR} & 3DGS & \capno & \cappart & \cappart & \cappart & \capno & \capyes \\
 \addlinespace[2pt]
 Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \capno & \capno & \capno \\
@@ -123,8 +122,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \end{tabular}
 \caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; 3DGS: 3D Gaussian
 splatting. \emph{In view}: detects moving objects and reconstructs them once settled (\cappart{}: overwrites cells
-only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts or across visits
-only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
+only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts, or whole objects across visits only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
 states). \emph{Observation validity}: restricts past observations per state and region (\cappart{}: freezes submaps or
 drops/masks keyframes). \emph{Historical queries}: queries the map at past times (\cappart{}: keeps undated objects).
 $^{\dagger}$With 3DGS maps.}
@@ -133,8 +131,7 @@ $^{\dagger}$With 3DGS maps.}
 % ===== END tables / capabilities =====
 
 The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). Lifelong mapping must therefore maintain one consistent map within and
-across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
+rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
@@ -271,8 +268,7 @@ at $t$,
   \label{eq:map_at_t}
 \end{equation}
 Ending a state ends the lifetimes of its elements: the armchair leaves $\mathcal{M}(t)$ for later times and stays
-in it for earlier ones. An element added to a continuing state inherits that state's start, not its own
-allocation time.
+in it for earlier ones. An element added to a continuing state inherits that state's start, not its own allocation time: the armchair's back existed before the camera saw it.
 
 \subsection{Change Detection}
 \label{sec:states}
@@ -307,7 +303,7 @@ largest total score seen so far,
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ set from a 1\% error budget~\cite{Wald1945}, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$. On a revisit, only the candidate spanning the gap between visits
+samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -315,7 +311,7 @@ Beta smoothing; all later candidates start at zero.
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
-\emph{successor} once no sample at the old site is supported. For states carried across visits, persistence and candidate
+\emph{successor} once no sample at the old site is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. The successor starts a new state and ends the earlier one, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive.
@@ -673,7 +669,7 @@ supplement).
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
 GaME detects change from rendering conflicts, which can miss parts of a moved object, and keeps a keyframe until most of an object mask is stale, so the remaining stale pixels can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with ground-truth masks: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
