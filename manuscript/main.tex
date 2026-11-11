@@ -333,7 +333,7 @@ observations reconstruct the sofa and any successor, and continuing states keep 
 \vspace{0mm}\noindent\textbf{Valid observation contributions.}
 Each earlier observation keeps contributing to the states and regions it still describes, and to nothing else. For
 depth fusion the restriction is spatial: a ray keeps its surface band and the free space in front of it only up to
-the first object that arrived later (\cref{eq:domain}). For Gaussian optimization it is temporal.
+the first object that arrived later (\cref{eq:domain}). For Gaussian optimization it is temporal. No pixel or ray is tested for staleness: the state decisions alone decide where an old observation still applies.
 
 \vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
