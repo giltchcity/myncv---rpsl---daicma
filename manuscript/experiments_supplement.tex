@@ -623,17 +623,17 @@ observes a Gaussian whose lifetime later ends, and a rejected draw is replaced t
 budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
 geometry retirement, and the two variants start from the same saved visit-A map as Full.
-Unrestricted old-frame reuse reduces PSNR by 4.94\,dB. Allowing this only during refinement is as harmful
+Unrestricted old-frame reuse reduces PSNR by 5.74\,dB. Allowing this only during refinement is as harmful
 (22.78\,dB).
 First-visit rejection applies the test only to visit-A keyframes that observe at least 50 pixels of ended geometry.
-Discarding only the first-visit keyframes that meet this condition costs nothing (27.78\,dB), so the loss comes
+Discarding only the first-visit keyframes that meet this condition costs 0.65\,dB (27.78\,dB), so most of the loss comes
 from the current-visit keyframes: a second-visit keyframe that sees the empty floor is the very evidence that ends the
 stale Gaussians, and whole-frame rejection then discards it, which leaves the changed region under-constrained.
 
 \paragraph{Map-time selection and association.}
 The map-time variant changes the rendered map time for old frames while retaining the existing frame
 selection and trainable-element restrictions. Evaluating old keyframes on the
-current map rather than on the map at their capture time changes PSNR by 0.20\,dB. Capture-time evaluation preserves
+current map rather than on the map at their capture time lowers PSNR by 0.60\,dB. Capture-time evaluation preserves
 historical reconstructions at comparable current-view quality.
 The geometry-only association variant yields 89.98 mesh F1 and 28.14\,dB. These variants retain the
 other mechanisms that constrain reconstruction; the unrestricted-frame experiment removes the old-observation
@@ -641,15 +641,15 @@ constraints as a whole.
 
 \paragraph{Masks and association.}
 Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
-28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 and PSNR
-unchanged (89.9 and 27.56\,dB) but lower object F1 to 42.2 and change F1 to 72.7: three events are missed and none
+28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 nearly unchanged (89.9) but lower PSNR to 27.56\,dB,
+object F1 to 42.2, and change F1 to 72.7: three events are missed and none
 is invented, so segmentation errors cost completeness at the object level without corrupting the map.
 
 OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5; predicted instances are associated
 across frames before reconstruction.
 
 \paragraph{Thresholds and priors.}
-Thresholds $\eta\in\{9,99,999\}$ yield 27.63--27.81\,dB and differ by at most one detected event, and fixed
+Thresholds $\eta\in\{9,99,999\}$ yield 27.67--28.43\,dB and differ by at most one detected event, and fixed
 revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one event.
 
 \section{Qualitative Comparisons}
