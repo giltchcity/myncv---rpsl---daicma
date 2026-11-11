@@ -195,7 +195,7 @@ Figures~\ref{fig:supp_real_stages_1} and~\ref{fig:supp_real_stages_2} show seven
 \end{figure*}
 % ===== END figures / real_stages_original =====
 
-\paragraph{ReviScene-Apartment.}
+\paragraph{ReviScene-Home.}
 We animate objects and camera trajectories in InteriorAgent's kujiale\_0021 apartment~\cite{InteriorAgent2025}
 and capture two visits in Isaac Sim. The visits share a world coordinate frame and contain 4,186 and
 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export ground-truth camera poses, semantic and
@@ -211,7 +211,7 @@ Figures~\ref{fig:supp_sim_stages_1} and~\ref{fig:supp_sim_stages_2} show success
 \centering\begingroup
 \setlength{\unitlength}{\dimexpr\linewidth/500\relax}
 \begin{picture}(500,574)
-\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Apartment}}
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Home}}
 \put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont First visit and return}}
 \put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
 \put(0,525){\makebox(0,0)[l]{\color[HTML]{795BA1}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
@@ -241,7 +241,7 @@ Figures~\ref{fig:supp_sim_stages_1} and~\ref{fig:supp_sim_stages_2} show success
 \centering\begingroup
 \setlength{\unitlength}{\dimexpr\linewidth/500\relax}
 \begin{picture}(500,574)
-\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Apartment}}
+\put(0,565){\makebox(0,0)[l]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont \bfseries ReviScene-Home}}
 \put(500,565){\makebox(0,0)[r]{\color[HTML]{263344}\fontsize{9}{10.2}\selectfont Second visit}}
 \put(0,552){\color[HTML]{B8C3CE}\rule{500\unitlength}{0.5pt}}
 \put(0,525){\makebox(0,0)[l]{\color[HTML]{31799A}\fontsize{9}{10.2}\selectfont \textbf{01}\quad Initial layout}}
@@ -295,7 +295,7 @@ visits and evaluate novel-view rendering after updating the map.
 \section{Evaluation Protocol}
 
 \paragraph{Visit chains and geometry.}
-ReviScene-bedRoom contains visits A, B, and C; ReviScene-Apartment and Flat contain visits A and B.
+ReviScene-bedRoom contains visits A, B, and C; ReviScene-Home and Flat contain visits A and B.
 Each method continues through the chain using its own map updates. Panoptic Multi-TSDFs loads the preceding
 visit's map through its native interface. We evaluate mesh F1 at the end of each visit; the final-visit Gaussian scores use the refined maps. The real-room reference is a reconstructed surface at 1\,cm resolution,
 restricted to the room. The synthetic reference consists of ground-truth surfaces observed up to the evaluation
@@ -312,7 +312,7 @@ from scratch with our continuously updated maps.
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}l*{8}{r}@{}}
 \toprule
-F1$\uparrow$ & \multicolumn{3}{c}{ReviScene-bedRoom} & \multicolumn{2}{c}{ReviScene-Apartment} & \multicolumn{2}{c}{Flat} & 3RScan \\
+F1$\uparrow$ & \multicolumn{3}{c}{ReviScene-bedRoom} & \multicolumn{2}{c}{ReviScene-Home} & \multicolumn{2}{c}{Flat} & 3RScan \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
 Method & A & B & C & A & B & A & B & Mean \\ \midrule
 Khronos & 90.9 & 88.9 & 87.7 & 93.6 & 93.1 & 86.0 & 86.9 & 88.8 \\
@@ -351,7 +351,7 @@ ReviScene-bedRoom & TSDF & A & 85.62 & 96.87 & 90.90 & 93.22 & 95.94 & 94.56 \\
  & Occupancy & B & 86.79 & 90.84 & 88.77 & 85.44 & 93.10 & 89.11 \\
  & Occupancy & C & 82.41 & 96.66 & 88.97 & 84.72 & 98.36 & 91.03 \\
 \midrule
-ReviScene-Apartment & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
+ReviScene-Home & TSDF & A & 98.38 & 89.33 & 93.64 & 99.74 & 98.63 & 99.18 \\
  & TSDF & B & 98.10 & 77.57 & 86.63 & 99.80 & 98.66 & 99.23 \\
  & 3DGS & A & 94.02 & 95.85 & 94.92 & 97.01 & 98.49 & 97.74 \\
  & 3DGS & B & 93.30 & 78.72 & 85.39 & 97.15 & 95.99 & 96.57 \\
@@ -385,7 +385,7 @@ The same export rule is used for a representation's native and proposed updates.
 exports declare appearances; the exporter does not infer movement by counting closed states.
 
 \paragraph{Inputs and native baselines.}
-Khronos receives annotated instances on ReviScene-bedRoom, ReviScene-Apartment, and 3RScan; its Flat run
+Khronos receives annotated instances on ReviScene-bedRoom, ReviScene-Home, and 3RScan; its Flat run
 uses semantic input. ReviScene-bedRoom and 3RScan instance tracking uses the supplied identities, while synthetic
 tracking uses mask overlap. Panoptic uses
 5\,cm object and background resolution for the synthetic apartment, the real room, and 3RScan.
@@ -478,10 +478,10 @@ ReviScene-bedRoom B & Khronos & 86.6 & 92.4 & 28.2 & 42.0 & 95.9 \\
 ReviScene-bedRoom C & Khronos & 86.7 & 84.1 & 3.3 & 46.0 & 94.8 \\
  & Ours & 88.9 & 93.3 & 97.0 & 85.7 & 97.0 \\
 \midrule
-ReviScene-Apartment A & Khronos & 77.0 & 69.5 & 0.9 & 63.5 & 93.6 \\
+ReviScene-Home A & Khronos & 77.0 & 69.5 & 0.9 & 63.5 & 93.6 \\
  & Ours & 92.1 & 77.0 & 73.6 & 71.3 & 99.2 \\
 \midrule
-ReviScene-Apartment B & Khronos & 63.8 & 68.5 & 27.4 & 43.7 & 86.6 \\
+ReviScene-Home B & Khronos & 63.8 & 68.5 & 27.4 & 43.7 & 86.6 \\
  & Ours & 77.1 & 77.9 & 73.9 & 59.2 & 89.9 \\
 \bottomrule
 \end{tabular}
@@ -509,7 +509,7 @@ reference and therefore differs from the historical background score.
 
 \paragraph{Main-comparison sequences.}
 \Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs used for the
-mapping comparison with instance masks on ReviScene-bedRoom, ReviScene-Apartment, Flat, and 3RScan. These results complement the shared
+mapping comparison with instance masks on ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan. These results complement the shared
 geometry, object, and change metrics in the main comparison.
 
 \paragraph{Flat and Aria.}
@@ -526,7 +526,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \midrule
 ReviScene-bedRoom & GaME & 18.22 & 0.758 & 0.454 & 6.03\\
  & Ours & 19.90 & 0.811 & 0.370 & 4.96\\
-ReviScene-Apartment & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
+ReviScene-Home & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
  & Ours & 24.90 & 0.824 & 0.215 & 15.32\\
 Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
  & Ours & 27.64 & 0.947 & 0.117 & 0.47\\
@@ -683,7 +683,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png}\\[2pt]
 % 3_sim_02850 [150, 15, 580, 445]
-\rotatebox{90}{ReviScene-Apartment} &
+\rotatebox{90}{ReviScene-Home} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/0_image.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/2_panoptic.png} &
@@ -693,7 +693,7 @@ revisit priors of $1/4$, $1/2$, and $3/4$ match the learned prior within one eve
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/6_wavemap.png} &
 \includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/7_ours_occ.png}\\[2pt]
 % 10_sim_03080 [100, 0, 580, 480]
-\rotatebox{90}{ReviScene-Apartment} &
+\rotatebox{90}{ReviScene-Home} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png} &
