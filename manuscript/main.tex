@@ -110,8 +110,8 @@ Panoptic Mapping~\cite{9811877} & TSDF & \capno & \capyes & \capyes & \cappart &
 POCD~\cite{Qian-RSS-22} & TSDF & \capno & \capyes & \capyes & \cappart & \capno & \capno \\
 Khronos~\cite{Schmid-RSS-24} & TSDF & \capyes & \capyes & \cappart & \capno & \capyes & \capno \\
 \addlinespace[2pt]
-CL-Splats~\cite{Ackermann_2025_ICCV} & 3DGS & \capno & \cappart & \capyes & \cappart & \capyes & \capyes \\
-GaussianUpdate~\cite{Zeng_2025_ICCV} & 3DGS & \capno & \cappart & \capyes & \cappart & \capyes & \capyes \\
+CL-Splats~\cite{Ackermann_2025_ICCV} & 3DGS & \capno & \capno & \capyes & \cappart & \capyes & \capyes \\
+GaussianUpdate~\cite{Zeng_2025_ICCV} & 3DGS & \capno & \capno & \capyes & \cappart & \capyes & \capyes \\
 GaME~\cite{Yugay_2026_CVPR} & 3DGS & \capno & \capyes & \cappart & \cappart & \capno & \capyes \\
 \addlinespace[2pt]
 Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \capno & \capno & \capno \\
@@ -122,7 +122,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \end{tabular}
 \caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; 3DGS: 3D Gaussian
 splatting. \emph{In view}: detects moving objects and reconstructs them once settled (\cappart{}: overwrites cells
-only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts, or whole objects across visits only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
+only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
 states). \emph{Observation validity}: restricts past observations per state and region (\cappart{}: freezes submaps or
 drops/masks keyframes). \emph{Historical queries}: queries the map at past times (\cappart{}: keeps undated objects).
 $^{\dagger}$With 3DGS maps.}
@@ -246,7 +246,7 @@ with surface evidence to update both geometry and past views in the map.
 Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames and instance masks with identities consistent across frames and visits, \emph{change
+lifetimes and historical observation validity. Given posed RGB-D frames and instance masks linked across frames, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
@@ -373,7 +373,7 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Each visit fuses and archives only its own frames; earlier visits enter as surfaces without the free space that could carve objects arriving since. When a decision
+Each visit fuses and archives only its own frames in compressed form; earlier visits enter as surfaces without the free space that could carve objects arriving since. When a decision
 changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from archived frames in
 capture order; this archive and re-integration are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
@@ -389,7 +389,7 @@ splats.
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once, keeping them for past times.
-The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted before the clamped update continues. Local replacement clears stale occupied copies behind
+The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted, removing the earlier visits' free space there, before the clamped update continues. Local replacement clears stale occupied copies behind
 re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and clamped log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
@@ -655,7 +655,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
