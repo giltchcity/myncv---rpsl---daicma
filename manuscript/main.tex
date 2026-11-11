@@ -207,7 +207,7 @@ DynoSAM estimate camera and object motion jointly~\cite{9385844,11288097}. Dynab
 that fall into space known to be free, without any prior on object appearance~\cite{10218983}. Dynamic Gaussian
 methods model motion and deformation~\cite{Matsuki_2025_CVPR,Li_2025_ICCV,Li_2026_WACV,Wang_2026_CVPR,Wu_2024_CVPR_4dgs}, and 4D
 Primitive-M\^ach\'e assembles observations across time into persistent reconstructions~\cite{Mazur_2026_CVPR}.
-Spacetime Gaussians give each Gaussian a temporal opacity learned from a complete capture~\cite{Li_2024_CVPR_spacetime}, the nearest relative of our element lifetimes, which are
+Spacetime Gaussians give each Gaussian a temporal opacity learned from a complete capture~\cite{Li_2024_CVPR_spacetime}, a relative of our element lifetimes, which are
 decided online. These methods model motion while observed; a change out of view leaves no motion to track. We use the
 free-space cue of Dynablox to detect visible motion and treat the settled object as a new state, so changes seen in
 motion and changes found later share the same transition of object state.
@@ -297,9 +297,8 @@ largest total score seen so far,
   L_{s,n}=\max_{j\leq n}\Big(\pi_s(j)+\sum_{i=j}^{n}w_i(j)\,\ell_s(f_i)\Big),
   \label{eq:absence}
 \end{equation}
-where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
-patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$, i.e., 99:1 odds, in all experiments, and see-through
+where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, whereas $f_i$ uses all judged samples to stay a measurement; staring at one patch thus adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
+The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ in all experiments, and see-through
 samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
@@ -518,7 +517,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static im
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap objects follow mask identities. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects, so their Gaussians and cells are grouped by mask identity, as ours are. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -585,8 +584,7 @@ With one shared decision rule, \ours improves mesh, object, and change F1 over t
 \endgroup%
 \vspace{-2mm}
 \caption{\textbf{Reconstructions after scene changes.} Final-visit views on BedRoom, Home, and Flat
-beside the ground-truth image: baselines keep ghost geometry or erode new furniture, while \ours (3DGS) retires absent
-objects cleanly.}
+beside the ground-truth image: baselines keep ghost geometry or erode new furniture, while \ours (3DGS) retires absent objects cleanly. Per-representation scores are in \cref{tab:main}.}
 \label{fig:geometry_details}
 \label{fig:gaussian_details}
 \vspace{-2mm}
@@ -658,7 +656,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME detects change from rendering conflicts, which can miss parts of a moved object, and keeps a keyframe until most of an object mask is stale, so the remaining stale pixels can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
+GaME detects change from rendering conflicts, which can miss parts of a moved object; stale pixels it misses in kept keyframes can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
