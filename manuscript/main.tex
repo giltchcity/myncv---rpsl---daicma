@@ -435,8 +435,7 @@ Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Me
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
 \caption{\textbf{Dynamic mapping within and across visits.} Final-visit mesh F1 (5\,cm); object (Obj.) and change (Chg.)
-F1 over the visit chain (\%; higher is better) on BedRoom, Home, Flat, and 3RScan. \ours (shaded) leads every baseline per
-representation (bold).}
+F1 over the visit chain (\%; higher is better) on BedRoom, Home, Flat, and 3RScan. All methods use ground-truth instances and poses (ORB-SLAM3 poses on BedRoom~\cite{9440682}). \ours (shaded) leads every baseline per representation (bold).}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -515,8 +514,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional image sets. Methods share poses and masks: \cref{tab:main} and the ablations use ground-truth instances and poses, except ORB-SLAM3 poses on BedRoom~\cite{9440682}; TESSE (\cref{tab:tesse}) and Flat/Aria rendering (\cref{tab:rendering}) use the released poses
-and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively, following their original setups.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional image sets. Methods in each table share poses and masks.
 
 
 \noindent\textbf{Metrics.}
@@ -711,7 +709,7 @@ candidates that static-class filters drop, and each object is reconstructed once
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
 \caption{\textbf{Within-visit 4D mapping on TESSE.} Official 4D F1 (\%) on background (Bg.), static and dynamic (Dyn.)
-objects, and changes, plus 5\,cm mesh F1. Bold marks the best score; shading marks \ours.}
+objects, and changes, plus 5\,cm mesh F1, with Khronos's released poses and semantic masks. Bold marks the best score; shading marks \ours.}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
@@ -746,8 +744,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria
-(PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
+\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria, with GaME's released poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
 \label{tab:rendering}
 \vspace{-2mm}
 \end{table}
@@ -782,7 +779,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
+\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth instances).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
 across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
