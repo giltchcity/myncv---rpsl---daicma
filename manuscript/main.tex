@@ -798,7 +798,7 @@ and Flat).
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{27.63} & \textbf{0.48} \\
+\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.48} \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Geometry update}} \\
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
@@ -833,7 +833,7 @@ stale furniture stays in the map and renders into novel views.
 \noindent\textbf{Observation validity.}
 Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 4.94\,dB
 and raising depth L1 from 0.48 to 3.66\,cm as old frames rebuild removed furniture.
-GaME's whole-frame rejection~\cite{Yugay_2026_CVPR} discards keyframes from either
+Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 4.20\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
