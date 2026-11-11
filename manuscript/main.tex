@@ -160,8 +160,8 @@ the wall but stop their free space before the newly arrived sofa. Surface eviden
 views and drives both updates within and across visits. \ours carries these states across visits and applies the same
 transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
 
-Public datasets isolate either in-view motion or cross-visit changes. We therefore introduce \emph{ReviScene-BedRoom} and
-\emph{ReviScene-Home}, an RGB-D benchmark combining in-view motion, out-of-view changes, and multi-visit
+Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
+\emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
 rearrangements, and evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
 Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
 F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
@@ -177,7 +177,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, while
   keeping each map's native integration intact.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
-  in-view, out-of-view, and cross-visit changes, and demonstrate consistent gains across six datasets.
+  in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
 
 \begin{figure*}[t]
@@ -310,7 +310,7 @@ largest total score seen so far,
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ as in Wald's boundary~\cite{Wald1945}, and see-through
+The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ set from a 1\% error budget~\cite{Wald1945}, and see-through
 samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
@@ -386,18 +386,18 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Each visit fuses its own frames, archived in compressed form; earlier visits enter as surfaces without their free space. When a decision
+Each visit fuses and archives only its own frames; earlier visits enter as surfaces without the free space that could carve objects arriving since. When a decision
 changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from archived frames in
 capture order; this archive and re-integration are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
-retired faces stay available at past times, and object meshes are extracted as in Khronos~\cite{Schmid-RSS-24}.
+retired faces stay available at past times, and object meshes are extracted per state~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
 step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to those still active; retired
 Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. Rendering
 uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
-splats just as in GaME~\cite{Yugay_2026_CVPR}.
+splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
@@ -452,7 +452,7 @@ representation (bold).}
 \section{The ReviScene Benchmark}
 \label{sec:benchmark}
 
-Public datasets offer either motion within a run or changes between scans, never both. We therefore record
+Existing benchmarks annotate object changes either within one run or between scans, never both. We therefore record
 \emph{ReviScene-BedRoom} and render \emph{ReviScene-Home}, in which objects move while observed, change after
 the camera looks away, and rearrange between visits (\cref{fig:dataset_changes}).
 
