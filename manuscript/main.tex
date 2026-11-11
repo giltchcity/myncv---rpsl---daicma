@@ -107,7 +107,7 @@ benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}
 Method & Representation & \hdr{In}{view} & \hdr{After}{looking away} & \hdr{Across}{visits} & \hdr{Observation}{validity} & \hdr{Historical}{queries} & \hdr{Novel-view}{synthesis} \\
 \midrule
-Panoptic Multi-TSDFs~\cite{9811877} & TSDF & \capno & \capyes & \capyes & \cappart & \cappart & \capno \\
+Panoptic Mapping~\cite{9811877} & TSDF & \capno & \capyes & \capyes & \cappart & \cappart & \capno \\
 POCD~\cite{Qian-RSS-22} & TSDF & \capno & \capyes & \capyes & \cappart & \capno & \capno \\
 Khronos~\cite{Schmid-RSS-24} & TSDF & \capyes & \cappart & \cappart & \capno & \capyes & \capno \\
 \addlinespace[2pt]
@@ -138,7 +138,7 @@ across visits: a map that updates what changes, retains what persists, and answe
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
-Multi-TSDFs~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
+Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
 in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
 GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
 overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
@@ -223,7 +223,7 @@ motion and changes found later share the same transition of object state.
 Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
 surfaces~\cite{7989614,9811877}. Removert and ERASOR build static LiDAR maps by removing points that later scans see
 through~\cite{kim2020removert,lim2021erasor}, the cue behind our see-through evidence, applied per point without object
-states. Panoptic Multi-TSDFs freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
+states. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
 with active submaps, leaving in-view motion aside~\cite{9811877}. POCD estimates object change and stationarity, and
 POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos pairs motion detection with absence
 checks against stored rays, confirms absence when 60\% of rays in a 5\,s window agree, and keeps each fragment's
@@ -257,7 +257,7 @@ with surface evidence to update both geometry and past views in the map.
 Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames, masks, and associations, \emph{change
+lifetimes and historical observation validity. Given posed RGB-D frames and instance masks, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
@@ -265,7 +265,7 @@ example runs through this section and \cref{fig:method}: an armchair leaves, a s
 the wall stays where it is.
 
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
-A \emph{state} is one object configuration; masks and associations group its observations, so new views complete its
+A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
 surface. State $s$ has a surface $G_s$ and a \emph{state interval} $[b_s,d_s)$ fixing when its geometry belongs in the
 map and which views describe it. Each map element $e$---a TSDF face, Gaussian, or occupied cell---carries its
 association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$ is the set of elements alive
@@ -297,7 +297,7 @@ a larger one at the same spot stays in place until its site comes back into view
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples of state $s$,
-where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30, 2\% of the 1,500 samples, follows the relative-support scale of Panoptic Multi-TSDFs~\cite{9811877}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
+where $\nu_{\mathrm{rel}}$ is the state's number of reliable samples; the floor of 30 is the common large-sample rule of thumb~\cite{diez2015openintro}. Let $f_i$ be the fraction of judged samples that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
 model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model
 after a change. Let $\ell_s(f_i)$ be the log-likelihood ratio of the
 changed model against the in-place model, with fractions clamped between the in-place mean and just below one to keep each round's evidence finite~\cite{smithson2006lemon}. Let $w_i(j)$ be the share of
@@ -311,7 +311,7 @@ largest total score seen so far,
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ as in Wald's boundary~\cite{Wald1945}, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is round $n$, an upper bound on the change time, so changes between visits are dated on return. On a revisit, only the candidate spanning the gap between visits
+samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -453,7 +453,7 @@ representation (bold).}
 \section{The ReviScene Benchmark}
 \label{sec:benchmark}
 
-Public datasets offer either motion within a run or changes between scans, rarely both. We therefore record
+Public datasets offer either motion within a run or changes between scans, never both. We therefore record
 \emph{ReviScene-bedRoom} and render \emph{ReviScene-Home}, in which objects move while observed, change after
 the camera looks away, and rearrange between visits (\cref{fig:dataset_changes}).
 
@@ -523,10 +523,10 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
-Multi-TSDFs~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
+Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
 occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional image sets. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
 ORB-SLAM3 poses on ReviScene-bedRoom~\cite{9440682}; TESSE and Flat/Aria rendering use the released poses
-and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively.
+and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively, to match their published results.
 
 
 \noindent\textbf{Metrics.}
@@ -672,7 +672,7 @@ Gains are largest where the scene changes most. On ReviScene-bedRoom, mesh F1 ri
 map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Khronos verifies absence using rays between
 reconstructed background vertices and camera poses. We assess absence from new depth images at the object's own surface
 and apply a confirmed change to its full geometry. Valid domains also stop earlier free space at new objects, so old
-observations do not carve away newly added geometry, raising precision and recall together. Panoptic Multi-TSDFs
+observations do not carve away newly added geometry, raising precision and recall together. Panoptic Mapping
 compares whole submaps against active ones and marks a submap absent when enough points conflict: on 3RScan, its change
 F1 is 44.6 versus our 80.5 and Khronos's 73.3. Continuing the map also pays off on partial revisits: on ReviScene-Home Visit~B, our continued TSDF
 map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper and 12.6 above a fresh restart of Khronos (see the
@@ -685,7 +685,7 @@ GaME propagates local rendering conflicts through historical object masks to rem
 Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves (see the supplement).
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks.
 On ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 4.22, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.038, and 0.035.
@@ -893,7 +893,7 @@ segmentation are natural next steps. Code will be published.
 
 \noindent\textbf{Limitations.}
 %
-\ours assumes rigid indoor objects, stable lighting, and external poses, masks, and associations. Objects hidden behind
+\ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Objects hidden behind
 larger replacements persist until seen through, and our real benchmark covers one room.
 
 % ===== END sec / 7_conclusion =====
