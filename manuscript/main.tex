@@ -651,7 +651,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME's DSA leaves ghost geometry of moved objects (\cref{fig:gaussian_details}); our state decisions retire whole objects, and each of our keyframes trains only the Gaussians alive at its capture time. Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+GaME leaves ghost geometry of moved objects (\cref{fig:gaussian_details}); our state decisions retire whole objects, and each of our keyframes trains only the Gaussians alive at its capture time. Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
@@ -737,7 +737,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.42\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME's KM masks stale pixels and rejects a keyframe once its object mask is mostly stale, losing that frame's view of unchanged surfaces; our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
+Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME masks stale pixels and rejects a keyframe once its object mask is mostly stale, losing that frame's view of unchanged surfaces; our keyframes keep constraining static walls and floors (\cref{sec:ablation}; \cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
