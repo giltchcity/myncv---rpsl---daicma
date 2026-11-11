@@ -301,7 +301,7 @@ largest total score seen so far,
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, so staring at one
 patch adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ set from a 1\% error budget~\cite{Wald1945}, and see-through
+The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$, i.e., 99:1 odds, in all experiments, and see-through
 samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
