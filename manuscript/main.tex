@@ -515,8 +515,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional image sets. Methods share poses and masks: \cref{tab:main} uses ground-truth instances and poses, except
-ORB-SLAM3 poses on BedRoom~\cite{9440682}; TESSE and Flat/Aria rendering use the released poses
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs additional image sets. Methods share poses and masks: \cref{tab:main} and the ablations use ground-truth instances and poses, except ORB-SLAM3 poses on BedRoom~\cite{9440682}; TESSE (\cref{tab:tesse}) and Flat/Aria rendering (\cref{tab:rendering}) use the released poses
 and semantic/SAM masks of Khronos~\cite{Schmid-RSS-24} and GaME~\cite{Yugay_2026_CVPR}, respectively, following their original setups.
 
 
@@ -669,7 +668,7 @@ supplement).
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
 GaME detects change from rendering conflicts, which can miss parts of a moved object, and keeps a keyframe until most of an object mask is stale, so the remaining stale pixels can retrain the old layout. Each of our keyframes trains only the Gaussians alive at its capture time, leaving fewer residual surfaces (\cref{fig:gaussian_details}). The gains on Flat and
-3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with ground-truth masks: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
@@ -747,7 +746,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria with SAM masks
+\caption{\textbf{Novel-view synthesis after scene updates.} Held-out final-visit views on Flat and Aria
 (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
 \label{tab:rendering}
 \vspace{-2mm}
@@ -783,7 +782,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth masks unless noted).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
+\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
 across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
