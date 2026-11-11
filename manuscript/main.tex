@@ -373,7 +373,7 @@ set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ 
 \label{eq:domain}
 \end{equation}
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
-sofa. Rays that hit an ended state are excluded in full, free space included: their bands would rebuild the armchair,
+sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. Rays that hit an ended state are excluded in full, free space included: their bands would rebuild the armchair,
 and later views supply free space in its vacated spot. $\lambda_o$ checks object states only; changed background like
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
