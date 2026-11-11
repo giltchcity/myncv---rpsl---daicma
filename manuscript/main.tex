@@ -442,8 +442,8 @@ Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Me
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} Final-visit mesh (5\,cm), object (Obj.), and change (Chg.)
-F1 (\%; higher is better) for continued maps on Real, Sim, Flat, and 3RScan. \ours (shaded) leads every baseline per
+\caption{\textbf{Dynamic mapping within and across visits.} Final-visit mesh F1 (5\,cm), and object (Obj.) and change (Chg.)
+F1 over the visit chain (\%; higher is better) on Real, Sim, Flat, and 3RScan. \ours (shaded) leads every baseline per
 representation (bold).}
 \label{tab:main}
 \end{table*}
@@ -806,14 +806,17 @@ No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
 \multicolumn{5}{@{}l}{\textit{Observation reuse}} \\
 Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
 Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Mask inputs}} \\
+Predicted masks & 89.9 & 72.7 & 27.56 & 0.50 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh (5\,cm) and change (Chg.) F1
-(\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
+\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
+across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
@@ -838,6 +841,8 @@ visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Our state-aware constraints retain useful supervision of
 unchanged surfaces while excluding ended states. Change F1 remains 83.3
 across the observation-reuse variants.
+
+With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 stays at 89.9, while object and change F1 drop to 42.2 and 72.7.
 
 
 \begin{table}[t]
