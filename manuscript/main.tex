@@ -387,11 +387,10 @@ the window sash (\cref{sec:memory}) is left to the retention test, and each stat
 at once.
 
 Each visit fuses its own frames, archived in compressed form; earlier visits enter as surfaces without their free space. When a decision
-changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from the archived frames, in
+changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from archived frames in
 capture order; this archive and re-integration are the cost of
 valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
-retired faces stay available at past times, and object meshes are extracted with the
-procedure of Khronos~\cite{Schmid-RSS-24}.
+retired faces stay available at past times, and object meshes are extracted as in Khronos~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
@@ -543,8 +542,7 @@ refinement.
 
 
 Across all three representations and four datasets, \ours improves mesh, object, and change F1 over native updates
-(\cref{tab:main}); \cref{fig:geometry_details} compares the resulting maps after scene
-changes.
+(\cref{tab:main}); \cref{fig:geometry_details} shows the maps after scene changes.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -686,7 +684,7 @@ Our state decisions apply jointly to geometry and observation validity;
 the resulting maps have fewer residual surfaces in the illustrated scene changes
 (\cref{fig:gaussian_details}). The gains on Flat and
 3RScan are smaller, 3.6 and 3.7 mesh F1, but consistent across all three scores. Rendering also improves with instance masks.
-On ReviScene-bedRoom, ReviScene-Home, Flat, and 3RScan, PSNR increases by
+On bedRoom, Home, Flat, and 3RScan, PSNR increases by
 1.68, 3.05, 4.22, and 0.96\,dB, respectively.
 The corresponding MS-SSIM gains are 0.053, 0.067, 0.038, and 0.035.
 LPIPS decreases by 0.084, 0.098, 0.057, and 0.035,
@@ -702,11 +700,11 @@ objects and local replacement clears those stale layers behind each wall.
 \subsection{Changes within a Single Run and 4D on TESSE}
 \label{sec:exp_temporal}
 
-Khronos's TESSE sequences contain observed motion and changes after looking away within one continuous run, and its
+Khronos's TESSE sequences contain observed motion and changes after looking away within one run, and its
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
 Our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
-Apartment. Khronos confirms absence when 60\% of the rays stored with its observations see through within a 5\,s
+Apartment. Khronos confirms absence when 60\% of its stored rays see through within a 5\,s
 window, firing on objects still in place, whereas our state-based test waits for coverage of the object's own
 surface. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
 candidates that static-class filters drop, and each object is reconstructed once it settles in place.
@@ -874,7 +872,7 @@ Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 
 \noindent\textbf{Computational cost.}\label{sec:cost}
 On Flat (\cref{tab:cost}), \ours maps faster and with less peak RAM than Khronos for TSDF and GaME for 3DGS,
-while for occupancy it adds 2.3\,s and 0.6\,GB over Wavemap.
+while it adds 2.3\,s and 0.6\,GB over Wavemap.
 
 
 % ===== END sec / 5_experiments =====
