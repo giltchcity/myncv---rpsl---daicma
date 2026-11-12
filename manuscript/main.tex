@@ -74,6 +74,7 @@ Unified 4D Mapping of Evolving Scenes Within and Across Visits and Representatio
 element lifetimes for queries at any past time.}
 \label{fig:teaser}
 \captionsetup{hypcap=true}
+\vspace{-2mm}
 \end{strip}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
@@ -83,8 +84,8 @@ layouts. Objects move in view, shift out of view, and rearrange across visits, y
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, not voxels, splats, or cells, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
-the proposed \ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 score on public
+queryable history and limits past observations to the states and regions they still describe. Acting on states, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
+\ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -577,7 +578,6 @@ beside the ground-truth image: baselines keep ghost geometry or erode new furnit
 
 
 \begin{figure}[!t]
-\vspace{-2mm}
 \centering
 \setlength{\tabcolsep}{0.4pt}
 \renewcommand{\arraystretch}{0.5}
