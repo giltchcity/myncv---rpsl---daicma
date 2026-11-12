@@ -165,7 +165,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, and a cell replace for occupancy, which realize one mechanism within each map’s native integration.
+  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, and a cell replacement for occupancy, which realize one mechanism within each map’s native integration.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
@@ -229,7 +229,7 @@ RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes re
 scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks across
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
-transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}  , or appearance and disappearance
+transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
 hypotheses~\cite{11247086}. These models estimate whether an object persists, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
@@ -288,8 +288,8 @@ largest total score seen so far,
   \label{eq:absence}
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, whereas $f_i$ uses all judged samples to stay a measurement; staring at one patch thus adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends at round $n$ once $L_{s,n}>\ln\eta$, with $\eta=99$ in all experiments, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved. On a revisit, only the candidate spanning the gap between visits
+The state ends at round $n$ once $L_{s,n}$, the log posterior odds of a change, exceeds $\ln\eta$, with $\eta=99$ in all experiments, and see-through
+samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history under
 Beta smoothing; all later candidates start at zero.
 
@@ -298,7 +298,7 @@ Observations matching no state form candidates. Spatial extent and surface agree
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
-history also count. From its first view, the successor replaces the earlier state, as when the armchair reappears
+history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object simply ends at its old site and starts anew at its new one.
 
@@ -362,10 +362,7 @@ and later views supply free space in its vacated spot. $\lambda_o$ checks object
 the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
 at once.
 
-Each visit fuses and archives only its own frames in compressed form; earlier visits enter as surfaces without the free space that could carve objects arriving since. When a decision
-changes the valid domains of a voxel block, the voxels whose updates change are re-integrated from archived frames in
-capture order; this archive and re-integration are the cost of
-valid domains for TSDF maps. The current mesh holds faces of live states and background faces passing the retention test,
+Each visit re-fuses its own depth within the valid domains of its state decisions; earlier visits enter as surfaces, kept where this visit does not see through them, without the free space that could carve objects arriving since. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and object meshes are extracted per state~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
@@ -497,14 +494,14 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code, and methods in each table share poses and masks.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code; since their default inputs differ, methods in each table share poses and masks.
 
 
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so the same rule can score differently across representations. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -513,7 +510,7 @@ refinement.
 \label{sec:exp_main}
 
 
-With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} shows the maps after scene changes.
+With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} show the maps after scene changes.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -655,7 +652,7 @@ map reaches 99.2 mesh F1, 9.3 points above a restart of our mapper, since surfac
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
 object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME leaves ghost geometry of moved objects (\cref{fig:gaussian_details}); our state decisions retire whole objects, and each of our keyframes trains only the Gaussians alive at its capture time. Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
+GaME leaves ghost geometry of moved objects (\cref{fig:gaussian_details}); our state decisions retire whole objects, and each of our keyframes renders the map of its capture time and trains only Gaussians that still exist. Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
@@ -792,7 +789,7 @@ Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented: weaker identities mainly cost object-level scores (supplement).
+With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 is unchanged and no change is invented; only three events on missed objects go undetected.
 
 
 \begin{table}[t]
