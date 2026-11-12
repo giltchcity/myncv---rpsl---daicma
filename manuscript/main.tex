@@ -150,15 +150,12 @@ We treat every discrete scene change as a transition of \emph{object
 state}. An object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. Rays in earlier frames
-that hit the armchair stop contributing to the current volume, whereas rays that hit the wall behind it still support
-the wall but stop their free space before the newly arrived sofa. New depth tests old surfaces directly, confirms changes from partial views, and drives both updates within and across visits. \ours carries these states across visits and applies the same
+armchair's state ends, we retire its entire surface from the current map, unseen back included. Earlier rays that hit the armchair stop contributing to the current volume. Rays that hit the wall still support it, but their free space stops before the newly arrived sofa. New depth tests old surfaces directly, confirms changes from partial views, and drives both updates within and across visits. \ours carries these states across visits and applies the same
 transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
-rearrangements, and evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and
-Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
+rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
 F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
 to 92.6 in Apartment. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
 views at 0.88 to 3.26\,dB higher PSNR than GaME.
@@ -168,12 +165,12 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, realizing one mechanism within each map's native integration.
+  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, and a cell replace for occupancy, which realize one mechanism within each map’s native integration.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
 \end{itemize}
-Our novelty is the coupling: one state transition decides both which geometry exists and which past observations still count.
-
+% Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
+Our novelty: for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
 
 \begin{figure*}[t]
 \centering
@@ -208,13 +205,11 @@ methods model motion and deformation~\cite{Matsuki_2025_CVPR,Li_2025_ICCV,Li_202
 Primitive-M\^ach\'e assembles observations across time into persistent reconstructions~\cite{Mazur_2026_CVPR}.
 Spacetime Gaussians give each Gaussian a temporal opacity learned from a complete capture~\cite{Li_2024_CVPR_spacetime}, a relative of our element lifetimes, which are
 decided online. These methods model motion while observed; a change out of view leaves no motion to track. We use the
-free-space cue of Dynablox to detect visible motion and treat the settled object as a new state, so changes seen in
-motion and changes found later share the same transition of object state.
+free-space cue of Dynablox to detect visible motion and treat the settled object as a new state, so changes seen in motion and changes found later share one state transition.
 
 \vspace{0mm}\noindent\textbf{Updating evolving scenes.}
 Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
-surfaces~\cite{7989614,9811877}. Removert builds static LiDAR maps by removing points that later scans see through~\cite{kim2020removert}, the cue behind our see-through evidence, applied per point without object
-states. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
+surfaces~\cite{7989614,9811877}. Removert builds static LiDAR maps by removing points that later scans see through~\cite{kim2020removert}, the cue for our see-through evidence. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
 with active submaps, leaving in-view motion aside~\cite{9811877}. POCD estimates object change and stationarity, and
 POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos pairs motion detection with absence
 checks against stored rays, confirms absence when 60\% of rays in a 5\,s window agree, and keeps each fragment's
@@ -234,19 +229,18 @@ RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes re
 scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks across
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
-transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. Whereas these models only estimate whether an object persists, we combine persistence priors
-with surface evidence to update both geometry and past views in the map.
+transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}  , or appearance and disappearance
+hypotheses~\cite{11247086}. These models estimate whether an object persists, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
 \section{Method}
 \label{sec:method}
 
-Whether an object is still present is determined by scene evidence, independent of the map representation. Yet an
+Whether an object is still present is determined by testing scene evidence against its mapped geometry under a shared rule across representations. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames and instance masks linked across frames, \emph{change
+lifetimes and historical observation validity. Given posed RGB-D frames and instance masks, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
@@ -256,8 +250,7 @@ the wall stays where it is.
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
 A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
 surface. State $s$ has a surface $G_s$ and a \emph{state interval} $[b_s,d_s)$ fixing when its geometry belongs in the
-map and which views describe it. Each map element $e$---a TSDF face, Gaussian, or occupied cell---carries its
-association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$, as known now, is the set of elements alive
+map and which views describe it. Each map element $e$ (a TSDF face, Gaussian, or occupied cell) carries its association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$, as known now, is the set of elements alive
 at $t$,
 \begin{equation}
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
@@ -274,8 +267,7 @@ the new sofa or out of view. A decision should come once evidence suffices, yet 
 add up to a full change. One test handles changes out of view and across visits; tracked motion handles those in view.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while in place,
-and only rays below $60^\circ$ incidence see through them, since grazing views
+We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while mask still showed the object there, and only rays below $60^\circ$ incidence see through them, since grazing views
 of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
 size~\cite{9811877}; Gaussian maps use a 5\,cm scale. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
@@ -521,7 +513,7 @@ refinement.
 \label{sec:exp_main}
 
 
-With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details} shows the maps after scene changes.
+With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} shows the maps after scene changes.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
