@@ -410,7 +410,7 @@ updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 \cmidrule(lr){3-8}\cmidrule(lr){9-14}
 & & \multicolumn{3}{c}{BedRoom} & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} & \multicolumn{3}{c}{3RScan} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
-Map & Method & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. \\
+Map & Method & Mesh $\uparrow$ & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. \\
 \midrule
  & Khronos~\cite{Schmid-RSS-24} & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
   & Panoptic Mapping~\cite{9811877} & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
@@ -586,6 +586,18 @@ beside the ground-truth image: baselines keep ghost geometry or erode new furnit
 \end{figure*}
 % ===== END OPTION A =====
 
+
+\begin{figure}[!t]
+\vspace{-2mm}
+\includegraphics[width=0.245\columnwidth]{figures/export_lossless/2_panoptic_a8edd3e3.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/1_khronos_a9f68713.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/6_wavemap_ac73dda5.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/4_game_519ea7a8.png}\\
+\includegraphics[width=0.245\columnwidth]{figures/export_lossless/2_panoptic_a8edd3e3.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/1_khronos_a9f68713.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/6_wavemap_ac73dda5.png}\includegraphics[width=0.245\columnwidth]{figures/export_lossless/4_game_519ea7a8.png}
+\vspace{-2mm}
+\caption{\textbf{Our method different map types.} ... }
+\label{fig:geometry_details}
+\label{fig:gaussian_details}
+\vspace{-2mm}
+\end{figure}
+
 % ===== OPTION B: VERTICAL / 5 rows x 4 columns / single-column width =====
 % \begin{figure}[!t]
 % \centering
@@ -750,13 +762,13 @@ Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.41} \\
-\midrule
+\textbf{Ours (full)} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.41} \\
+%\midrule
 No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
-\midrule
+%\midrule
 Unrestricted reuse & 84.7 & 83.3 & 22.69 & 3.66 \\
 Whole-frame rejection & 89.5 & 83.3 & 23.43 & 1.92 \\
-\midrule
+%\midrule
 Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \bottomrule
 }
