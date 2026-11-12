@@ -139,11 +139,11 @@ Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence wit
 Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
 in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
 GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
-overwrites occupancy cells through clamped log-odds. Once the scene changes, they all face one dilemma: earlier
+overwrites occupancy cells via clamped log-odds. Once the scene changes, they all face one dilemma: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
 behind it. Khronos confirms absence along rays from background vertices, Wavemap reinforces stale copies behind each new surface, and GaME discards stale keyframe pixels for good. Yet an observation can be correct about the past without being valid for the present. We therefore
-seek one change decision that governs both geometry and past views across all three map types.
+seek one change decision that governs geometry and past views across all three map types.\looseness=-1
 
 
 
@@ -231,17 +231,17 @@ scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks a
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. These models estimate whether an object persists, we combine persistence priors with surface evidence to update both geometry and past views.
+hypotheses~\cite{11247086}. While these models estimate whether an object persists, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
 \section{Method}
 \label{sec:method}
 
-Whether an object is still present is determined by testing scene evidence against its mapped geometry under a shared rule across representations. Yet an
+Whether an object is still present is determined by testing scene evidence against its mapped geometry under one rule across representations. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
-frame's useful observations of the wall. \ours therefore uses each object-state transition to govern both geometry
-lifetimes and historical observation validity. Given posed RGB-D frames and instance masks, \emph{change
+frame's useful observations of the wall. \ours therefore uses each object-state transition to govern geometry
+lifetimes and past observation validity. Given posed RGB-D frames and instance masks, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
 each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
@@ -257,8 +257,8 @@ at $t$,
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
   \label{eq:map_at_t}
 \end{equation}
-Ending a state ends the lifetimes of its elements: the armchair leaves $\mathcal{M}(t)$ for later times and stays
-in it for earlier ones. An element added to a continuing state inherits that state's start, not its own allocation time: the armchair's back existed before the camera saw it.
+Ending a state ends its elements' lifetimes: the armchair leaves $\mathcal{M}(t)$ for later times and stays
+in it for earlier ones. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
 
 \subsection{Change Detection}
 \label{sec:states}
@@ -274,7 +274,7 @@ size~\cite{9811877}; Gaussian maps use a 5\,cm scale. A sample is \emph{supporte
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
 the floor where the armchair stood is evidence that it left, whereas the sofa in front of the wall only occludes
 the wall. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden by
-a larger one at the same spot stays in place until its site comes back into view.
+a larger one at the same spot stays in place until its site is seen again.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 A \emph{round} is a depth image that judges at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples~\cite{9811877} of state $s$,
@@ -495,7 +495,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code; since their default inputs differ, methods in each table share poses and masks.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code; as default inputs differ, methods in each table share poses and masks.
 
 
 \noindent\textbf{Metrics.}
@@ -511,7 +511,7 @@ refinement.
 \label{sec:exp_main}
 
 
-With one shared decision rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} show the maps after scene changes.
+With one shared rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} show the updated maps.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -783,18 +783,18 @@ across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps (\cref{tab:ablation_variants}); the supplement varies thresholds and priors.
 
 \noindent\textbf{Applying changes to geometry.}
-With change detection intact, disabling object- and element-level retirement reduces mesh F1 from 89.8 to 84.5,
+With change detection intact, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5,
 change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, as
-stale furniture stays in the map and renders into novel views.
+stale furniture stays and renders into novel views.
 
 \noindent\textbf{Observation validity.}
 Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 5.74\,dB
 and raising depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
-0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
+0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8.
 
-With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 is unchanged and no change is invented; only three events on missed objects go undetected.
+With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on missed objects go undetected.\looseness=-1
 
 
 \begin{table}[t]
