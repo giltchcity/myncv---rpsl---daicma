@@ -256,7 +256,7 @@ the wall stays where it is.
 A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
 surface. State $s$ has a surface $G_s$ and a \emph{state interval} $[b_s,d_s)$ fixing when its geometry belongs in the
 map and which views describe it. Each map element $e$---a TSDF face, Gaussian, or occupied cell---carries its
-association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$ is the set of elements alive
+association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$, as known now, is the set of elements alive
 at $t$,
 \begin{equation}
   \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
@@ -304,7 +304,7 @@ Beta smoothing; all later candidates start at zero.
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
 or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
 existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
-\emph{successor} once no sample at the old site is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
+\emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. From its first view, the successor replaces the earlier state, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object simply ends at its old site and starts anew at its new one.
@@ -504,14 +504,14 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Methods in each table share poses and masks.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code, and methods in each table share poses and masks.
 
 
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects, so their Gaussians and cells are grouped by mask identity, as ours are. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so shared decisions can score differently across representations. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -693,7 +693,7 @@ candidates that static-class filters drop, and each object is reconstructed once
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
 \caption{\textbf{Within-visit 4D mapping on TESSE.} Official 4D F1 (\%) on background (Bg.), static and dynamic (Dyn.)
-objects, and changes, plus 5\,cm mesh F1, with Khronos's released poses and semantic masks. Bold marks the best score; shading marks \ours.}
+objects, and changes, plus 5\,cm mesh F1, with Khronos's released poses and semantic masks; Khronos is rerun from its released code. Bold marks the best score; shading marks \ours.}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
@@ -787,7 +787,7 @@ Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
 0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8 (supplement).
 
-With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented: weaker identities mainly cost object-level scores.
+With OneFormer masks~\cite{Jain_2023_CVPR} associated by overlap, mesh F1 is unchanged, while object F1 falls from 67.1 to 42.2 and change F1 drops, through missed objects and events, none invented: weaker identities mainly cost object-level scores (supplement).
 
 
 \begin{table}[t]
@@ -812,7 +812,7 @@ Wavemap & \textbf{5.3} & \textbf{1.94} & \textbf{0.30} \\
 \bottomrule
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost on Flat (visits A--B).} Total time over both visits and peak RAM and VRAM on a
+\caption{\textbf{Computational cost on Flat (visits A--B).} Each pair runs on the same inputs, each method with its own settings; total time over both visits and peak RAM and VRAM on a
 Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
 \label{tab:cost}
 \vspace{-2mm}
