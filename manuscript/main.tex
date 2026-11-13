@@ -147,8 +147,8 @@ We treat every discrete scene change as a transition of \emph{object
 state}. An object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. Earlier rays that hit the armchair stop contributing to the current volume. Rays that hit the wall still support it, but their free space stops before the newly arrived sofa. New depth tests old surfaces directly, confirms changes from partial views, and drives both updates within and across visits. \ours carries these states across visits and applies the same
-transitions to TSDF, Gaussian, and occupancy maps, so old views no longer harm our updated map.
+armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may only train the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it. \ours carries these states across visits and applies the same
+transitions to TSDF, Gaussian, and occupancy maps.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
