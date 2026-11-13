@@ -84,9 +84,9 @@ Robots working in human spaces over weeks need a 3D map that updates what change
 layouts. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle isolated cases:
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
 We introduce \ours, where one mechanism resolves both conflicts by starting or ending an object state,
-confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
+confirmed by surface evidence from partial views. It retires ended geometry, unseen parts included, to
 queryable history and limits past observations to the states and regions they still describe. Acting on states, it runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
-\ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 on public
+\ours beats the strongest map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -122,7 +122,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: truncated signed distance field; 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS. Partial means: \emph{in view}, cell overwrite without objects; \emph{after looking away}, only re-observed cells; \emph{across visits}, concatenated or dropped states; \emph{observation validity}, frozen submaps or masked/dropped keyframes; \emph{historical queries}, undated objects.}
+\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: truncated signed distance field; 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS. Partial means: \emph{in view}, cell overwrite without objects; \emph{after looking away}, only re-observed cells; \emph{across visits}, captures concatenated into one run or states dropped at restart; \emph{observation validity}, frozen submaps or masked/dropped keyframes; \emph{historical queries}, undated objects.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
@@ -149,8 +149,7 @@ armchair's state ends, we retire its entire surface from the current map, unseen
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
-rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, object, and change F1. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
-to 92.6 in Apartment. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
+rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, object, and change F1. On TESSE, change F1 rises up to $2.4\times$. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
 views at 0.88 to 3.26\,dB higher PSNR than GaME.
 
 % Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
@@ -470,7 +469,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static image set per change. Baselines run from their released code; as default inputs differ, methods in each table share poses and masks.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from their released code; as default inputs differ, methods in each table share poses and masks.
 
 
 \noindent\textbf{Metrics.}
@@ -754,10 +753,10 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \label{sec:ablation}
 \enlargethispage{\baselineskip}
 
-We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps (\cref{tab:ablation_variants}); the supplement varies thresholds and priors.
+We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps (\cref{tab:ablation_variants}); in the supplement, thresholds $\eta\in\{9,999\}$ and fixed revisit priors change at most one detected event.
 
 \noindent\textbf{Applying changes to geometry.}
-With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, leaving stale furniture visible in novel views.
+With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB; stale furniture stays visible in novel views.
 
 \noindent\textbf{Observation validity.}
 Using all dynamic views (keyframes that saw a later change) as current views reduces PSNR by 5.74\,dB
