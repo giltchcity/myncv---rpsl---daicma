@@ -576,9 +576,9 @@ Local-surface scope & 89.4 & 66.6 & 80.0 & 27.88 & 0.95 & 0.11 & 0.48 \\
 No handover & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
 
 
-Unrestricted reuse & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
+All dynamic views & 84.7 & 66.7 & 83.3 & 22.69 & 0.89 & 0.17 & 3.66 \\
 Unrestricted refinement & 84.5 & 66.5 & 83.3 & 22.78 & 0.89 & 0.17 & 3.45 \\
-Whole-frame rejection & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
+No dynamic views & 89.5 & 66.6 & 83.3 & 23.43 & 0.86 & 0.24 & 1.92 \\
 First-visit rejection & 89.9 & 66.9 & 83.3 & 27.78 & 0.95 & 0.12 & 0.47 \\
 Current-map rendering & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
@@ -609,9 +609,9 @@ the inherited geometry in the full configuration.
 
 \paragraph{Old observations.}
 The main table compares three ways to use earlier keyframes while mapping and refining visit B.
-Unrestricted reuse treats an earlier keyframe as a current one: it samples it without replay weights,
+All dynamic views treats an earlier keyframe as a current one: it samples it without replay weights,
 supervises the current map on all pixels, and allows it to optimize currently alive Gaussians.
-Whole-frame rejection drops a keyframe of either visit once it
+No dynamic views drops a keyframe of either visit once it
 observes a Gaussian whose lifetime later ends, and a rejected draw is replaced to keep the optimization
 budget.
 Full uses the observation constraints described in the method. All three retain the change rules and
