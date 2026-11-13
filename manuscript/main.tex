@@ -144,8 +144,8 @@ behind it. In Khronos, evidence of absence comes from a library of rays derived 
 
 We treat every discrete scene change as a transition of \emph{object state}, where an object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
-states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations, and \ours carries these states across visits. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may train only the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
+states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations (\cref{fig:method}), and \ours carries these states across visits. New depth tells us directly whether an old surface is still there, even from partial views. When the
+armchair's state ends, we retire its entire surface from the current map, unseen back included. An old image was correct at the moment it was taken, so it may train only the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
@@ -161,7 +161,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, and a cell replacement for occupancy, which realize one mechanism within each map’s native integration.
+  it still describes, with valid domains for depth fusion, capture-time keyframes for Gaussian optimization, and local replacement for occupancy, each within the map’s native update.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth.
 \end{itemize}
@@ -170,7 +170,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
 \centering
 \includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
 \vspace{-4mm}
-\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks test the \emph{Earlier map} (\emph{Evidence}): depth supports \emph{Screen} (gray), sees through \emph{Old sofa} (purple), and observes \emph{New sofa} (yellow). \emph{Change detection} drives \emph{Old sofa}'s absence score past threshold over T1--T4 and validates \emph{New sofa}. \emph{Map update} retires \emph{Old sofa}, keeps \emph{Screen} with valid past views, and adds \emph{New sofa} via timed frames (3DGS), object fusion (TSDF), or cell replacement (Occupancy), yielding an \emph{Updated 4D map} queryable at T1--T4.}
+\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks test the \emph{Earlier map} (\emph{Evidence}): depth supports \emph{Screen} (gray), sees through \emph{Old sofa} (purple), and observes \emph{New sofa} (yellow). \emph{Change detection} drives \emph{Old sofa}'s change score past threshold over T1--T4 and validates \emph{New sofa}. \emph{Map update} retires \emph{Old sofa}, keeps \emph{Screen} with valid past views, and adds \emph{New sofa} via timed frames (3DGS), object fusion (TSDF), or local replacement (Occupancy), yielding an \emph{Updated 4D map} queryable at T1--T4.}
 \label{fig:method}
 \vspace{-4mm}
 \end{figure*}
@@ -645,7 +645,7 @@ smallest on Home and Flat, within 2.2 mesh F1.
 Khronos's TESSE sequences contain observed motion and changes after looking away within one run, and its
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
 Our TSDF maps improve all four categories on both scenes and reach higher final
-mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
+mesh F1 (\cref{tab:tesse}). Change F1 moves most: it rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
 Apartment. Because the evaluator queries the map at every earlier time, these gains cover the full history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1, because our motion detection keeps
 candidates that static-class filters drop.
 
