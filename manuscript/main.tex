@@ -269,7 +269,7 @@ changed model against the in-place model, with fractions clamped between the in-
 the state's reliable surface that round $i$ inspects for the first time since candidate change time $j$. A
 sequential test~\cite{Wald1945,Page1954} sums the weighted evidence $w_i(j)\,\ell_s(f_i)$ of rounds since each candidate change time $j$, adds a prior $\pi_s(j)$, zero within a visit, and keeps the largest sum as the change score. Repeated views thus add no coverage. The maximum over $j$ tries each moment the armchair could have left, so a patch seen before it left counts again once seen empty.
 The state ends at round $n$ once the change score exceeds $\ln\eta$, with $\eta=99$ in all experiments, and see-through
-samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
+samples since the chosen $j$ outnumber supported ones. Unlike the score, this vote also counts repeated views, so renewed support blocks a spurious end. $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; all later candidates start at zero; the supplement gives the full score, model fitting, and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
@@ -761,7 +761,7 @@ With detection unchanged, disabling object and element retirement lowers mesh F1
 Using all dynamic views (keyframes that saw a later change) as current views reduces PSNR by 5.74\,dB
 and raises depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Dropping all dynamic views, walls and floors included, costs 5.00\,dB PSNR and
-0.3 mesh F1 points. Capture-time keyframes avoid both failures without masking pixels: each dynamic view trains the map before or after the change it saw. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8.
+0.3 mesh F1 points. Capture-time keyframes avoid both failures without masking pixels: each dynamic view trains the map before or after the change it saw. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8. Frames that saw a moved object then fuse it back, so the mean residual at its old site rises from 5.8\% to 45.0\%. Frames captured before an arrival carve the newcomer, whose coverage falls from 99.7\% to 78.3\%.
 \ours is robust to predicted masks. With OneFormer~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on objects that OneFormer misses go undetected.\looseness=-1
 
 
@@ -807,7 +807,7 @@ while it adds 2.3\,s and 0.6\,GB over Wavemap.
 
 We presented \ours, where one object-state transition governs geometry retirement and observation validity within and
 across visits. Valid domains and capture-time keyframes restrict past observations to unchanged surfaces, realizing one mechanism within native TSDF, Gaussian, and occupancy integration. Across six datasets, \ours beats map-specific baselines,
-retains unvisited rooms on partial revisits, and keeps history queryable. Modeling non-rigid motion and joint
+retains unvisited rooms on partial revisits, and keeps history queryable. Once bounded to the states they recorded, past observations keep completing what persists after a change. Modeling non-rigid motion and joint
 segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
