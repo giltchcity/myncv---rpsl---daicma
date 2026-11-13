@@ -21,7 +21,7 @@
 
 \usepackage{cuted} % Official two-column teaser support.
 \usepackage{colortbl}
-%\usepackage{lineno}
+\usepackage{lineno}
 \definecolor{oursbg}{RGB}{236,236,236} % light-gray background of our rows
 \definecolor{resultgold}{RGB}{153,117,16}
 \definecolor{resultgray}{RGB}{95,102,110}
@@ -452,8 +452,7 @@ the camera looks away, and rearrange between visits (\cref{fig:dataset_changes})
 \dsbox{329.360}{10.530}{95.160}{84.435}%
 \end{picture}%
 \endgroup
-\caption{\textbf{Changes within and across visits.} Left: earlier visit; middle and right: before and after an in-visit
-change, tracking suitcases in BedRoom (top) and a sofa in Home (bottom).}
+\caption{\textbf{ReviScene.} Purple boxes mark objects moved across visits (\emph{left}, \emph{middle}) and in a visit (\emph{middle}, \emph{right}): suitcases in real BedRoom (\emph{top}) and a sofa in synthetic Home (\emph{bottom}).}
 \label{fig:dataset_changes}
 \end{figure}
 % ===== END figures / dataset_overview_main =====
@@ -557,8 +556,7 @@ refinement.
 \end{picture}%
 \endgroup%
 \vspace{-2mm}
-\caption{\textbf{Reconstructions after scene changes.} Final-visit views on BedRoom, Home, and Flat
-beside the ground-truth image: baselines keep ghost geometry or erode new furniture, while \ours (3DGS) retires absent objects cleanly. Per-representation scores are in \cref{tab:main}.}
+\caption{\textbf{Maps after multi-visit changes.} Views beside \emph{Ground Truth} RGB on BedRoom, Home, and Flat: 3DGS (GaME), occupancy (Wavemap), and TSDF (Khronos, Panoptic Mapping) leave ghosts or erode surfaces; \ours (3DGS) retires moved objects.}
 \label{fig:geometry_details}
 \label{fig:gaussian_details}
 \vspace{-2mm}
@@ -576,7 +574,7 @@ beside the ground-truth image: baselines keep ghost geometry or erode new furnit
 \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_occ.png} \\
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{\ours in three map types.} BedRoom (top) and Home (bottom), seen from the image's view.}
+\caption{\textbf{\ours across map types.} Final-visit 3DGS, TSDF, and occupancy (\emph{Occ.}) maps beside \emph{Ground Truth} RGB on BedRoom (\emph{top}) and Home (\emph{bottom}) all reflect the updated scene.}
 \label{fig:ours_maps}
 \vspace{-2mm}
 \end{figure}
@@ -689,8 +687,7 @@ candidates that static-class filters drop, and each object is reconstructed once
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Within-visit 4D mapping on TESSE.} Official 4D F1 (\%) on background (Bg.), static and dynamic (Dyn.)
-objects, and changes, plus 5\,cm mesh F1, with Khronos's released poses and semantic masks; Khronos is rerun from its released code. Bold marks the best score; shading marks \ours.}
+\caption{\textbf{Single-visit 4D TSDF mapping on TESSE.} F1 (\%; $\uparrow$) over past times for background (\emph{Bg.}), \emph{Static} and dynamic (\emph{Dyn.}) objects, and \emph{Changes}, plus final 5\,cm \emph{Mesh} F1, with shared poses and semantic masks (bold: best; shaded: \ours).}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
@@ -725,7 +722,8 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Novel-view synthesis after scene updates.} Final-visit views on Flat and Aria, with GaME's released poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
+\caption{\textbf{3DGS rendering after cross-visit changes.} Held-out final views on Flat and Aria with shared poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
+
 \label{tab:rendering}
 \vspace{-2mm}
 \end{table}
@@ -760,8 +758,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Mechanism ablations across two visits of Flat (3DGS, ground-truth instances unless noted).} Final-visit mesh F1 (5\,cm), change (Chg.) F1
-across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
+\caption{\textbf{Two-visit 3DGS ablations on Flat.} \emph{No retirement}: keeps ended splats; \emph{Unrestricted reuse}: trains old frames on the map; \emph{Whole-frame rejection}: drops frames with retired splats; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
@@ -806,8 +803,7 @@ Map & Method & Time (s)$\downarrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarro
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{llrrr}\costrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Computational cost on Flat (visits A--B).} Each pair runs on the same inputs, each method with its own settings; total time over both visits and peak RAM and VRAM on a
-Ryzen 7 9700X / RTX 5070 Ti; TSDF runs on CPU (bold: best; shaded: \ours).}
+\caption{\textbf{Runtime and memory on Flat.} Total mapping and refinement time and peak RAM/VRAM over two visits with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only; bold: best per map type; shaded: \ours).}
 \label{tab:cost}
 \vspace{-2mm}
 \end{table}
