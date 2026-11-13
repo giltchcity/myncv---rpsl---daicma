@@ -275,7 +275,7 @@ largest total score seen so far,
   \label{eq:absence}
 \end{equation}
 where $\pi_s(j)=0$ within a visit. A sample adds weight only on its first inspection after $j$, whereas $f_i$ uses all judged samples to stay a measurement; staring at one patch thus adds no coverage, and the maximum over $j$ lets a later candidate reuse samples inspected before the change.
-The state ends at round $n$ once $L_{s,n}$, the coverage-weighted log posterior odds of the best-supported change, exceeds $\ln\eta$, with $\eta=99$ in all experiments, and see-through
+The state ends at round $n$ once the change score $L_{s,n}$ exceeds $\ln\eta$, with $\eta=99$ in all experiments, and see-through
 samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. On a revisit, only the candidate spanning the gap between visits
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; all later candidates start at zero.
 
