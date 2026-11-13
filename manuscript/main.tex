@@ -145,7 +145,7 @@ behind it. In Khronos, evidence of absence comes from a library of rays derived 
 We treat every discrete scene change as a transition of \emph{object state}, where an object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
 states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations, and \ours carries these states across visits. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may only train the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
+armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may train only the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
@@ -227,7 +227,7 @@ hypotheses~\cite{11247086}. \ours works downstream of instance segmentation and 
 \section{Method}
 \label{sec:method}
 
-Whether an object is still present is determined by testing scene evidence against its mapped geometry under one rule across representations. Yet an
+We decide whether an object is still present by testing scene evidence against its mapped geometry under one rule across representations. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern geometry
 lifetimes and past observation validity. Given posed RGB-D frames and instance masks, \emph{change
