@@ -639,7 +639,7 @@ constraints as a whole.
 \paragraph{Masks and association.}
 Associating masks by geometry instead of by annotated identity maintains reconstruction quality (90.0 mesh F1,
 28.14\,dB). Predicted masks from OneFormer~\cite{Jain_2023_CVPR}, associated by overlap, leave mesh F1 unchanged (89.8) but lower PSNR to 27.56\,dB,
-object F1 to 42.2, and change F1 to 72.7: three events are missed and none
+4D object F1 to 42.2, and change F1 to 72.7: three events are missed and none
 is invented, so segmentation errors cost completeness at the object level without corrupting the map.
 
 OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5; predicted instances are associated
@@ -674,8 +674,8 @@ and B; in visit A, precision and recall drop by 0.55 and 1.81 points. Two effect
 moved object at its old site fuse it back: for changes after looking away, the mean residual at the old site rises
 from 5.8\% to 45.0\%, and the median time until the site is cleared, an upper bound, grows from 16.2 to 27.1\,s.
 Frames captured before an object arrived carve its new site with free space, and new-site coverage falls from
-99.7\% to 78.3\%. Object F1 changes by 0.2 points: objects are still found, but their geometry is wrong. On Flat,
-where all changes occur between visits, both settings give identical mesh, object, and change scores.
+99.7\% to 78.3\%. 4D object F1 changes by 0.2 points: objects are still found, but their geometry is wrong. On Flat,
+where all changes occur between visits, both settings give identical mesh, 4D object, and change scores.
 
 \section{Qualitative Comparisons}
 % ===== BEGIN figures / qualitative_native =====
