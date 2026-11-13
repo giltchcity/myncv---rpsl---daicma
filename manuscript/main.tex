@@ -290,8 +290,8 @@ map update as changes out of view or across visits.
 \subsection{Map Update}
 \label{sec:validity}
 
-A decision helps only if the map follows it and past views do not undo it. Map
-update thus acts on geometry and past views alike, in space for depth fusion and in time for Gaussians.
+A decision helps only if the map follows it and past views do not undo it, so map
+update acts on geometry and past views.
 
 \vspace{0mm}\noindent\textbf{Applying changes to geometry.}
 A decision concerns the whole state, so all elements of the armchair end their lifetimes together, unseen back
@@ -299,9 +299,12 @@ included. The geometry is \emph{retired}: it leaves the current map and stays av
 observations reconstruct the sofa and any successor, and continuing states keep growing.
 
 \vspace{0mm}\noindent\textbf{Valid observation contributions.}
-Each earlier observation keeps contributing to the states and regions it still describes, and to nothing else. For
-depth fusion the restriction is spatial: a ray keeps its surface band and the free space in front of it only up to
-the first object that arrived later (\cref{eq:domain}). For Gaussian optimization it is temporal. No pixel or ray is tested for staleness: the state decisions alone decide where an old observation still applies.
+Each earlier observation keeps contributing to the states and regions it still describes, and to nothing else. Formally, an observation captured at $t_o$ may update element $e$ only if $e$ was alive then and now,
+\begin{equation}
+  e\in\mathcal{M}(t_o)\cap\mathcal{M}(t).
+  \label{eq:valid}
+\end{equation}
+Depth fusion enforces this rule in space (\cref{eq:domain}), Gaussian optimization in time, and occupancy by removing earlier free space. No pixel or ray is tested for staleness: the state decisions alone decide where an old observation still applies.
 
 \vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
@@ -319,7 +322,7 @@ return are therefore judged by the same rule as changes found after looking away
 \subsection{Reconstruction in Three Representations}
 \label{sec:representations}
 
-Each representation realizes the shared decisions within its own integration, wherever it uses observations.
+Each representation enforces \cref{eq:valid} within its own integration, wherever it uses observations.
 
 \vspace{0mm}\noindent\textbf{TSDF.}
 We restrict projective fusion~\cite{10.1145/237170.237269,6162880} to each depth observation's \emph{valid
@@ -473,7 +476,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpd
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of the objects in the current map at each snapshot, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so applying the same rule to different maps can yield different scores. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. We evaluate rendering on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. We evaluate rendering on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
