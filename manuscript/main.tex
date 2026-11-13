@@ -343,10 +343,10 @@ Each visit re-fuses its own depth within the valid domains of its state decision
 retired faces stay available at past times, and we extract object meshes per state~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
-We enforce state lifetimes and capture-time supervision in online mapping and refinement. At each
-step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to active ones; retired
-Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. We use
-the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
+We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
+step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to those still active; retired
+Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. Rendering
+uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
 splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
