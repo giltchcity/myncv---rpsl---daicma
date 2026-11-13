@@ -86,7 +86,7 @@ keeping old frames of a moved chair re-fuses it and carves away newcomers, where
 We introduce \ours, where one mechanism resolves both conflicts by starting or ending an object state,
 confirmed by surface evidence from partial views. It retires ended geometry, unseen parts included, to
 queryable history and limits past observations to the states and regions they still describe. Acting on states, it runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
-\ours beats the strongest map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 on public
+\ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
@@ -149,7 +149,7 @@ armchair's state ends, we retire its entire surface from the current map, unseen
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
-rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, object, and change F1. On TESSE, change F1 rises up to $2.4\times$. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
+rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, 4D object, and change F1. On TESSE, change F1 rises up to $2.4\times$. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
 views at 0.88 to 3.26\,dB higher PSNR than GaME.
 
 % Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
@@ -243,7 +243,7 @@ at $t$,
   \label{eq:map_at_t}
 \end{equation}
 Ending a state ends its elements' lifetimes: the armchair leaves $\mathcal{M}(t)$ for later times and stays
-in it for earlier ones. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
+in it for earlier ones. Each decision revises these lifetimes, so $\mathcal{M}(t)$ answers queries about any past $t$ with all evidence to date; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
 
 \subsection{Change Detection}
 \label{sec:states}
@@ -270,7 +270,7 @@ the state's reliable surface that round $i$ inspects for the first time since ca
 sequential test~\cite{Wald1945,Page1954} sums the weighted evidence $w_i(j)\,\ell_s(f_i)$ of rounds since each candidate change time $j$, adds a prior $\pi_s(j)$, zero within a visit, and keeps the largest sum as the change score. Repeated views thus add no coverage. The maximum over $j$ tries each moment the armchair could have left, so a patch seen before it left counts again once seen empty.
 The state ends at round $n$ once the change score exceeds $\ln\eta$, with $\eta=99$ in all experiments, and see-through
 samples since the chosen $j$ outnumber supported ones; $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
-starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; all later candidates start at zero.
+starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; all later candidates start at zero; the supplement gives the full score, model fitting, and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
@@ -326,19 +326,18 @@ We restrict projective fusion~\cite{10.1145/237170.237269,6162880} to each depth
 domain}. An earlier ray that hit the wall may still complete the wall, but its free space must stop before the
 sofa. Let observation $o$ be one pixel ray
 captured at time $t_o$ with measured range $r_o$. For a point $x$ on the ray, let $\rho_o(x)$ be its range,
-$\delta_o(x)=r_o-\rho_o(x)$ its distance in front of the measured surface, and $\lambda_o$ the range at which the
-ray first meets a current object state that began after $t_o$, or $\infty$ if there is none. With surface band $T$
+$\delta_o(x)=r_o-\rho_o(x)$ its distance in front of the measured surface, and $\lambda_o(t)$ the range at which the
+ray first meets an object state alive at $t$ that began after $t_o$, or $\infty$ if there is none. With surface band $T$
 set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ is
 \begin{equation}
 \small
-\Omega_o(t)=\{x:\;\delta_o(x)>-T\ \land\ (\delta_o(x)\leq T\ \lor\ \rho_o(x)<\lambda_o-T)\}.
+\Omega_o(t)=\{x:\;\delta_o(x)>-T\ \land\ (\delta_o(x)\leq T\ \lor\ \rho_o(x)<\lambda_o(t)-T)\}.
 \label{eq:domain}
 \end{equation}
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
 sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. Rays that hit an ended state are excluded in full, free space included: their bands would rebuild the armchair,
-and later views supply free space in its vacated spot. $\lambda_o$ checks object states only; changed background like
-the window sash (\cref{sec:memory}) is left to the retention test, and each state change updates every affected domain
-at once.
+and later views supply free space in its vacated spot. $\lambda_o(t)$ checks object states only; changed background like
+the window sash (\cref{sec:memory}) is left to the retention test. Earlier frames are already fused when a change is decided, so the change rebuilds only the voxel blocks it touches, from the frames that saw them.
 
 Each visit re-fuses its own depth within the valid domains of its state decisions; earlier visits enter as surfaces, kept where this visit does not see through them, without the free space that could carve objects arriving since. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and we extract object meshes per state~\cite{Schmid-RSS-24}.
@@ -392,7 +391,7 @@ Map & Method & Mesh $\uparrow$ & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. 
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} Methods continue one map across visits on ReviScene (BedRoom, Home) and public datasets (Flat, 3RScan), reporting final 5\,cm mesh F1 (\emph{Mesh}) plus object (\emph{Obj.}) and change (\emph{Chg.}) F1 over the visit chain (\%; higher is better) with the same masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
+\caption{\textbf{Dynamic mapping within and across visits.} Methods continue one map across visits on ReviScene (BedRoom, Home) and public datasets (Flat, 3RScan), reporting final 5\,cm mesh F1 (\emph{Mesh}) plus 4D object (\emph{Obj.}) and change (\emph{Chg.}) F1 over the visit chain (\%; higher is better) with the same masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -474,7 +473,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpd
 
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
-maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of mapped objects, and change F1
+maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of the objects in the current map at each snapshot, and change F1
 evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so applying the same rule to different maps can yield different scores. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. We evaluate rendering on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
@@ -484,7 +483,7 @@ refinement.
 \label{sec:exp_main}
 
 
-\ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All four baselines keep the suitcase that left BedRoom, which still hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor. \cref{fig:ours_maps} shows our map types.
+\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor. \cref{fig:ours_maps} shows our map types.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -625,16 +624,16 @@ refinement.
 
 \noindent\textbf{TSDF.}
 Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
-map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21. Continuing the map pays off on partial revisits: on Home Visit~B, our continued TSDF
+map, 4D object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21. Continuing the map pays off on partial revisits: on Home Visit~B, our continued TSDF
 map reaches 99.2 mesh F1, 9.3 points above restarting our mapper, since surfaces the revisit misses stay from Visit~A (see the supplement).
 
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
-object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
+4D object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
 GaME leaves ghost geometry of moved objects; ours retire them cleanly (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are smaller, 3.6 and 3.7 points, and all three scores still improve. Rendering also improves with the inputs of \cref{tab:main}: PSNR reaches 19.90, 24.90, 28.43, and 21.06\,dB on BedRoom, Home, Flat, and 3RScan, against 18.22, 21.85, 24.21, and 20.10\,dB for GaME.
 
 \noindent\textbf{Occupancy.}
-Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
+Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and 4D object F1 from 80.0 to 93.8, and
 smallest on Home and Flat, within 2.2 mesh F1.
 
 \subsection{Changes within a Single Run and 4D on TESSE}
