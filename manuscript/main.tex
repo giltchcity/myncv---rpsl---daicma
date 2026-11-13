@@ -138,7 +138,7 @@ GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and
 overwrites occupancy cells via clamped log-odds. Once the scene changes, they all face one dilemma: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
-behind it. Khronos confirms absence along rays from background vertices, Wavemap reinforces stale copies behind shifted surfaces, and GaME discards stale keyframe pixels for good. Yet an observation can be correct about the past without being valid for the present. We therefore
+behind it. In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed; in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate. GaME says: ``this patch of pixels in this old image is wrong, never use it again.'' Yet an observation can be correct about the past without being valid for the present. We therefore
 seek one change decision that governs geometry and past views across all three map types.\looseness=-1
 
 
