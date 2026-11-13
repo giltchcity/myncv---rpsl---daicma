@@ -337,16 +337,16 @@ set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ 
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
 sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. Rays that hit an ended state are excluded in full, free space included: their bands would rebuild the armchair,
 and later views supply free space in its vacated spot. $\lambda_o(t)$ checks object states only; changed background like
-the window sash (\cref{sec:memory}) is left to the retention test. Earlier frames are already fused when a change is decided, so the change rebuilds only the voxel blocks it touches, from the frames that saw them.
+the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we re-fuse only the voxel blocks they cross, from the frames that observed those blocks.
 
 Each visit re-fuses its own depth within the valid domains of its state decisions; earlier visits enter as surfaces, kept where this visit does not see through them, without the free space that could carve objects arriving since. The current mesh holds faces of live states and background faces passing the retention test,
 retired faces stay available at past times, and we extract object meshes per state~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
-We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
-step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to those still active; retired
-Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. Rendering
-uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
+We enforce state lifetimes and capture-time supervision in online mapping and refinement. At each
+step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to active ones; retired
+Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. We use
+the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
 splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
