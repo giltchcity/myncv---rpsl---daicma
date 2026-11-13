@@ -122,7 +122,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: signed-distance field; 3DGS: 3D Gaussian splatting; shaded: \ours. \emph{In view}: tracks motion and maps settled objects (\cappart{}: cell overwrite). \emph{After looking away}: retires absent objects (\cappart{}: re-observed cells). \emph{Across visits}: carries map and states (\cappart{}: concatenates or drops states). \emph{Observation validity}: limits past views by state and region (\cappart{}: freezes submaps or masks/drops frames). \emph{Historical queries}: queries past times (\cappart{}: undated). $^{\dagger}$3DGS.}
+\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: truncated signed distance field; 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS. Partial means: \emph{in view}, cell overwrite without objects; \emph{after looking away}, only re-observed cells; \emph{across visits}, concatenated or dropped states; \emph{observation validity}, frozen submaps or masked/dropped keyframes instead of limits by state and region; \emph{historical queries}, undated objects.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
