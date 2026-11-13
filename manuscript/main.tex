@@ -131,11 +131,10 @@ The world does not reset when a mapper restarts. Objects move in front of a robo
 rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
-Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
-Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans but leave
-in-view motion aside. GaME~\cite{Yugay_2026_CVPR}, CL-Splats~\cite{Ackermann_2025_ICCV}, and
-GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}
-overwrites occupancy cells via clamped log-odds. Once the scene changes, they all face one dilemma: earlier
+Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, unifies visible motion and later changes within one run. Panoptic
+Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans. GaME~\cite{Yugay_2026_CVPR}, the first Gaussian mapper with novel-view synthesis for evolving scenes, CL-Splats~\cite{Ackermann_2025_ICCV}, and
+GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23},
+a state-of-the-art efficient occupancy mapper built for static scenes, updates fast enough for its clamped log-odds to partly follow changes. Even so, they all face one dilemma when objects move: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
 behind it. In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed; in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
@@ -153,7 +152,8 @@ rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, 
 views at 0.88 to 3.26\,dB higher PSNR than GaME.
 
 % Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
-\vspace{0mm}\noindent\textbf{Our novelty:} for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
+% \vspace{0mm}\noindent\textbf{Our novelty:} for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
+\vspace{0mm}\noindent\textbf{Our novelty:} object states inferred online decide both which geometry lives and which past observations may still supervise it, in space and time, within each map's native update.
 
 \vspace{0mm}\noindent\textbf{Contributions:}
 \begin{itemize}
@@ -204,14 +204,14 @@ POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khron
 checks against stored rays, confirms absence when 60\% of rays in a 5\,s window agree, and keeps each fragment's
 interval so the map stays queryable over time~\cite{Schmid-RSS-24}.
 
-For Gaussians, LT-Gaussian and GaussianUpdate maintain maps through scene changes~\cite{11097624,Zeng_2025_ICCV}, and
+For Gaussians, LT-Gaussian maintains maps across changes~\cite{11097624}, GaussianUpdate keeps pruned Gaussians in a visibility pool for earlier times and replays rendered views~\cite{Zeng_2025_ICCV}, and
 CL-Splats updates local regions from sparse captures and recovers earlier states~\cite{Ackermann_2025_ICCV}. SynGS
 learns per-Gaussian change probabilities with illumination-aware updates~\cite{huang2025syngs}, O-SCD fuses multi-view
 change cues online~\cite{galappaththige2026changes}, and 3DGS-CD detects rearrangements from lifted SAM
 masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. GaME detects changes from rendering conflicts, expands removal through
 historical masks, and masks stale keyframe regions, dropping a keyframe once a mask is mostly
 stale~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
-and GS-Diff detects changes between Gaussian maps~\cite{galappaththige2026gsdiff}.
+and GS-Diff compares Gaussian maps~\cite{galappaththige2026gsdiff}.
 
 \vspace{0mm}\noindent\textbf{Object association and scene history.}
 RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes reconstructs objects across
@@ -761,7 +761,7 @@ With detection unchanged, disabling object and element retirement lowers mesh F1
 Using all dynamic views (keyframes that saw a later change) as current views reduces PSNR by 5.74\,dB
 and raises depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Dropping all dynamic views, walls and floors included, costs 5.00\,dB PSNR and
-0.3 mesh F1 points. Capture-time keyframes avoid both failures without masking pixels: each dynamic view trains the map before or after the change it saw. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8. Frames that saw a moved object then fuse it back, so the mean residual at its old site rises from 5.8\% to 45.0\%. Frames captured before an arrival carve the newcomer, whose coverage falls from 99.7\% to 78.3\%.
+0.3 mesh F1 points. Capture-time keyframes avoid both failures: each dynamic view trains the map before or after the change it saw. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8. Frames that saw a moved object then fuse it back, so the mean residual at its old site rises from 5.8\% to 45.0\%. Frames captured before an arrival carve the newcomer, whose coverage falls from 99.7\% to 78.3\%.
 \ours is robust to predicted masks. With OneFormer~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on objects that OneFormer misses go undetected.\looseness=-1
 
 
