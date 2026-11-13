@@ -21,6 +21,7 @@
 
 \usepackage{cuted} % Official two-column teaser support.
 \usepackage{colortbl}
+%\usepackage{lineno}
 \definecolor{oursbg}{RGB}{236,236,236} % light-gray background of our rows
 \definecolor{resultgold}{RGB}{153,117,16}
 \definecolor{resultgray}{RGB}{95,102,110}
@@ -56,7 +57,7 @@
 \def\confName{CVPR}
 \def\confYear{2027}
 \title{REEL:
-Unified 4D Mapping of Evolving Scenes Within and Across Visits and Representations}
+Unified 4D Mapping of Evolving Scenes \\Within and Across Visits and Map Representations}
 % Revisiting Evolving Environments with Lifelong Maps
 \author{Anonymous Authors}
 \begin{document}
@@ -70,11 +71,11 @@ Unified 4D Mapping of Evolving Scenes Within and Across Visits and Representatio
 \captionsetup{hypcap=false}
 \captionof{figure}{\textbf{One map tracks scene changes within and across visits.} A robot sees objects move in view
 (red) and finds missing or added objects after looking away or returning days later (purple). Both trigger one update:
-\ours retires ended states with their unseen parts, reconstructs the new layout, keeps valid past geometry, and stores
+\ours retires ended object states, reconstructs the new layout, keeps valid past geometry, and stores
 element lifetimes for queries at any past time.}
 \label{fig:teaser}
 \captionsetup{hypcap=true}
-\vspace{-2mm}
+\vspace{-1mm}
 \end{strip}
 % ===== END figures / teaser_front =====
 % ===== BEGIN sec / 0_abstract =====
@@ -121,18 +122,13 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; 3DGS: 3D Gaussian
-splatting. \emph{In view}: detects moving objects and reconstructs them once settled (\cappart{}: overwrites cells
-only). \emph{After looking away}: retires the whole absent object within a visit (\cappart{}: re-observed parts only). \emph{Across visits}: carries map and object states across sessions (\cappart{}: concatenates runs or drops
-states). \emph{Observation validity}: restricts past observations per state and region (\cappart{}: freezes submaps or
-drops/masks keyframes). \emph{Historical queries}: queries the map at past times (\cappart{}: keeps undated objects).
-$^{\dagger}$With 3DGS maps.}
+\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: signed-distance field; 3DGS: 3D Gaussian splatting; shaded: \ours. \emph{In view}: tracks motion and maps settled objects (\cappart{}: cell overwrite). \emph{After looking away}: retires absent objects (\cappart{}: re-observed cells). \emph{Across visits}: carries map and states (\cappart{}: concatenates or drops states). \emph{Observation validity}: limits past views by state and region (\cappart{}: freezes submaps or masks/drops frames). \emph{Historical queries}: queries past times (\cappart{}: undated). $^{\dagger}$3DGS.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
 
 The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
+rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping, lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24} tracks visible motion and checks object absence within a TSDF session. Panoptic
@@ -177,11 +173,7 @@ Our novelty: for different map representations facing scene dynamics, \ours corr
 \centering
 \includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
 \vspace{-4mm}
-\caption{\textbf{State transitions update both geometry and observations.} Incoming RGB-D frames, masks, and poses are
-tested against the retained map: surface see-through evidence ends the absent armchair's state (purple), and consistent
-depth confirms the new sofa (yellow). The update retires the whole armchair, restricts earlier observations to preserve
-the unchanged wall, and adds the sofa across TSDF, Gaussian, and occupancy maps, while element lifetimes support
-historical queries.}
+\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks test the \emph{Earlier map} (\emph{Evidence}): depth supports \emph{Screen} (gray), sees through \emph{Old sofa} (purple), and observes \emph{New sofa} (yellow). \emph{Change detection} drives \emph{Old sofa}'s absence score past threshold over T1--T4 and validates \emph{New sofa}. \emph{Map update} retires \emph{Old sofa}, keeps \emph{Screen} with valid past views, and adds \emph{New sofa} via timed frames (3DGS), object fusion (TSDF), or cell replacement (Occupancy), yielding an \emph{Updated 4D map} queryable at T1--T4.}
 \label{fig:method}
 \vspace{-4mm}
 \end{figure*}
@@ -231,7 +223,7 @@ scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks a
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. While these models estimate whether an object persists, we combine persistence priors with surface evidence to update both geometry and past views.
+hypotheses~\cite{11247086}. While these models estimate object persistence, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
@@ -244,9 +236,7 @@ frame's useful observations of the wall. \ours therefore uses each object-state 
 lifetimes and past observation validity. Given posed RGB-D frames and instance masks, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
 transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
-each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One
-example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and
-the wall stays where it is.
+each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and the wall remains unchanged.
 
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
 A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
@@ -416,8 +406,7 @@ Map & Method & Mesh $\uparrow$ & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. 
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} Final-visit mesh F1 (5\,cm); object (Obj.) and change (Chg.)
-F1 over the visit chain (\%; higher is better) on BedRoom, Home, Flat, and 3RScan. All methods use ground-truth instances and poses (ORB-SLAM3 poses on BedRoom~\cite{9440682}). \ours (shaded) leads every baseline per representation (bold).}
+\caption{\textbf{Dynamic mapping within and across visits.} Methods continue one map across visits on ReviScene (BedRoom, Home) and public datasets (Flat, 3RScan), reporting final 5\,cm mesh F1 (\emph{Mesh}) plus object (\emph{Obj.}) and change (\emph{Chg.}) F1 (\%; higher is better) with shared ground-truth masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -502,7 +491,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static im
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following
 Khronos~\cite{Schmid-RSS-24}, object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so the same rule can score differently across representations. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so applying the same rule to different maps can yield different scores. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -511,7 +500,7 @@ refinement.
 \label{sec:exp_main}
 
 
-With one shared rule, \ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details,fig:ours_maps} show the updated maps.
+\ours improves mesh, object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}); \cref{fig:geometry_details} shows the updated maps. \cref{fig:ours_maps} shows our map types.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -665,6 +654,7 @@ smallest on the synthetic scenes, within 2.2 mesh F1 on Home and Flat. Across vi
 
 \subsection{Changes within a Single Run and 4D on TESSE}
 \label{sec:exp_temporal}
+\enlargethispage{\baselineskip}
 
 Khronos's TESSE sequences contain observed motion and changes after looking away within one run, and its
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
@@ -779,22 +769,20 @@ across visits (\%), PSNR (dB), and depth L1 (cm). The full method is shaded.}
 
 \subsection{Ablations}
 \label{sec:ablation}
+\enlargethispage{\baselineskip}
 
 We ablate geometry retirement and observation reuse over two visits of Flat with Gaussian maps (\cref{tab:ablation_variants}); the supplement varies thresholds and priors.
 
 \noindent\textbf{Applying changes to geometry.}
-With change detection intact, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5,
-change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, as
-stale furniture stays and renders into novel views.
+With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, leaving stale furniture visible in novel views.
 
 \noindent\textbf{Observation validity.}
 Unrestricted reuse treats earlier keyframes as current views, reducing PSNR by 5.74\,dB
 and raising depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Whole-frame rejection discards keyframes from either
 visit that observed subsequently retired Gaussians, costing 5.00\,dB PSNR and
-0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. For TSDF maps on Home, turning valid domains off lowers change F1 from 97.9 to 82.8.
-
-With OneFormer masks~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on missed objects go undetected.\looseness=-1
+0.3 mesh F1 points. Capture-time keyframes avoid both failures. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8.
+With OneFormer ~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on missed objects go undetected.\looseness=-1
 
 
 \begin{table}[t]
