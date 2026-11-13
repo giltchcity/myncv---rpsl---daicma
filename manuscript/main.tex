@@ -723,7 +723,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.42\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it. GaME masks the pixels of moved objects in old keyframes or drops those keyframes, walls and floors included; ours need no stale-pixel mask: each renders the map of its capture time, where the armchair still explains its pixels, and trains only Gaussians alive now (\cref{sec:ablation}; \cref{fig:gaussian_details}).
+Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Geometry retirement removes stale content from current views, and observation validity keeps earlier images from rebuilding it (\cref{sec:ablation}; \cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
