@@ -83,9 +83,9 @@ element lifetimes for queries at any past time.}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
 layouts. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle isolated cases:
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
-We introduce \ours, where one decision resolves both conflicts by starting or ending an object state,
+We introduce \ours, where one mechanism resolves both conflicts by starting or ending an object state,
 confirmed by surface-coverage evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, one mechanism runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
+queryable history and limits past observations to the states and regions they still describe. Acting on states, it runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
 \ours beats the best map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, object, and change F1 on public
 benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
@@ -138,25 +138,22 @@ GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and
 overwrites occupancy cells via clamped log-odds. Once the scene changes, they all face one dilemma: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
-behind it. In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed; in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore
-seek one change decision that governs geometry and past views across all three map types.\looseness=-1
+behind it. In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed; in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
 
 
 
-We treat every discrete scene change as a transition of \emph{object
-state}. An object holds one configuration over a
+We treat every discrete scene change as a transition of \emph{object state}, where an object holds one configuration over a
 half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
-states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may only train the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it. \ours carries these states across visits and applies the same
-transitions to TSDF, Gaussian, and occupancy maps.
+states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations, and \ours carries these states across visits. When the
+armchair's state ends, we retire its entire surface from the current map, unseen back included. New depth tells us directly whether an old surface is still there, even from partial views. An old image was correct at the moment it was taken, so it may only train the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
-rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours improves mesh, object, and change
-F1 over each representation's native update. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
+rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, object, and change F1. On TESSE, change F1 rises from 46.2 to 78.6 in Office and from 38.6
 to 92.6 in Apartment. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
 views at 0.88 to 3.26\,dB higher PSNR than GaME.
 
+% Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
 \vspace{0mm}\noindent\textbf{Our novelty:} for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
 
 \vspace{0mm}\noindent\textbf{Contributions:}
@@ -166,7 +163,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
   it still describes, with valid domains for depth fusion and capture-time keyframes for Gaussian optimization, and a cell replacement for occupancy, which realize one mechanism within each map’s native integration.
   \item \textbf{Joint dynamic benchmark and evaluation:} We will release ReviScene-BedRoom and ReviScene-Home, which unite
-  in-view, out-of-view, and cross-visit changes with object-level ground truth, and demonstrate consistent gains across six datasets.
+  in-view, out-of-view, and cross-visit changes with object-level ground truth.
 \end{itemize}
 
 \begin{figure*}[t]
@@ -223,7 +220,7 @@ scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks a
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. While these models estimate object persistence, we take their associations as input and combine persistence priors with surface evidence to update both geometry and past views.
+hypotheses~\cite{11247086}. \ours works downstream of instance segmentation and association: whereas these models estimate persistence, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
@@ -257,7 +254,7 @@ the new sofa or out of view. A decision should come once evidence suffices, yet 
 add up to a full change. One test handles changes out of view and across visits; tracked motion handles those in view.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while mask still showed the object there, and only rays below $60^\circ$ incidence see through them, since grazing views
+We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while the mask still showed the object there, and only rays below $60^\circ$ incidence see through them, since grazing views
 of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
 size~\cite{9811877}; Gaussian maps use a 5\,cm scale. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
@@ -285,12 +282,11 @@ Beta smoothing; all later candidates start at zero.
 
 \vspace{0mm}\noindent\textbf{Successors.}
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
-or twice the Gaussian scale, tell a new configuration from a further partial view: a candidate supported at the
-existing site extends that state, whereas a distinct, supported candidate of the same object becomes its
+or twice the Gaussian scale, tell a new configuration from a further partial view. A candidate supported at the existing site extends that state. A distinct, supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
-state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object simply ends at its old site and starts anew at its new one.
+state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object ends at its old site and starts anew at its new one; the map is updated the same way, and the link between the two is lost.
 
 \vspace{0mm}\noindent\textbf{Observed motion.}
 Motion candidates arise where new measurements enter space previously seen empty, and we track them across
@@ -317,7 +313,7 @@ the first object that arrived later (\cref{eq:domain}). For Gaussian optimizatio
 
 \vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
-only elements alive both at $t_k$ and at the current time. Retired Gaussians reproduce the armchair in earlier views but stay frozen, while the same frames keep constraining the wall, even where the sofa now hides it.
+only elements alive both at $t_k$ and at the current time. Retired Gaussians reproduce the armchair in earlier views but stay frozen; the same frames keep constraining the wall, even where the sofa now hides it.
 
 \vspace{0mm}\noindent\textbf{Retaining and replacing surfaces.}\label{sec:memory}
 Not every stale surface belongs to a state: a closed window sash or drift duplicate has no state to end. Background
@@ -353,7 +349,7 @@ the window sash (\cref{sec:memory}) is left to the retention test, and each stat
 at once.
 
 Each visit re-fuses its own depth within the valid domains of its state decisions; earlier visits enter as surfaces, kept where this visit does not see through them, without the free space that could carve objects arriving since. The current mesh holds faces of live states and background faces passing the retention test,
-retired faces stay available at past times, and object meshes are extracted per state~\cite{Schmid-RSS-24}.
+retired faces stay available at past times, and we extract object meshes per state~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
@@ -363,10 +359,9 @@ uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/97
 splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
-A new object may occupy cells previously observed as free, while shifted surfaces can leave stale occupied layers.
+A new object may occupy cells previously observed as free, and shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once, keeping them for past times.
-The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, the cell's saved log-odds value is subtracted, removing the earlier visits' free space there, while clamping caps free space gathered since. Local replacement clears stale occupied copies behind
-re-measured surfaces, while unobserved cells remain. We retain Wavemap's wavelet representation and log-odds
+The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, we subtract the cell's saved log-odds value, removing the earlier visits' free space there; clamping caps free space gathered since. Local replacement clears stale occupied copies behind re-measured surfaces; unobserved cells remain. We retain Wavemap's wavelet representation and log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
 
@@ -460,7 +455,7 @@ the camera looks away, and rearrange between visits (\cref{fig:dataset_changes})
 
 \noindent\textbf{Real-world recordings.}
 We recorded three visits to the same room over two weeks using an Azure Kinect. Objects move within visits and are
-rearranged between visits, while a moving person, depth noise, and partial views introduce the challenges of real-world
+rearranged between visits, and a moving person, depth noise, and partial views introduce the challenges of real-world
 mapping. Camera poses come from ORB-SLAM3~\cite{9440682}. We annotate object identities and changes over time, yielding
 31 reference change events (5 within visits and 26 between visits), and build a 1\,cm reference mesh for the geometric
 evaluation.
@@ -488,7 +483,7 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats needs a static im
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of mapped objects, and change F1
-evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so applying the same rule to different maps can yield different scores. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. Rendering is evaluated on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. Both are read from the objects each map holds, so applying the same rule to different maps can yield different scores. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. Wavemap thus scores changes whenever new rays overwrite a changed object's cells. We evaluate rendering on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 
@@ -659,7 +654,7 @@ official evaluator queries the map at earlier times to score background, static 
 Our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). The change score moves most: F1 rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
 Apartment. Because the evaluator queries the map at every earlier time, these gains cover the full history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1: our motion detection keeps
-candidates that static-class filters drop, and each object is reconstructed once it settles in place.
+candidates that static-class filters drop, and we reconstruct each object once it settles in place.
 
 % ===== BEGIN tables / tesse =====
 % SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
@@ -772,7 +767,7 @@ We ablate geometry retirement and observation reuse over two visits of Flat with
 With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB, leaving stale furniture visible in novel views.
 
 \noindent\textbf{Observation validity.}
-Using all dynamic views, keyframes that saw a later change, as current views reduces PSNR by 5.74\,dB
+Using all dynamic views (keyframes that saw a later change) as current views reduces PSNR by 5.74\,dB
 and raises depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Dropping all dynamic views, walls and floors included, costs 5.00\,dB PSNR and
 0.3 mesh F1 points. Capture-time keyframes avoid both failures without masking pixels: each dynamic view trains the map before or after the change it saw. Change F1 remains 83.3 across the observation-reuse variants, which keep the same object states. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8.
