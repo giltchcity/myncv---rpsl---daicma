@@ -185,9 +185,9 @@ Our novelty: for different map representations facing scene dynamics, \ours corr
 
 \noindent\textbf{Dense map representations.}
 Dense mapping uses signed-distance volumes~\cite{10.1145/237170.237269,6162880,8202315}, surfel
-meshes~\cite{schops2020surfelmeshing}, and probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}.
+meshes~\cite{schops2020surfelmeshing}, probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}, and neural fields~\cite{mildenhall2020nerf,Zhu_2022_CVPR}.
 Gaussian splatting~\cite{10.1145/3592433} supports joint camera tracking, mapping, and rendering in MonoGS and
-SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each integrates a measurement by weighted averaging of signed distances, by log-odds updates, or by gradient steps on a rendering loss. Our decisions act within these integrations: shared object states decide online which observations each may still integrate.
+SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each integrates a measurement by weighted averaging of signed distances, log-odds updates, or gradient steps on a rendering loss. Our decisions act within them: shared object states decide online which observations each may still integrate.
 
 \vspace{0mm}\noindent\textbf{Dynamic reconstruction.}
 WildGS-SLAM reconstructs static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}. Co-Fusion,
