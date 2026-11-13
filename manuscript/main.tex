@@ -235,8 +235,7 @@ earlier frame may observe both a moved object and an unchanged wall: retiring th
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern geometry
 lifetimes and past observation validity. Given posed RGB-D frames and instance masks, \emph{change
 detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
-transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on
-each representation's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and the wall remains unchanged.
+transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on each map's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and the wall remains unchanged.
 
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
 A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
@@ -569,12 +568,14 @@ refinement.
 \setlength{\tabcolsep}{0.4pt}
 \renewcommand{\arraystretch}{0.5}
 \begin{tabular}{@{}cccc@{}}
-\footnotesize Ground Truth & \footnotesize Ours (3DGS) & \footnotesize Ours (TSDF) & \footnotesize Ours (Occ.) \\[2pt]
+ & \multicolumn{3}{c}{\footnotesize Ours} \\[-1pt]
+\cmidrule(lr){2-4}
+\footnotesize Ground Truth & \footnotesize 3DGS & \footnotesize TSDF & \footnotesize Occupancy \\[2pt]
 \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_occ.png} \\
-\includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03065_occ.png} \\
+\includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_occ.png} \\
 \end{tabular}
 \vspace{-2mm}
-\caption{\textbf{\ours across map types.} Final-visit 3DGS, TSDF, and occupancy (\emph{Occ.}) maps beside \emph{Ground Truth} RGB on BedRoom (\emph{top}) and Home (\emph{bottom}) all reflect the updated scene.}
+\caption{\textbf{\ours across map types.} Final-visit 3DGS, TSDF, and occupancy maps beside \emph{Ground Truth} RGB on BedRoom (\emph{top}) and Home (\emph{bottom}) all reflect the updated scene.}
 \label{fig:ours_maps}
 \vspace{-2mm}
 \end{figure}
@@ -672,9 +673,7 @@ candidates that static-class filters drop, and each object is reconstructed once
 
 \def\resultrows{
 \toprule
-\multirow{2}{*}{Scene} & \multirow{2}{*}{Method} & \multirow{2}{*}{Bg.} & \multicolumn{2}{c}{Objects} & \multirow{2}{*}{Changes} & \multirow{2}{*}{Mesh} \\
-\cmidrule(lr){4-5}
- & & & Static & Dyn. & & \\
+Scene & Method & Bg. & Static & Dyn. & Changes & Mesh \\
 \midrule
  & Khronos & 74.6 & 67.4 & 84.8 & 46.2 & 92.8 \\
 \multirow{-2}{*}{Office} & \oursname & \ob{76.1} & \ob{69.2} & \ob{96.7} & \ob{78.6} & \ob{94.1} \\
@@ -758,7 +757,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Two-visit 3DGS ablations on Flat.} \emph{No retirement}: keeps ended splats; \emph{Unrestricted reuse}: trains old frames on the map; \emph{Whole-frame rejection}: drops frames with retired splats; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
+\caption{\textbf{Two-visit 3DGS ablations on Flat.} \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops frames with retired splats; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
