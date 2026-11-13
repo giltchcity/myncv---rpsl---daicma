@@ -229,9 +229,9 @@ hypotheses~\cite{11247086}. \ours works downstream of instance segmentation and 
 We decide whether an object is still present by testing scene evidence against its mapped geometry under one rule across representations. Yet an
 earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
 frame's useful observations of the wall. \ours therefore uses each object-state transition to govern geometry
-lifetimes and past observation validity. Given posed RGB-D frames and instance masks, \emph{change
-detection} determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
-transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same decision rule operates on each map's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of a wall, and the wall remains unchanged.
+lifetimes and past observation validity. We assume reliably posed RGB-D frames and masks as input. \emph{Change
+detection} then determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
+transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same mechanism operates on each map's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of an unchanged wall.
 
 \vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
 A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
@@ -812,7 +812,7 @@ segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
 %
-\ours assumes rigid indoor objects, stable lighting, and external poses and instance masks. Change times follow the confirming evidence, objects hidden behind larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
+\ours assumes rigid indoor objects, stable lighting, and external poses and masks. Change times follow the confirming evidence, objects hidden behind larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
 
 % ===== END sec / 7_conclusion =====
 
