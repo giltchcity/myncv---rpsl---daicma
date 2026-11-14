@@ -676,6 +676,37 @@ Frames captured before an object arrived carve its new site with free space, and
 99.7\% to 78.3\%. 4D object F1 changes by 0.2 points: objects are still found, but their geometry is wrong. On Flat,
 where all changes occur between visits, both settings give identical mesh, 4D object, and change scores.
 
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Variant & Home$\uparrow$ & Flat$\uparrow$ \\
+\midrule
+Wavemap & 93.2 & 80.2 \\
+\rowcolor{oursbg}
+\textbf{Ours (full)} & \textbf{94.2} & \textbf{82.4} \\
+No saved-log-odds subtraction & 94.0 & 81.8 \\
+No local replacement & 93.6 & 80.9 \\
+Neither & 93.4 & 80.3 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Occupancy update ablations.} Mesh F1 (\%) at 5\,cm after the second visit, using the final-map protocol of the main table.}
+\label{tab:supp_occupancy_ablation}
+\end{table}
+
+\paragraph{Occupancy updates.}
+\Cref{tab:supp_occupancy_ablation} removes saved-log-odds subtraction and local replacement separately and
+together, keeping the other components fixed. Both improve final geometry on Home and Flat; local replacement
+has the larger effect. Removing both brings Flat within 0.1 points of Wavemap.
+
+\paragraph{History storage.}
+On Flat, our two TSDF history archives occupy 86.9\,MB; encoding the same maps and timestamps as full snapshots
+requires 2.26\,GB. Decoding reproduces the full-snapshot files byte for byte, a lossless $26.0\times$ reduction.
+These sizes cover historical-map archives, excluding input RGB-D, logs, and resume state. Storage is measured
+separately from the main paper's runtime comparison, which excludes map export.
+
 \section{Qualitative Comparisons}
 % ===== BEGIN figures / qualitative_native =====
 % Original PNG panels; square cropping is applied by graphicx.
