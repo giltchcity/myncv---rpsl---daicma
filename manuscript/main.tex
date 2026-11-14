@@ -121,7 +121,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: truncated signed distance field; 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS. Partial means: \emph{in view}, cell overwrite without objects; \emph{after looking away}, only re-observed cells; \emph{across visits}, captures concatenated into one run or states dropped at restart; \emph{observation validity}, frozen submaps or masked/dropped keyframes; \emph{historical queries}, undated objects.}
+\caption{\textbf{Dynamic mapping capabilities.} \capyes{} full, \cappart{} partial, \capno{} none; TSDF: truncated signed distance field; 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS. Partial: \emph{in view}, cell overwrite without objects; \emph{after looking away}, only re-observed cells; \emph{across visits}, captures concatenated into one run or states dropped at restart; \emph{observation validity}, frozen submaps or masked/dropped keyframes; \emph{historical queries}, undated objects.}
 \label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
@@ -473,18 +473,28 @@ occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpd
 
 
 \noindent\textbf{Metrics.}
-We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. On Home, \emph{Mesh}$_{\mathrm{4D}}$ averages F1 against complete ground-truth meshes at historical times queried after both visits, without object grouping. For Gaussian
-maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of the objects in the current map at each snapshot, and change F1
-evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, using the ground-truth instances. We evaluate rendering on held-out views as in
-GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
-refinement.
+We evaluate geometric accuracy and completeness using mesh
+F1~\cite{Knapitsch2017} at a 5\,cm threshold.
+On Home, \emph{4D} averages mesh F1 against complete ground-truth meshes
+at historical times queried after both visits, without object grouping.
+For Gaussian maps, we extract meshes by TSDF fusion of rendered depth maps,
+following 2DGS~\cite{Huang2DGS2024}.
+Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy
+and completeness of the objects in the current map at each snapshot,
+and change F1 evaluates the detection of object appearances and
+disappearances in the map.
+We group GaME's Gaussians and Wavemap's cells into objects using
+the same rule and ground-truth instances as ours.
+We evaluate held-out views after refinement as in
+GaME~\cite{Yugay_2026_CVPR}, using PSNR, MS-SSIM~\cite{1292216},
+LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 
 
 \subsection{4D Mapping within and across Visits}
 \label{sec:exp_main}
 
 
-\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). Home's temporal mesh scores also improve across all three representations. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor. \cref{fig:ours_maps} shows our map types.
+\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). Home's temporal mesh scores also improve across all three representations. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor \cref{fig:ours_maps}.
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
