@@ -649,8 +649,9 @@ LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 
 \noindent\textbf{TSDF.}
 Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
-map, 4D object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21. Continuing the map pays off on partial revisits: on Home Visit~B, our continued TSDF
-map reaches 99.2 mesh F1, 9.3 points above restarting our mapper, since surfaces the revisit misses stay from Visit~A (see the supplement).
+map, 4D object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21. On Home Visit~B, our continued TSDF map preserves surfaces seen only
+in Visit~A and achieves 99.2 mesh F1, outperforming a fresh
+reconstruction by 9.3 points (see the supplement).
 
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
