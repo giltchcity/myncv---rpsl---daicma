@@ -377,7 +377,7 @@ updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 \cmidrule(lr){3-8}\cmidrule(lr){9-14}
 & & \multicolumn{3}{c}{BedRoom} & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} & \multicolumn{3}{c}{3RScan} \\
 \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
-Map & Method & Mesh $\uparrow$ & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. & Chg. \\
+Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
  & Khronos~\cite{Schmid-RSS-24} & 87.7 & 78.5 & 70.8 & 93.1 & 80.2 & 84.0 & 86.9 & 45.4 & 53.3 & 88.8 & 65.6 & 73.3 \\
   & Panoptic Mapping~\cite{9811877} & 87.3 & 63.4 & 50.0 & 92.4 & 76.6 & 73.5 & 89.4 & 45.3 & 55.6 & 81.0 & 54.9 & 44.6 \\
@@ -393,7 +393,7 @@ Map & Method & Mesh $\uparrow$ & Obj. & Chg. & Mesh & Obj. & Chg. & Mesh & Obj. 
 \sbox0{\begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/22\relax}
 \begin{tabular}{llrrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr@{\hspace{10pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} Methods continue one map across visits on ReviScene (BedRoom, Home) and public datasets (Flat, 3RScan), reporting final 5\,cm mesh F1 (\emph{Mesh}) plus 4D object (\emph{Obj.}) and change (\emph{Chg.}) F1 over the visit chain (\%; higher is better) with the same masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
+\caption{\textbf{Dynamic mapping within and across visits.} Methods continue one map across visits on ReviScene (BedRoom, Home) and public datasets (Flat, 3RScan), reporting final 5\,cm mesh F1 (\emph{Mesh}) plus 4D object (\emph{Obj.}) and change (\emph{Chg.}) F1 over the visit chain (\%) with the same masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -660,7 +660,7 @@ candidates that static-class filters drop.
 
 \def\resultrows{
 \toprule
-Scene & Method & Bg. & Static & Dyn. & Changes & Mesh \\
+Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\uparrow$ & Mesh$\uparrow$ \\
 \midrule
  & Khronos & 74.6 & 67.4 & 84.8 & 46.2 & 92.8 \\
 \multirow{-2}{*}{Office} & \oursname & \ob{76.1} & \ob{69.2} & \ob{96.7} & \ob{78.6} & \ob{94.1} \\
@@ -673,7 +673,7 @@ Scene & Method & Bg. & Static & Dyn. & Changes & Mesh \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Single-visit 4D TSDF mapping on TESSE.} F1 (\%; $\uparrow$) over past times for background (\emph{Bg.}), \emph{Static} and dynamic (\emph{Dyn.}) objects, and \emph{Changes}, plus final 5\,cm \emph{Mesh} F1, with shared poses and semantic masks (bold: best; shaded: \ours).}
+\caption{\textbf{Single-visit 4D TSDF mapping on TESSE.} F1 (\%) over past times for background (\emph{Bg.}), \emph{Static} and dynamic (\emph{Dyn.}) objects, and \emph{Changes}, plus final 5\,cm \emph{Mesh} F1, with shared poses and semantic masks (bold: best; shaded: \ours).}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
