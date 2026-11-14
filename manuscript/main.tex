@@ -131,7 +131,7 @@ The world does not reset when a mapper restarts. Objects move in front of a robo
 rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
-Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, unifies visible motion and later changes within one run. Panoptic
+Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, handles changes within one run. Panoptic
 Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans. GaME~\cite{Yugay_2026_CVPR}, the first Gaussian mapper with novel-view synthesis for evolving scenes, CL-Splats~\cite{Ackermann_2025_ICCV}, and
 GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23},
 a state-of-the-art efficient occupancy mapper built for static scenes, updates fast enough for its clamped log-odds to partly follow changes. Even so, they all face one dilemma when objects move: earlier
@@ -470,13 +470,13 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from their released code; as default inputs differ, methods in each table share poses and masks.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from released code; methods in each table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants} (but the OneFormer row), and semantic and SAM masks in \cref{tab:tesse,tab:rendering}.
 
 
 \noindent\textbf{Metrics.}
 We evaluate geometric accuracy and completeness using mesh F1~\cite{Knapitsch2017} at a 5\,cm threshold. For Gaussian
 maps, we extract meshes by TSDF fusion of rendered depth maps, following 2DGS~\cite{Huang2DGS2024}. Following Khronos~\cite{Schmid-RSS-24}, 4D object F1 measures the accuracy and completeness of the objects in the current map at each snapshot, and change F1
-evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, by the same mask identities. We evaluate rendering on held-out views as in
+evaluates the detection of object appearances and disappearances in the map. GaME and Wavemap keep no objects; for a fair comparison, we group their Gaussians and cells into objects exactly as ours, using the ground-truth instances. We evaluate rendering on held-out views as in
 GaME~\cite{Yugay_2026_CVPR}, via PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1 after
 refinement.
 

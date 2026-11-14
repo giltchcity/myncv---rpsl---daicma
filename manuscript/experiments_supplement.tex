@@ -384,8 +384,7 @@ The same export rule is used for a representation's native and proposed updates.
 exports declare appearances; the exporter does not infer movement by counting closed states.
 
 \paragraph{Inputs and native baselines.}
-Khronos receives annotated instances on BedRoom, Home, Flat, and 3RScan. BedRoom and 3RScan instance tracking uses the supplied identities, while synthetic
-tracking uses mask overlap. Panoptic uses
+Khronos receives ground-truth instance masks on BedRoom, Home, Flat, and 3RScan. Panoptic uses
 5\,cm object and background resolution for the synthetic apartment, the real room, and 3RScan.
 GaME and Wavemap continue with their native updates as baselines. The GaME 3RScan run uses its
 dataset-adapted implementation. On real RGB-D, invalid depths are excluded from geometry supervision and
