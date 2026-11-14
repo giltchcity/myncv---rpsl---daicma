@@ -199,17 +199,17 @@ free-space cue of Dynablox to detect visible motion and treat the settled object
 \vspace{0mm}\noindent\textbf{Updating evolving scenes.}
 Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
 surfaces~\cite{7989614,9811877}. Removert builds static LiDAR maps by removing points that later scans see through~\cite{kim2020removert}, the cue for our see-through evidence. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
-with active submaps, leaving in-view motion aside~\cite{9811877}. POCD estimates object change and stationarity, and
-POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos pairs motion detection with absence
-checks against stored rays, confirms absence when 60\% of rays in a 5\,s window agree, and keeps each fragment's
-interval so the map stays queryable over time~\cite{Schmid-RSS-24}.
+with active submaps~\cite{9811877}. POCD estimates object change and stationarity, and
+POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos approximates free space
+by a library of rays from background vertices, confirms absence when 60\% of rays in a 5\,s window agree, and propagates
+this evidence back through time to update its belief about earlier times within one run~\cite{Schmid-RSS-24}.
 
 For Gaussians, LT-Gaussian maintains maps across changes~\cite{11097624}, GaussianUpdate keeps pruned Gaussians in a visibility pool for earlier times and replays rendered views~\cite{Zeng_2025_ICCV}, and
-CL-Splats updates local regions from sparse captures and recovers earlier states~\cite{Ackermann_2025_ICCV}. SynGS
+CL-Splats incrementally updates Gaussians from sparse scene captures and recovers previous scenes~\cite{Ackermann_2025_ICCV}. SynGS
 learns per-Gaussian change probabilities with illumination-aware updates~\cite{huang2025syngs}, O-SCD fuses multi-view
 change cues online~\cite{galappaththige2026changes}, and 3DGS-CD detects rearrangements from lifted SAM
-masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. GaME detects changes from rendering conflicts, expands removal through
-historical masks, and masks stale keyframe regions, dropping a keyframe once a mask is mostly
+masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. Building a consistent model of the scene at the final time, GaME removes Gaussians disagreeing visually or geometrically with new frames, extends removal through
+keyframe SAM masks, and ignores only their stale areas, dropping one once a mask is mostly
 stale~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
 and GS-Diff compares Gaussian maps~\cite{galappaththige2026gsdiff}.
 
@@ -219,7 +219,7 @@ scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks a
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. \ours works downstream of instance segmentation and association: whereas these models estimate persistence, we combine persistence priors with surface evidence to update both geometry and past views.
+hypotheses~\cite{11247086}. \ours works downstream of segmentation: whereas these models estimate persistence, we combine persistence priors with surface evidence to update both geometry and past views.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
@@ -243,7 +243,7 @@ at $t$,
   \label{eq:map_at_t}
 \end{equation}
 Ending a state ends its elements' lifetimes: the armchair leaves $\mathcal{M}(t)$ for later times and stays
-in it for earlier ones. Each decision revises these lifetimes, so $\mathcal{M}(t)$ answers queries about any past $t$ with all evidence to date; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
+in it for earlier ones. Each decision revises these lifetimes as frames arrive, so $\mathcal{M}(t)$ answers queries about any past $t$ with all evidence to date; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
 
 \subsection{Change Detection}
 \label{sec:states}
