@@ -1,4 +1,4 @@
-# DynaState
+# REVAMAP
 
 CVPR 2027 manuscript.
 
