@@ -169,7 +169,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
 \centering
 \includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
 \vspace{-4mm}
-\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks test the \emph{Earlier map} (\emph{Evidence}): depth supports \emph{Screen} (gray), sees through \emph{Old sofa} (purple), and observes \emph{New sofa} (yellow). \emph{Change detection} drives \emph{Old sofa}'s change score past threshold over T1--T4 and validates \emph{New sofa}. \emph{Map update} retires \emph{Old sofa}, keeps \emph{Screen} with valid past views, and adds \emph{New sofa} via timed frames (3DGS), object fusion (TSDF), or local replacement (Occupancy), yielding an \emph{Updated 4D map} queryable at T1--T4.}
+\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks compare the \emph{Earlier map} with new observations. The wall (green) remains, the armchair (red) disappears from its previous location, and a sofa (yellow) appears. \emph{Change detection} accumulates evidence of absence over $T_1$--$T_4$ and validates the new sofa using depth fit and frame support within $T_4$. \emph{Map update} removes the armchair from the current map, keeps the wall, and adds the sofa through each representation's native update. The resulting \emph{Updated 4D map} retains past states for queries at earlier times.}
 \label{fig:method}
 \vspace{-4mm}
 \end{figure*}
