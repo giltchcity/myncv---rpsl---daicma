@@ -646,8 +646,8 @@ Khronos's TESSE sequences contain observed motion and changes after looking away
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
 Our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). Change F1 moves most: it rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
-Apartment. Because the evaluator queries the map at every earlier time, these gains cover the full history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1, because our motion detection keeps
-candidates that static-class filters drop.
+Apartment. Because the evaluator queries the map at every earlier time, these gains cover the history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1, because ours keeps
+candidates it drops.
 
 % ===== BEGIN tables / tesse =====
 % SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
