@@ -759,6 +759,7 @@ No retirement & 84.5 & 68.8 & 23.79 & 3.31 \\
 %\midrule
 All dynamic views & 84.7 & 83.3 & 22.69 & 3.66 \\
 No dynamic views & 89.5 & 83.3 & 23.43 & 1.92 \\
+No dynamic pixels & 88.1 & 80.0 & 23.34 & 1.97 \\
 %\midrule
 Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \bottomrule
@@ -767,7 +768,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Two-visit 3DGS ablations on Flat.} \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops frames with retired splats; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
+\caption{\textbf{Two-visit 3DGS ablations on Flat.} \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops frames with retired splats; \emph{No dynamic pixels}: masks out dynamic pixels in old keyframes using GaME's thresholds~\cite{Yugay_2026_CVPR}; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
@@ -786,7 +787,7 @@ With detection unchanged, disabling object and element retirement lowers mesh F1
 Using all dynamic views (keyframes that saw a later change) as current views reduces PSNR by 5.74\,dB
 and raises depth L1 from 0.41 to 3.66\,cm as old frames rebuild removed furniture.
 Dropping all dynamic views, walls and floors included, costs 5.00\,dB PSNR and
-0.3 mesh F1 points. Capture-time keyframes avoid both failures: each dynamic view trains the map before or after the change it saw. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8, increases old-object residue from 5.8\% to 45.0\%, and reduces new-object coverage from 99.7\% to 78.3\%. On Flat, removing saved-log-odds subtraction, local replacement, or both lowers occupancy mesh F1 by 0.6, 1.5, and 2.1 points, respectively.
+0.3 mesh F1 points. Masking dynamic pixels costs 5.09\,dB PSNR. Capture-time keyframes avoid both failures: each dynamic view trains the map before or after the change it saw. On Home, disabling valid domains lowers TSDF change F1 from 97.9 to 82.8, increases old-object residue from 5.8\% to 45.0\%, and reduces new-object coverage from 99.7\% to 78.3\%. On Flat, removing saved-log-odds subtraction, local replacement, or both lowers occupancy mesh F1 by 0.6, 1.5, and 2.1 points, respectively.
 \ours is robust to predicted masks. With OneFormer~\cite{Jain_2023_CVPR}, mesh F1 holds and no change is invented; three events on objects that OneFormer misses go undetected.\looseness=-1
 
 
