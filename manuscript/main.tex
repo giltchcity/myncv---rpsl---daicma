@@ -147,7 +147,7 @@ frames of a removed armchair would fuse it back, their free-space rays would car
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
 % Old: In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed;
 % Old: in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate.
-behind it. Khronos says: my library of camera-to-background rays marks the armchair absent in its scene-graph node, but some of its surfaces may remain in the dense mesh, waiting for further ray checks to remove them; Wavemap says: my clamped log-odds let me quickly adapt to changes. But the occupied band behind a new surface can reinforce an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
+behind it. Khronos says: my library of camera-to-background rays marks the armchair absent in its scene-graph node, but some of its surfaces may remain in the dense mesh, waiting for further ray checks to remove them. Wavemap says: my clamped log-odds let me quickly adapt to changes. But the occupied band behind a new surface can reinforce an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
 
 
 
@@ -280,7 +280,7 @@ starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object
 
 \vspace{0mm}\noindent\textbf{Successors.}
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
-or twice the Gaussian scale, tell a new configuration from a further partial view. A candidate supported at the existing site extends that state. A distinct, supported candidate of the same object becomes its
+or twice the Gaussian scale, tell a new configuration from a further partial view. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
