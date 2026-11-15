@@ -80,10 +80,9 @@ element lifetimes for queries at any past time.}
 \begin{abstract}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
 layouts. Objects move in view, shift out of view, and are rearranged between visits, yet prior mappers handle isolated cases:
-using old frames to update the current map can reconstruct moved objects and erode new ones, while discarding them loses evidence for unchanged surfaces.
+updating with old frames can reconstruct moved objects and erode new ones; discarding them loses evidence for unchanged surfaces.
 We introduce \ours, an RGB-D mapping system that jointly updates geometry and observation validity through object-state
-transitions confirmed by surface evidence from partial views. When a state ends, its entire geometry leaves the current
-map but remains queryable at past times. Past observations constrain only the states and regions they still describe.
+transitions confirmed by surface evidence from partial views. Ended geometry leaves the current map but remains queryable at past times. Past observations constrain only the states and regions they still describe.
 The same decisions drive TSDF, 3D Gaussian, and occupancy updates. In each map type,
 \ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
 benchmarks and our datasets, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
@@ -152,11 +151,10 @@ mapper, maintains a single evolving occupancy map.
 When objects move, earlier frames can reconstruct a removed armchair or train Gaussians for a vanished layout,
 while their free-space rays carve away a sofa placed there. Discarding these frames also loses evidence for the
 unchanged wall. An observation can be correct about the past without being valid for the present.
-Geometry and past observations must therefore be updated together.
 
 We treat every discrete scene change as a transition of \emph{object state}, where an object holds one configuration over a
 time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
-states it recorded. Starting or ending a state updates geometry and observation validity together (\cref{fig:method}), and \ours carries these states across visits.
+states it recorded. \ours carries these states across visits (\cref{fig:method}).
 New depth tells us whether an old surface remains, even from partial views. When the armchair's state ends, we retire its
 entire surface from the current map, including parts outside the current view. Each image supervises only Gaussians that
 existed at its capture time; an old ray still supports the wall, but its free space stops before the newly arrived sofa.
@@ -165,9 +163,8 @@ A new estimate of a surface replaces its old copy.
 Khronos uses its library of camera-to-background rays to mark the armchair absent in its scene-graph node,
 but some surfaces may remain in the dense mesh, waiting for further ray checks to remove them.
 Wavemap's clamped log-odds adapt quickly to changes, but the occupied band behind a new surface can reinforce an
-older surface estimate. GaME removes outdated Gaussians and masks old keyframe pixels based on depth disagreement.
-In \ours, a confirmed object-state transition jointly governs the lifetime of the object's entire geometry and where
-and when past observations remain valid. These decisions are shared by TSDF, Gaussian, and occupancy maps.
+older surface estimate. GaME uses masks in earlier views to select Gaussians for removal.
+\ours ends an existing object state, retiring all associated geometry and updating observation validity across all three representations.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, two RGB-D datasets with object annotations for in-view motion, out-of-view changes, and rearrangements
