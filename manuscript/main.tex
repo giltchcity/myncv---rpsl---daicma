@@ -81,7 +81,7 @@ element lifetimes for queries at any past time.}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
 layouts. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle isolated cases:
 keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
-We introduce \ours, where one mechanism resolves both conflicts by starting or ending an object state,
+We introduce \ours, an RGB-D mapping system where one mechanism resolves both conflicts by starting or ending an object state,
 confirmed by surface evidence from partial views. It retires ended geometry, unseen parts included, to
 queryable history and limits past observations to the states and regions they still describe. Acting on states, it runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
 \ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
@@ -137,7 +137,7 @@ TSDF: truncated signed distance field;
 % ===== END tables / capabilities =====
 
 The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
+rearrange between visits (\cref{fig:teaser}). At the core of lifelong robotic RGB-D mapping lies one consistent map within and across visits: a map that updates what changes, retains what persists, and answers queries at any past time.
 
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, handles changes within one run. Panoptic
