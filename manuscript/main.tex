@@ -168,7 +168,7 @@ older surface estimate. GaME uses masks in earlier views to select Gaussians for
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
 \emph{ReviScene-Home}, two RGB-D datasets with object annotations for in-view motion, out-of-view changes, and rearrangements
-across visits. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our datasets, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, 4D object, and change F1. On TESSE, change F1 is up to $2.4\times$ that of Khronos. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps improve novel-view PSNR by 0.88--3.26\,dB over GaME.
+across visits. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our datasets, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, 4D object, and change F1. On TESSE, change F1 is up to $2.4\times$ that of Khronos. On Flat and Aria, our Gaussian maps improve novel-view PSNR by 0.88--3.26\,dB over GaME.
 
 % Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
 % \vspace{0mm}\noindent\textbf{Our novelty:} for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
