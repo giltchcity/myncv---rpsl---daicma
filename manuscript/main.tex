@@ -142,12 +142,12 @@ rearrange between visits (\cref{fig:teaser}). At the core of lifelong mapping li
 Existing mappers solve fragments of this problem, each within a single representation (\cref{tab:capabilities}).
 Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, handles changes within one run. Panoptic
 Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF scans. GaME~\cite{Yugay_2026_CVPR}, the first Gaussian mapper with novel-view synthesis for evolving scenes, CL-Splats~\cite{Ackermann_2025_ICCV}, and
-GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23},
-a state-of-the-art efficient occupancy mapper built for static scenes, updates fast enough for its clamped log-odds to partly follow changes. Even so, they all face one dilemma when objects move: earlier
+GaussianUpdate~\cite{Zeng_2025_ICCV} adapt 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}, an efficient wavelet-based occupancy mapper, maintains a single evolving occupancy map. Even so, they all face one dilemma when objects move: earlier
 frames of a removed armchair would fuse it back, their free-space rays would carve away a sofa placed there, and
 their keyframes would train Gaussians for a vanished layout, yet those frames also observed the unchanged wall
 % Old: In Khronos, evidence of absence comes from a library of rays derived from the background, so some see-through evidence can be missed or delayed;
-behind it. Khronos says: my library of camera-to-background rays marks the armchair absent in its scene-graph node, but some of its surfaces may remain in the dense mesh, waiting for further ray checks to remove them; in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
+% Old: in Wavemap, each new surface adds occupied evidence just behind it, even when that reinforces an older surface estimate.
+behind it. Khronos says: my library of camera-to-background rays marks the armchair absent in its scene-graph node, but some of its surfaces may remain in the dense mesh, waiting for further ray checks to remove them; Wavemap says: my clamped log-odds let me quickly adapt to changes. But the occupied band behind a new surface can reinforce an older surface estimate. GaME says: this patch of pixels in this old image is wrong, never use it again. Yet an observation can be correct about the past without being valid for the present. We therefore seek one mechanism that governs both geometry and past views across all three map types.\looseness=-1
 
 
 
