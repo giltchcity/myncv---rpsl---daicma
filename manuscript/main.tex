@@ -659,7 +659,7 @@ LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
 map, 4D object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21. On Home Visit~B, our continued TSDF map preserves surfaces seen only
 in Visit~A and achieves 99.2 mesh F1, outperforming a fresh
-reconstruction by 9.3 points (see the supplement).
+reconstruction by 9.3 points.
 
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
@@ -668,7 +668,7 @@ GaME leaves ghost geometry of moved objects; ours retire them cleanly (\cref{fig
 on BedRoom, 21.85 to 24.90\,dB on Home, 24.21 to 28.43\,dB
 on Flat, and 20.10 to 21.06\,dB on 3RScan.
 Before refinement, historical rendering on Home achieves 24.01\,dB PSNR,
-compared with 22.99\,dB for GaME snapshots (supplement).
+compared with 22.99\,dB for GaME snapshots.
 
 \noindent\textbf{Occupancy.}
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and 4D object F1 from 80.0 to 93.8, and
@@ -791,7 +791,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \label{sec:ablation}
 \enlargethispage{\baselineskip}
 
-We ablate geometry retirement and observation validity on Flat and Home (\cref{tab:ablation_variants} and supplement).
+We ablate geometry retirement and observation validity on Flat (\cref{tab:ablation_variants}) and Home.
 
 \noindent\textbf{Applying changes to geometry.}
 With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB; stale furniture stays visible in novel views.
