@@ -79,13 +79,14 @@ element lifetimes for queries at any past time.}
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
-layouts. Objects move in view, shift out of view, and rearrange across visits, yet prior mappers handle isolated cases:
-keeping old frames of a moved chair re-fuses it and carves away newcomers, whereas dropping them loses unchanged objects.
-We introduce \ours, an RGB-D mapping system where one mechanism resolves both conflicts by starting or ending an object state,
-confirmed by surface evidence from partial views. It retires ended geometry, unseen parts included, to
-queryable history and limits past observations to the states and regions they still describe. Acting on states, it runs in TSDF, 3D Gaussian, and occupancy maps, each through its own update. In each map type,
+layouts. Objects move in view, shift out of view, and are rearranged between visits, yet prior mappers handle isolated cases:
+using old frames to update the current map can reconstruct moved objects and erode new ones, while discarding them loses evidence for unchanged surfaces.
+We introduce \ours, an RGB-D mapping system that jointly updates geometry and observation validity through object-state
+transitions confirmed by surface evidence from partial views. When a state ends, its entire geometry leaves the current
+map but remains queryable at past times. Past observations constrain only the states and regions they still describe.
+The same decisions drive TSDF, 3D Gaussian, and occupancy updates. In each map type,
 \ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
-benchmarks and ours, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
+benchmarks and our datasets, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -137,7 +138,7 @@ TSDF: truncated signed distance field;
 % ===== END tables / capabilities =====
 
 The world does not reset when a mapper restarts. Objects move in front of a robot, shift while it looks elsewhere, and
-rearrange between visits (\cref{fig:teaser}). We address dynamic RGB-D mapping within and across visits, with one
+are rearranged between visits (\cref{fig:teaser}). We address dynamic RGB-D mapping within and across visits, with one
 consistent map that updates what changes, retains what persists,
 and answers queries at past times.
 
@@ -150,25 +151,27 @@ mapper, maintains a single evolving occupancy map.
 
 When objects move, earlier frames can reconstruct a removed armchair or train Gaussians for a vanished layout,
 while their free-space rays carve away a sofa placed there. Discarding these frames also loses evidence for the
-unchanged wall. An observation can be correct about the past without being valid for the present. We therefore
-seek one mechanism that governs both geometry and past views across all three map types.
+unchanged wall. An observation can be correct about the past without being valid for the present.
+Geometry and past observations must therefore be updated together.
 
 We treat every discrete scene change as a transition of \emph{object state}, where an object holds one configuration over a
-half-open time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
-states it recorded. Ending or starting a state thus fixes both geometry and the validity of past observations (\cref{fig:method}), and \ours carries these states across visits. New depth tells us directly whether an old surface is still there, even from partial views. When the
-armchair's state ends, we retire its entire surface from the current map, unseen back included. An old image was correct at the moment it was taken, so it may train only the Gaussians that existed at that moment; an old ray likewise still supports the wall, but its free space stops before the newly arrived sofa. A new estimate of a surface replaces its old copy instead of reinforcing it.
+time interval. Its geometry belongs in the map during that interval, and each observation constrains only the
+states it recorded. Starting or ending a state updates geometry and observation validity together (\cref{fig:method}), and \ours carries these states across visits.
+New depth tells us whether an old surface remains, even from partial views. When the armchair's state ends, we retire its
+entire surface from the current map, including parts outside the current view. Each image supervises only Gaussians that
+existed at its capture time; an old ray still supports the wall, but its free space stops before the newly arrived sofa.
+A new estimate of a surface replaces its old copy.
 
 Khronos uses its library of camera-to-background rays to mark the armchair absent in its scene-graph node,
 but some surfaces may remain in the dense mesh, waiting for further ray checks to remove them.
 Wavemap's clamped log-odds adapt quickly to changes, but the occupied band behind a new surface can reinforce an
-older surface estimate. GaME excludes outdated pixels in old keyframes from further supervision.
-In \ours, one object-state transition jointly governs geometry retirement and the spatial and temporal validity
-of past observations across TSDF, Gaussian, and occupancy maps.
+older surface estimate. GaME removes outdated Gaussians and masks old keyframe pixels based on depth disagreement.
+In \ours, a confirmed object-state transition jointly governs the lifetime of the object's entire geometry and where
+and when past observations remain valid. These decisions are shared by TSDF, Gaussian, and occupancy maps.
 
 Existing benchmarks annotate object changes either within one run or between scans. We therefore introduce \emph{ReviScene-BedRoom} and
-\emph{ReviScene-Home}, an RGB-D benchmark that annotates objects through in-view motion, out-of-view changes, and multi-visit
-rearrangements. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our benchmark, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, 4D object, and change F1. On TESSE, change F1 rises up to $2.4\times$. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps render novel
-views at 0.88 to 3.26\,dB higher PSNR than GaME.
+\emph{ReviScene-Home}, two RGB-D datasets with object annotations for in-view motion, out-of-view changes, and rearrangements
+across visits. We also evaluate on Flat~\cite{9811877}, 3RScan~\cite{9010673}, TESSE~\cite{Schmid-RSS-24}, and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR}. On our datasets, Flat, and 3RScan, \ours outperforms each representation's native update in mesh, 4D object, and change F1. On TESSE, change F1 is up to $2.4\times$ that of Khronos. On the partial revisit of Home, continuing our TSDF map improves mesh F1 by 9.3 points over restarting our mapper. On Flat and Aria, our Gaussian maps improve novel-view PSNR by 0.88--3.26\,dB over GaME.
 
 % Our novelty lies in a unified object mechanism that operates across map representations, applying the same update rule to bring any map to the current state across 4D time.
 % \vspace{0mm}\noindent\textbf{Our novelty:} for different map representations facing scene dynamics, \ours corrects the map via a unified mechanism, applying the same state-driven rule to reflect the present.
@@ -178,7 +181,7 @@ views at 0.88 to 3.26\,dB higher PSNR than GaME.
   \item \textbf{Unified dynamic mapping:} We formulate changes within and across visits as object-state
   transitions that jointly govern geometry and observation validity across TSDF, 3D Gaussian, and occupancy maps.
   \item \textbf{Observation validity across representations:} We limit each past observation to the states and regions
-  it still describes, with valid domains for depth fusion, capture-time keyframes for Gaussian optimization, and local replacement for occupancy, each within the map’s native update.
+  it still describes, with valid domains for depth fusion, capture-time supervision for Gaussian optimization, and local replacement for occupancy.
   \item \textbf{Joint dynamic benchmark and evaluation:} We introduce ReviScene-BedRoom and ReviScene-Home, which unite
   in-view, out-of-view, and cross-visit changes with object-level ground truth, and will release both.
 \end{itemize}
