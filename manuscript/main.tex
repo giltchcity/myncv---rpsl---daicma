@@ -209,9 +209,7 @@ free-space cue of Dynablox to detect visible motion and treat the settled object
 Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
 surfaces~\cite{7989614,9811877}. Removert builds static LiDAR maps by removing points that later scans see through~\cite{kim2020removert}, the cue for our see-through evidence. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
 with active submaps~\cite{9811877}. POCD estimates object change and stationarity, and
-POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos approximates free space
-by a library of rays from background vertices, confirms absence when 60\% of rays in a 5\,s window agree, and propagates
-this evidence back through time to update its belief about earlier times within one run~\cite{Schmid-RSS-24}.
+POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Within one run, Khronos tracks short-term dynamics in an active window, reasons over long-term changes with a factor graph, and separately reconciles object presence times and dense-map geometry~\cite{Schmid-RSS-24}.
 
 For Gaussians, LT-Gaussian maintains maps across changes~\cite{11097624}, GaussianUpdate keeps pruned Gaussians in a visibility pool for earlier times and replays rendered views~\cite{Zeng_2025_ICCV}, and
 CL-Splats incrementally updates Gaussians from sparse scene captures and recovers previous scenes~\cite{Ackermann_2025_ICCV}. SynGS
