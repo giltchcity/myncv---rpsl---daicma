@@ -217,9 +217,7 @@ For Gaussians, LT-Gaussian maintains maps across changes~\cite{11097624}, Gaussi
 CL-Splats incrementally updates Gaussians from sparse scene captures and recovers previous scenes~\cite{Ackermann_2025_ICCV}. SynGS
 learns per-Gaussian change probabilities with illumination-aware updates~\cite{huang2025syngs}, O-SCD fuses multi-view
 change cues online~\cite{galappaththige2026changes}, and 3DGS-CD detects rearrangements from lifted SAM
-masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. Building a consistent model of the scene at the final time, GaME removes Gaussians disagreeing visually or geometrically with new frames, extends removal through
-keyframe SAM masks, and ignores only their stale areas, dropping one once a mask is mostly
-stale~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
+masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. Building a consistent model of the scene at the final time, GaME adapts its Gaussians to scene changes and manages keyframes to discard outdated observations while preserving as much information as possible~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
 and GS-Diff compares Gaussian maps~\cite{galappaththige2026gsdiff}.
 
 \vspace{0mm}\noindent\textbf{Object association and scene history.}
