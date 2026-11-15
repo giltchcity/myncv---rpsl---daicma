@@ -145,8 +145,7 @@ Existing mappers solve fragments of this problem, each within a single represent
 Khronos~\cite{Schmid-RSS-24}, the first real-time system to build a dense spatio-temporal map, handles changes within
 one run. Panoptic Mapping~\cite{9811877} and POCD~\cite{Qian-RSS-22} reason about object persistence across TSDF
 scans. GaME~\cite{Yugay_2026_CVPR}, the first Gaussian mapper with novel-view synthesis for evolving scenes,
-adapts 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23}, an efficient wavelet-based occupancy
-mapper, maintains a single evolving occupancy map.
+adapts 3D Gaussian maps across captures, and Wavemap~\cite{Reijgwart-RSS-23} efficiently updates a single wavelet-compressed occupancy map.
 
 When objects move, earlier frames can reconstruct a removed armchair or train Gaussians for a vanished layout,
 while their free-space rays carve away a sofa placed there. Discarding these frames also loses evidence for the
