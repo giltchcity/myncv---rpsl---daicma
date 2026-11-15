@@ -559,6 +559,29 @@ depth L1 in cm.}
 \end{minipage}
 \end{table*}
 
+\paragraph{Historical rendering.}
+After both visits, we query historical maps at 24 times $T$ and render from the poses of keyframes captured by $T$.
+The reference depicts the scene at $T$: we use the original image when the scene has not changed since capture,
+and otherwise render it in Isaac Sim at $T$ from the same pose.
+Both methods use identical views and references before refinement; GaME uses saved snapshots
+(\cref{tab:supp_historical_rendering}).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Method & PSNR$\uparrow$ \\
+\midrule
+GaME snapshots & 22.99 \\
+\rowcolor{oursbg}
+\textbf{Ours (history queries)} & \textbf{24.01} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Historical rendering on Home before refinement.} PSNR (dB), averaged over views within each time and then across 24 times.}
+\label{tab:supp_historical_rendering}
+\end{table}
+
 \section{Complete Ablations}
 
 % ===== BEGIN tables / supp_ablations =====
@@ -700,12 +723,6 @@ Neither & 93.4 & 80.3 \\
 \Cref{tab:supp_occupancy_ablation} removes saved-log-odds subtraction and local replacement separately and
 together, keeping the other components fixed. Both improve final geometry on Home and Flat; local replacement
 has the larger effect. Removing both brings Flat within 0.1 points of Wavemap.
-
-\paragraph{History storage.}
-On Flat, our two TSDF history archives occupy 86.9\,MB; encoding the same maps and timestamps as full snapshots
-requires 2.26\,GB. Decoding reproduces the full-snapshot files byte for byte, a lossless $26.0\times$ reduction.
-These sizes cover historical-map archives, excluding input RGB-D, logs, and resume state. Storage is measured
-separately from the main paper's runtime comparison, which excludes map export.
 
 \section{Qualitative Comparisons}
 % ===== BEGIN figures / qualitative_native =====
