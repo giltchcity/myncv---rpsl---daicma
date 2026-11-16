@@ -161,7 +161,7 @@ video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
 changes while away are handled by updating the map to its latest state. Both
 kinds of change have been handled together in one 4D map within a single visit.
 Earlier states have been recovered between finished captures. To our
-knowledge, no RGB-D mapping system continues one history from one visit into the next
+knowledge, no system keeps one history both within a visit and from one visit into the next
 (\cref{tab:capabilities}). A restart typically begins a new map or
 updates the old one in place, so the earlier layout is lost.
 
@@ -333,7 +333,7 @@ set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ 
 \label{eq:domain}
 \end{equation}
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
-sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. For an object that moves within a visit, rays that hit its ended state have an empty domain: their bands would rebuild the armchair,
+sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. For an object that moves within a visit, rays that hit its ended state are excluded in full, free space included: their bands would rebuild the armchair,
 and later views supply free space in its vacated spot. $\lambda_o(t)$ checks object states only; changed background like
 the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we rebuild only the voxel blocks they cross from archived frames.
 
