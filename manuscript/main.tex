@@ -177,7 +177,7 @@ the same scene in different ways. We overcome the first with a change detection
 that brings every change to the same object-level decision, built on comparing
 mapped object surfaces with current observations, and the second with a map
 update that applies each decision to the geometry and the past observations of
-every representation, where retired geometry remains as history. We contribute:
+every representation, where retired geometry remains as history. Our contributions are as follows:
 
 \begin{itemize}
   \item \ours is the first system for 4D mapping across visits in TSDF,
@@ -280,8 +280,7 @@ the wall. Occlusions, invalid depths, and out-of-image samples add no absence ev
 \vspace{0mm}\noindent\textbf{Change decisions.}
 The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
 A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
-model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model after a change; $\ell_s(f_i)$ is the log-likelihood ratio of the changed model against the in-place one~\cite{smithson2006lemon}. The
-test then scores the state at round $n$ as
+model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model after a change; $\ell_s(f_i)$ is the log-likelihood ratio of the changed model against the in-place one~\cite{smithson2006lemon}. The score at round $n$ is
 \begin{equation}
   L_{s,n}=\max_{j\le n}\Bigl[\pi_s(j)+\sum_{i=j}^{n} w_i(j)\,\ell_s(f_i)\Bigr],
   \label{eq:score}
@@ -371,8 +370,7 @@ retired faces stay available at past times, and we extract object meshes per sta
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
 step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to those still active; retired
 Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. Rendering
-uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links masks to
-splats.
+uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links instance masks to individual splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, and shifted surfaces can leave stale occupied layers.
@@ -658,7 +656,7 @@ LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 
 \noindent\textbf{TSDF.}
 Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
-map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, whose few-point conflict rule reports 66 false changes to our 21.
+map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, which reports 66 false changes to our 21.
 
 \noindent\textbf{3D Gaussians.}
 Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
@@ -789,7 +787,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \label{sec:ablation}
 \enlargethispage{\baselineskip}
 
-We ablate geometry retirement and observation validity on Flat (\cref{tab:ablation_variants}) and Home.
+We ablate retirement and validity on Flat (\cref{tab:ablation_variants}) and Home.
 
 \noindent\textbf{Applying changes to geometry.}
 With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB; stale furniture stays visible in novel views.
@@ -854,7 +852,7 @@ segmentation are natural next steps.
 % ===== END sec / 7_conclusion =====
 
 \section*{LLM Usage Statement}
-We used LLM assistants, mainly Claude Code, to help implement and debug code, run and summarize experiments, prepare figures, and edit the text, following the CVPR 2027 policy on large language models. The authors designed the method, verified all reported results, and reviewed every change.
+We used LLM assistants, mainly Claude Code, to help implement and debug code, run and summarize experiments, prepare figures, and edit the text, following the CVPR 2027 policy on large language models. The authors designed the method, verified all results, and reviewed every change.
 
 
 We also used LLMs to systematically cross-check the manuscript against the source code, experimental configurations, execution logs, and evaluation outputs. These checks examined the consistency of methodological descriptions, implementations, reported numerical results, tables, figures, and scientific conclusions. Identified discrepancies were examined by the authors.
