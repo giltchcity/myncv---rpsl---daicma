@@ -209,6 +209,7 @@ contributions are:
 
 % ===== END sec / 1_intro =====
 % ===== BEGIN sec / 2_related_work =====
+
 \section{Related Work}
 \label{sec:related_work}
 
@@ -216,29 +217,63 @@ contributions are:
 Dense mapping uses signed-distance volumes~\cite{10.1145/237170.237269,6162880,8202315}, surfel
 meshes~\cite{schops2020surfelmeshing}, probabilistic occupancy~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}, and neural fields~\cite{mildenhall2020nerf,Zhu_2022_CVPR}.
 Gaussian splatting~\cite{10.1145/3592433} supports joint camera tracking, mapping, and rendering in MonoGS and
-SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. These systems fuse observations by weighted averaging of signed distances, log-odds updates, or gradient steps on a rendering loss, each assuming a static scene. Occupancy maps such as Wavemap can follow a change cell by cell, but keep neither objects nor history. \ours keeps these native updates and adds change handling to each.
+SplaTAM~\cite{Matsuki_2024_CVPR,Keetha_2024_CVPR}. Each integrates a measurement by weighted averaging of signed distances, log-odds updates, or gradient steps on a rendering loss. Our decisions act within them: shared object states decide online which observations each may still integrate.
 
-\vspace{0mm}\noindent\textbf{Observed changes.}
-WildGS-SLAM reconstructs static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}, and Dynablox detects moving points without appearance priors~\cite{10218983}. Co-Fusion,
+\vspace{0mm}\noindent\textbf{Dynamic reconstruction.}
+WildGS-SLAM reconstructs static surroundings by suppressing moving regions~\cite{Zheng_2025_CVPR}. Co-Fusion,
 MID-Fusion, and EM-Fusion reconstruct objects while they move~\cite{7989518,8794371,9010932}, and DynaSLAM~II and
-DynoSAM estimate camera and object motion jointly~\cite{9385844,11288097}. Dynamic Gaussian
-methods model motion and deformation over a capture~\cite{Matsuki_2025_CVPR,Li_2025_ICCV,Li_2026_WACV,Wang_2026_CVPR,Wu_2024_CVPR_4dgs}, Spacetime Gaussians learn a temporal opacity per Gaussian from a complete capture~\cite{Li_2024_CVPR_spacetime}, and 4D
+DynoSAM estimate camera and object motion jointly~\cite{9385844,11288097}. Dynablox detects moving points as those
+that fall into space known to be free, without any prior on object appearance~\cite{10218983}. Dynamic Gaussian
+methods model motion and deformation~\cite{Matsuki_2025_CVPR,Li_2025_ICCV,Li_2026_WACV,Wang_2026_CVPR,Wu_2024_CVPR_4dgs}, and 4D
 Primitive-M\^ach\'e assembles observations across time into persistent reconstructions~\cite{Mazur_2026_CVPR}.
-All of these follow motion while it is observed. A change while away leaves no motion to track, and \ours handles it as well.
+Spacetime Gaussians give each Gaussian a temporal opacity learned from a complete capture~\cite{Li_2024_CVPR_spacetime}, a relative of our element lifetimes, which are
+decided online. These methods model motion while observed; a change out of view leaves no motion to track. We use the
+free-space cue of Dynablox to detect visible motion and treat the settled object as a new state, so changes seen in motion and changes found later share one state transition.
 
-\vspace{0mm}\noindent\textbf{Changes while away.}
-Earlier work treats such changes as long-term dynamics within one run or as differences between separate scans. Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029,kim2020removert} and volumetric
-surfaces~\cite{7989614}. Panoptic Mapping maintains object-level TSDF submaps across scans and stores inactive ones without timestamps~\cite{9811877}, and POCD and
-POV-SLAM estimate which objects have changed~\cite{Qian-RSS-22,Qian-RSS-23}. For Gaussians, LT-Gaussian and GS-LTS update the map as the scene evolves~\cite{11097624,fu2025gslts3dgaussiansplattingbased}, while SynGS, O-SCD, 3DGS-CD, and GS-Diff detect what has changed~\cite{huang2025syngs,galappaththige2026changes,lu20253dgscd,galappaththige2026gsdiff}. GaME, the closest Gaussian mapper, builds a consistent model of the scene at the final time and leaves observed motion and 4D history to future work~\cite{Yugay_2026_CVPR}. All of these keep the map consistent with the latest state of the scene, so the earlier layout is lost.
+\vspace{0mm}\noindent\textbf{Updating evolving scenes.}
+Long-term map maintenance updates point clouds~\cite{6907397,8594310,9811916,10802029} and volumetric
+surfaces~\cite{7989614,9811877}. Removert builds static LiDAR maps by removing points that later scans see through~\cite{kim2020removert}, the cue for our see-through evidence. Panoptic Mapping freezes inactive submaps and marks one absent once 20 surface points, or 2\%, conflict
+with active submaps~\cite{9811877}. POCD estimates object change and stationarity, and
+POV-SLAM couples this with pose estimation~\cite{Qian-RSS-22,Qian-RSS-23}. Khronos tracks short-term dynamics in an active temporal window and reasons over long-term changes using a factor graph formulation; it maintains a dense scene mesh and object-fragment nodes carrying estimated presence intervals~\cite{Schmid-RSS-24}.
 
-\vspace{0mm}\noindent\textbf{Scene history.}
-Khronos builds a dense 4D map of one continuous run and leaves lifelong operation to future work~\cite{Schmid-RSS-24}. GaussianUpdate and CL-Splats recover earlier states of a Gaussian scene from posed images captured after each change~\cite{Zeng_2025_ICCV,Ackermann_2025_ICCV}.
-RIO and Living Scenes re-localize and reconstruct instances across
-scans~\cite{9010673,Zhu_2024_CVPR}, ObVi-SLAM and OASIS-Map associate object landmarks across
+For Gaussians, LT-Gaussian maintains maps across changes~\cite{11097624}, GaussianUpdate keeps pruned Gaussians in a visibility pool for earlier times and replays rendered views~\cite{Zeng_2025_ICCV}, and
+CL-Splats incrementally updates Gaussians from sparse scene captures and recovers previous scenes~\cite{Ackermann_2025_ICCV}. SynGS
+learns per-Gaussian change probabilities with illumination-aware updates~\cite{huang2025syngs}, O-SCD fuses multi-view
+change cues online~\cite{galappaththige2026changes}, and 3DGS-CD detects rearrangements from lifted SAM
+masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}. Building a consistent model of the scene at the final time, GaME adapts its Gaussians to scene changes and manages keyframes to discard outdated observations while preserving as much information as possible~\cite{Yugay_2026_CVPR}. GS-LTS acquires views for Gaussian editing~\cite{fu2025gslts3dgaussiansplattingbased},
+and GS-Diff compares Gaussian maps~\cite{galappaththige2026gsdiff}.
+
+\vspace{0mm}\noindent\textbf{Object association and scene history.}
+RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes reconstructs objects across
+scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks across
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. Each of these histories or priors belongs to one representation and one mode of capture (\cref{tab:capabilities}). \ours instead maintains one 4D history within and across visits, in all three map types.
+hypotheses~\cite{11247086}. \ours works downstream of segmentation: whereas these models estimate persistence, we combine persistence priors with surface evidence to update both geometry and past views.
+
+% ===== END sec / 2_related_work =====
+% ===== BEGIN sec / 4_method =====
+\section{Method}
+\label{sec:method}
+
+We decide whether an object is still present by testing scene evidence against its mapped geometry under one rule across representations. Yet an
+earlier frame may observe both a moved object and an unchanged wall: retiring the object should not discard the
+frame's useful observations of the wall. \ours therefore uses each object-state transition to govern geometry
+lifetimes and past observation validity. We assume reliably posed RGB-D frames and masks as input. \emph{Change
+detection} then determines which states continue, end, or begin (\cref{sec:states}), and \emph{map update} applies these
+transitions to geometry and observations (\cref{fig:method}, \cref{sec:validity}). The same mechanism operates on each map's own geometry across TSDF, Gaussian, and occupancy maps (\cref{sec:representations}). One example runs through this section and \cref{fig:method}: an armchair leaves, a sofa arrives in front of an unchanged wall.
+
+\vspace{0mm}\noindent\textbf{Map representation.}\label{sec:setting}
+A \emph{state} is one object configuration; instance masks group its observations, so new views complete its
+surface. State $s$ has a surface $G_s$ and a \emph{state interval} $[b_s,d_s)$ fixing when its geometry belongs in the
+map and which views describe it. Each map element $e$ (a TSDF face, Gaussian, or occupied cell) carries its association, if any, and a lifetime $[c_e,d_e)$ following its state. The map at time $t$, as known now, is the set of elements alive
+at $t$,
+\begin{equation}
+  \mathcal{M}(t)=\{e\in\mathcal{E}:c_e\leq t<d_e\}.
+  \label{eq:map_at_t}
+\end{equation}
+Ending a state ends its elements' lifetimes: the armchair leaves $\mathcal{M}(t)$ for later times and stays
+in it for earlier ones. Each decision revises these lifetimes as frames arrive, so $\mathcal{M}(t)$ answers queries about any past $t$ with all evidence to date; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
 
 \subsection{Change Detection}
 \label{sec:states}
