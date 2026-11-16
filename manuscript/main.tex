@@ -238,11 +238,10 @@ masks~\cite{Kirillov_2023_ICCV,lu20253dgscd}, and GS-Diff compares Gaussian maps
 Khronos handles short-term dynamics and long-term changes within one run and keeps a dense mesh whose objects carry presence intervals~\cite{Schmid-RSS-24}. GaussianUpdate keeps pruned Gaussians in a visibility pool for earlier times~\cite{Zeng_2025_ICCV}, and
 CL-Splats updates Gaussians from sparse scene captures and recovers previous scenes~\cite{Ackermann_2025_ICCV}.
 RIO re-localizes instances in changed scans~\cite{9010673}, and Living Scenes reconstructs objects across
-scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks across
-sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
+scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM associates object landmarks across sessions~\cite{10423794}, OASIS-Map labels object changes between two sessions~\cite{oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
-transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. Each of these histories or priors belongs to one representation and one mode of capture (\cref{tab:capabilities}). \ours instead maintains one 4D history of the scene within and across visits in TSDF, Gaussian, and occupancy maps.
+transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, the periodic states of map elements~\cite{7878680}, or appearance and disappearance
+hypotheses~\cite{11247086}. Khronos, GaussianUpdate, and CL-Splats keep a dense history, each in one representation and one mode of capture (\cref{tab:capabilities}); the others relate objects across scans or predict change. \ours instead maintains one 4D history of the scene within and across visits in TSDF, Gaussian, and occupancy maps.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
@@ -269,30 +268,30 @@ in it for earlier ones. Each decision revises these lifetimes as frames arrive, 
 
 The camera sees only part of an object at once, and an unseen surface is not a missing one: the armchair may sit behind
 the new sofa or out of view. A decision should come once evidence suffices, but a hundred views of one armrest must not
-add up to a full change. One surface test handles every change, observed or found while away; for observed changes, tracked motion also gives the time of the change.
+add up to a full change. One surface test handles every change, observed or found while away.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only these count. Rays beyond a maximum incidence angle cannot see through a sample, since noisy depth then yields false see-through evidence~\cite{6375037}. Depth tolerance is the voxel or cell
+We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only these count. Rays beyond a maximum incidence angle cannot see through a sample, since real depth sensors then yield false see-through evidence~\cite{6375037}. Depth tolerance is the voxel or cell
 size~\cite{9811877}, or a fixed scale for Gaussian maps. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
 the floor where the armchair stood is evidence that it left, whereas the sofa only occludes the wall behind it. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden behind a larger one stays until its site is seen again.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
-The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
-A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore model $f_i$ per state: a Beta distribution fitted to the state's earlier rounds while it was in place, regularized toward pooled statistics, and a uniform distribution after a change. $\ell_s(f_i)$ is the log-likelihood ratio of the uniform against the Beta distribution~\cite{smithson2006lemon}. The score at round $n$ is
+The decision rule adapts a standard sequential test~\cite{Wald1945,Page1954}.
+A \emph{round} is a periodic check of state $s$ that judges enough reliable samples in the new depth images~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore model $f_i$ per state: a Beta distribution fitted to the state's earlier rounds while it was in place, regularized toward pooled statistics, and a uniform distribution after a change. $\ell_s(f_i)$ is the log-likelihood ratio of the uniform against the Beta distribution~\cite{smithson2006lemon}. The score at round $n$ is
 \begin{equation}
   L_{s,n}=\max_{j\le n}\Bigl[\pi_s(j)+\sum_{i=j}^{n} w_i(j)\,\ell_s(f_i)\Bigr],
   \label{eq:score}
 \end{equation}
 where $j$ ranges over candidate change times, $w_i(j)$ is the share of the state's reliable surface that round $i$ inspects for the first time since $j$, and the prior $\pi_s(j)$ is zero within a visit. The weights stop repeated views of one patch from adding evidence. The maximum tries every moment at which the armchair could have left: a patch seen while the armchair stood there counts again once it is seen empty.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$ and see-through
-samples since the chosen $j$ outnumber supported ones. This second condition counts repeated views too, so a state that is supported again is not ended. The end time $d_s$ is the time of round $n$, since the change itself was not observed; if a successor is found, $d_s$ moves back to the successor's first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
+samples since the chosen $j$ outnumber supported ones. This second condition counts repeated views too, so a state that is supported again is not ended. The end time $d_s$ is the time of round $n$, since the change itself was not observed. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
-Observations matching no state form candidates. A candidate is a further partial view of an existing state if its extent and surface agree with that state within twice the map resolution or twice the Gaussian scale; otherwise it is a new configuration. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
+Observations matching no state form candidates. A candidate is a further partial view of an existing state if its extent and surface agree with that state within twice the depth tolerance; otherwise it is a new configuration. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
-history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
+history also count. Once confirmed, the successor replaces the earlier state, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
 state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object ends at its old site and starts anew at its new one; the map is updated the same way, but the link is lost.
 
@@ -312,7 +311,7 @@ update acts on geometry and past views.
 A decision concerns the whole state, so all elements of the armchair end their lifetimes together, unseen back
 included. The geometry is \emph{retired}: it leaves the current map and stays available for earlier times. New
 observations reconstruct the sofa and any successor, and continuing states keep growing.
-Each revisit resumes the previous map and object-state evidence in a shared coordinate frame. Changes found on
+Each revisit resumes the previous map and object states in a shared coordinate frame. Changes found on
 return are therefore judged by the same rule within and across visits.
 
 \vspace{0mm}\noindent\textbf{Valid observation contributions.}
@@ -351,11 +350,11 @@ set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ 
 \label{eq:domain}
 \end{equation}
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
-sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. For an object that moves within a visit, rays that hit its ended state are excluded in full, free space included: their bands would rebuild the armchair,
+sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. For an object that moves within a visit, rays that hit its ended state have an empty domain: their bands would rebuild the armchair,
 and later views supply free space in its vacated spot. $\lambda_o(t)$ checks object states only; changed background like
-the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we re-fuse only the voxel blocks they cross, using the archived frames that had observed those blocks.
+the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we rebuild only the voxel blocks they cross from archived frames.
 
-Each visit fuses only its own depth, within these valid domains. Earlier visits enter as surfaces only: they are kept wherever the current visit does not see through them, and they bring no free space that could carve objects that arrived later. The current mesh holds faces of live states and background faces passing the retention test, retired faces stay available at past times, and object meshes are extracted per state, following Khronos~\cite{Schmid-RSS-24}.
+Each visit fuses only its own depth, within these valid domains. Earlier visits enter as surfaces only: they are kept wherever the current visit does not see through them, and they bring no free space that could carve objects that arrived later. The current mesh holds faces of live states and background faces passing the retention test, retired faces stay available at past times, and each state has its own mesh.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
@@ -482,7 +481,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from released code. Methods in a table share poses and masks. \Cref{tab:main,tab:ablation_variants} use ground-truth instances, except the OneFormer row. \Cref{tab:tesse,tab:rendering} use per-frame semantic and SAM masks.
+occupancy. POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from released code. Methods in a table share poses and masks. \Cref{tab:main,tab:ablation_variants} use ground-truth instances, except the OneFormer row. \Cref{tab:tesse,tab:rendering} use per-frame semantic and SAM masks.
 
 
 \noindent\textbf{Metrics.}
@@ -509,7 +508,7 @@ The incidence limit is $60^\circ$, and the tolerance for Gaussian maps is 5\,cm.
 \label{sec:exp_main}
 
 
-\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). Home's temporal mesh scores also improve across all three representations. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor (\cref{fig:ours_maps}).
+\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). History stays queryable. On Home, our TSDF maps reach a Mesh$_{\mathrm{4D}}$ of 53.1 against 48.2 for Khronos, our Gaussian maps 56.0 against 53.2 for GaME, and occupancy is level at 55.2 against 55.0. The second visit covers part of Home, yet final mesh F1 against the complete apartment reaches 99.2, 96.5, and 94.2, so unvisited rooms are kept. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor (\cref{fig:ours_maps}).
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -649,13 +648,10 @@ The incidence limit is $60^\circ$, and the tolerance for Gaussian maps is 5\,cm.
 % ===== END figures / qualitative_combined =====
 
 \noindent\textbf{TSDF.}
-Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 over Khronos continuing its
-map, object F1 from 78.5 to 96.6, and change F1 from 70.8 to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, which reports 66 false changes to our 21.
+Gains are largest on BedRoom, where mesh F1 rises from 87.7 to 96.1 and change F1 from 70.8 to 98.4 over Khronos continuing its map. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On 3RScan, change F1 reaches 80.5, against 73.3 for Khronos and 44.6 for Panoptic Mapping, which reports 66 false changes to our 21.
 
 \noindent\textbf{3D Gaussians.}
-Our Gaussian maps exceed GaME in mesh F1 by 6.5 points on BedRoom and 15.6 on Home, in
-object F1 by 17.1 and 11.4, and in change F1 by 1.7 and 15.0.
-GaME leaves ghost geometry of moved objects; ours retire them cleanly (\cref{fig:gaussian_details}). Mesh F1 gains on Flat and 3RScan are 3.6 and 3.7 points, and all three scores improve. With instance masks, PSNR increases from GaME's 18.22 to 19.90\,dB
+Our Gaussian maps gain most over GaME on Home, by 15.6 points in mesh F1 and 15.0 in change F1, because GaME leaves ghost geometry of moved objects while ours retire them (\cref{fig:gaussian_details}). With instance masks, PSNR increases from GaME's 18.22 to 19.90\,dB
 on BedRoom, 21.85 to 24.90\,dB on Home, 24.21 to 28.43\,dB
 on Flat, and 20.10 to 21.06\,dB on 3RScan.
 Before refinement, historical rendering on Home achieves 24.01\,dB PSNR,
@@ -665,16 +661,15 @@ compared with 22.99\,dB for GaME snapshots.
 Occupancy gains are largest on BedRoom, with mesh F1 from 84.5 to 91.0 and object F1 from 80.0 to 93.8, and
 smallest on Home and Flat, within 2.2 mesh F1.
 
-\subsection{Changes within a Single Run and 4D on TESSE}
+\subsection{Changes within a Visit: 4D Mapping on TESSE}
 \label{sec:exp_temporal}
 \enlargethispage{\baselineskip}
 
-Khronos's TESSE sequences contain observed motion and changes after looking away within one run, and its
+Khronos's TESSE sequences contain observed motion and changes after looking away within one visit, and its
 official evaluator queries the map at earlier times to score background, static objects, dynamic objects, and changes.
 Our TSDF maps improve all four categories on both scenes and reach higher final
 mesh F1 (\cref{tab:tesse}). Change F1 moves most: it rises from 46.2 to 78.6 in Office and from 38.6 to 92.6 in
-Apartment. Because the evaluator queries the map at every earlier time, these gains cover the history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1, because ours keeps
-candidates it drops.
+Apartment. Because the evaluator queries the map at every earlier time, these gains cover the history before and after each change. Dynamic-object F1 rises from 84.8 to 96.7 and from 85.5 to 95.1, because ours keeps motion candidates that Khronos drops.
 
 % ===== BEGIN tables / tesse =====
 % SRC: pure semantic inputs, 5 cm cells on both sides; ours tesse_{apt,a}_5m_semv5, Khronos tesse/khronos_sem_{apartment,office}_5cm.
@@ -744,7 +739,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the
-Aria rooms. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Our renders show only the current scene and keep fine detail such as chair legs; GaME's renders blur this detail and keep ghosts such as a second picture frame on Flat (\cref{fig:gaussian_details}).
+Aria rooms. On Flat, GaME masks 371 and drops 194 of its 442 keyframes to fit its current map, whereas ours keeps all 447. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Our renders show only the current scene and keep fine detail such as chair legs; GaME's renders blur this detail and keep ghosts such as a second picture frame on Flat (\cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]

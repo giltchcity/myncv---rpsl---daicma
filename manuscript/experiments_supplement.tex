@@ -401,7 +401,7 @@ pixels with valid measured depth in both methods.
 
 \paragraph{Evidence and state comparison.}
 Surface tolerance follows the map resolution, with a 5\,cm reference scale for Gaussians. Each depth image tests at most 1,500 surface samples per state.
-The $60^\circ$ incidence filter applies to noisy real-world depth, and the minimum of
+The $60^\circ$ incidence filter guards against noisy real-world depth, and the minimum of
 $\min(30,\nu_{\mathrm{rel}})$ judged samples applies to every round.
 The change score of state $s$ at round $n$ is
 \begin{equation}
@@ -421,7 +421,7 @@ surface geometry and $L_{U:N}$ compares the candidate's own observations under
 an unsupported and a valid-surface explanation. The candidate-validity prior is
 symmetric. Within a visit, a spatially distinct candidate with measured support
 can replace a state whose old site has no current support; ambiguous candidates
-remain pending. Surface correspondence uses twice the map-resolution scale.
+remain pending. Surface correspondence uses twice the depth tolerance.
 
 \paragraph{Occupancy near a replaced surface.}
 An occupied measurement updates a finite band behind the measured surface. When a re-observed surface lies
