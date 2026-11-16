@@ -176,8 +176,10 @@ discovered in different ways, as they happen or only on return, and maps store
 the same scene in different ways. We overcome the first with a change detection
 that brings every change to the same object-level decision, built on comparing
 mapped object surfaces with current observations, and the second with a map
-update that applies each decision to the geometry and the past observations of
-every representation, where retired geometry remains as history. Our contributions are as follows:
+update that applies each decision to the geometry and past observations of
+every map and keeps retired geometry as history.
+
+\noindent Our contributions are:
 
 \begin{itemize}
   \item \ours is the first system for 4D mapping across visits in TSDF,
@@ -288,7 +290,7 @@ model of $f_i$ to each state's earlier in-place rounds, regularized toward poole
 where $j$ ranges over candidate change times, $w_i(j)$ is the share of the state's reliable surface that round $i$ inspects for the first time since $j$, and the prior $\pi_s(j)$ is zero within a visit. The weights keep repeated views from adding evidence, and the maximum tries each moment the armchair could have left, so a patch seen before it left counts again once seen empty.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$ and see-through
 samples since the chosen $j$ outnumber supported ones. Unlike the score, this vote also counts repeated views, so renewed support blocks a spurious end. $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
-starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting, priors, and thresholds.
+starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
 Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
@@ -510,6 +512,9 @@ We evaluate held-out views after refinement as in
 GaME~\cite{Yugay_2026_CVPR}, using PSNR, MS-SSIM~\cite{1292216},
 LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 
+
+\noindent\textbf{Implementation.}
+We use a $60^\circ$ incidence limit, a 5\,cm tolerance for Gaussian maps, rounds of at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples, and $\eta=99$ in all experiments.
 
 \subsection{4D Mapping within and across Visits}
 \label{sec:exp_main}
