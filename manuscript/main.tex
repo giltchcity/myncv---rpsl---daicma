@@ -154,16 +154,16 @@ accurate final map, so whatever conflicts with the latest observations is
 overwritten, masked, or discarded. But real scenes change in two ways. In an \emph{observed change}, the camera
 watches an object move. In a \emph{change while away}, the camera returns to
 find an object moved, gone, or new. It may have looked away for a moment or
-been switched off for days between visits. We call each run of the system, from start to shutdown, a \emph{visit}. Prior work on long-term dynamics stays within a single visit.
+been switched off for days between visits. A \emph{visit} is one run of the system from start to shutdown. Prior work on long-term dynamics stays within a single visit.
 The two are mostly studied apart: observed changes are suppressed or
 reconstructed from
 video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
-changes while away are handled by updating the map to its latest state. Within
-a single visit, both kinds of change have been handled together in one 4D map,
-and earlier states have been recovered between finished captures. To our
+changes while away are handled by updating the map to its latest state. Both
+kinds of change have been handled together in one 4D map within a single visit.
+Earlier states have been recovered between finished captures. To our
 knowledge, no system continues one history from one visit into the next
-(\cref{tab:capabilities}). A restart therefore typically begins a new map or
-updates the old one in place, and the earlier layout is lost.
+(\cref{tab:capabilities}). A restart typically begins a new map or
+updates the old one in place, so the earlier layout is lost.
 
 A complete 4D scene record must both reflect the current environment and track
 when each of its elements appeared and disappeared. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Prior methods tackle these regimes in isolation: Khronos~\cite{Schmid-RSS-24} reconstructs dense 4D history over one uninterrupted session, while recent Gaussian approaches~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} infer earlier map states between separate captures. Each of these histories, however, exists in a single representation, whereas an
@@ -184,7 +184,7 @@ every representation, where retired geometry remains as history. We contribute:
   Gaussian, and occupancy maps (\cref{tab:capabilities}).
 
   \item One object-level decision rule controls when geometry leaves the
-  current map and where past observations still apply, in each of the three
+  current map and where past observations still apply in each of the three
   representations.
 
   \item Two RGB-D datasets with both kinds of change, ReviScene-BedRoom and
@@ -240,7 +240,7 @@ scans~\cite{Zhu_2024_CVPR}. ObVi-SLAM and OASIS-Map associate object landmarks a
 sessions~\cite{10423794,oh2026oasismapobjectlevelchangedetection}, and 3D VSG predicts semantic scene
 changes~\cite{10161212}. Persistence models reason about feature survival~\cite{7487237,9196913}, occupancy
 transitions~\cite{DBLP:conf/aaai/Meyer-DeliusBB12}, periodicity~\cite{7878680}, or appearance and disappearance
-hypotheses~\cite{11247086}. Each of these histories or priors belongs to one representation and one mode of capture (\cref{tab:capabilities}). \ours instead maintains one 4D history within and across visits, in TSDF meshes, 3D Gaussians, and occupancy grids.
+hypotheses~\cite{11247086}. Each of these histories or priors belongs to one representation and one mode of capture (\cref{tab:capabilities}). \ours instead maintains one 4D history of the scene within and across visits in TSDF, Gaussian, and occupancy maps.
 
 % ===== END sec / 2_related_work =====
 % ===== BEGIN sec / 4_method =====
