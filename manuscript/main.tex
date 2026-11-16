@@ -80,11 +80,11 @@ queries at any past time.}
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
-layouts. Objects move in view, shift out of view, and are rearranged between visits, yet prior mappers handle isolated cases:
+layouts. Objects move in view, shift out of view, and are rearranged between visits, yet prior mappers each cover only part of this:
 updating with old frames can reconstruct moved objects and erode new ones; discarding them loses evidence for unchanged surfaces.
 We introduce \ours, an RGB-D mapping system that jointly updates geometry and observation validity through object-state
 transitions confirmed by surface evidence from partial views. Ended geometry leaves the current map but remains queryable at past times. Past observations constrain only the states and regions they still describe.
-The same decisions drive TSDF, 3D Gaussian, and occupancy updates. In each map type,
+The same decision rule drives TSDF, 3D Gaussian, and occupancy updates. In each map type,
 \ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
 benchmarks and our datasets, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
 \end{abstract}
@@ -154,38 +154,37 @@ accurate final map, so whatever conflicts with the latest observations is
 overwritten, masked, or discarded. But real scenes change in two ways. In an \emph{observed change}, the camera
 watches an object move. In a \emph{change while away}, the camera returns to
 find an object moved, gone, or new. It may have looked away for a moment or
-been switched off for days between visits. Prior work on long-term dynamics stays within a single run.
+been switched off for days between visits. We call each run of the system, from start to shutdown, a \emph{visit}. Prior work on long-term dynamics stays within a single visit.
 The two are mostly studied apart: observed changes are suppressed or
 reconstructed from
 video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
-changes while away are handled by updating the map to its latest state. No
-method yet maintains one 4D history of the scene through both. Existing maps
-therefore lose track of a scene that changes in both ways: geometry is left
-stale or missing, and a restart typically begins a new map or updates the old
-one in place, so the earlier layout is lost.
+changes while away are handled by updating the map to its latest state. Within
+a single visit, both kinds of change have been handled together in one 4D map,
+and earlier states have been recovered between finished captures. To our
+knowledge, no system continues one history from one visit into the next
+(\cref{tab:capabilities}). A restart therefore typically begins a new map or
+updates the old one in place, and the earlier layout is lost.
 
 A complete 4D scene record must both reflect the current environment and track
 when each of its elements appeared and disappeared. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Prior methods tackle these regimes in isolation: Khronos~\cite{Schmid-RSS-24} reconstructs dense 4D history over one uninterrupted session, while recent Gaussian approaches~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} infer earlier map states between separate captures. Each of these histories, however, exists in a single representation, whereas an
 embodied agent or a digital twin needs a long-term memory of the scene in every
 map it uses: surfaces, free space, and rendered views.
 
-Our goal is 4D mapping under both kinds of change across TSDF meshes, 3D
-Gaussians, and occupancy grids. Two obstacles stand in the way: changes are
+Our goal is \emph{4D mapping across visits}: one history through both kinds of
+change and across shutdowns, in all three map types. Two obstacles stand in the way: changes are
 discovered in different ways, as they happen or only on return, and maps store
 the same scene in different ways. We overcome the first with a change detection
 that brings every change to the same object-level decision, built on comparing
 mapped object surfaces with current observations, and the second with a map
-update that applies each decision to the geometry and the past observations of
-every representation, where retired geometry remains as history. Our
-contributions are:
+update that applies each decision to the geometry and past observations of
+every representation, where retired geometry remains as history. We contribute:
 
 \begin{itemize}
-  \item \ours is the first RGB-D mapping system to handle observed changes and
-  changes while away jointly while keeping a queryable 4D history in TSDF
-  meshes, 3D Gaussians, and occupancy grids.
+  \item \ours is the first system for 4D mapping across visits in TSDF,
+  Gaussian, and occupancy maps (\cref{tab:capabilities}).
 
-  \item One object-level decision per change controls when geometry leaves the
-  current map and where past observations still apply, in all three
+  \item One object-level decision rule controls when geometry leaves the
+  current map and where past observations still apply, in each of the three
   representations.
 
   \item Two RGB-D datasets with both kinds of change, ReviScene-BedRoom and
