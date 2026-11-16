@@ -273,6 +273,7 @@ add up to a full change. One surface test handles every change, observed or foun
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
 We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only these count. Rays beyond a maximum incidence angle cannot see through a sample, since noisy depth then yields false see-through evidence~\cite{6375037}. Depth tolerance is the voxel or cell
+
 size~\cite{9811877}, or a fixed scale for Gaussian maps. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
 the floor where the armchair stood is evidence that it left, whereas the sofa only occludes the wall behind it. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden behind a larger one stays until its site is seen again.
