@@ -171,12 +171,12 @@ embodied agent or a digital twin needs a long-term memory of the scene in every
 map it uses: surfaces, free space, and rendered views.
 
 Our goal is \emph{4D mapping across visits}: one history through both kinds of
-change and across shutdowns, in all three map types. Two obstacles stand in the way: changes are
+change, in all three map types. Two obstacles stand in the way: changes are
 discovered in different ways, as they happen or only on return, and maps store
 the same scene in different ways. We overcome the first with a change detection
 that brings every change to the same object-level decision, built on comparing
 mapped object surfaces with current observations, and the second with a map
-update that applies each decision to the geometry and past observations of
+update that applies each decision to the geometry and the past observations of
 every representation, where retired geometry remains as history. We contribute:
 
 \begin{itemize}
