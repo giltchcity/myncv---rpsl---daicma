@@ -67,10 +67,11 @@
 \includegraphics[width=\linewidth]{figures/teaser_with_zooms.jpg}
 \vspace{-5mm}
 \captionsetup{hypcap=false}
-\captionof{figure}{\textbf{One map tracks scene changes within and across visits.} A robot sees objects move in view
-(red) and finds missing or added objects after looking away or returning days later (purple). Both trigger one update:
-\ours retires ended object states, reconstructs the new layout, keeps valid past geometry, and stores
-element lifetimes for queries at any past time.}
+\captionof{figure}{\textbf{One map tracks scene changes within and across
+visits.} A robot sees objects move in view (red) and finds missing or added
+objects after looking away during a run or after a restart days later
+(purple). \ours updates the map for both and keeps the earlier layout for
+queries at any past time.}
 \label{fig:teaser}
 \captionsetup{hypcap=true}
 \vspace{-1mm}
@@ -136,71 +137,70 @@ TSDF: truncated signed distance field;
 \end{table*}
 % ===== END tables / capabilities =====
 
-The world does not reset when a mapper restarts. Objects move in view,
-shift while a robot looks elsewhere, and are rearranged between visits
-(\cref{fig:teaser}). An RGB-D map must follow these changes, preserve
-unchanged parts of the scene, and answer queries about the past.
+RGB-D mapping turns a stream of color and depth images into a live 3D map of
+the scene. Self-driving cars plan on real-time maps, AR headsets keep a live
+mesh of the room, inspection robots rescan construction sites weekly, and
+digital twins mirror changing factories. Such maps are now built accurately as
+occupancy grids for free
+space~\cite{10.1007/s10514-012-9321-0,Reijgwart-RSS-23}, signed distance
+fields (SDFs) for surfaces~\cite{6162880,8202315}, and 3D Gaussians for
+novel-view synthesis~\cite{Keetha_2024_CVPR,Matsuki_2024_CVPR}. A robot trained in a digital twin, for example, sees Gaussian-rendered views, collides
+with a surface mesh, and plans through free space. What is missing is one way to keep all these maps current as the scene changes
+within and across visits (\cref{fig:teaser}).
 
-A past observation can be useful and harmful at the same time.
-A depth measurement taken before a sofa arrived still supports the
-wall behind it, but marks the sofa's new location as empty. Keeping
-the measurement unchanged can erode the sofa; discarding it loses
-evidence for the wall. Likewise, an old image of a removed armchair
-describes a real past scene but must not restore it in the current map.
 
-Prior work addresses temporal mapping within individual representations
-(\cref{tab:capabilities}). Khronos~\cite{Schmid-RSS-24} tracks when
-objects are present, while POCD~\cite{Qian-RSS-22} models their
-persistence across scans. Panoptic Mapping~\cite{9811877} maintains
-object-centric TSDF submaps, and Wavemap~\cite{Reijgwart-RSS-23}
-updates a wavelet-compressed occupancy map. GaME~\cite{Yugay_2026_CVPR}
-removes changed Gaussian geometry and masks stale regions in past
-keyframes. These systems use update rules specific to their map
-representations.
+Recent systems extend these maps to changing
+scenes~\cite{Zheng_2025_CVPR,Reijgwart-RSS-23,Yugay_2026_CVPR}. They typically
+aim at one accurate final map, so whatever conflicts with the latest
+observations is overwritten, masked, or discarded. However, real scenes change
+in two ways: objects move while the camera watches (observed changes), and they
+move, disappear, or appear while the camera is away, within or across visits
+(changes while away). The two are mostly studied apart: observed changes are
+suppressed or reconstructed from
+video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
+changes while away are handled by updating the map to its latest state.
+Maintaining one 4D history of the scene through both remains unexplored. As a
+result, existing mapping methods struggle to follow a scene through both kinds
+of change: geometry is left stale or missing, and a restart typically begins a
+new map or updates the old one in place, so the earlier layout is lost.
 
-We introduce \ours, an RGB-D mapping system that uses object changes
-to update geometry and decide how to reuse past observations.
-We detect changes from tracked motion and depth views within
-and across visits. GaME selects geometry to remove through masks in
-earlier views; we keep geometry linked to objects throughout mapping.
-When an object moves or disappears, we remove its old geometry from
-the current map, even outside the current view, and retain it for
-historical queries.
 
-The same change times determine where earlier observations can still
-update the map (\cref{fig:method}). In TSDF maps, old measurements keep
-supporting unchanged surfaces, while their free-space contributions
-stop before new objects. For Gaussian maps, we render the scene at
-each keyframe's capture time and update only geometry present both
-then and now. An old image can thus keep refining the wall now hidden
-by the sofa without restoring the removed armchair. In occupancy maps,
-we remove conflicting free-space evidence and locally replace stale
-occupied surfaces.
 
-We introduce \emph{ReviScene-BedRoom} and \emph{ReviScene-Home},
-two RGB-D datasets with annotations for in-view motion, out-of-view
-changes, and cross-visit changes. With shared poses and masks,
-\ours improves mesh, 4D object, and change F1 over the native baselines
-on ReviScene, Flat~\cite{9811877}, and 3RScan~\cite{9010673}.
-On TESSE~\cite{Schmid-RSS-24}, change F1 reaches up to $2.4\times$
-that of Khronos. On Flat and Aria~\cite{Pan_2023_ICCV,Yugay_2026_CVPR},
-our Gaussian maps improve novel-view PSNR by 0.88--3.26\,dB over GaME.
 
-\noindent\textbf{Contributions:}
+A complete 4D scene record must both reflect the current environment and track the lifespans—appearance and disappearance times—of its elements. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Prior methods tackle these regimes in isolation: Khronos~\cite{Schmid-RSS-24} reconstructs dense 4D history over one uninterrupted session, while recent Gaussian approaches~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} infer earlier map states between separate captures. Each of these histories, however, exists in a single representation, whereas an
+embodied agent or a digital twin needs a long-term memory of the scene in every
+map it uses: surfaces, free space, and rendered views.
+
+
+
+
+
+This work addresses 4D mapping under both kinds of change across TSDF meshes,
+Gaussian, and occupancy maps. Two obstacles stand in the way: changes are
+discovered in different ways, as they happen or only on return, and maps store
+the same scene in different ways. We overcome the first with a change detection
+that brings every change to the same object-level decision, built on comparing
+mapped object surfaces with current observations, and the second with a map
+update that applies each decision to the current map and its history in every
+representation. Our contributions are:
+
 \begin{itemize}
-  \item \textbf{Joint map and observation updates:}
-  We use object changes to control geometry removal and the reuse
-  of past observations in TSDF, Gaussian, and occupancy maps.
+  \item We present \ours, the first RGB-D mapping system to handle observed
+  changes and changes while away jointly while keeping a queryable 4D history
+  in TSDF, Gaussian, and occupancy maps.
 
-  \item \textbf{Change detection within and across visits:}
-  We combine tracked motion with partial depth observations to
-  detect changes during a visit and on revisits.
+  \item One object-level decision per change controls when geometry leaves the
+  current map and where past observations still apply, in all three
+  representations.
 
-  \item \textbf{Joint dynamic benchmark and evaluation:}
-  We introduce two RGB-D datasets covering in-view, out-of-view,
-  and cross-visit changes, and evaluate across three map
-  representations and six datasets. We will release the code and data.
+  \item Two RGB-D datasets, ReviScene-BedRoom and ReviScene-Home, annotated
+  with both kinds of change. On these and public benchmarks, \ours outperforms
+  the strongest baseline of each map type in mesh, 4D object, and change F1,
+  with up to $2.4\times$ the change F1 of Khronos on TESSE and
+  0.88--3.26\,dB higher PSNR than GaME. We will release the code and data.
 \end{itemize}
+
+
 
 
 
