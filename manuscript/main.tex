@@ -80,13 +80,12 @@ queries at any past time.}
 % ===== BEGIN sec / 0_abstract =====
 \begin{abstract}
 Robots working in human spaces over weeks need a 3D map that updates what changes, keeps what persists, and recalls past
-layouts. Objects move in view, shift out of view, and are rearranged between visits, yet prior mappers each cover only part of this:
-updating with old frames can reconstruct moved objects and erode new ones; discarding them loses evidence for unchanged surfaces.
-We introduce \ours, an RGB-D mapping system that jointly updates geometry and observation validity through object-state
-transitions confirmed by surface evidence from partial views. Ended geometry leaves the current map but remains queryable at past times. Past observations constrain only the states and regions they still describe.
-The same decision rule drives TSDF, 3D Gaussian, and occupancy updates. In each map type,
-\ours beats the best-performing map-specific baseline (Khronos, Panoptic Mapping, GaME, Wavemap) in mesh, 4D object, and change F1 on public
-benchmarks and our datasets, with up to $2.4\times$ change F1 on TESSE and +3.3\,dB PSNR on Flat. We will release the code and data.
+layouts. Objects move in view, change while the camera looks away, and are rearranged between visits, and existing mappers each handle only some of these changes.
+Old observations are the difficulty: fusing them rebuilds moved objects and erodes new ones, and discarding them loses the unchanged surfaces they saw.
+But an old frame is wrong only about the objects that changed.
+We introduce \ours, an RGB-D system for 4D mapping across visits, in which one rule tests each mapped object against new depth images and decides whether it is still there.
+If not, its geometry is retired: it leaves the current map but stays queryable at past times, and old frames keep updating only what they still describe.
+The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline, raising change F1 from 70.8 to 98.4 on our real recordings and PSNR by 3.26\,dB on Flat. We will release code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -154,8 +153,8 @@ accurate final map, so whatever conflicts with the latest observations is
 overwritten, masked, or discarded. But real scenes change in two ways. In an \emph{observed change}, the camera
 watches an object move. In a \emph{change while away}, the camera returns to
 find an object moved, gone, or new. It may have looked away for a moment or
-been switched off for days between visits. A \emph{visit} is one run of the system from start to shutdown. Prior work on long-term dynamics stays within a single visit.
-The two are mostly studied apart: observed changes are suppressed or
+been switched off for days between visits. A \emph{visit} is one run of the system from start to shutdown.
+The two kinds of change are mostly studied apart: observed changes are suppressed or
 reconstructed from
 video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
 changes while away are handled by updating the map to its latest state. Both
@@ -163,7 +162,7 @@ kinds of change have been handled together in one 4D map within a single visit.
 Earlier states have been recovered between finished captures. To our
 knowledge, no system keeps one history both within a visit and from one visit into the next
 (\cref{tab:capabilities}). A restart typically begins a new map or
-updates the old one in place, so the earlier layout is lost.
+updates the old one in place, and in both cases the earlier layout is lost.
 
 A complete 4D scene record must both reflect the current environment and track
 when each of its elements appeared and disappeared. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Prior methods tackle these regimes in isolation: Khronos~\cite{Schmid-RSS-24} reconstructs dense 4D history over one uninterrupted session, while recent Gaussian approaches~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} infer earlier map states between separate captures. Each of these histories, however, exists in a single representation, whereas an
@@ -191,8 +190,7 @@ every representation and keeps retired geometry as history.
 
   \item Two RGB-D datasets with both kinds of change, ReviScene-BedRoom and
   ReviScene-Home. On these and public benchmarks, \ours beats the strongest
-  baseline of each map type, by up to $2.4\times$ in change F1 and 3.26\,dB in
-  PSNR. We will release the code and data.
+  baseline of each map type, raising change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release the code and data.
 \end{itemize}
 
 
@@ -203,7 +201,7 @@ every representation and keeps retired geometry as history.
 \centering
 \includegraphics[width=\textwidth]{figures/export_lossless/pipeline_halfgrid_operations.pdf}
 \vspace{-4mm}
-\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks compare the \emph{Earlier map} with new observations. The wall (green) remains, the armchair (red) disappears from its previous location, and a sofa (yellow) appears. \emph{Change detection} accumulates evidence of absence over $T_1$--$T_4$ and validates the new sofa using depth support within $T_4$, comparing depth observations (blue) with candidate geometry (yellow). \emph{Map update} removes the armchair from the current map, keeps the wall, and adds the sofa through each representation's native update. The resulting \emph{Updated 4D map} retains past states for queries at earlier times.}
+\caption{\textbf{State-driven 4D map update.} Posed RGB-D frames and masks compare the \emph{Earlier map} with new observations. The wall (green) remains, the armchair (red) disappears from its previous location, and a sofa (yellow) appears. \emph{Change detection} accumulates evidence of absence over $T_1$--$T_4$ and validates the new sofa using depth support within $T_4$, comparing depth observations (blue) with candidate geometry (yellow). \emph{Map update} removes the armchair from the current map, keeps the wall, and adds the sofa through each representation's own update. The resulting \emph{Updated 4D map} retains past states for queries at earlier times.}
 \label{fig:method}
 \vspace{-4mm}
 \end{figure*}
@@ -449,8 +447,7 @@ evaluation.
 
 \noindent\textbf{Simulated sequences.}
 We rendered two animated visits to an InteriorAgent apartment~\cite{InteriorAgent2025} in Isaac Sim, with 72 change events (38 within visits and 34 between visits). The simulator supplies exact camera poses, object labels, and scene geometry over
-time. The second visit covers only part of the apartment, testing whether a continued map keeps what the revisit leaves
-unseen.
+time. The second visit covers only part of the apartment, as return visits often do.
 
 
 
@@ -472,7 +469,7 @@ Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: 
 \label{sec:exp_main}
 
 \noindent\textbf{All three map types improve.}
-\ours improves all three scores over every baseline on all four datasets (\cref{tab:main}). The three map types store geometry in different ways, yet each gains. What they share is the object-level decision rule (\cref{sec:states}), so we attribute the gain to it and not to one representation. Scores also differ between map types, for baselines and ours alike: on Flat, every TSDF and Gaussian system misses the same cups and plates, so we compare within each map type. The largest gap is in TSDF maps on the real BedRoom recording, where change F1 is 70.8 for Khronos and 98.4 for ours. In \cref{fig:geometry_details}, the suitcase that left BedRoom stays in every baseline map, and in Khronos and Panoptic Mapping it still hides the chair. Khronos can confirm an absence only through rays that reach reconstructed background, whereas \ours tests the object's own surface. GaME leaves ghost geometry where objects stood, with a change F1 on Home of 82.9 against our 97.9. Wavemap frees only the cells that later rays cross, whereas \ours retires all cells of an ended object at once (\cref{fig:ours_maps}). On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos and 44.6 for Panoptic Mapping.
+\ours improves all three scores over every baseline on all four datasets (\cref{tab:main}). The three map types store geometry in different ways, and each gains. What they share is the object-level decision rule (\cref{sec:states}), so we attribute the gain to it and not to one representation. Scores also differ between map types, for baselines and ours alike, because each representation has its own strengths. We therefore compare within each map type. The largest gap is in TSDF maps on the real BedRoom recording, where change F1 is 70.8 for Khronos and 98.4 for ours. In \cref{fig:geometry_details}, the suitcase that left BedRoom stays in every baseline map, and in Khronos and Panoptic Mapping it still hides the chair. Khronos can confirm an absence only through rays that reach reconstructed background, whereas \ours tests the object's own surface. GaME leaves ghost geometry where objects stood, with a change F1 on Home of 82.9 against our 97.9. Wavemap frees only the cells that later rays cross, whereas \ours retires all cells of an ended object at once (\cref{fig:ours_maps}). On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos and 44.6 for Panoptic Mapping.
 
 
 % ===== BEGIN figures / qualitative_combined =====
@@ -632,9 +629,9 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 \label{sec:exp_public}
 \setcounter{topnumber}{2}% at most two floats per column top from here on
 
-We next adopt the evaluation code of Khronos and GaME, with predicted masks in place of ground-truth instances.
+We next adopt the evaluation code of Khronos and GaME, with per-frame semantic and SAM masks.
 
-\noindent\textbf{Comparison on the benchmark of Khronos.}\label{sec:exp_temporal}
+\noindent\textbf{The gains also hold within one visit.}\label{sec:exp_temporal}
 In the TESSE scenes, people walk in front of the camera, and objects change while it looks away. The official evaluator asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. With the same poses and semantic masks, our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
 
 
@@ -767,7 +764,7 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
-\noindent\textbf{The change test finds objects that are simply gone.}
+\noindent\textbf{The change test detects removed objects.}
 An object carried out of the room leaves no motion to see and no new place to find. Without the change test, the map on BedRoom (TSDF) misses four such changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights the test removes two static objects.
 
 \noindent\textbf{A decision must reach the geometry.}
@@ -776,7 +773,7 @@ Without retirement, a detected change stays a label: stale furniture remains, ch
 \noindent\textbf{Old keyframes must be limited, not dropped.}
 Dynamic views are keyframes that saw a later change, so they show both what changed and what stayed. Trained as current views, they rebuild removed furniture and cost 5.74\,dB PSNR. Dropping them also loses the walls and floors they saw and costs 5.00\,dB. Capture-time keyframes avoid both: each view trains the map before or after the change it saw. The other map types need the same limit: without valid domains, TSDF change F1 on Home falls from 97.9 to 82.8, and without saved-log-odds subtraction and local replacement, occupancy mesh F1 on Flat falls by 2.1.
 
-\noindent\textbf{\ours does not depend on ground-truth masks.}
+\noindent\textbf{\ours also runs on predicted masks.}
 With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three events go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
 
 
@@ -784,7 +781,7 @@ With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is inven
 
 
 \noindent\textbf{\ours remains an online mapping system.}\label{sec:cost}
-Handling changes and keeping history add work to every update. Nonetheless, \ours maps at least as fast as Khronos and GaME and with less peak memory (\cref{tab:cost}), and reaches 100 FPS in occupancy maps against 144 for Wavemap. Like GaME, our Gaussian maps are not yet real-time.
+Handling changes and keeping history add work to every update. Nonetheless, \ours maps at least as fast as Khronos and GaME and with less peak memory (\cref{tab:cost}), and reaches 100 FPS in occupancy maps against 144 for Wavemap. Our Gaussian maps are not yet real-time.
 
 
 % ===== END sec / 5_experiments =====
@@ -795,9 +792,7 @@ Handling changes and keeping history add work to every update. Nonetheless, \our
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \ours, where one object-state transition governs geometry retirement and observation validity within and
-across visits. Valid domains and capture-time keyframes restrict past observations to unchanged surfaces, realizing one mechanism within native TSDF, Gaussian, and occupancy integration. Across six datasets, \ours beats map-specific baselines and keeps history queryable. Once bounded to the states they recorded, past observations keep completing what persists after a change. Modeling non-rigid motion and joint
-segmentation are natural next steps.
+We presented \ours, an RGB-D system for 4D mapping across visits. One decision per object retires the geometry that left and limits each old frame to what it still describes, through valid domains in TSDF, capture-time keyframes in Gaussian, and removal of earlier free space in occupancy maps. On six datasets, \ours beats the strongest baseline of each map type, keeps every past state queryable, and remains online. A changing scene does not force a map to forget: old geometry can be retired instead of deleted, and old frames limited instead of dropped. Non-rigid motion and joint segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
 %
