@@ -464,15 +464,15 @@ Besides ReviScene (\cref{sec:benchmark}), we use public datasets. Flat~\cite{981
 Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and per-frame semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats needs a separate posed capture after each change.
 
 \noindent\textbf{Metrics.}
-Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed by TSDF fusion of rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. GaME's Gaussians and Wavemap's cells are grouped into objects by the same rule and instances as ours. Change F1~\cite{Schmid-RSS-24} measures whether the map reports each appearance and disappearance, and an invented change is an error. Held-out views are scored after refinement as in GaME, by PSNR, MS-SSIM~\cite{1292216}, LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
+Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped into objects by the same instances. Change F1~\cite{Schmid-RSS-24} measures whether the map reports each appearance and disappearance.
 
-\noindent\textbf{Implementation.}
-The incidence limit is $60^\circ$, a round judges at least 30 reliable samples, and $\eta=99$ in all experiments.
+
 
 \subsection{4D Mapping within and across Visits}
 \label{sec:exp_main}
 
-\ours improves mesh, object, and change F1 over the baselines of every map type on all four datasets (\cref{tab:main}). Its surfaces are more accurate, its maps hold the objects that are there, and fewer changes are missed or invented. \Cref{fig:geometry_details} shows what the baselines get wrong: every baseline keeps the suitcase that left BedRoom, and in Khronos and Panoptic Mapping it still hides the chair behind it. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor (\cref{fig:ours_maps}). The gain is largest in TSDF maps on BedRoom, where change F1 rises from 70.8 for Khronos to 98.4. Without reconstructed background behind an object, Khronos has no ray to confirm its absence. On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos and 44.6 for Panoptic Mapping. GaME leaves ghost geometry of moved objects, and Gaussian change F1 on Home rises from 82.9 to 97.9. Occupancy gains most on BedRoom, with object F1 from 80.0 to 93.8.
+\noindent\textbf{All three map types improve.}
+\ours improves all three scores over every baseline on all four datasets (\cref{tab:main}). The three map types store geometry in different ways, yet each gains. What they share is the object-level decision rule (\cref{sec:states}), so we attribute the gain to it and not to one representation. Scores also differ between map types, for baselines and ours alike: on Flat, every TSDF and Gaussian system misses the same cups and plates, so we compare within each map type. The largest gap is in TSDF maps on the real BedRoom recording, where change F1 is 70.8 for Khronos and 98.4 for ours. In \cref{fig:geometry_details}, the suitcase that left BedRoom stays in every baseline map, and in Khronos and Panoptic Mapping it still hides the chair. Khronos can confirm an absence only through rays that reach reconstructed background, whereas \ours tests the object's own surface. GaME leaves ghost geometry where objects stood, with a change F1 on Home of 82.9 against our 97.9. Wavemap frees only the cells that later rays cross, whereas \ours retires all cells of an ended object at once (\cref{fig:ours_maps}). On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos and 44.6 for Panoptic Mapping.
 
 
 % ===== BEGIN figures / qualitative_combined =====
@@ -597,11 +597,11 @@ The incidence limit is $60^\circ$, a round judges at least 30 reliable samples, 
 % ===== END OPTION B =====
 % ===== END figures / qualitative_combined =====
 
-\noindent\textbf{Kinds of change.}
-ReviScene lets us score each kind of change on its own. On Home, \ours finds all 38 changes that happen while the camera looks away within a visit, where Khronos misses 9 and GaME 11. Between the visits it misses at most 3 of 34, against 8 and 10. On the real BedRoom, it misses at most one of 31, and Khronos 14.
+\noindent\textbf{Changes while away are found.}
+Of the 38 changes on Home made while the camera looks away within a visit, \ours finds all, where Khronos misses 9 and GaME 11. Of the 34 between the visits it misses at most 3, against 8 and 10. Motion in view is scored on TESSE (\emph{Dyn.}, \cref{sec:exp_public}).
 
-\noindent\textbf{History.}
-A 4D map must also be right in the past. Mesh$_{\mathrm{4D}}$ tests the geometry: on Home, the map of each time is compared with the scene of that time. Our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Historical rendering tests the appearance: before refinement, ours reaches 24.01\,dB PSNR against 22.99\,dB for the saved snapshots of GaME, which keeps no history. TESSE below tests objects and changes at earlier times.
+\noindent\textbf{Earlier times are also mapped better.}
+On Home, Mesh$_{\mathrm{4D}}$ checks the map at earlier times: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, while occupancy is level with Wavemap. For appearance, refinement cannot be run for every earlier time, so historical rendering is compared before it: \ours reaches 24.01\,dB PSNR against 22.99\,dB for snapshots of GaME, which keeps only its latest map.
 
 \begin{table}[t]
 \centering
@@ -623,7 +623,7 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours beats Khronos in every score, most of all for changes. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks (bold: best; shaded: \ours).}
+\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks.}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
@@ -634,8 +634,8 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 
 We next adopt the evaluation code of Khronos and GaME, with predicted masks in place of ground-truth instances.
 
-\noindent\textbf{Changes within a visit.}\label{sec:exp_temporal}
-TESSE is the benchmark of Khronos itself. People walk through the scenes, and objects change while the camera looks away. The official evaluator asks the map about every earlier time, so errors in the past count too. Our TSDF maps lead in every score on both scenes (\cref{tab:tesse}). The gap is widest for changes, the hardest score for Khronos: in Apartment its change F1 is 38.6 and ours is 92.6, a factor of 2.4. Walking people are also mapped better, because \ours keeps motion candidates that Khronos drops.
+\noindent\textbf{Comparison on the benchmark of Khronos.}\label{sec:exp_temporal}
+In the TESSE scenes, people walk in front of the camera, and objects change while it looks away. The official evaluator asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. With the same poses and semantic masks, our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
 
 
 % ===== BEGIN tables / tesse =====
@@ -653,8 +653,8 @@ TESSE is the benchmark of Khronos itself. People walk through the scenes, and ob
 
 % ===== END tables / rendering =====
 
-\noindent\textbf{Novel-view rendering.}\label{sec:exp_gaussians}
-Our Gaussian maps render held-out views better than GaME on all three scenes, in PSNR, MS-SSIM, and LPIPS (\cref{tab:rendering}). PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms. The reason is the keyframes. To fit old views to the changed scene, GaME masks 371 and drops 194 of its 442 keyframes on Flat, and with the dropped ones go the walls and floors they also showed. \ours keeps all 447 and trains each on the map at its capture time. The renders show the difference: ours keep fine detail such as chair legs, while GaME's blur it and leave ghosts such as a second picture frame (\cref{fig:gaussian_details}).
+\noindent\textbf{Capture-time keyframes improve rendering.}\label{sec:exp_gaussians}
+To fit old views to the changed scene, GaME masks 371 and drops 194 of its 442 keyframes on Flat. The dropped views also showed walls and floors that never changed. \ours instead trains each keyframe on the map at its capture time, so old views still supervise what did not change: PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms, with better MS-SSIM~\cite{1292216} and LPIPS~\cite{Zhang_2018_CVPR} (\cref{tab:rendering}). The renders in \cref{fig:gaussian_details} show the same difference: ours keep fine detail such as chair legs, whereas those of GaME blur it and leave ghosts such as a second picture frame.
 
 \begin{table}[t]
 \centering
@@ -678,7 +678,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm; bold: best, shaded: \ours).}
+\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm).}
 
 \label{tab:rendering}
 \vspace{-2mm}
@@ -725,7 +725,7 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Ablations of Gaussian maps on Flat.} Turning off any part costs at least 4.6\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops frames with retired splats; \emph{Predicted masks}: OneFormer masks. \emph{Mesh} (5\,cm) and \emph{Chg.} F1 (\%), PSNR (dB), depth L1 (cm; bold: best, shaded: \ours).}
+\caption{\textbf{Ablations of Gaussian maps on Flat.} Turning off any part costs at least 4.6\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops them; \emph{Predicted masks}: OneFormer. F1 in \%, PSNR in dB, L1 in cm.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
@@ -735,16 +735,16 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \small
 \def\costrows{
 \toprule
-Map & Method & Time (s)$\downarrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
+Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \midrule
-& Khronos & 264.5 & 15.52 & \nev \\
-\multirow{-2}{*}{TSDF} & \oursname & \ob{250.8} & \ob{7.42} & \oc{\nev} \\
+& Khronos & 2.9 & 15.52 & \nev \\
+\multirow{-2}{*}{TSDF} & \oursname & \ob{3.0} & \ob{7.42} & \oc{\nev} \\
 \midrule
-& GaME & 1543.6 & 11.65 & 5.60 \\
-\multirow{-2}{*}{3DGS} & \oursname & \ob{1249.1} & \ob{8.29} & \ob{3.94} \\
+& GaME & 0.49 & 11.65 & 5.60 \\
+\multirow{-2}{*}{3DGS} & \oursname & \ob{0.61} & \ob{8.29} & \ob{3.94} \\
 \midrule
-& Wavemap & \textbf{5.3} & \textbf{1.94} & \textbf{0.30} \\
-\multirow{-2}{*}{Occupancy} & \oursname & \oc{7.6} & \oc{2.53} & \oc{0.32} \\
+& Wavemap & \textbf{144} & \textbf{1.94} & \textbf{0.30} \\
+\multirow{-2}{*}{Occupancy} & \oursname & \oc{100} & \oc{2.53} & \oc{0.32} \\
 \bottomrule
 }
 \setlength{\tabcolsep}{2pt}
@@ -752,7 +752,7 @@ Map & Method & Time (s)$\downarrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarro
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{llrrr}\costrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Runtime and memory on Flat.} Total mapping time and peak RAM/VRAM over two visits with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only; bold: best per map type; shaded: \ours).}
+\caption{\textbf{\ours remains online.} It maps at least as fast as Khronos and GaME, with less peak memory. FPS over the 762 frames of both visits and peak RAM/VRAM, with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only).}
 \label{tab:cost}
 \vspace{-2mm}
 \end{table}
@@ -767,24 +767,24 @@ Map & Method & Time (s)$\downarrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarro
 
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
-\noindent\textbf{Change detection.}
-Without the change test, the map on BedRoom (TSDF) misses four changes: two objects that were taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four on real data. Without the coverage weights, the test removes two static objects.
+\noindent\textbf{The change test finds objects that are simply gone.}
+An object carried out of the room leaves no motion to see and no new place to find. Without the change test, the map on BedRoom (TSDF) misses four such changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights the test removes two static objects.
 
-\noindent\textbf{Retirement.}
-Without retirement, a detected change does not reach the map: stale furniture stays, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
+\noindent\textbf{A decision must reach the geometry.}
+Without retirement, a detected change stays a label: stale furniture remains, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
 
-\noindent\textbf{Observation validity.}
-Dynamic views are keyframes that saw a later change, so they show both what changed and what stayed. Trained as current views, they cost 5.74\,dB PSNR, because they rebuild removed furniture. Dropped, they cost 5.00\,dB, because the walls and floors they saw are lost. Capture-time keyframes avoid both: each view trains the map before or after the change it saw. Without valid domains, TSDF change F1 on Home falls from 97.9 to 82.8. Without saved-log-odds subtraction and local replacement, occupancy mesh F1 on Flat falls by 2.1.
+\noindent\textbf{Old keyframes must be limited, not dropped.}
+Dynamic views are keyframes that saw a later change, so they show both what changed and what stayed. Trained as current views, they rebuild removed furniture and cost 5.74\,dB PSNR. Dropping them also loses the walls and floors they saw and costs 5.00\,dB. Capture-time keyframes avoid both: each view trains the map before or after the change it saw. The other map types need the same limit: without valid domains, TSDF change F1 on Home falls from 97.9 to 82.8, and without saved-log-odds subtraction and local replacement, occupancy mesh F1 on Flat falls by 2.1.
 
-\noindent\textbf{Predicted masks.}
-\ours works with different segmentation front ends: TESSE runs on semantic masks and rendering on SAM masks. With OneFormer~\cite{Jain_2023_CVPR} masks on Flat, mesh F1 holds and no change is invented. Three events go undetected, all on objects that OneFormer misses.
-
-
+\noindent\textbf{\ours does not depend on ground-truth masks.}
+With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three events go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
 
 
 
-\noindent\textbf{Computational cost.}\label{sec:cost}
-On Flat, \ours maps faster and with less peak RAM than Khronos and GaME, and adds 2.3\,s and 0.6\,GB over Wavemap (\cref{tab:cost}).
+
+
+\noindent\textbf{\ours remains an online mapping system.}\label{sec:cost}
+Handling changes and keeping history add work to every update. Nonetheless, \ours maps at least as fast as Khronos and GaME and with less peak memory (\cref{tab:cost}), and reaches 100 FPS in occupancy maps against 144 for Wavemap. Like GaME, our Gaussian maps are not yet real-time.
 
 
 % ===== END sec / 5_experiments =====
