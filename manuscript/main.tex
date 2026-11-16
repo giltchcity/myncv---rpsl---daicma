@@ -272,15 +272,14 @@ the new sofa or out of view. A decision should come once evidence suffices, but 
 add up to a full change. One surface test handles every change, observed or found while away; for observed changes, tracked motion also gives the time of the change.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only reliable samples count. Rays at grazing angles are ignored, since noisy depth then yields false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
+We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only these count. Rays beyond a maximum incidence angle cannot see through a sample, since noisy depth then yields false see-through evidence~\cite{6375037}. Depth tolerance is the voxel or cell
 size~\cite{9811877}, or a fixed scale for Gaussian maps. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
-the floor where the armchair stood is evidence that it left, whereas the sofa in front of the wall only occludes
-the wall. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden behind a larger one stays in place until its site is seen again.
+the floor where the armchair stood is evidence that it left, whereas the sofa only occludes the wall behind it. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden behind a larger one stays until its site is seen again.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
-A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore model $f_i$ per state: a Beta distribution fitted to the state's earlier rounds while it was in place, regularized toward pooled statistics, and a uniform distribution after a change. $\ell_s(f_i)$ is the log-likelihood ratio of the two~\cite{smithson2006lemon}. The score at round $n$ is
+A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore model $f_i$ per state: a Beta distribution fitted to the state's earlier rounds while it was in place, regularized toward pooled statistics, and a uniform distribution after a change. $\ell_s(f_i)$ is the log-likelihood ratio of the uniform against the Beta distribution~\cite{smithson2006lemon}. The score at round $n$ is
 \begin{equation}
   L_{s,n}=\max_{j\le n}\Bigl[\pi_s(j)+\sum_{i=j}^{n} w_i(j)\,\ell_s(f_i)\Bigr],
   \label{eq:score}
@@ -291,7 +290,7 @@ samples since the chosen $j$ outnumber supported ones. This second condition cou
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
-Observations matching no state form candidates. A candidate is a further partial view of an existing state if its extent and surface agree with that state within twice the map resolution or Gaussian scale; otherwise it is a new configuration. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
+Observations matching no state form candidates. A candidate is a further partial view of an existing state if its extent and surface agree with that state within twice the map resolution or twice the Gaussian scale; otherwise it is a new configuration. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
@@ -362,7 +361,7 @@ Each visit fuses only its own depth, within these valid domains. Earlier visits 
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
 step, lifetimes select the Gaussians rendered for the keyframe and restrict gradients to those still active; retired
 Gaussians stay frozen for historical rendering, while old views keep constraining static surfaces they saw. Rendering
-uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links instance masks to individual splats.
+uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/978-3-031-72670-5_26} links the 2D masks to individual splats.
 
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, and shifted surfaces can leave stale occupied layers.
@@ -504,7 +503,7 @@ LPIPS~\cite{Zhang_2018_CVPR}, and depth L1.
 
 
 \noindent\textbf{Implementation.}
-We use a $60^\circ$ incidence limit, a 5\,cm tolerance for Gaussian maps, rounds of at least $\min(30,\nu_{\mathrm{rel}})$ reliable samples, and $\eta=99$ in all experiments.
+The incidence limit is $60^\circ$, and the tolerance for Gaussian maps is 5\,cm. A round judges at least 30 reliable samples, or all of them for a smaller state. We set $\eta=99$ in all experiments.
 
 \subsection{4D Mapping within and across Visits}
 \label{sec:exp_main}
