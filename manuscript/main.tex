@@ -262,7 +262,7 @@ at $t$,
   \label{eq:map_at_t}
 \end{equation}
 Ending a state ends its elements' lifetimes: the armchair leaves $\mathcal{M}(t)$ for later times and stays
-in it for earlier ones. Each decision revises these lifetimes as frames arrive, so $\mathcal{M}(t)$ answers queries about any past $t$ with all evidence to date; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
+in it for earlier ones. Each decision revises these lifetimes as frames arrive, so $\mathcal{M}(t)$ answers queries about any past $t$; at the present $t$, it is the \emph{current map}. An element added to a continuing state inherits the state's start, not its allocation time: the armchair's back existed before the camera saw it.\looseness=-1
 
 \subsection{Change Detection}
 \label{sec:states}
@@ -272,8 +272,7 @@ the new sofa or out of view. A decision should come once evidence suffices, but 
 add up to a full change. One surface test handles every change, observed or found while away; for observed changes, tracked motion also gives the time of the change.
 
 \vspace{0mm}\noindent\textbf{Surface evidence.}
-We project the surface samples of $G_s$ into each new depth image. Only \emph{reliable} samples count, those never seen through while the mask still showed the object there, and only rays below a maximum incidence angle see through them, since grazing views
-of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
+We project the surface samples of $G_s$ into each new depth image. A sample is \emph{reliable} if it was never seen through while the mask still showed the object there, and only reliable samples count. Rays at grazing angles are ignored, since noisy depth then yields false see-through evidence~\cite{6375037}. Depth tolerance equals the voxel or cell
 size~\cite{9811877}, or a fixed scale for Gaussian maps. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
 the floor where the armchair stood is evidence that it left, whereas the sofa in front of the wall only occludes
@@ -281,31 +280,28 @@ the wall. Occlusions, invalid depths, and out-of-image samples add no absence ev
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
-A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
-model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model after a change; $\ell_s(f_i)$ is the log-likelihood ratio of the changed model against the in-place one~\cite{smithson2006lemon}. The score at round $n$ is
+A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore model $f_i$ per state: a Beta distribution fitted to the state's earlier rounds while it was in place, regularized toward pooled statistics, and a uniform distribution after a change. $\ell_s(f_i)$ is the log-likelihood ratio of the two~\cite{smithson2006lemon}. The score at round $n$ is
 \begin{equation}
   L_{s,n}=\max_{j\le n}\Bigl[\pi_s(j)+\sum_{i=j}^{n} w_i(j)\,\ell_s(f_i)\Bigr],
   \label{eq:score}
 \end{equation}
-where $j$ ranges over candidate change times, $w_i(j)$ is the share of the state's reliable surface that round $i$ inspects for the first time since $j$, and the prior $\pi_s(j)$ is zero within a visit. The weights keep repeated views from adding evidence, and the maximum tries each moment the armchair could have left, so a patch seen before it left counts again once seen empty.
+where $j$ ranges over candidate change times, $w_i(j)$ is the share of the state's reliable surface that round $i$ inspects for the first time since $j$, and the prior $\pi_s(j)$ is zero within a visit. The weights stop repeated views of one patch from adding evidence. The maximum tries every moment at which the armchair could have left: a patch seen while the armchair stood there counts again once it is seen empty.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$ and see-through
-samples since the chosen $j$ outnumber supported ones. Unlike the score, this vote also counts repeated views, so renewed support blocks a spurious end. $d_s$ is then the time of round $n$, since the change itself is unobserved; a successor moves it back to its own first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
+samples since the chosen $j$ outnumber supported ones. This second condition counts repeated views too, so a state that is supported again is not ended. The end time $d_s$ is the time of round $n$, since the change itself was not observed; if a successor is found, $d_s$ moves back to the successor's first view. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
-Observations matching no state form candidates. Spatial extent and surface agreement, within twice the map resolution
-or twice the Gaussian scale, tell a new configuration from a further partial view. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
+Observations matching no state form candidates. A candidate is a further partial view of an existing state if its extent and surface agree with that state within twice the map resolution or Gaussian scale; otherwise it is a new configuration. A candidate supported at the existing site extends that state. A supported candidate of the same object becomes its
 \emph{successor} once the old site is seen again and no sample there is supported, since one object stands in one place at a time. For states carried across visits, persistence and candidate
 history also count. Once confirmed, the successor replaces the earlier state from its first view, as when the armchair reappears
 elsewhere, and we reconstruct the settled object from its new views. A candidate matching no prior object starts a new
-state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object ends at its old site and starts anew at its new one; the map is updated the same way, and the link between the two is lost.
+state; unresolved ones wait until more new depth views arrive. Without a shared identity, a moved object ends at its old site and starts anew at its new one; the map is updated the same way, but the link is lost.
 
 \vspace{0mm}\noindent\textbf{Observed motion.}
 Motion candidates arise where new measurements enter space previously seen empty, and we track them across
 frames~\cite{10218983,Schmid-RSS-24}. Static-class candidates without
 instance association are kept and confirmed by tracked displacement; people count as moving and never form states. A
-moving object's state ends, a successor starts once it settles, and new views reconstruct it in place, driving the same
-map update as changes out of view or across visits.
+moving object's state ends, a successor starts once it settles, and new views reconstruct it in place, driving the same map update as a change while away.
 
 \subsection{Map Update}
 \label{sec:validity}
@@ -317,6 +313,8 @@ update acts on geometry and past views.
 A decision concerns the whole state, so all elements of the armchair end their lifetimes together, unseen back
 included. The geometry is \emph{retired}: it leaves the current map and stays available for earlier times. New
 observations reconstruct the sofa and any successor, and continuing states keep growing.
+Each revisit resumes the previous map and object-state evidence in a shared coordinate frame. Changes found on
+return are therefore judged by the same rule within and across visits.
 
 \vspace{0mm}\noindent\textbf{Valid observation contributions.}
 Each earlier observation keeps contributing to the states and regions it still describes, and to nothing else. Formally, an observation captured at $t_o$ may update element $e$ only if $e$ was alive then and now,
@@ -325,19 +323,12 @@ Each earlier observation keeps contributing to the states and regions it still d
   \label{eq:valid}
 \end{equation}
 Depth fusion enforces this rule in space (\cref{eq:domain}), Gaussian optimization in time, and occupancy by removing earlier free space. No pixel or ray is tested for staleness: the state decisions alone decide where an old observation still applies.
-
-\vspace{0mm}\noindent\textbf{Capture-time keyframes.}
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
 only elements alive both at $t_k$ and at the current time. Retired Gaussians reproduce the armchair in earlier views but stay frozen; the same frames keep constraining the wall, even where the sofa now hides it.
 
 \vspace{0mm}\noindent\textbf{Retaining and replacing surfaces.}\label{sec:memory}
 Not every stale surface belongs to a state: a closed window sash or drift duplicate has no state to end. Background
-elements are thus tested one by one within valid domains. We retire an element when see-through views outnumber
-supporting ones; on a tie, a current surface right in front, within the surface band and matching in normal, replaces the old copy. Otherwise it remains, occluded geometry included.
-
-\vspace{0mm}\noindent\textbf{Handover across visits.}\label{sec:handoff}
-Each revisit resumes the previous map and object-state evidence in a shared coordinate frame. Changes observed on
-return are therefore judged by the same rule as changes found after looking away.
+elements are thus tested one by one within valid domains (\cref{sec:representations}). We retire an element when more views see through it than support it. On a tie, it is replaced only if a current surface lies right in front of it, within the surface band and with a matching normal. Otherwise it remains, even when occluded.
 
 \subsection{Reconstruction in Three Representations}
 \label{sec:representations}
@@ -361,12 +352,11 @@ set to twice the voxel size~\cite{9811877}, the valid domain of $o$ at time $t$ 
 \label{eq:domain}
 \end{equation}
 The surface band keeps the wall, and free space reaches only to the first object that arrived later, stopping at the
-sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. Rays that hit an ended state are excluded in full, free space included: their bands would rebuild the armchair,
+sofa. A thin object within $T$ of the wall shares its band, a resolution limit of any TSDF. For an object that moves within a visit, rays that hit its ended state are excluded in full, free space included: their bands would rebuild the armchair,
 and later views supply free space in its vacated spot. $\lambda_o(t)$ checks object states only; changed background like
-the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we re-fuse only the voxel blocks they cross, from the frames that observed those blocks.
+the window sash (\cref{sec:memory}) is left to the retention test. Since earlier rays are already fused when their domains change, we re-fuse only the voxel blocks they cross, using the archived frames that had observed those blocks.
 
-Each visit re-fuses its own depth within the valid domains of its state decisions; earlier visits enter as surfaces, kept where this visit does not see through them, without the free space that could carve objects arriving since. The current mesh holds faces of live states and background faces passing the retention test,
-retired faces stay available at past times, and we extract object meshes per state~\cite{Schmid-RSS-24}.
+Each visit fuses only its own depth, within these valid domains. Earlier visits enter as surfaces only: they are kept wherever the current visit does not see through them, and they bring no free space that could carve objects that arrived later. The current mesh holds faces of live states and background faces passing the retention test, retired faces stay available at past times, and object meshes are extracted per state, following Khronos~\cite{Schmid-RSS-24}.
 
 \vspace{0mm}\noindent\textbf{3D Gaussians.}
 We enforce state lifetimes and capture-time supervision during online mapping and final refinement. At each training
@@ -377,7 +367,7 @@ uses the 3DGS rasterizer~\cite{10.1145/3592433}, and FlashSplat~\cite{10.1007/97
 \vspace{0mm}\noindent\textbf{Occupancy.}
 A new object may occupy cells previously observed as free, and shifted surfaces can leave stale occupied layers.
 We therefore give each cell the state of the masks that measured it and retire the cells of an ended state at once, keeping them for past times.
-The map is saved when each visit starts; where the visit's object readings first reach a cell that was free in this copy, we subtract the cell's saved log-odds value, removing the earlier visits' free space there; clamping caps free space gathered since. Local replacement clears stale occupied copies behind re-measured surfaces; unobserved cells remain. We retain Wavemap's wavelet representation and log-odds
+We save a copy of the map when a visit starts. When an object reading of this visit first reaches a cell that was free in the copy, we subtract the cell's saved log-odds, which removes the free space of earlier visits there. Clamping limits the free space gathered since. Local replacement clears stale occupied copies behind re-measured surfaces; unobserved cells remain. We retain Wavemap's wavelet representation and log-odds
 updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 
 
