@@ -495,7 +495,7 @@ within a visit, we use the Office and Apartment runs of TESSE from Khronos~\cite
 \noindent\textbf{Baselines and protocol.}
 We compare each representation with its native update: Khronos~\cite{Schmid-RSS-24} and Panoptic
 Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for
-occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from released code; methods in each table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants} (but the OneFormer row), and semantic and SAM masks in \cref{tab:tesse,tab:rendering}.
+occupancy; POCD and GaussianUpdate lack public code; CL-Splats, like GaussianUpdate, updates a trained Gaussian field from posed images captured after each change, not one RGB-D stream. Baselines run from released code. Methods in a table share poses and masks. \Cref{tab:main,tab:ablation_variants} use ground-truth instances, except the OneFormer row. \Cref{tab:tesse,tab:rendering} use per-frame semantic and SAM masks.
 
 
 \noindent\textbf{Metrics.}
