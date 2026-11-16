@@ -279,9 +279,10 @@ the wall. Occlusions, invalid depths, and out-of-image samples add no absence ev
 a larger one at the same spot stays in place until its site is seen again.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
+The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
 A \emph{round} is a depth image that judges enough reliable samples of state $s$~\cite{9811877}, and $f_i$ is the fraction of them that round $i$ sees through. Even stationary objects produce different rates of spurious see-through evidence. We therefore fit an in-place Beta
-model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model after a change; $\ell_s(f_i)$ is the log-likelihood ratio of the changed model against the in-place one~\cite{smithson2006lemon}. A
-sequential test~\cite{Wald1945,Page1954} then scores the state at round $n$ as
+model of $f_i$ to each state's earlier in-place rounds, regularized toward pooled statistics, and use a uniform model after a change; $\ell_s(f_i)$ is the log-likelihood ratio of the changed model against the in-place one~\cite{smithson2006lemon}. The
+test then scores the state at round $n$ as
 \begin{equation}
   L_{s,n}=\max_{j\le n}\Bigl[\pi_s(j)+\sum_{i=j}^{n} w_i(j)\,\ell_s(f_i)\Bigr],
   \label{eq:score}
