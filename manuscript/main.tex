@@ -275,8 +275,7 @@ of noisy depth yield false see-through evidence~\cite{6375037}. Depth tolerance 
 size~\cite{9811877}, or a fixed scale for Gaussian maps. A sample is \emph{supported} when depths agree,
 \emph{seen through} when the measurement lies farther along the ray, and \emph{occluded} when closer. Seeing
 the floor where the armchair stood is evidence that it left, whereas the sofa in front of the wall only occludes
-the wall. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden by
-a larger one at the same spot stays in place until its site is seen again.
+the wall. Occlusions, invalid depths, and out-of-image samples add no absence evidence, so an object hidden behind a larger one stays in place until its site is seen again.
 
 \vspace{0mm}\noindent\textbf{Change decisions.}
 The decision rule is a standard sequential test~\cite{Wald1945,Page1954}; the coverage weights make it robust on real data, where views are partial and repeated.
