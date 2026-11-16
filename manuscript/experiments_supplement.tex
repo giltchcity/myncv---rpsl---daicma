@@ -402,7 +402,7 @@ pixels with valid measured depth in both methods.
 \paragraph{Evidence and state comparison.}
 Surface tolerance follows the map resolution, with a 5\,cm reference scale for Gaussians. Each depth image tests at most 1,500 surface samples per state.
 The $60^\circ$ incidence filter applies to noisy real-world depth, and the minimum of
-$\min(30,\nu_{\mathrm{rel}})$ judged samples applies to every round, as described in the main paper.
+$\min(30,\nu_{\mathrm{rel}})$ judged samples applies to every round.
 The change score of state $s$ at round $n$ is
 \begin{equation}
   L_{s,n}=\max_{j\leq n}\Big(\pi_s(j)+\sum_{i=j}^{n}w_i(j)\,\ell_s(f_i)\Big),
