@@ -511,7 +511,7 @@ The incidence limit is $60^\circ$, and the tolerance for Gaussian maps is 5\,cm.
 \label{sec:exp_main}
 
 
-\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). History stays queryable. On Home, our TSDF maps reach a Mesh$_{\mathrm{4D}}$ of 53.1 against 48.2 for Khronos, our Gaussian maps 56.0 against 53.2 for GaME, and occupancy is level at 55.2 against 55.0. The second visit covers part of Home, yet final mesh F1 against the complete apartment reaches 99.2, 96.5, and 94.2, so unvisited rooms are kept. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor (\cref{fig:ours_maps}).
+\ours improves mesh, 4D object, and change F1 over the native update of every representation on all four datasets (\cref{tab:main}). History stays queryable. On Home, our TSDF maps reach a Mesh$_{\mathrm{4D}}$ of 53.1 against 48.2 for Khronos, our Gaussian maps 56.0 against 53.2 for GaME, and occupancy is level at 55.2 against 55.0. The second visit covers part of Home, yet final mesh F1 against every surface observed so far reaches 99.2, 96.5, and 94.2, so unvisited rooms are kept. Our maps are better at removing what left and recovering what it hid (\cref{fig:geometry_details}). All baselines keep the suitcase that left BedRoom, which hides the chair in Khronos and Panoptic Mapping. On Home, Khronos and Wavemap leave floor holes and Panoptic Mapping keeps old furniture, whereas ours show the full floor (\cref{fig:ours_maps}).
 
 % ===== BEGIN figures / qualitative_combined =====
 % Two alternatives for Figure 4. Keep exactly one option uncommented.
@@ -742,7 +742,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 
 Our Gaussian maps render held-out views of all three scenes with higher PSNR and MS-SSIM
 and lower LPIPS than GaME (\cref{tab:rendering}). PSNR increases by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the
-Aria rooms. On Flat, GaME masks 371 and drops 194 of its 442 keyframes to fit its current map, whereas ours keeps all 447. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Our renders show only the current scene and keep fine detail such as chair legs; GaME's renders blur this detail and keep ghosts such as a second picture frame on Flat (\cref{fig:gaussian_details}).
+Aria rooms. On Flat, GaME masks 371 and drops 194 of its 442 keyframes; ours keeps all 447. Depth L1 falls on Flat and room1 and is comparable on room0 (0.70 vs.\ 0.71\,cm). Our renders show only the current scene and keep fine detail such as chair legs; GaME's renders blur this detail and keep ghosts such as a second picture frame on Flat (\cref{fig:gaussian_details}).
 
 % ===== BEGIN tables / ablation =====
 \begin{table}[t]
@@ -779,7 +779,10 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \label{sec:ablation}
 \enlargethispage{\baselineskip}
 
-We ablate retirement and validity on Flat (\cref{tab:ablation_variants}) and Home.
+We ablate each part on BedRoom, Flat (\cref{tab:ablation_variants}), and Home.
+
+\noindent\textbf{Change detection.}
+On BedRoom (TSDF), disabling the change test misses both objects removed without reappearing and both changes within the last visit, and object F1 there drops from 97.5 to 93.0. A fixed Beta model never fires on real data and gives the same result. Without coverage weights, the test ends two static objects.
 
 \noindent\textbf{Applying changes to geometry.}
 With detection unchanged, disabling object and element retirement lowers mesh F1 from 89.8 to 84.5, change F1 from 83.3 to 68.8, and PSNR by 4.64\,dB; stale furniture stays visible in novel views.
