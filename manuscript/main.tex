@@ -595,7 +595,7 @@ Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: 
 % ===== END figures / qualitative_combined =====
 
 \noindent\textbf{Changes while away are found.}
-Of the 38 changes on Home made while the camera looks away within a visit, \ours finds all, where Khronos misses 9 and GaME 11. Of the 34 between the visits it misses at most 3, against 8 and 10. Motion in view is scored on TESSE (\emph{Dyn.}, \cref{sec:exp_public}).
+Of the 38 changes on Home made while the camera looks away within a visit, \ours finds all, while Khronos misses 9 and GaME 11. Of the 34 between the visits it misses at most 3, against 8 and 10. Motion in view is scored on TESSE (\emph{Dyn.}, \cref{sec:exp_public}).
 
 \noindent\textbf{Earlier times are also mapped better.}
 On Home, Mesh$_{\mathrm{4D}}$ scores each map at its own time: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Every tenth frame is also held out and rendered from the map as it was at that time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR in the two visits. GaME keeps no history, and snapshots of its map reach 24.19 and 25.87\,dB.
@@ -700,7 +700,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops them; \emph{Predicted masks}: OneFormer. All use ground-truth instances, except Predicted masks (OneFormer). F1 in \%, PSNR in dB, L1 in cm.}
+\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the current map; \emph{No dynamic views}: drops them. All use ground-truth instances, except \emph{Predicted masks} (OneFormer). F1 in \%, PSNR in dB, L1 in cm.}
 \label{tab:ablation_variants}
 \vspace{-2mm}
 \centering
