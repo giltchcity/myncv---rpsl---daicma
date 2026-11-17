@@ -632,7 +632,7 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 We next adopt the evaluation code of Khronos and GaME, with per-frame semantic and SAM masks.
 
 \noindent\textbf{The gains also hold within one visit.}\label{sec:exp_temporal}
-In the TESSE scenes, people walk in front of the camera, and objects change while it looks away. The official evaluator asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. With the same poses and semantic masks, our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
+On TESSE, people walk in front of the camera, and objects change while it looks away. The official evaluator asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. Our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
 
 
 % ===== BEGIN tables / tesse =====
@@ -765,7 +765,7 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
 \noindent\textbf{The change test detects removed objects.}
-Without the change test, the map on BedRoom (TSDF) misses four changes: two objects taken out of the room, and two changes during the last visit. One noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights it removes two static objects.
+Without the change test, the map on BedRoom (TSDF) misses four changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights the test wrongly removes two objects that never moved.
 
 \noindent\textbf{A decision must reach the geometry.}
 Without retirement, a detected change stays a label: stale furniture remains, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
