@@ -83,9 +83,9 @@ Robots working in human spaces over weeks need a 3D map that updates what change
 layouts. Objects move in view, change while the camera looks away, and are rearranged between visits, and existing mappers each handle only some of these changes.
 Old observations are the difficulty: fusing them rebuilds moved objects and erodes new ones, and discarding them loses the unchanged surfaces they saw.
 But an old frame is wrong only about the objects that changed.
-We introduce \ours, an RGB-D system for 4D mapping across visits, in which one rule tests each mapped object against new depth images and decides whether it is still there.
+We introduce \ours, an RGB-D system for 4D mapping across visits, in which one rule tests each mapped object against new depth and decides whether it is still there.
 If not, its geometry is retired: it leaves the current map but stays queryable at past times, and old frames keep updating only what they still describe.
-The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline, raising change F1 from 70.8 to 98.4 on our real recordings and PSNR by 3.26\,dB on Flat. We will release code and data.
+The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline on public and our own data, raising change F1 from 70.8 to 98.4 on our real data and PSNR by 3.26\,dB on Flat. We will release code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -385,7 +385,7 @@ Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$
 \sbox0{\begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/24\relax}
 \begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the reported changes (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
+\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the changes read from the maps (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
 \label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
@@ -458,10 +458,10 @@ time. The second visit covers only part of the apartment, as return visits often
 Besides ReviScene (\cref{sec:benchmark}), we use public datasets. Flat~\cite{9811877}, a simulated apartment, and eight real rooms of 3RScan~\cite{9010673} contain changes across visits. The Office and Apartment runs of TESSE~\cite{Schmid-RSS-24} contain changes within a visit. Aria~\cite{Yugay_2026_CVPR} has no object annotations and serves rendering only, as in GaME.
 
 \noindent\textbf{Baselines.}
-Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and per-frame semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats needs a separate posed capture after each change.
+Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and per-frame semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats needs a separate posed capture after each change. Only Gaussian scores vary between runs, by at most 0.2.
 
 \noindent\textbf{Metrics.}
-Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped into objects by the same instances. Change F1~\cite{Schmid-RSS-24} measures whether the map reports each appearance and disappearance.
+Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped into objects by the same instances. Change F1 is read from the maps before and after each change, so no method needs to output changes.
 
 
 
@@ -620,7 +620,7 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
 \vspace{-2mm}
-\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks.}
+\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
 \label{tab:tesse}
 \vspace{-2mm}
 \end{table}
@@ -651,7 +651,7 @@ In the TESSE scenes, people walk in front of the camera, and objects change whil
 % ===== END tables / rendering =====
 
 \noindent\textbf{Capture-time keyframes improve rendering.}\label{sec:exp_gaussians}
-To fit old views to the changed scene, GaME masks 371 and drops 194 of its 442 keyframes on Flat. The dropped views also showed walls and floors that never changed. \ours instead trains each keyframe on the map at its capture time, so old views still supervise what did not change: PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms, with better MS-SSIM~\cite{1292216} and LPIPS~\cite{Zhang_2018_CVPR} (\cref{tab:rendering}). The renders in \cref{fig:gaussian_details} show the same difference: ours keep fine detail such as chair legs, whereas those of GaME blur it and leave ghosts such as a second picture frame.
+To fit old views to the changed scene, GaME masks 371 of its 442 keyframes on Flat: 177 are used with the masked pixels removed and 194 are dropped entirely. The dropped views also showed walls and floors that never changed. \ours instead trains each keyframe on the map at its capture time, so old views still supervise what did not change: PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms, with better MS-SSIM~\cite{1292216} and LPIPS~\cite{Zhang_2018_CVPR} (\cref{tab:rendering}). The renders in \cref{fig:gaussian_details} show the same difference: ours keep fine detail such as chair legs, whereas those of GaME blur it and leave ghosts such as a second picture frame.
 
 \begin{table}[t]
 \centering
@@ -765,7 +765,7 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
 \noindent\textbf{The change test detects removed objects.}
-An object carried out of the room leaves no motion to see and no new place to find. Without the change test, the map on BedRoom (TSDF) misses four such changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights the test removes two static objects.
+Without the change test, the map on BedRoom (TSDF) misses four changes: two objects taken out of the room, and two changes during the last visit. One noise model for all objects, instead of one per object, misses the same four on real data, and without the coverage weights it removes two static objects.
 
 \noindent\textbf{A decision must reach the geometry.}
 Without retirement, a detected change stays a label: stale furniture remains, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
@@ -792,11 +792,11 @@ Handling changes and keeping history add work to every update. Nonetheless, \our
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \ours, an RGB-D system for 4D mapping across visits. One decision per object retires the geometry that left and limits each old frame to what it still describes, through valid domains in TSDF, capture-time keyframes in Gaussian, and removal of earlier free space in occupancy maps. On six datasets, \ours beats the strongest baseline of each map type, keeps every past state queryable, and remains online. A changing scene does not force a map to forget: old geometry can be retired instead of deleted, and old frames limited instead of dropped. Non-rigid motion and joint segmentation are natural next steps.
+We presented \ours, an RGB-D system for 4D mapping across visits. One decision per object retires the geometry that left and limits each old frame to what it still describes. On six datasets, \ours beats the strongest baseline of each map type, keeps every past state queryable, and remains online. A changing scene does not force a map to forget: old geometry can be retired instead of deleted, and old frames limited instead of dropped.
 
 \noindent\textbf{Limitations.}
 %
-\ours assumes rigid indoor objects, stable lighting, and external poses and masks. Change times follow the confirming evidence, objects hidden behind larger replacements persist until seen through, and our benchmark remains room-scale, with a few visits per scene.
+\ours relies on external poses and masks and assumes rigid indoor objects. Change decisions rest on depth, so lighting changes affect colors, not the geometry that is kept. A change while away is timed by its confirming evidence, and an object hidden behind a larger one stays until its site is seen again. Our benchmark remains room-scale.
 
 % ===== END sec / 7_conclusion =====
 
