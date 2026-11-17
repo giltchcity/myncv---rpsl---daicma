@@ -630,7 +630,7 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 We next adopt the evaluation code of Khronos and GaME.
 
 \noindent\textbf{The gains also hold within one visit.}\label{sec:exp_temporal}
-On TESSE, people walk in front of the camera, and objects change while it looks away. The official evaluator asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. Our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
+On TESSE, people walk in front of the camera, and objects change while it looks away. The official evaluator~\cite{Schmid-RSS-24} asks the map about every earlier time. \emph{Dyn.} counts the moving objects, such as walking people, that the map holds as moving, and \emph{Changes} the objects whose appearance or disappearance is labeled correctly. Our TSDF maps score above Khronos in every column on both scenes (\cref{tab:tesse}). \emph{Dyn.} rises because \ours keeps motion candidates that Khronos drops.
 
 
 % ===== BEGIN tables / tesse =====
