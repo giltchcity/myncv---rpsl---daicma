@@ -607,6 +607,30 @@ GaME snapshots & 22.99 \\
 \label{tab:supp_historical_rendering}
 \end{table}
 
+\paragraph{Held-out views of both visits.}
+The protocol of GaME~\cite{Yugay_2026_CVPR} holds out every tenth frame of the last visit only. For this experiment on Home, we apply the same rule to the first visit as well (418 and 355 held-out frames), and run both methods again without these frames. After both visits, each held-out frame is rendered from the map of its own time and compared with its own image, which neither method was trained on. \Cref{tab:supp_heldout_history} reports two queries. The first uses the map of the mapping round that contains the frame, and is the one reported in the main paper. The second uses the last map before the frame; it is up to 10.8\,s old, so regions the camera has just entered are often missing, for both methods alike. GaME uses saved snapshots. All maps are rendered before refinement, since refining the map of every time would take about 30 minutes each. The values exceed those on Home in \cref{tab:supp_instance_rendering}, where every held-out frame is rendered from the final map: Home changes within its visits, so the final map no longer shows what a frame saw before a later change.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+& & \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Query & Method & A & B & A & B & A & B \\
+\midrule
+Round of & GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
+the frame & \textbf{Ours} & \textbf{26.64} & \textbf{26.92} & \textbf{0.919} & \textbf{0.926} & \textbf{0.199} & \textbf{0.149} \\
+\midrule
+Last map & GaME & 15.28 & 18.29 & 0.604 & 0.646 & 0.521 & 0.452 \\
+before & \textbf{Ours} & \textbf{16.39} & \textbf{18.87} & \textbf{0.646} & \textbf{0.696} & \textbf{0.483} & \textbf{0.385} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Held-out views of both visits on Home, each at its own time.} A: first visit, B: second visit; PSNR in dB. The second query scores 386 frames of A, since the first 32 precede the first map.}
+\label{tab:supp_heldout_history}
+\end{table}
+
 \section{Complete Ablations}
 
 % ===== BEGIN tables / supp_ablations =====

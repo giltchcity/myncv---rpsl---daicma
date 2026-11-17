@@ -598,7 +598,7 @@ Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: 
 Of the 38 changes on Home made while the camera looks away within a visit, \ours finds all, where Khronos misses 9 and GaME 11. Of the 34 between the visits it misses at most 3, against 8 and 10. Motion in view is scored on TESSE (\emph{Dyn.}, \cref{sec:exp_public}).
 
 \noindent\textbf{Earlier times are also mapped better.}
-On Home, Mesh$_{\mathrm{4D}}$ checks the map at earlier times: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, while occupancy is level with Wavemap. For appearance, refinement cannot be run for every earlier time, so historical rendering is compared before it: \ours reaches 24.01\,dB PSNR against 22.99\,dB for snapshots of GaME, which keeps only its latest map.
+On Home, Mesh$_{\mathrm{4D}}$ checks earlier times: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. We also hold out every tenth frame and render each from the map of its own time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR per visit, against 24.19 and 25.87\,dB for snapshots of GaME, which keeps no history.
 
 \begin{table}[t]
 \centering
