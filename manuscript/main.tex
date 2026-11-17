@@ -446,7 +446,7 @@ mapping. Camera poses come from ORB-SLAM3~\cite{9440682}. We annotate object ide
 evaluation.
 
 \noindent\textbf{Simulated sequences.}
-We rendered two animated visits to an InteriorAgent apartment~\cite{InteriorAgent2025} in Isaac Sim, with 72 change events (38 within visits and 34 between visits). The simulator supplies exact camera poses, object labels, and scene geometry over
+We rendered two animated visits to an InteriorAgent apartment~\cite{InteriorAgent2025} in Isaac Sim, with three motions in view and 72 changes while away (38 within visits and 34 between visits). The simulator supplies exact camera poses, object labels, and scene geometry over
 time. The second visit covers only part of the apartment.
 
 
@@ -774,7 +774,7 @@ In \emph{No retirement}, a detected change stays a label: stale furniture remain
 Dynamic views are keyframes that saw a later change, so they show what changed and what stayed. Trained as current views (\emph{All dynamic views}), they rebuild removed furniture and cost 5.74\,dB PSNR. Dropping them (\emph{No dynamic views}) loses the walls and floors they saw and costs 5.00\,dB. Capture-time keyframes avoid both: each view trains the map before or after the change it saw. The other maps need the same limit: without valid domains, TSDF change F1 on Home falls from 97.9 to 82.8, and without saved-log-odds subtraction and local replacement, occupancy mesh F1 on Flat falls by 2.1.
 
 \noindent\textbf{\ours also runs on predicted masks.}
-With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three events go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
+With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three events in total go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
 
 
 
