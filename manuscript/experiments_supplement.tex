@@ -379,22 +379,22 @@ reported as disappeared is a false positive. \Cref{tab:supp_change_kinds} splits
 \fontsize{9}{10.3}\selectfont
 \setlength{\tabcolsep}{3.2pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}ll*{5}{r}@{}}
+\begin{tabular}{@{}ll*{4}{r}@{}}
 \toprule
-& & \multicolumn{2}{c}{BedRoom} & \multicolumn{3}{c}{Home} \\ \cmidrule(lr){3-4}\cmidrule(lr){5-7}
-Map & Method & Away & Across & In view & Away & Across \\ \midrule
-TSDF & Khronos & 57.1 & 73.2 & 66.7 & 81.7 & 86.7 \\
- & Panoptic & 36.4 & 54.1 & 66.7 & 76.9 & 69.2 \\
- & Ours & 100.0 & 98.0 & 90.9 & 100.0 & 95.4 \\
+& & \multicolumn{2}{c}{BedRoom} & \multicolumn{2}{c}{Home} \\ \cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Map & Method & Away & Across & Away & Across \\ \midrule
+TSDF & Khronos & 57.1 & 73.2 & 81.7 & 86.7 \\
+ & Panoptic & 36.4 & 54.1 & 76.9 & 69.2 \\
+ & Ours & 100.0 & 98.0 & 100.0 & 95.4 \\
 \midrule
-3DGS & GaME & 100.0 & 96.0 & 90.9 & 83.1 & 82.8 \\
- & Ours & 100.0 & 98.0 & 90.9 & 100.0 & 95.4 \\
+3DGS & GaME & 100.0 & 96.0 & 83.1 & 82.8 \\
+ & Ours & 100.0 & 98.0 & 100.0 & 95.4 \\
 \midrule
-Occupancy & Wavemap & 90.9 & 89.4 & 90.9 & 98.7 & 93.8 \\
- & Ours & 100.0 & 100.0 & 90.9 & 100.0 & 97.0 \\
+Occupancy & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
+ & Ours & 100.0 & 100.0 & 100.0 & 97.0 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes in view, after looking away within a visit (\emph{Away}), and across visits. The change F1 of the main paper pools the last two. BedRoom has 5 and 26 such events and no scored change in view; Home has 6, 38, and 34.}
+\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes after looking away within a visit (\emph{Away}) and across visits. The change F1 of the main paper pools the two. BedRoom has 5 and 26 such events; Home has 38 and 34.}
 \label{tab:supp_change_kinds}
 \end{table}
 
