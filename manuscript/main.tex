@@ -96,6 +96,19 @@ The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours be
 
 % ===== BEGIN tables / capabilities =====
 \begin{table*}[t]
+\caption{\textbf{Dynamic mapping capabilities.}
+\capyes{} full, \cappart{} partial, \capno{} none.
+For partial support, changes \emph{in view} are handled by cell
+updates without objects.
+\emph{After looking away}, only re-observed cells are updated.
+\emph{Across visits}, captures are concatenated into one run
+or states are discarded at restart.
+\emph{Observation validity} relies on frozen submaps or regions,
+masked/dropped keyframes, or replayed views.
+For \emph{historical queries}, stored objects lack timestamps.
+TSDF: truncated signed distance field;
+3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS.}
+\label{tab:capabilities}
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -120,19 +133,7 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Dynamic mapping capabilities.}
-\capyes{} full, \cappart{} partial, \capno{} none.
-For partial support, changes \emph{in view} are handled by cell
-updates without objects.
-\emph{After looking away}, only re-observed cells are updated.
-\emph{Across visits}, captures are concatenated into one run
-or states are discarded at restart.
-\emph{Observation validity} relies on frozen submaps or regions,
-masked/dropped keyframes, or replayed views.
-For \emph{historical queries}, stored objects lack timestamps.
-TSDF: truncated signed distance field;
-3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS.}
-\label{tab:capabilities}
+
 \end{table*}
 % ===== END tables / capabilities =====
 
@@ -264,7 +265,7 @@ A \emph{round} is a periodic check of state $s$ that judges enough reliable samp
 \end{equation}
 where $j$ ranges over candidate change times, $w_i(j)$ is the share of the state's reliable surface that round $i$ inspects for the first time since $j$, and the prior $\pi_s(j)$ is zero within a visit. The weights stop repeated views of one patch from adding evidence. The maximum tries every moment at which the armchair could have left: a patch seen while the armchair stood there counts again once it is seen empty.
 The state ends at round $n$ once $L_{s,n}>\ln\eta$ and see-through
-samples since the chosen $j$ outnumber supported ones. This second condition counts repeated views too, so a state that is supported again is not ended. The end time $d_s$ is the time of round $n$, since the change itself was not observed. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
+samples since the chosen $j$ outnumber supported ones. This second condition counts repeated views too, so repeated support can keep a state alive. The end time $d_s$ is the time of round $n$, since the change itself was not observed. A chair that often moves should need less evidence than a fixed wardrobe. On a revisit, only the candidate spanning the gap between visits therefore
 starts at $\pi_s(j)=\ln\frac{1-q}{q}$, where persistence $q$ combines the object's history with its class history; the supplement gives the model fitting and priors.
 
 \vspace{0mm}\noindent\textbf{Successors.}
@@ -299,7 +300,7 @@ Each earlier observation keeps contributing to the states and regions it still d
   e\in\mathcal{M}(t_o)\cap\mathcal{M}(t).
   \label{eq:valid}
 \end{equation}
-Depth fusion enforces this rule in space (\cref{eq:domain}), Gaussian optimization in time, and occupancy by removing earlier free space. No pixel or ray is tested for staleness: the state decisions alone decide where an old observation still applies.
+Depth fusion enforces this rule in space (\cref{eq:domain}), Gaussian optimization in time, and occupancy by removing earlier free space. No pixel or ray is tested for staleness: the state decisions decide where an old observation still applies.
 A keyframe captured at $t_k$ renders and evaluates its loss on $\mathcal{M}(t_k)$, the map at its capture time, and optimizes
 only elements alive both at $t_k$ and at the current time. Retired Gaussians reproduce the armchair in earlier views but stay frozen; the same frames keep constraining the wall, even where the sofa now hides it.
 
@@ -357,6 +358,8 @@ updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 % ===== BEGIN tables / main_results =====
 % Values: wt_takeover_runs/RESULTS_TABLE_20261029.md (main table, 11-04).
 \begin{table*}[t]
+\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the changes read from the maps (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
+\label{tab:main}
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -383,8 +386,7 @@ Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$
 \sbox0{\begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/24\relax}
 \begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}
-\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the changes read from the maps (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
-\label{tab:main}
+
 \end{table*}
 % ===== END tables / main_results =====
 
@@ -459,7 +461,7 @@ Besides ReviScene (\cref{sec:benchmark}), we use public datasets. Flat~\cite{981
 Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats aims at a different task.
 
 \noindent\textbf{Metrics.}
-Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped by the same instances. Change F1~\cite{Schmid-RSS-24} is read from the maps before and after each change, so no method needs to output changes.
+Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks and identities, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped by the same instances. Change F1~\cite{Schmid-RSS-24} is read from the maps before and after each change, so no method needs to output changes.
 
 
 
@@ -599,6 +601,9 @@ Of the 38 changes on Home made while the camera looks away within a visit, \ours
 On Home, Mesh$_{\mathrm{4D}}$ checks earlier times: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Every tenth frame is also held out and rendered from the map as it was at that time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR in the two visits. GaME keeps no history, and snapshots of its map reach 24.19 and 25.87\,dB.
 
 \begin{table}[t]
+\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
+\label{tab:tesse}
+\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{2.6pt}
@@ -617,9 +622,7 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 \sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
-\vspace{-2mm}
-\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
-\label{tab:tesse}
+
 \vspace{-2mm}
 \end{table}
 
@@ -652,6 +655,9 @@ On TESSE, people walk in front of the camera, and objects change while it looks 
 To fit old views to the changed scene, GaME masks changed regions and drops 194 of its 442 keyframes on Flat. The dropped views also showed walls and floors that never changed. \ours instead trains each keyframe on the map at its capture time, so old views still supervise what did not change: PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms, with better MS-SSIM~\cite{1292216} and LPIPS~\cite{Zhang_2018_CVPR} (\cref{tab:rendering}). In the renders of \cref{fig:gaussian_details}, ours keep fine detail such as chair legs, whereas those of GaME blur it and leave ghosts such as a second picture frame.
 
 \begin{table}[t]
+\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm).}
+\label{tab:rendering}
+\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{3.0pt}
@@ -672,10 +678,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
-\vspace{-2mm}
-\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm).}
 
-\label{tab:rendering}
 \vspace{-2mm}
 \end{table}
 
@@ -697,6 +700,9 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \end{figure}
 
 \begin{table}[t]
+\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops them; \emph{Predicted masks}: OneFormer. F1 in \%, PSNR in dB, L1 in cm.}
+\label{tab:ablation_variants}
+\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -719,13 +725,14 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
-\vspace{-2mm}
-\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the map; \emph{No dynamic views}: drops them; \emph{Predicted masks}: OneFormer. F1 in \%, PSNR in dB, L1 in cm.}
-\label{tab:ablation_variants}
+
 \vspace{-2mm}
 \end{table}
 
 \begin{table}[t]
+\caption{\textbf{\ours remains online.} It maps at least as fast as Khronos and GaME, with less peak memory. FPS over the 762 frames of Flat and peak RAM/VRAM, with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only).}
+\label{tab:cost}
+\vspace{-2mm}
 \centering
 \small
 \def\costrows{
@@ -746,9 +753,7 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \sbox0{\begin{tabular}{llrrr}\costrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{llrrr}\costrows\end{tabular}
-\vspace{-2mm}
-\caption{\textbf{\ours remains online.} It maps at least as fast as Khronos and GaME, with less peak memory. FPS over the 762 frames of Flat and peak RAM/VRAM, with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only).}
-\label{tab:cost}
+
 \vspace{-2mm}
 \end{table}
 
@@ -762,9 +767,6 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
-\noindent\textbf{The change test detects removed objects.}
-An object carried out of the room leaves no motion to see and no new place to find. Without the change test, the map on BedRoom (TSDF) misses four such changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four changes on real data, and without the coverage weights the test removes two static objects.
-
 \noindent\textbf{A decision must reach the geometry.}
 In \emph{No retirement}, a detected change stays a label: stale furniture remains, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
 
@@ -777,6 +779,9 @@ With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is inven
 
 
 
+
+\noindent\textbf{The change test detects removed objects.}
+We ablate the change test in TSDF maps on BedRoom (see supplement). An object carried out of the room leaves no motion to see and no new place to find. Without the test, the map misses four such changes: two objects taken out, and two changes in the last visit. One noise model for all objects, instead of one per object, misses the same four changes, and without the coverage weights the test removes two static objects.
 
 \noindent\textbf{\ours remains an online mapping system.}\label{sec:cost}
 Handling changes and keeping history add work to every update. Nonetheless, \ours maps at least as fast as Khronos and GaME and with less peak memory (\cref{tab:cost}), and reaches 100 FPS in occupancy maps against 144 for Wavemap. Our Gaussian maps are not yet real-time.
@@ -799,7 +804,7 @@ We presented \ours, an RGB-D system for 4D mapping across visits. One decision p
 % ===== END sec / 7_conclusion =====
 
 \section*{LLM Usage Statement}
-We used LLM assistants, to help debug code, run and summarize experiments, following the CVPR 2027 policy on large language models. The authors designed the method, verified all results, and reviewed every change.
+We used Claude Code and ChatGPT to help implement and debug code, run and summarize experiments, prepare figures, and review and edit the text, following the CVPR 2027 policy on large language models. The authors designed the method, verified all results, and reviewed every change.
 
 
 {
