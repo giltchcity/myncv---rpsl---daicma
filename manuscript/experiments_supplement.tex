@@ -74,6 +74,7 @@ surface band, with the same orientation. In a tied case, the current estimate re
 The remaining geometry is retained, including unobserved regions.
 
 \paragraph{Lifetimes and observation times.}
+A state begins when it is first seen and ends at its confirming round, which bounds the unobserved departure from above.
 Element lifetimes follow scene states and may begin before the elements are allocated. For keyframe
 optimization, frame selection, trainable geometry, and map-time selection jointly enforce that a keyframe
 captured at $t_k$ evaluates its loss on $\mathcal{M}(t_k)$. The current map uses only observations received
@@ -82,10 +83,10 @@ by the current processing time.
 \paragraph{Representations.}
 \emph{TSDF.} When a valid domain changes, the affected voxel blocks are rebuilt from archived frames in
 observation order. The current mesh includes the earlier faces that pass the retention test. We use the
-active window, tracking, and object extraction of Khronos~\cite{Schmid-RSS-24}.
+active window, tracking, and object extraction of Khronos~\cite{Schmid-RSS-24}. For a removed object, the exported 4D map places the end midway between the last supporting observation and the confirming round, as Khronos does.
 \emph{3D Gaussians.} Current-visit frames optimize new and revisited regions, while historical replay
 maintains earlier geometry outside the current coverage. These constraints also apply during final
-refinement. Pruned historical Gaussians receive an end time and remain available to earlier queries.
+refinement. Pruned historical Gaussians receive an end time and remain available to earlier queries. A state interval is the lifetime of its Gaussians, and a state that changed between visits ends at the start of the current visit.
 \emph{Occupancy.} The replacement condition $C(e)$ retires nearby stale copies, while eligible unobserved
 cells are retained.
 % ===== END sec / method_details =====
