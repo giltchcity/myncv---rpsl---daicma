@@ -96,19 +96,6 @@ The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours be
 
 % ===== BEGIN tables / capabilities =====
 \begin{table*}[t]
-\caption{\textbf{Dynamic mapping capabilities.}
-\capyes{} full, \cappart{} partial, \capno{} none.
-For partial support, changes \emph{in view} are handled by cell
-updates without objects.
-\emph{After looking away}, only re-observed cells are updated.
-\emph{Across visits}, captures are concatenated into one run
-or states are discarded at restart.
-\emph{Observation validity} relies on frozen submaps or regions,
-masked/dropped keyframes, or replayed views.
-For \emph{historical queries}, stored objects lack timestamps.
-TSDF: truncated signed distance field;
-3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS.}
-\label{tab:capabilities}
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -133,7 +120,19 @@ Wavemap~\cite{Reijgwart-RSS-23} & Occupancy & \cappart & \cappart & \cappart & \
 \textbf{Ours} & TSDF, 3DGS, Occupancy & \capyes & \capyes & \capyes & \capyes & \capyes & \capyes$^{\dagger}$ \\
 \bottomrule
 \end{tabular}
-
+\caption{\textbf{Dynamic mapping capabilities.}
+\capyes{} full, \cappart{} partial, \capno{} none.
+For partial support, changes \emph{in view} are handled by cell
+updates without objects.
+\emph{After looking away}, only re-observed cells are updated.
+\emph{Across visits}, captures are concatenated into one run
+or states are discarded at restart.
+\emph{Observation validity} relies on frozen submaps or regions,
+masked/dropped keyframes, or replayed views.
+For \emph{historical queries}, stored objects lack timestamps.
+TSDF: truncated signed distance field;
+3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS.}
+\label{tab:capabilities}
 \end{table*}
 % ===== END tables / capabilities =====
 
@@ -358,8 +357,6 @@ updates~\cite{Reijgwart-RSS-23,10.1007/s10514-012-9321-0}.
 % ===== BEGIN tables / main_results =====
 % Values: wt_takeover_runs/RESULTS_TABLE_20261029.md (main table, 11-04).
 \begin{table*}[t]
-\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the changes read from the maps (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
-\label{tab:main}
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -386,7 +383,8 @@ Map & Method & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$
 \sbox0{\begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/24\relax}
 \begin{tabular}{llrrr@{\hspace{8pt}}rcrr@{\hspace{8pt}}rrr@{\hspace{8pt}}rrr}\resultrows\end{tabular}
-
+\caption{\textbf{Dynamic mapping within and across visits.} \ours outperforms every baseline on every score, dataset, and map type. F1 (\%) of the final mesh (\emph{Mesh}, 5\,cm), of the mesh over time on Home (\emph{Mesh}$_{\mathrm{4D}}$), of the objects in the map (\emph{Obj.}), and of the changes read from the maps (\emph{Chg.}). Methods share masks and poses (ORB-SLAM3~\cite{9440682} on BedRoom). Bold: best per map type; shaded: \ours.}
+\label{tab:main}
 \end{table*}
 % ===== END tables / main_results =====
 
@@ -601,9 +599,6 @@ Of the 38 changes on Home made while the camera looks away within a visit, \ours
 On Home, Mesh$_{\mathrm{4D}}$ scores each map at its own time: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Every tenth frame is also held out and rendered from the map as it was at that time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR in the two visits. GaME keeps no history, and snapshots of its map reach 24.19 and 25.87\,dB.
 
 \begin{table}[t]
-\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
-\label{tab:tesse}
-\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{2.6pt}
@@ -622,7 +617,9 @@ Scene & Method & Bg.$\uparrow$ & Static$\uparrow$ & Dyn.$\uparrow$ & Changes$\up
 \sbox0{\begin{tabular}{llrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{llrrrrr}\resultrows\end{tabular}
-
+\vspace{-2mm}
+\caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
+\label{tab:tesse}
 \vspace{-2mm}
 \end{table}
 
@@ -655,9 +652,6 @@ On TESSE, people walk in front of the camera, and objects change while it looks 
 To fit old views to the changed scene, GaME masks changed regions and drops 194 of its 442 keyframes on Flat. The dropped views also showed walls and floors that never changed. \ours instead trains each keyframe on the map at its capture time, so old views still supervise what did not change: PSNR rises by 3.26\,dB on Flat and by 0.88 and 1.47\,dB on the real Aria rooms, with better MS-SSIM~\cite{1292216} and LPIPS~\cite{Zhang_2018_CVPR} (\cref{tab:rendering}). In the renders of \cref{fig:gaussian_details}, ours keep fine detail such as chair legs, whereas those of GaME blur it and leave ghosts such as a second picture frame.
 
 \begin{table}[t]
-\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm).}
-\label{tab:rendering}
-\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{3.0pt}
@@ -678,7 +672,9 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
-
+\vspace{-2mm}
+\caption{\textbf{Rendering after changes across visits.} \ours renders held-out views of the last visit better than GaME on all three scenes. Both use the same poses and SAM masks (PSNR in dB, depth L1 in cm).}
+\label{tab:rendering}
 \vspace{-2mm}
 \end{table}
 
@@ -700,9 +696,6 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the current map; \emph{No dynamic views}: drops them. All use ground-truth instances, except \emph{Predicted masks} (OneFormer). F1 in \%, PSNR in dB, L1 in cm.}
-\label{tab:ablation_variants}
-\vspace{-2mm}
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -725,14 +718,13 @@ Predicted masks & 89.8 & 72.7 & 27.56 & 0.50 \\
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
-
+\vspace{-2mm}
+\caption{\textbf{Ablations of Gaussian maps on Flat.} Removing a component costs 4.6 to 5.7\,dB PSNR. \emph{No retirement}: keeps ended splats; \emph{All dynamic views}: trains old frames on the current map; \emph{No dynamic views}: drops them. All use ground-truth instances, except \emph{Predicted masks} (OneFormer). F1 in \%, PSNR in dB, L1 in cm.}
+\label{tab:ablation_variants}
 \vspace{-2mm}
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{\ours remains online.} It maps at least as fast as Khronos and GaME, with less peak memory. FPS over the 762 frames of Flat and peak RAM/VRAM, with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only).}
-\label{tab:cost}
-\vspace{-2mm}
 \centering
 \small
 \def\costrows{
@@ -753,7 +745,9 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 \sbox0{\begin{tabular}{llrrr}\costrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{llrrr}\costrows\end{tabular}
-
+\vspace{-2mm}
+\caption{\textbf{\ours remains online.} It maps at least as fast as Khronos and GaME, with less peak memory. FPS over the 762 frames of Flat and peak RAM/VRAM, with shared inputs per map type on Ryzen~7 9700X / RTX~5070~Ti (\nev: CPU-only).}
+\label{tab:cost}
 \vspace{-2mm}
 \end{table}
 
