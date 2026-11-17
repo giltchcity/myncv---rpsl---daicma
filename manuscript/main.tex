@@ -690,7 +690,7 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \cmidrule(lr){2-4}
 \footnotesize Ground Truth & \footnotesize 3DGS & \footnotesize TSDF & \footnotesize Occupancy \\[2pt]
 \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_real06060_occ.png} \\
-\includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_sim03300_occ.png} \\
+\includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_simA03449_image.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_simA03449_gs.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_simA03449_tsdf.png} & \includegraphics[width=0.245\columnwidth]{figures/export_lossless/ours_maps_simA03449_occ.png} \\
 \end{tabular}
 \vspace{-2mm}
 \caption{\textbf{\ours across map types.} 3DGS, TSDF, and occupancy maps beside \emph{Ground Truth} RGB on BedRoom (\emph{top}) and Home (\emph{bottom}) all reflect the updated scene.}
@@ -792,7 +792,7 @@ Handling changes and keeping history add work to every update. Nonetheless, \our
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \ours, an RGB-D system for 4D mapping across visits. One decision per object retires the geometry that left and limits each old frame to what it still describes. On six datasets, \ours beats the strongest baseline of each map type, keeps every past state queryable, and remains online. A changing scene does not force a map to forget: old geometry can be retired instead of deleted, and old frames limited instead of dropped.
+We presented \ours, an RGB-D system for 4D mapping across visits. One decision per object retires the geometry that left and limits each old frame to what it still describes, through valid domains in TSDF, capture-time keyframes in Gaussian, and removal of earlier free space in occupancy maps. On six datasets, \ours beats the strongest baseline of each map type, keeps every past state queryable, and remains online. A changing scene does not force a map to forget: old geometry can be retired instead of deleted, and old frames limited instead of dropped. Non-rigid motion and joint segmentation are natural next steps.
 
 \noindent\textbf{Limitations.}
 %
