@@ -85,7 +85,7 @@ Old observations are the difficulty: fusing them rebuilds moved objects and erod
 But an old frame can only be wrong about the objects that changed.
 We introduce \ours, an RGB-D system for 4D mapping across visits, in which one rule tests each mapped object against new depth and decides whether it is still there.
 If not, its geometry is retired: it leaves the current map but stays queryable at past times, and old frames keep updating only what they still describe.
-The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline on public benchmarks and our ReviScene dataset, raising change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release code and data.
+The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline on public benchmarks and our ReviScene dataset, raising TSDF change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -188,7 +188,7 @@ every representation and keeps retired geometry as history.
 
   \item Two RGB-D datasets with both kinds of change, ReviScene-BedRoom and
   ReviScene-Home. On these and public benchmarks, \ours beats the strongest
-  baseline of each map type, raising change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release the code and data.
+  baseline of each map type, raising TSDF change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release the code and data.
 \end{itemize}
 
 
@@ -467,7 +467,7 @@ Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: 
 \label{sec:exp_main}
 
 \noindent\textbf{All three map types improve.}
-\ours improves all three scores over every baseline on all four datasets (\cref{tab:main}). The three map types store geometry in different ways, and each gains. What they share is the object-level decision rule (\cref{sec:states}), so we attribute the gain to it and not to one representation. Scores also differ between map types, for baselines and ours alike, because each representation has its own strengths. We therefore compare within each map type. The largest gap is in TSDF maps on the real BedRoom recording, where change F1 is 70.8 for Khronos and 98.4 for ours. In \cref{fig:geometry_details}, the suitcase that left BedRoom stays in every baseline map, and in Khronos and Panoptic Mapping it still hides the chair. Khronos can confirm an absence only through rays that reach reconstructed background, whereas \ours tests the object's own surface. GaME leaves ghost geometry where objects stood, with a change F1 on Home of 82.9 against our 97.9. Wavemap frees only the cells that later rays cross, whereas \ours retires all cells of an ended object at once (\cref{fig:ours_maps}). On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos.
+\ours improves all three scores over every baseline on all four datasets (\cref{tab:main}). The three map types store geometry in different ways, and each gains. What they share is how changes are decided and applied (\cref{sec:method}), so we attribute the gain to this, not to one representation. Scores also differ between map types, for baselines and ours alike, because each representation has its own strengths. We therefore compare within each map type. The largest gap is in TSDF maps on the real BedRoom recording, where change F1 is 70.8 for Khronos and 98.4 for ours. In \cref{fig:geometry_details}, the suitcase that left BedRoom stays in every baseline map, and in Khronos and Panoptic Mapping it still hides the chair. Khronos can confirm an absence only through rays that reach reconstructed background, whereas \ours tests the object's own surface. GaME leaves ghost geometry where objects stood, with a change F1 on Home of 82.9 against our 97.9. Wavemap frees only the cells that later rays cross, whereas \ours retires all cells of an ended object at once (\cref{fig:ours_maps}). On the public 3RScan rooms, change F1 reaches 80.5 against 73.3 for Khronos.
 
 
 % ===== BEGIN figures / qualitative_combined =====
