@@ -85,7 +85,7 @@ Old observations are the difficulty: fusing them rebuilds moved objects and erod
 But an old frame is wrong only about the objects that changed.
 We introduce \ours, an RGB-D system for 4D mapping across visits, in which one rule tests each mapped object against new depth and decides whether it is still there.
 If not, its geometry is retired: it leaves the current map but stays queryable at past times, and old frames keep updating only what they still describe.
-The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline on public and our own data, raising change F1 from 70.8 to 98.4 on our real data and PSNR by 3.26\,dB on Flat. We will release code and data.
+The same rule drives TSDF, 3D Gaussian, and occupancy maps, and in each \ours beats the strongest baseline on public benchmarks and our ReviScene dataset, raising change F1 from 70.8 to 98.4 on BedRoom and PSNR by 3.26\,dB on Flat. We will release code and data.
 \end{abstract}
 % ===== END sec / 0_abstract =====
 % ===== BEGIN sec / 1_intro =====
@@ -127,8 +127,8 @@ updates without objects.
 \emph{After looking away}, only re-observed cells are updated.
 \emph{Across visits}, captures are concatenated into one run
 or states are discarded at restart.
-\emph{Observation validity} relies on frozen submaps or
-masked/dropped keyframes.
+\emph{Observation validity} relies on frozen submaps or regions,
+masked/dropped keyframes, or replayed views.
 For \emph{historical queries}, stored objects lack timestamps.
 TSDF: truncated signed distance field;
 3DGS: 3D Gaussian splatting; $^{\dagger}$3DGS.}
@@ -157,20 +157,18 @@ been switched off for days between visits. A \emph{visit} is one run of the syst
 The two kinds of change are mostly studied apart: observed changes are suppressed or
 reconstructed from
 video~\cite{Wu_2024_CVPR_4dgs,Li_2024_CVPR_spacetime,Matsuki_2025_CVPR}, and
-changes while away are handled by updating the map to its latest state. Both
-kinds of change have been handled together in one 4D map within a single visit.
-Earlier states have been recovered between finished captures. To our
+changes while away are handled by updating the map to its latest state. Khronos~\cite{Schmid-RSS-24} handles both kinds of change in one 4D map, but only within a single visit. Recent Gaussian methods~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} recover earlier states, but only between finished captures. To our
 knowledge, no system keeps one history both within a visit and from one visit into the next
 (\cref{tab:capabilities}). A restart typically begins a new map or
 updates the old one in place, and in both cases the earlier layout is lost.
 
 A complete 4D scene record must both reflect the current environment and track
-when each of its elements appeared and disappeared. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Prior methods tackle these regimes in isolation: Khronos~\cite{Schmid-RSS-24} reconstructs dense 4D history over one uninterrupted session, while recent Gaussian approaches~\cite{Ackermann_2025_ICCV,Zeng_2025_ICCV} infer earlier map states between separate captures. Each of these histories, however, exists in a single representation, whereas an
+when each of its elements appeared and disappeared. Unlike changes encountered during a continuous run, cross-visit rearrangements are discovered only after a system restart, often belatedly and from incomplete viewpoints. Each existing history also lives in a single representation, whereas an
 embodied agent or a digital twin needs a long-term memory of the scene in every
 map it uses: surfaces, free space, and rendered views.
 
 Our goal is \emph{4D mapping across visits}: one history through both kinds of
-change in all three map types. Two obstacles stand in the way: changes are
+change in all three map types. An observation can be correct about the past without being valid for the present. One decision per object then tells where each past observation still applies, and no pixel or frame has to be judged on its own. Two obstacles stand in the way: changes are
 discovered in different ways, as they happen or only on return, and maps store
 the same scene in different ways. We overcome the first with a change detection
 that brings every change to the same object-level decision, built on comparing
@@ -458,7 +456,7 @@ time. The second visit covers only part of the apartment, as return visits often
 Besides ReviScene (\cref{sec:benchmark}), we use public datasets. Flat~\cite{9811877}, a simulated apartment, and eight real rooms of 3RScan~\cite{9010673} contain changes across visits. The Office and Apartment runs of TESSE~\cite{Schmid-RSS-24} contain changes within a visit. Aria~\cite{Yugay_2026_CVPR} has no object annotations and serves rendering only, as in GaME.
 
 \noindent\textbf{Baselines.}
-Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and per-frame semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats needs a separate posed capture after each change. Only Gaussian scores vary between runs, by at most 0.2.
+Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats aims at a different task.
 
 \noindent\textbf{Metrics.}
 Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped by the same instances. Change F1~\cite{Schmid-RSS-24} is read from the maps before and after each change, so no method needs to output changes.
@@ -765,7 +763,7 @@ Map & Method & FPS$\uparrow$ & RAM (GB)$\downarrow$ & VRAM (GB)$\downarrow$ \\
 We turn off one part of the method at a time (\cref{tab:ablation_variants}).
 
 \noindent\textbf{The change test detects removed objects.}
-Without the change test, the map on BedRoom (TSDF) misses four changes: two objects that were taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four changes on real data, and without the coverage weights the test removes two static objects.
+An object carried out of the room leaves no motion to see and no new place to find. Without the change test, the map on BedRoom (TSDF) misses four such changes: two objects taken out of the room, and two changes during the last visit. Using one noise model for all objects, instead of one per object, misses the same four changes on real data, and without the coverage weights the test removes two static objects.
 
 \noindent\textbf{A decision must reach the geometry.}
 Without retirement, a detected change stays a label: stale furniture remains, change F1 falls from 83.3 to 68.8, and PSNR by 4.64\,dB.
