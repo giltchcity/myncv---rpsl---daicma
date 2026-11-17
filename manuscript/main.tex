@@ -461,7 +461,7 @@ Besides ReviScene (\cref{sec:benchmark}), we use public datasets. Flat~\cite{981
 Each map type is compared with public systems of the same type: Khronos~\cite{Schmid-RSS-24} and Panoptic Mapping~\cite{9811877} for TSDF, GaME~\cite{Yugay_2026_CVPR} for Gaussians, and Wavemap~\cite{Reijgwart-RSS-23} for occupancy. All run from released code, and the methods in a table share poses and masks: ground-truth instances in \cref{tab:main,tab:ablation_variants}, except the OneFormer row, and semantic and SAM masks in \cref{tab:tesse,tab:rendering}. POCD and GaussianUpdate have no public code, and CL-Splats aims at a different task.
 
 \noindent\textbf{Metrics.}
-Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks and identities, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped by the same instances. Change F1~\cite{Schmid-RSS-24} is read from the maps before and after each change, so no method needs to output changes.
+Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: geometry that should be gone lowers its precision, and missing surfaces lower its recall. Gaussian maps are meshed from rendered depth~\cite{Huang2DGS2024}. On Home, the reference is the complete ground-truth mesh of the apartment, and Mesh$_{\mathrm{4D}}$ averages mesh F1 over time in both visits. Object F1 follows Khronos~\cite{Schmid-RSS-24} and checks the objects of the map at every time. An object is the geometry that one instance mask selects, with its class and its lifetime. With ground-truth masks, the score measures whether objects are placed, kept, and removed correctly, not the detector. Gaussians and occupancy cells are grouped by the same instances. Change F1~\cite{Schmid-RSS-24} is read from the maps before and after each change, so no method needs to output changes.
 
 
 
@@ -598,7 +598,7 @@ Mesh F1~\cite{Knapitsch2017} at 5\,cm measures the surfaces of the current map: 
 Of the 38 changes on Home made while the camera looks away within a visit, \ours finds all, where Khronos misses 9 and GaME 11. Of the 34 between the visits it misses at most 3, against 8 and 10. Motion in view is scored on TESSE (\emph{Dyn.}, \cref{sec:exp_public}).
 
 \noindent\textbf{Earlier times are also mapped better.}
-On Home, Mesh$_{\mathrm{4D}}$ checks earlier times: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Every tenth frame is also held out and rendered from the map as it was at that time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR in the two visits. GaME keeps no history, and snapshots of its map reach 24.19 and 25.87\,dB.
+On Home, Mesh$_{\mathrm{4D}}$ scores each map at its own time: our TSDF maps reach 75.3 against 69.5 for Khronos and our Gaussian maps 76.9 against 71.6 for GaME, and occupancy is level with Wavemap. Every tenth frame is also held out and rendered from the map as it was at that time, before refinement: \ours reaches 26.64 and 26.92\,dB PSNR in the two visits. GaME keeps no history, and snapshots of its map reach 24.19 and 25.87\,dB.
 
 \begin{table}[t]
 \caption{\textbf{Changes within one visit, on the benchmark of Khronos.} \ours scores higher than Khronos in every column. F1 (\%) at earlier times for background (\emph{Bg.}), \emph{Static} and moving (\emph{Dyn.}) objects, and \emph{Changes}, and final \emph{Mesh} F1 at 5\,cm, with the same poses and semantic masks. Both methods use 5\,cm voxels.}
@@ -774,7 +774,7 @@ In \emph{No retirement}, a detected change stays a label: stale furniture remain
 Dynamic views are keyframes that saw a later change, so they show what changed and what stayed. Trained as current views (\emph{All dynamic views}), they rebuild removed furniture and cost 5.74\,dB PSNR. Dropping them (\emph{No dynamic views}) loses the walls and floors they saw and costs 5.00\,dB. Capture-time keyframes avoid both: each view trains the map before or after the change it saw. The other maps need the same limit: without valid domains, TSDF change F1 on Home falls from 97.9 to 82.8, and without saved-log-odds subtraction and local replacement, occupancy mesh F1 on Flat falls by 2.1.
 
 \noindent\textbf{\ours also runs on predicted masks.}
-With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three events in total go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
+With OneFormer~\cite{Jain_2023_CVPR} masks, mesh F1 holds and no change is invented. Three more events go undetected, all on objects that OneFormer misses, so the limit is the segmentation.
 
 
 
