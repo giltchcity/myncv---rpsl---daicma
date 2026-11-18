@@ -46,7 +46,7 @@
 \label{sec:supp_method}
 
 Every dense map fuses observations into its elements: TSDF volumes average them, Gaussian maps take gradient steps on a
-rendering loss, and occupancy maps sum log-odds. \ours keeps each native rule and only decides which observations may
+rendering loss, and occupancy maps sum log-odds. \ours keeps each rule and only decides which observations may
 enter it. An observation $o$ captured at $t_o$ is valid for an element $e$ at time $t$ if $e$ existed then and exists
 now (Eq.~3 of the main paper),
 \begin{equation}
@@ -88,10 +88,10 @@ free bound $L_{\min}$. \\
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
-$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state is fitted to its own in-place rounds and shrunk
-toward the pool of all objects; without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Persistence $q$
-is estimated from unchanged and moved outcomes with a Beta prior from the object's class. All three maps receive the same state
-interval: a state begins when it is first seen and ends at its confirming round, which bounds the unobserved departure
+$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state is fitted to its earlier rounds while it was in place and
+regularized toward pooled statistics; without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Persistence $q$
+combines the object's history of unchanged and moved outcomes with a Beta prior from its class. All three maps receive the same state
+interval: a state begins when it is first seen and ends at its confirming round, which bounds the unobserved change
 from above. Two maps place the end earlier inside this bound when they record history: the exported TSDF map uses the
 midpoint between the last supporting observation and the confirming round for a removed object, as
 Khronos~\cite{Schmid-RSS-24} does, and Gaussians of a state that changed between visits end at the start of the
@@ -103,7 +103,7 @@ current visit.
 ReviScene-BedRoom (\cref{fig:supp_bed_a,fig:supp_bed_b,fig:supp_bed_c}) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
 1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register visits B and C to A using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review, with ADE20K classes and
-17 persistent object IDs; people are labeled dynamic. No ethics review was carried out because the only person recorded
+17 persistent object identities; people are labeled as moving. No ethics review was carried out because the only person recorded
 is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_home_a,fig:supp_home_b}) animates objects
 and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}. Its two visits share a
 world coordinate frame and have 4,186 and 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export per-frame object
@@ -152,7 +152,7 @@ moves eight objects, adds five, and removes four between its two runs~\cite{9811
 \section{Evaluation Details}
 
 Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding
-visit's map through its native interface, and its Absent submaps supply its disappearance decisions. GaME uses its
+visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its
 original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from
 geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards
 sampling termination. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and
@@ -217,34 +217,31 @@ Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
  & Ours & 21.06 & 0.774 & 0.366 & 2.79\\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Gaussian rendering on the main-comparison sequences.} Held-out views after refinement;
+\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} Held-out views after refinement;
 PSNR in dB and depth L1 in cm.}
 \label{tab:supp_instance_rendering}
 \end{table}
 
 \paragraph{Held-out views of both visits.}
 On Home, we hold out every tenth frame of both visits (418 and 355 frames), run both methods again without them, and
-render each frame from the map of its own time, before refinement. \Cref{tab:supp_heldout_history} reports the map of
-the round that contains the frame, as in the main paper, and the last map before the frame.
+render each frame from the map as it was at that time, before refinement, as in the main paper
+(\cref{tab:supp_heldout_history}).
 
 \begin{table}[!htb]
 \centering
 \small
 \setlength{\tabcolsep}{3.2pt}
-\begin{tabular}{@{}llrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-& & \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
-Query & Method & A & B & A & B & A & B \\
+& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Method & A & B & A & B & A & B \\
 \midrule
-Round of & GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
-the frame & \textbf{Ours} & \textbf{26.64} & \textbf{26.92} & \textbf{0.919} & \textbf{0.926} & \textbf{0.199} & \textbf{0.149} \\
-\midrule
-Last map & GaME & 15.28 & 18.29 & 0.604 & 0.646 & 0.521 & 0.452 \\
-before & \textbf{Ours} & \textbf{16.39} & \textbf{18.87} & \textbf{0.646} & \textbf{0.696} & \textbf{0.483} & \textbf{0.385} \\
+GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
+\textbf{Ours} & \textbf{26.64} & \textbf{26.92} & \textbf{0.919} & \textbf{0.926} & \textbf{0.199} & \textbf{0.149} \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Held-out views of both visits on Home, each at its own time.} A: first visit, B: second visit; PSNR in dB. The second query scores 386 frames of A, since the first 32 precede the first map.}
+\caption{\textbf{Held-out views of both visits on Home, each at its own time.} A: first visit, B: second visit; PSNR in dB.}
 \label{tab:supp_heldout_history}
 \end{table}
 
@@ -273,13 +270,13 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
 \section{Further Ablations}
 
 \paragraph{Gaussian maps on Flat.}
-\Cref{tab:supp_ablations} adds variants to the ablation table of the main paper. Without the handover of states across
-visits, change F1 drops by one event, to 80.0. Evaluating old keyframes on the current map instead of the map at their
-capture time lowers PSNR by 0.60\,dB. Associating masks by geometry instead of by annotated identity keeps the quality
-(90.0 mesh F1, 28.14\,dB). Thresholds $\eta\in\{9,99,999\}$ yield 27.67--28.43\,dB and differ by at most one detected
-event, and fixed revisit priors of $1/4$, $1/2$ (no bias), and $3/4$ match the learned prior within one event. For the
-predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted
-instances are associated by overlap across frames before reconstruction.
+\Cref{tab:supp_ablations} adds variants to the ablation table of the main paper. Two more components are needed:
+without the object states of the previous visit one change is missed, and rendering old keyframes on the current map
+instead of the map at their capture time lowers PSNR. The method is robust to its settings: with thresholds $\eta$ from
+9 to 999, a fixed persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated
+identity, the F1 scores and PSNR stay within 5\% of the full method. For the predicted masks of the main paper,
+OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap
+across frames before reconstruction.
 
 \begin{table}[!htb]
 \centering
@@ -290,16 +287,16 @@ instances are associated by overlap across frames before reconstruction.
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 Full & 89.8 & 67.1 & 83.3 & 28.43 & 0.96 & 0.11 & 0.41 \\
-No handover & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
+No previous states & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
 
 
 Current-map rendering & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
 Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
 Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
-Fixed prior $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
-Fixed prior $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
-Fixed prior $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
+Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
+Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
+Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Further ablations of Gaussian maps on Flat.} F1 in \%, PSNR in dB, depth L1 in cm.}
@@ -307,12 +304,11 @@ Fixed prior $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
 \end{table}
 
 \paragraph{Change test on BedRoom.}
-\Cref{tab:supp_change_test} ablates the change test in TSDF maps on BedRoom. All variants start from the same map of
-visit A, and each continues from its own map of visit B. In visit B, every object moved between the visits is also seen
-at its new place, so the variants differ little. In visit C, two objects are carried out of the room and two changes
-happen during the visit. Without the change test, these four are missed and object F1 falls by 4.5. One noise model for
-all objects never reaches the threshold on this recording and misses the same four. Without the coverage weights,
-repeated views of one patch add up, and the test ends two static objects in visit C.
+\Cref{tab:supp_change_test} ablates the change test in TSDF maps on BedRoom. In visit B, every object moved between the
+visits is also seen at its new place, so the variants differ little. In visit C, two objects are carried out of the
+room and two changes happen during the visit. Without the change test, these four are missed. One noise model for all
+objects never reaches the threshold on this recording and misses the same four. Without the coverage weights, repeated
+views of one patch add up, and the test ends two static objects in visit C.
 
 \begin{table}[!htb]
 \centering
@@ -337,10 +333,9 @@ Threshold $\eta=999$ & 98.3 & 15/16 & 95.6 & 1/2 & 10/10 \\
 \end{table}
 
 \paragraph{Valid domains.}
-With valid domains off, every archived frame contributes its full ray (\cref{tab:supp_valid_domains}). On Home, change
-F1 falls from 97.9 to 82.8 and mesh F1 by more than one point after each visit. Frames that saw a moved object at
-its old site fuse it back, and frames captured before an object arrived carve its new site: new-site coverage falls
-from 99.7\% to 78.3\%.
+Without valid domains, every archived frame contributes its full ray. Frames that saw a moved object at its old site
+fuse it back, and frames captured before an object arrived carve its new site, so change F1 and mesh F1 both fall on
+Home (\cref{tab:supp_valid_domains}).
 
 \begin{table}[!htb]
 \centering
@@ -359,9 +354,8 @@ Off & 78.6 & 81.8 & 83.4 & 82.8 \\
 \end{table}
 
 \paragraph{Occupancy updates.}
-\Cref{tab:supp_occupancy_ablation} removes saved-log-odds subtraction and local replacement separately and together.
-Both improve the final geometry on Home and Flat; the subtraction matters more on Home and local replacement on Flat.
-Removing both brings each dataset within 0.1 points of Wavemap.
+Saved-log-odds subtraction and local replacement both improve the final geometry on Home and Flat, and without them the
+result returns to that of Wavemap (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[!htb]
 \centering
@@ -385,7 +379,7 @@ Neither & 80.0 & 80.3 \\
 
 \section{Further Qualitative Results}
 
-\Cref{fig:qualitative} compares all methods in six views of BedRoom, Home, and Flat.
+\Cref{fig:supp_qual} compares all methods in two views each of BedRoom, Home, and Flat. TSDF and occupancy maps use reference colors, and occupancy is shown at 2\,cm resolution. The BedRoom occupancy panels use the maps of the capture time; all other panels use the final maps.
 
 \begin{figure}[!htb]
 \centering
@@ -393,74 +387,64 @@ Neither & 80.0 & 80.3 \\
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
 \fontsize{7}{8}\selectfont
 \begin{tabular}{@{}c*{8}{c}@{}}
-& & \multicolumn{3}{c}{TSDF} & \multicolumn{2}{c}{3D Gaussians} & \multicolumn{2}{c}{Occupancy}\\[3pt]
-& Image & Khronos & Panoptic & Ours & GaME & Ours & Wavemap & Ours\\[3pt]
-% 1_real_05320 [165, 72, 615, 522]
-\rotatebox{90}{BedRoom} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/4_game.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={165.0000bp 10.0000bp 343.0000bp 72.0000bp},clip]{figures/results_native/qual/1_real_05320/7_ours_occ.png}\\[2pt]
-% 2_real_02540 [105, 80, 550, 525]
-\rotatebox{90}{BedRoom} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/privacy/face_redacted_5.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/4_game.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={105.0000bp 7.0000bp 408.0000bp 80.0000bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png}\\[2pt]
-% 3_sim_02850 [150, 15, 580, 445]
-\rotatebox{90}{Home} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/0_image.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/4_game.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/5_ours_3dgs.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={150.0000bp 35.0000bp 100.0000bp 15.0000bp},clip]{figures/results_native/qual/3_sim_02850/7_ours_occ.png}\\[2pt]
-% 10_sim_03080 [100, 0, 580, 480]
-\rotatebox{90}{Home} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/0_image.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/4_game.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/5_ours_3dgs.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={100bp 0bp 100bp 0bp},clip]{figures/results_native/qual/10_sim_03080/7_ours_occ.png}\\[2pt]
-% 5_flat_00270 [160, 90, 550, 480]
-\rotatebox{90}{Flat} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={160.0000bp 0.0000bp 90.0000bp 90.0000bp},clip]{figures/results_native/qual/5_flat_00270/7_ours_occ.png}\\[2pt]
-% 6_flat_00225 [100, 30, 525, 455]
-\rotatebox{90}{Flat} &
+ & Ground Truth & \textbf{Ours (3DGS)} & \textbf{Ours (TSDF)} & \textbf{Ours (Occupancy)} & GaME & Wavemap & Khronos & Panoptic Mapping\\[3pt]
+\rotatebox{90}{\makebox[\qwidth][c]{BedRoom}} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/4_game.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/2_panoptic.png}\\[1.2pt]
+\rotatebox{90}{\makebox[\qwidth][c]{BedRoom}} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/0_image.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/4_game.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={100bp 2bp 508bp 180bp},clip]{figures/results_native/qual/2_real_02540/2_panoptic.png}\\[1.2pt]
+\rotatebox{90}{\makebox[\qwidth][c]{Home}} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/0_image.png} &
+\includegraphics[width=\qwidth]{figures/export_lossless/5_ours_3dgs_home02870.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/4_game.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={180bp 80bp 100bp 0bp},clip]{figures/results_native/qual/9_sim_02870/2_panoptic.png}\\[1.2pt]
+\rotatebox{90}{\makebox[\qwidth][c]{Home}} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/0_image.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/4_game.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={140bp 0bp 120bp 60bp},clip]{figures/results_native/qual/4_sim_03065/2_panoptic.png}\\[1.2pt]
+\rotatebox{90}{\makebox[\qwidth][c]{Flat}} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/0_image.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/4_game.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/6_wavemap.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={185bp 2bp 158bp 181bp},clip]{figures/results_native/qual/5_flat_00270/2_panoptic.png}\\[1.2pt]
+\rotatebox{90}{\makebox[\qwidth][c]{Flat}} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/0_image.png} &
-\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
-\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png} &
-\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/3_ours_tsdf.png} &
-\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/4_game.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/5_ours_3dgs.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/3_ours_tsdf.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/4_game.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/6_wavemap.png} &
-\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/7_ours_occ.png}\\[2pt]
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
+\includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png}\\[1.2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Scene updates across three representations.} Six views from the real room, synthetic apartment,
-and Flat, with each method rendered at the image pose. Each row uses the same square crop and scale across methods.
-TSDF and occupancy use reference colors. BedRoom occupancy panels use the capture-time maps; other panels
-use final maps. Occupancy is visualized at 2\,cm resolution.}
-\label{fig:qualitative}
+\caption{\textbf{Maps after scene changes.} One view per row; the first five are the views of Fig.~4 of the main paper. Every map is rendered at the pose of the \emph{Ground Truth} frame.}
+\label{fig:supp_qual}
 \end{figure}
 
 \FloatBarrier
