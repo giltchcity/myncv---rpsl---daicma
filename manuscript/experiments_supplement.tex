@@ -60,48 +60,51 @@ and each map applies $v$ inside its own update:
   \theta_e&\leftarrow\theta_e-\alpha\sum_k v_k(e,t)\,\frac{\partial\,\ell\bigl(I_k,R(\mathcal{M}(t_k))\bigr)}{\partial\theta_e},\label{eq:supp_gs}\\
   L(c)&\leftarrow\mathrm{clamp}\bigl(L(c)+v_o(c,t)\,\Delta_o(c)\bigr).\label{eq:supp_occ}
 \end{align}
-In \cref{eq:supp_tsdf}, the signed distance $D$ of a voxel $x$ is the weighted mean of the ray distances $d_o$. A pixel
-ray $o$ ends on a state $\sigma_o$ or on the background, $\mathcal{S}(t)$ is the set of states alive at $t$, and
-$\Omega_o(t)$ is the valid domain (Eq.~4 of the main paper). A ray counts only while the state it hit still stands; its
-band keeps the surface it measured, and its free space stops before the first state that arrived after $t_o$. The wall
-thus keeps its old views, the departed armchair loses its own, and views taken before the sofa arrived never carve it.
-A state that starts or ends re-fuses only the voxel blocks its rays cross, from archived frames.
-In \cref{eq:supp_gs}, keyframe $k$ with image $I_k$ renders the map of its capture time, $R(\mathcal{M}(t_k))$, and its
-gradient reaches only the Gaussians alive both then and now; ended Gaussians stay frozen.
-In \cref{eq:supp_occ}, a cell $c$ keeps only the clamped sum of its updates $\Delta_o$, not which observation
-contributed what, so $v$ is applied at the two ends of a state, the only times it changes. At its start, the first
-object reading of a visit in a cell that earlier visits saw free withdraws the value $L_0(c)<0$ that the cell held when
-the visit began, $L(c)\leftarrow L(c)-L_0(c)$, so the cell keeps only the evidence of the current visit. At its end,
-the cells of the state are set to the free bound $L_{\min}$. The state intervals that
-define $\mathcal{M}$ and $\mathcal{S}$ come from change detection.
+\Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
+$x$, a pixel ray $o$ ends on a state $\sigma_o$, $\mathcal{S}(t)$ is the set of states alive at $t$ (the background
+always is), and $\Omega_o(t)$ is the valid domain (Eq.~4 of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $\Delta_o$ is the update of cell $c$, and $L_0(c)$ is the value the cell
+held when the visit began.
+
+\begin{table}[!htb]
+\centering
+\small
+\begin{tabular}{@{}lp{0.78\linewidth}@{}}
+\toprule
+Map & Where $v$ acts \\
+\midrule
+TSDF & A ray counts only while the state it hit still stands. Its band keeps the surface it measured, and its free
+space stops before the first state that arrived after $t_o$. \\
+3D Gaussians & A keyframe renders the map of its capture time, $\mathcal{M}(t_k)$, and its gradient reaches only the
+Gaussians alive both then and now. \\
+Occupancy & A cell keeps only its clamped sum, so $v$ acts at the two ends of a state. Start: the first object reading
+of a visit in a cell that earlier visits saw free withdraws $L_0(c)<0$. End: the cells of the state are set to the
+free bound $L_{\min}$. \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{One validity, three maps.} Each map keeps its own update and applies $v$ of \cref{eq:supp_valid} inside it.}
+\label{tab:supp_validity}
+\end{table}
 
 \paragraph{Change detection.}
-Each depth image tests at most 1,500 surface samples per state, with a depth tolerance equal to the map resolution
-(a 5\,cm reference scale for Gaussians) and an incidence limit of $60^\circ$. A round needs at least
-$\min(30,\nu_{\mathrm{rel}})$ judged samples, where $\nu_{\mathrm{rel}}$ is the number of reliable samples of the state,
-and $f_i=k_i/n_i$ is the fraction of the $n_i$ inspected samples that round $i$ sees through. A round is in place when
-more of its samples carry the state's own mask than are seen through, and it is scored before it can join the in-place
-statistics, so rounds after a change never enter the model. The Beta moments are fitted per object from its third
-in-place round on and shrunk toward the pool of all objects, weighted as three rounds; the variance never falls below
-the spread between objects or $10^{-4}$, and the concentration is at least two. Without a pool, the model is
-$\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate, and fractions are clamped between the fitted mean and 0.995 before
-computing the one-sided log-density ratio $\ell_s(f_i)$. The weight $w_i(j)=\nu_i(j)/\nu_{\mathrm{rel}}$ divides the
-number $\nu_i(j)$ of reliable samples inspected for the first time since the candidate change time $j$ by
-$\nu_{\mathrm{rel}}$, so each sample contributes once per candidate window. We use $\eta=99$ in all experiments.
-Persistence is estimated from unchanged and moved outcomes using a Beta prior from the object's class, with the class
-estimate smoothed toward its mobility group. A state begins when it is first seen and ends at its confirming round,
-which bounds the unobserved departure from above. For a removed object, the exported TSDF map places the end midway
-between the last supporting observation and the confirming round, as Khronos~\cite{Schmid-RSS-24} does, and a Gaussian
-state that changed between visits ends at the start of the current visit.
+The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
+$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state is fitted to its own in-place rounds and shrunk
+toward the pool of all objects; without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Persistence $q$
+is estimated from unchanged and moved outcomes with a Beta prior from the object's class. All three maps receive the same state
+interval: a state begins when it is first seen and ends at its confirming round, which bounds the unobserved departure
+from above. Two maps place the end earlier inside this bound when they record history: the exported TSDF map uses the
+midpoint between the last supporting observation and the confirming round for a removed object, as
+Khronos~\cite{Schmid-RSS-24} does, and Gaussians of a state that changed between visits end at the start of the
+current visit.
 
 \section{Datasets}
 \label{sec:supp_datasets}
 
-ReviScene-BedRoom (\cref{fig:supp_bedroom}) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
+ReviScene-BedRoom (\cref{fig:supp_datasets}, top) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
 1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register visits B and C to A using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review, with ADE20K classes and
 17 persistent object IDs; people are labeled dynamic. No ethics review was carried out because the only person recorded
-is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_home}) animates objects
+is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_datasets}, bottom) animates objects
 and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}. Its two visits share a
 world coordinate frame and have 4,186 and 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export per-frame object
 transforms and visibility, which give the scene geometry at each timestamp together with the object meshes. Instance
@@ -111,23 +114,14 @@ moves eight objects, adds five, and removes four between its two runs~\cite{9811
 
 \begin{figure}[!htb]
 \centering
-\newcommand{\bedpanel}[2]{\begin{minipage}[t]{0.243\linewidth}\centering{\footnotesize #1}\par\vspace{1pt}%
-\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/#2.png}\end{minipage}}
-\bedpanel{Visit A, 85.0\,s}{a_before}\hfill\bedpanel{Visit A, 133.3\,s}{a_after}\hfill\bedpanel{Visit B, 34.0\,s}{b_before}\hfill\bedpanel{Visit B, 134.5\,s}{b_after}\\[4pt]
-\bedpanel{Visit C, 30.0\,s}{c_before}\hfill\bedpanel{Visit C, 100.0\,s}{c_middle}\hfill\bedpanel{Visit C, 240.0\,s}{c_after}\hfill\begin{minipage}[t]{0.243\linewidth}\mbox{}\end{minipage}
-\caption{\textbf{ReviScene-BedRoom from a fixed overview camera.} The luggage appears beside the wall during visit A, moves toward the bed during visit B, and during visit C moves from beside the desk to the clothes rack and then toward the bed. The room is also rearranged between visits.}
-\label{fig:supp_bedroom}
-\end{figure}
-
-\begin{figure}[!htb]
-\centering
-\newcommand{\homepanel}[2]{\begin{minipage}[t]{0.243\linewidth}\centering{\footnotesize #1}\par\vspace{1pt}%
-\includegraphics[width=\linewidth]{figures/dataset_stages/#2_rgb.png}\end{minipage}}
-\homepanel{Visit A, 0\,s: initial layout}{a_0000.00}\hfill\homepanel{Visit A, 80\,s: after cabinet motion}{a_0080.00}\hfill\homepanel{Visit A, 95\,s: furniture rearranged}{a_0095.00}\hfill\homepanel{Visit A, 125\,s: side table moved}{a_0125.00}\\[4pt]
-\homepanel{Visit A, 139.5\,s: chair moved}{a_0139.50}\hfill\homepanel{Visit B, 0\,s: initial layout}{b_0000.00}\hfill\homepanel{Visit B, 35\,s: side table moved}{b_0035.00}\hfill\homepanel{Visit B, 50\,s: chair moved}{b_0050.00}\\[4pt]
-\homepanel{Visit B, 65\,s: furniture rearranged}{b_0065.00}\hfill\homepanel{Visit B, 90\,s: cabinet moved}{b_0090.00}\hfill\homepanel{Visit B, 118.4\,s: plant moved}{b_0118.40}\hfill\begin{minipage}[t]{0.243\linewidth}\mbox{}\end{minipage}
-\caption{\textbf{ReviScene-Home from a fixed overview camera.} Isaac Sim renders of the successive arrangements in the two visits. The start of visit B shows the bedroom and living room rearranged between the visits.}
-\label{fig:supp_home}
+\newcommand{\bedpanel}[2]{\begin{minipage}[t]{0.325\linewidth}\centering
+\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/#2.png}\par\vspace{1pt}{\small #1}\end{minipage}}
+\newcommand{\homepanel}[2]{\begin{minipage}[t]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/dataset_stages/#2_rgb.png}\par\vspace{1pt}{\small #1}\end{minipage}}
+\bedpanel{BedRoom, end of visit A}{a_after}\hfill\bedpanel{BedRoom, end of visit B}{b_after}\hfill\bedpanel{BedRoom, end of visit C}{c_after}\\[6pt]
+\homepanel{Home, end of visit A}{a_0139.50}\hfill\homepanel{Home, end of visit B}{b_0118.40}
+\caption{\textbf{ReviScene.} The scene at the end of each visit, from a fixed overview camera.}
+\label{fig:supp_datasets}
 \end{figure}
 
 \section{Evaluation Details}
@@ -143,13 +137,15 @@ occupancy maps, the objects are the connected components of each identity on a 1
 positives, false positives, and false negatives across the complete chain. For 3RScan, scores are averaged over visits
 within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at
 least half its points lie within 10\,cm of a single mapped object surface. Gaussian evaluation images on 3RScan are
-480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory.
+480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR
+varies by about 0.1\,dB, at most 0.2\,dB. Compared with carrying a single map across visits, \ours additionally stores only
+the history. On BedRoom, it holds the map at 240 times over the three visits, which takes a few MB for occupancy, a few
+hundred MB for TSDF, and a few GB for Gaussians.
 
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\Cref{tab:supp_change_kinds} splits the change F1 of the main paper into changes after looking away within a visit and
-changes across visits.
+\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change.
 
 \begin{table}[!htb]
 \centering
@@ -175,38 +171,8 @@ Occupancy & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
 \label{tab:supp_change_kinds}
 \end{table}
 
-\paragraph{Restart versus continued mapping.}
-\Cref{tab:supp_restart} compares native maps rebuilt from scratch in the last visit with our continued maps. The
-synthetic reference consists of the ground-truth surfaces observed up to the evaluation time, so it includes the regions
-that the last visit does not see.
-
-\begin{table}[!htb]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}lll*{6}{r}@{}}
-\toprule
-& & & \multicolumn{3}{c}{Native restart} & \multicolumn{3}{c}{Ours, continued} \\ \cmidrule(lr){4-6}\cmidrule(lr){7-9}
-Dataset & Map & Visit & P$\uparrow$ & R$\uparrow$ & F1$\uparrow$ & P$\uparrow$ & R$\uparrow$ & F1$\uparrow$ \\ \midrule
-BedRoom & TSDF & C & 91.33 & 98.62 & 94.83 & 93.62 & 98.81 & 96.14 \\
- & 3DGS & C & 97.00 & 93.72 & 95.33 & 95.36 & 94.68 & 95.01 \\
- & Occupancy & C & 82.41 & 96.66 & 88.97 & 84.72 & 98.36 & 91.03 \\
-\midrule
-Home & TSDF & B & 98.10 & 77.57 & 86.63 & 99.80 & 98.66 & 99.23 \\
- & 3DGS & B & 93.30 & 78.72 & 85.39 & 97.15 & 95.99 & 96.57 \\
- & Occupancy & B & 96.49 & 76.50 & 85.34 & 94.90 & 93.58 & 94.23 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Restart versus continued mapping after the last visit.} Precision, recall, and F1 at 5\,cm (\%), against the same reference.}
-\label{tab:supp_restart}
-\end{table}
-
 \paragraph{Rendering.}
-\Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison, which
-use instance masks. Every tenth frame of the final visit is held out, except the first. LPIPS uses the AlexNet
-backbone, and depth L1 is evaluated on pixels with valid measured depth in both methods. The 3RScan result is the mean
-over the final visit of each of eight rooms.
+\Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison.
 
 \begin{table}[!htb]
 \centering
@@ -232,14 +198,9 @@ PSNR in dB and depth L1 in cm.}
 \end{table}
 
 \paragraph{Held-out views of both visits.}
-The protocol of GaME~\cite{Yugay_2026_CVPR} holds out frames of the last visit only. For this experiment on Home, we
-apply the same rule to the first visit as well (418 and 355 held-out frames), and run both methods again without these
-frames. \Cref{tab:supp_heldout_history} reports two queries. The first uses the map of the mapping round that contains
-the frame, and is the one reported in the main paper. The second uses the last map before the frame; it is up to
-10.8\,s old, so regions the camera has just entered are often missing, for both methods alike. All maps are rendered
-before refinement, since refining the map of every time would take about 30 minutes each. The values exceed those on
-Home in \cref{tab:supp_instance_rendering}, where every held-out frame is rendered from the final map: Home changes
-within its visits, so the final map no longer shows what a frame saw before a later change.
+On Home, we hold out every tenth frame of both visits (418 and 355 frames), run both methods again without them, and
+render each frame from the map of its own time, before refinement. \Cref{tab:supp_heldout_history} reports the map of
+the round that contains the frame, as in the main paper, and the last map before the frame.
 
 \begin{table}[!htb]
 \centering
@@ -263,13 +224,11 @@ before & \textbf{Ours} & \textbf{16.39} & \textbf{18.87} & \textbf{0.646} & \tex
 \end{table}
 
 \paragraph{CL-Splats.}
-For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} (commit \texttt{587fffc}) on Flat and
-Aria with its released default configuration (\cref{tab:supp_clsplats}). The first visit trains the initial scene and
-the training frames of the second visit form the update, each with 30{,}000 iterations. CL-Splats receives the same
-poses and RGB images, with initial points from the depth of the first visit, and is scored on the same held-out views.
-It takes no depth during optimization and is designed for a small set of images of a locally changed region, whereas
-each of our visits covers the whole scene. On Aria room1 and Flat, one nearest-neighbour search of the released code is
-evaluated in chunks to fit a 16\,GB GPU, which does not change its result.
+For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} (commit \texttt{587fffc}) with its
+released default configuration and 30{,}000 iterations per visit, on the same poses, RGB images, and held-out views
+(\cref{tab:supp_clsplats}). Its initial points come from the depth of the first visit. CL-Splats is designed for a few
+images of a locally changed region. On Aria room1 and Flat, one nearest-neighbour search is evaluated in chunks to fit
+a 16\,GB GPU, which does not change its result.
 
 \begin{table}[!htb]
 \centering
@@ -330,8 +289,7 @@ visit A, and each continues from its own map of visit B. In visit B, every objec
 at its new place, so the variants differ little. In visit C, two objects are carried out of the room and two changes
 happen during the visit. Without the change test, these four are missed and object F1 falls by 4.5. One noise model for
 all objects never reaches the threshold on this recording and misses the same four. Without the coverage weights,
-repeated views of one patch add up, and the test ends two static objects in visit C. Thresholds of 9 and 999 cost up to
-1.0 and 1.8 points of object F1 against $\eta=99$.
+repeated views of one patch add up, and the test ends two static objects in visit C.
 
 \begin{table}[!htb]
 \centering
@@ -351,20 +309,15 @@ Threshold $\eta=9$ & 97.4 & 15/16 & 97.0 & 2/2 & 10/10 \\
 Threshold $\eta=999$ & 98.3 & 15/16 & 95.6 & 1/2 & 10/10 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test on BedRoom (TSDF).} Object F1 (\%) and the reference changes found within and between visits, after visits B and C. No variant reports a false change, and all find both changes within visit B.}
+\caption{\textbf{Change test on BedRoom (TSDF).} Object F1 (\%) and the reference changes found within and between visits, after visits B and C. All variants find both changes within visit B.}
 \label{tab:supp_change_test}
 \end{table}
 
 \paragraph{Valid domains.}
-With valid domains off, every archived frame contributes its full ray, and state changes no longer rebuild voxel
-blocks; all other components stay unchanged (\cref{tab:supp_valid_domains}). On Home, where objects also move during
-visits, change F1 falls from 97.9 to 82.8 (true positives, false positives, and false negatives change from 69/0/3 to
-53/3/19), and mesh F1 falls by 1.2 and 0.8 points after visits A and B. Two effects cause the drop. Frames that saw a
-moved object at its old site fuse it back: for changes after looking away, the mean residual at the old site rises from
-5.8\% to 45.0\%, and the median time until the site is cleared, an upper bound, grows from 16.2 to 27.1\,s. Frames
-captured before an object arrived carve its new site with free space, and new-site coverage falls from 99.7\% to
-78.3\%. 4D object F1 changes by 0.2 points: objects are still found, but their geometry is wrong. On Flat, where all
-changes occur between visits, both settings give identical scores.
+With valid domains off, every archived frame contributes its full ray (\cref{tab:supp_valid_domains}). On Home, change
+F1 falls from 97.9 to 82.8 and mesh F1 by more than one point after each visit. Frames that saw a moved object at
+its old site fuse it back, and frames captured before an object arrived carve its new site: new-site coverage falls
+from 99.7\% to 78.3\%.
 
 \begin{table}[!htb]
 \centering
@@ -374,8 +327,8 @@ changes occur between visits, both settings give identical scores.
 \toprule
 Valid domains & Mesh A$\uparrow$ & Mesh B$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-On (full) & 99.2 & 99.2 & 83.6 & 97.9 \\
-Off & 98.0 & 98.4 & 83.4 & 82.8 \\
+On (full) & 79.8 & 83.0 & 83.6 & 97.9 \\
+Off & 78.6 & 81.8 & 83.4 & 82.8 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Valid domains on Home (TSDF).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
@@ -384,8 +337,8 @@ Off & 98.0 & 98.4 & 83.4 & 82.8 \\
 
 \paragraph{Occupancy updates.}
 \Cref{tab:supp_occupancy_ablation} removes saved-log-odds subtraction and local replacement separately and together.
-Both improve the final geometry on Home and Flat, and local replacement has the larger effect. Removing both brings
-Flat within 0.1 points of Wavemap.
+Both improve the final geometry on Home and Flat; the subtraction matters more on Home and local replacement on Flat.
+Removing both brings each dataset within 0.1 points of Wavemap.
 
 \begin{table}[!htb]
 \centering
@@ -395,15 +348,15 @@ Flat within 0.1 points of Wavemap.
 \toprule
 Variant & Home$\uparrow$ & Flat$\uparrow$ \\
 \midrule
-Wavemap & 93.2 & 80.2 \\
+Wavemap & 79.9 & 80.2 \\
 \rowcolor{oursbg}
-\textbf{Ours (full)} & \textbf{94.2} & \textbf{82.4} \\
-No saved-log-odds subtraction & 94.0 & 81.8 \\
-No local replacement & 93.6 & 80.9 \\
-Neither & 93.4 & 80.3 \\
+\textbf{Ours (full)} & \textbf{80.8} & \textbf{82.4} \\
+No saved-log-odds subtraction & 80.3 & 81.8 \\
+No local replacement & 80.6 & 80.9 \\
+Neither & 80.0 & 80.3 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Occupancy update ablations.} Mesh F1 (\%) at 5\,cm after the second visit, using the final-map protocol of the main table.}
+\caption{\textbf{Occupancy update ablations.} Mesh F1 (\%) at 5\,cm after the second visit, as in the main table.}
 \label{tab:supp_occupancy_ablation}
 \end{table}
 
