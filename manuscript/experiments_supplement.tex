@@ -100,11 +100,11 @@ current visit.
 \section{Datasets}
 \label{sec:supp_datasets}
 
-ReviScene-BedRoom (\cref{fig:supp_datasets}, top) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
+ReviScene-BedRoom (\cref{fig:supp_bed_a,fig:supp_bed_b,fig:supp_bed_c}) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
 1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register visits B and C to A using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review, with ADE20K classes and
 17 persistent object IDs; people are labeled dynamic. No ethics review was carried out because the only person recorded
-is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_datasets}, bottom) animates objects
+is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_home_a,fig:supp_home_b}) animates objects
 and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}. Its two visits share a
 world coordinate frame and have 4,186 and 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export per-frame object
 transforms and visibility, which give the scene geometry at each timestamp together with the object meshes. Instance
@@ -114,15 +114,40 @@ moves eight objects, adds five, and removes four between its two runs~\cite{9811
 
 \begin{figure}[!htb]
 \centering
-\newcommand{\bedpanel}[2]{\begin{minipage}[t]{0.325\linewidth}\centering
-\includegraphics[width=\linewidth,trim=170bp 150bp 170bp 0bp,clip]{figures/real_stages_original/#2.png}\par\vspace{1pt}{\small #1}\end{minipage}}
-\newcommand{\homepanel}[2]{\begin{minipage}[t]{0.49\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/dataset_stages/#2_rgb.png}\par\vspace{1pt}{\small #1}\end{minipage}}
-\bedpanel{BedRoom, end of visit A}{a_after}\hfill\bedpanel{BedRoom, end of visit B}{b_after}\hfill\bedpanel{BedRoom, end of visit C}{c_after}\\[6pt]
-\homepanel{Home, end of visit A}{a_0139.50}\hfill\homepanel{Home, end of visit B}{b_0118.40}
-\caption{\textbf{ReviScene.} The scene at the end of each visit, from a fixed overview camera.}
-\label{fig:supp_datasets}
+\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/a_after.png}
+\caption{\textbf{ReviScene-BedRoom at the end of visit A}, from a fixed overview camera.}
+\label{fig:supp_bed_a}
 \end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/b_after.png}
+\caption{\textbf{ReviScene-BedRoom at the end of visit B}, from a fixed overview camera.}
+\label{fig:supp_bed_b}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/c_after.png}
+\caption{\textbf{ReviScene-BedRoom at the end of visit C}, from a fixed overview camera.}
+\label{fig:supp_bed_c}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0139.50_rgb.png}
+\caption{\textbf{ReviScene-Home at the end of visit A}, from a fixed overview camera.}
+\label{fig:supp_home_a}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/b_0118.40_rgb.png}
+\caption{\textbf{ReviScene-Home at the end of visit B}, from a fixed overview camera.}
+\label{fig:supp_home_b}
+\end{figure}
+
+\FloatBarrier
 
 \section{Evaluation Details}
 
