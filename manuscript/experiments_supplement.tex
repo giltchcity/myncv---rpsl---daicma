@@ -249,11 +249,9 @@ before & \textbf{Ours} & \textbf{16.39} & \textbf{18.87} & \textbf{0.646} & \tex
 \end{table}
 
 \paragraph{CL-Splats.}
-For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} (commit \texttt{587fffc}) with its
-released default configuration and 30{,}000 iterations per visit, on the same poses, RGB images, and held-out views
-(\cref{tab:supp_clsplats}). Its initial points come from the depth of the first visit. CL-Splats is designed for a few
-images of a locally changed region. On Aria room1 and Flat, one nearest-neighbour search is evaluated in chunks to fit
-a 16\,GB GPU, which does not change its result.
+For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
+released default configuration on the same poses, RGB images, and held-out views
+(\cref{tab:supp_clsplats}). 
 
 \begin{table}[!htb]
 \centering
