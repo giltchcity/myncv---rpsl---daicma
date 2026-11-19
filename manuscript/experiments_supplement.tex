@@ -10,6 +10,7 @@
 \usepackage{booktabs}
 \usepackage{microtype}
 \usepackage{placeins}
+\usepackage{float}
 \usepackage{colortbl}
 \definecolor{oursbg}{RGB}{255,247,225}
 \definecolor{resultgold}{RGB}{153,117,16}
@@ -269,7 +270,8 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
 
 \section{Further Ablations}
 
-The first four ablations each remove components from one map type. The last one varies the settings.
+The first four ablations each remove components from one map type. The last one varies the settings. All scores follow
+the main paper.
 
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
@@ -277,41 +279,42 @@ these four are missed (\cref{tab:supp_change_test}). One noise model for all obj
 this recording and misses the same four. Without the coverage weights, repeated views of one patch add up, and the
 test ends two static objects in the third visit.
 
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+\midrule
+Full & 96.1 & 96.6 & 98.4 \\
+No change test & 96.0 & 94.4 & 91.2 \\
+One noise model & 96.0 & 94.4 & 91.2 \\
+No coverage weights & 95.9 & 96.1 & 94.9 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Change test (TSDF, BedRoom).} F1 in \%, as in the main table.}
+\label{tab:supp_change_test}
+\end{table}
+
 \paragraph{Valid domains (TSDF, Home).}
 Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
 object arrived carve its new site, so change F1 and mesh F1 both fall (\cref{tab:supp_valid_domains}).
 
-\begin{table}[!htb]
+\begin{table}[H]
+\centering
 \small
-\setlength{\tabcolsep}{3.3pt}
-\begin{minipage}[t]{0.57\linewidth}\centering
-\begin{tabular}[t]{@{}lrrrrrr@{}}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrr@{}}
 \toprule
- & \multicolumn{3}{c}{Second visit} & \multicolumn{3}{c}{Third visit} \\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full & 96.0 & 98.4 & 97.1 & 96.1 & 97.5 & 100.0 \\
-No change test & 96.0 & 98.3 & 97.1 & 96.0 & 93.0 & 80.0 \\
-One noise model & 96.0 & 98.3 & 97.1 & 96.0 & 93.0 & 80.0 \\
-No coverage weights & 95.4 & 97.5 & 94.1 & 95.9 & 97.0 & 95.7 \\
+Full & 83.0 & 83.6 & 97.9 \\
+No valid domains & 81.8 & 83.4 & 82.8 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test (TSDF, BedRoom).} Mesh F1 at 5\,cm, object F1, and change F1 (\%) after the second and third visits.}
-\label{tab:supp_change_test}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.41\linewidth}\centering
-\begin{tabular}[t]{@{}lrrrr@{}}
-\toprule
-Variant & Mesh 1st$\uparrow$ & Mesh 2nd$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
-\midrule
-Full & 79.8 & 83.0 & 83.6 & 97.9 \\
-No valid domains & 78.6 & 81.8 & 83.4 & 82.8 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%; mesh F1 at 5\,cm after the first and second visits.}
+\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%, as in the main table.}
 \label{tab:supp_valid_domains}
-\end{minipage}
 \end{table}
 
 \paragraph{Object and element level (3DGS, Flat).}
@@ -322,15 +325,11 @@ F1 stays the same, but the rest of the old map is no longer confirmed against ne
 components also help: without the object states of the previous visit one change is missed, and rendering old
 keyframes on the current map instead of the map at their capture time lowers PSNR.
 
-\paragraph{Occupancy update (Home, Flat).}
-Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
-Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_occupancy_ablation}).
-
-\begin{table}[!htb]
+\begin{table}[H]
+\centering
 \small
-\setlength{\tabcolsep}{3.3pt}
-\begin{minipage}[t]{0.47\linewidth}\centering
-\begin{tabular}[t]{@{}lrrrr@{}}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
 \midrule
@@ -345,9 +344,17 @@ Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
 \end{tabular}
 \caption{\textbf{Object and element level (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
 \label{tab:supp_ablations}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.51\linewidth}\centering
-\begin{tabular}[t]{@{}lrrrrrr@{}}
+\end{table}
+
+\paragraph{Occupancy update (Home, Flat).}
+Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
+Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_occupancy_ablation}).
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
  & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\
 \cmidrule(lr){2-4}\cmidrule(l){5-7}
@@ -362,7 +369,6 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \end{tabular}
 \caption{\textbf{Occupancy update (Home, Flat).} F1 in \%, as in the main table. \emph{No subtraction}: without saved-log-odds subtraction.}
 \label{tab:supp_occupancy_ablation}
-\end{minipage}
 \end{table}
 
 \paragraph{Settings.}
@@ -370,10 +376,10 @@ The method is robust to its settings (\cref{tab:supp_settings}): with thresholds
 persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated identity, the F1
 scores and PSNR stay within 5\% of the full method.
 
-\begin{table}[!htb]
+\begin{table}[H]
 \centering
 \small
-\setlength{\tabcolsep}{3.4pt}
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}[t]{@{}lrrrr@{}}
 \multicolumn{5}{c}{(a) 3DGS, Flat}\\[3pt]
 \toprule
@@ -387,20 +393,18 @@ Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
 Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \bottomrule
-\end{tabular}\hfill
-\begin{tabular}[t]{@{}lrrrrrr@{}}
-\multicolumn{7}{c}{(b) TSDF, BedRoom}\\[3pt]
+\end{tabular}\hspace{4em}
+\begin{tabular}[t]{@{}lrrr@{}}
+\multicolumn{4}{c}{(b) TSDF, BedRoom}\\[3pt]
 \toprule
- & \multicolumn{3}{c}{Second visit} & \multicolumn{3}{c}{Third visit} \\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full & 96.0 & 98.4 & 97.1 & 96.1 & 97.5 & 100.0 \\
-Threshold $\eta=9$ & 96.0 & 97.4 & 97.1 & 96.0 & 97.0 & 100.0 \\
-Threshold $\eta=999$ & 96.0 & 98.3 & 97.1 & 96.0 & 95.6 & 95.7 \\
+Full & 96.1 & 96.6 & 98.4 \\
+Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
+Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. (a) F1 in \%, PSNR in dB. (b) Columns as in \cref{tab:supp_change_test}.}
+\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB.}
 \label{tab:supp_settings}
 \end{table}
 
