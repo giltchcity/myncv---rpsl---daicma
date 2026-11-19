@@ -162,7 +162,7 @@ occupancy maps, the objects are the connected components of each identity on a 1
 positives, false positives, and false negatives across the complete chain. For 3RScan, scores are averaged over visits
 within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at
 least half its points lie within 10\,cm of a single mapped object surface. Gaussian evaluation images on 3RScan are
-480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR
+480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR
 varies by about 0.1\,dB, at most 0.2\,dB. Compared with carrying a single map across visits, \ours additionally stores only
 the history. On BedRoom, it holds the map at 240 times over the three visits, which takes a few MB for occupancy, a few
 hundred MB for TSDF, and a few GB for Gaussians.
@@ -269,112 +269,139 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
 
 \section{Further Ablations}
 
-\paragraph{Gaussian maps on Flat.}
-\Cref{tab:supp_ablations} adds variants to the ablation table of the main paper. Two more components are needed:
-without the object states of the previous visit one change is missed, and rendering old keyframes on the current map
-instead of the map at their capture time lowers PSNR. The method is robust to its settings: with thresholds $\eta$ from
-9 to 999, a fixed persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated
-identity, the F1 scores and PSNR stay within 5\% of the full method. For the predicted masks of the main paper,
-OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap
-across frames before reconstruction.
+The first four ablations each remove components from one map type. The last one varies the settings.
+
+\paragraph{Change test (TSDF, BedRoom).}
+In visit C, two objects are carried out of the room and two changes happen during the visit. Without the change test,
+these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
+this recording and misses the same four. Without the coverage weights, repeated views of one patch add up, and the
+test ends two static objects in visit C.
+
+\paragraph{Valid domains (TSDF, Home).}
+Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
+object arrived carve its new site, so change F1 and mesh F1 both fall (\cref{tab:supp_valid_domains}).
 
 \begin{table}[!htb]
-\centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{2.7pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}l*{7}{r}@{}}
-\toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Full & 89.8 & 67.1 & 83.3 & 28.43 & 0.96 & 0.11 & 0.41 \\
-No previous states & 89.4 & 66.6 & 80.0 & 27.73 & 0.95 & 0.11 & 0.48 \\
-
-
-Current-map rendering & 90.4 & 67.0 & 83.3 & 27.83 & 0.95 & 0.11 & 0.46 \\
-Geometric association & 90.0 & 66.8 & 83.3 & 28.14 & 0.95 & 0.11 & 0.45 \\
-Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 & 0.95 & 0.11 & 0.45 \\
-Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 & 0.95 & 0.11 & 0.46 \\
-Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 & 0.95 & 0.12 & 0.46 \\
-Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 & 0.95 & 0.11 & 0.46 \\
-Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 & 0.95 & 0.11 & 0.46 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Further ablations of Gaussian maps on Flat.} F1 in \%, PSNR in dB, depth L1 in cm.}
-\label{tab:supp_ablations}
-\end{table}
-
-\paragraph{Change test on BedRoom.}
-\Cref{tab:supp_change_test} ablates the change test in TSDF maps on BedRoom. In visit B, every object moved between the
-visits is also seen at its new place, so the variants differ little. In visit C, two objects are carried out of the
-room and two changes happen during the visit. Without the change test, these four are missed. One noise model for all
-objects never reaches the threshold on this recording and misses the same four. Without the coverage weights, repeated
-views of one patch add up, and the test ends two static objects in visit C.
-
-\begin{table}[!htb]
-\centering
 \small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrrrr@{}}
+\setlength{\tabcolsep}{3.3pt}
+\begin{minipage}[t]{0.57\linewidth}\centering
+\begin{tabular}[t]{@{}lrrrrrr@{}}
 \toprule
- & \multicolumn{2}{c}{Visit B} & \multicolumn{3}{c}{Visit C} \\
-\cmidrule(lr){2-3}\cmidrule(l){4-6}
-Variant & Obj.$\uparrow$ & Betw. & Obj.$\uparrow$ & Within & Betw. \\
+ & \multicolumn{3}{c}{Visit B} & \multicolumn{3}{c}{Visit C} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full ($\eta=99$) & 98.4 & 15/16 & 97.5 & 2/2 & 10/10 \\
-No change test & 98.3 & 15/16 & 93.0 & 0/2 & 8/10 \\
-One noise model & 98.3 & 15/16 & 93.0 & 0/2 & 8/10 \\
-No coverage weights & 97.5 & 14/16 & 97.0 & 2/2 & 9/10 \\
-Threshold $\eta=9$ & 97.4 & 15/16 & 97.0 & 2/2 & 10/10 \\
-Threshold $\eta=999$ & 98.3 & 15/16 & 95.6 & 1/2 & 10/10 \\
+Full & 96.0 & 98.4 & 97.1 & 96.0 & 97.5 & 100.0 \\
+No change test & 96.0 & 98.3 & 97.1 & 96.0 & 93.0 & 80.0 \\
+One noise model & 96.0 & 98.3 & 97.1 & 96.0 & 93.0 & 80.0 \\
+No coverage weights & 95.4 & 97.5 & 94.1 & 95.9 & 97.0 & 95.7 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test on BedRoom (TSDF).} Object F1 (\%) and the reference changes found within and between visits, after visits B and C. All variants find both changes within visit B.}
+\caption{\textbf{Change test (TSDF, BedRoom).} Mesh F1 at 5\,cm, object F1, and change F1 (\%) after visits B and C.}
 \label{tab:supp_change_test}
-\end{table}
-
-\paragraph{Valid domains.}
-Without valid domains, every archived frame contributes its full ray. Frames that saw a moved object at its old site
-fuse it back, and frames captured before an object arrived carve its new site, so change F1 and mesh F1 both fall on
-Home (\cref{tab:supp_valid_domains}).
-
-\begin{table}[!htb]
-\centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrr@{}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.41\linewidth}\centering
+\begin{tabular}[t]{@{}lrrrr@{}}
 \toprule
-Valid domains & Mesh A$\uparrow$ & Mesh B$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Variant & Mesh A$\uparrow$ & Mesh B$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-On (full) & 79.8 & 83.0 & 83.6 & 97.9 \\
-Off & 78.6 & 81.8 & 83.4 & 82.8 \\
+Full & 79.8 & 83.0 & 83.6 & 97.9 \\
+No valid domains & 78.6 & 81.8 & 83.4 & 82.8 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Valid domains on Home (TSDF).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
+\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
 \label{tab:supp_valid_domains}
+\end{minipage}
 \end{table}
 
-\paragraph{Occupancy updates.}
-Saved-log-odds subtraction and local replacement both improve the final geometry on Home and Flat, and without them the
-result returns to that of Wavemap (\cref{tab:supp_occupancy_ablation}).
+\paragraph{Object and element level (3DGS, Flat).}
+\emph{No retirement} in the main paper switches off two steps at once, and \cref{tab:supp_ablations} separates them.
+If ended objects are not retired as a whole, moved furniture stays in the map, and change F1 and depth get as bad
+as in \emph{No retirement}. If elements are not tested one by one, every object is still handled correctly and change
+F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Two smaller
+components also help: without the object states of the previous visit one change is missed, and rendering old
+keyframes on the current map instead of the map at their capture time lowers PSNR.
+
+\paragraph{Occupancy update (Home, Flat).}
+Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
+Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_occupancy_ablation}).
+
+\begin{table}[!htb]
+\small
+\setlength{\tabcolsep}{3.3pt}
+\begin{minipage}[t]{0.47\linewidth}\centering
+\begin{tabular}[t]{@{}lrrrr@{}}
+\toprule
+Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
+\midrule
+Full & 89.8 & 83.3 & 28.43 & 0.41 \\
+No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
+No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
+No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
+\midrule
+No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
+Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Object and element level (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
+\label{tab:supp_ablations}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.51\linewidth}\centering
+\begin{tabular}[t]{@{}lrrrrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+\midrule
+Full & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
+No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
+No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
+Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
+Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Occupancy update (Home, Flat).} F1 in \%, as in the main table. \emph{No subtraction}: without saved-log-odds subtraction.}
+\label{tab:supp_occupancy_ablation}
+\end{minipage}
+\end{table}
+
+\paragraph{Settings.}
+The method is robust to its settings (\cref{tab:supp_settings}): with thresholds $\eta$ from 9 to 999, a fixed
+persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated identity, the F1
+scores and PSNR stay within 5\% of the full method.
 
 \begin{table}[!htb]
 \centering
 \small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{}lrr@{}}
+\setlength{\tabcolsep}{3.4pt}
+\begin{tabular}[t]{@{}lrrrr@{}}
+\multicolumn{5}{c}{(a) 3DGS, Flat}\\[3pt]
 \toprule
-Variant & Home$\uparrow$ & Flat$\uparrow$ \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ \\
 \midrule
-Wavemap & 79.9 & 80.2 \\
-\rowcolor{oursbg}
-\textbf{Ours (full)} & \textbf{80.8} & \textbf{82.4} \\
-No saved-log-odds subtraction & 80.3 & 81.8 \\
-No local replacement & 80.6 & 80.9 \\
-Neither & 80.0 & 80.3 \\
+Full & 89.8 & 67.1 & 83.3 & 28.43 \\
+Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 \\
+Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 \\
+Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 \\
+Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
+Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
+Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
+\bottomrule
+\end{tabular}\hfill
+\begin{tabular}[t]{@{}lrrrrrr@{}}
+\multicolumn{7}{c}{(b) TSDF, BedRoom}\\[3pt]
+\toprule
+ & \multicolumn{3}{c}{Visit B} & \multicolumn{3}{c}{Visit C} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+\midrule
+Full & 96.0 & 98.4 & 97.1 & 96.0 & 97.5 & 100.0 \\
+Threshold $\eta=9$ & 96.0 & 97.4 & 97.1 & 96.0 & 97.0 & 100.0 \\
+Threshold $\eta=999$ & 96.0 & 98.3 & 97.1 & 96.0 & 95.6 & 95.7 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Occupancy update ablations.} Mesh F1 (\%) at 5\,cm after the second visit, as in the main table.}
-\label{tab:supp_occupancy_ablation}
+\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. (a) F1 in \%, PSNR in dB. (b) Columns as in \cref{tab:supp_change_test}.}
+\label{tab:supp_settings}
 \end{table}
 
 \section{Further Qualitative Results}
