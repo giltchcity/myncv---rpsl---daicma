@@ -283,17 +283,17 @@ test ends two static objects in the third visit: object F1 falls, and two more r
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrrrc@{}}
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Found / false / missed \\
 \midrule
-Full & 96.1 & 96.6 & 98.4 \\
-No change test & 96.0 & 94.4 & 91.2 \\
-One noise model & 96.0 & 94.4 & 91.2 \\
-No coverage weights & 95.9 & 96.1 & 94.9 \\
+Full & 96.1 & 96.6 & 98.4 & 30 / 0 / 1 \\
+No change test & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
+One noise model & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
+No coverage weights & 95.9 & 96.1 & 94.9 & 28 / 0 / 3 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test (TSDF, BedRoom).} F1 in \%, as in the main table.}
+\caption{\textbf{Change test (TSDF, BedRoom).} F1 in \%, as in the main table. The last column counts the 31 reference changes of the three visits that are found, falsely reported, and missed; change F1 follows from these counts.}
 \label{tab:supp_change_test}
 \end{table}
 
@@ -393,24 +393,24 @@ Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
 Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \bottomrule
-\end{tabular}\hspace{4em}
-\begin{tabular}[t]{@{}lrrr@{}}
-\multicolumn{4}{c}{(b) TSDF, BedRoom}\\[3pt]
+\end{tabular}\hfill
+\begin{tabular}[t]{@{}lrrrc@{}}
+\multicolumn{5}{c}{(b) TSDF, BedRoom}\\[3pt]
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Found / false / missed \\
 \midrule
-Full & 96.1 & 96.6 & 98.4 \\
-Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
-Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
+Full & 96.1 & 96.6 & 98.4 & 30 / 0 / 1 \\
+Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 & 30 / 0 / 1 \\
+Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 & 29 / 0 / 2 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB.}
+\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB; counts as in \cref{tab:supp_change_test}.}
 \label{tab:supp_settings}
 \end{table}
 
 \section{Further Qualitative Results}
 
-\Cref{fig:supp_qual} compares all methods in two views each of BedRoom, Home, and Flat. TSDF and occupancy maps use reference colors, and occupancy is shown at 2\,cm resolution. The BedRoom occupancy panels use the maps of the capture time; all other panels use the final maps.
+\Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat.
 
 \begin{figure}[!htb]
 \centering
@@ -474,7 +474,7 @@ Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png}\\[1.2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Maps after scene changes.} One view per row; the first five are the views of Fig.~4 of the main paper. Every map is rendered at the pose of the \emph{Ground Truth} frame.}
+\caption{\textbf{Maps after scene changes.} Rows 1 to 5 are the views of Fig.~4 of the main paper. TSDF and occupancy maps use reference colors, and occupancy is shown at 2\,cm resolution.}
 \label{fig:supp_qual}
 \end{figure}
 
