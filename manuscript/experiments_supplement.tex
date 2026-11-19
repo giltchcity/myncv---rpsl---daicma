@@ -101,7 +101,7 @@ current visit.
 \label{sec:supp_datasets}
 
 ReviScene-BedRoom (\cref{fig:supp_bed_a,fig:supp_bed_b,fig:supp_bed_c}) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
-1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register visits B and C to A using landmark correspondences,
+1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register the second and third visits to the first using landmark correspondences,
 automatic registration, and manual refinement. Masks combine SAM assistance and manual review, with ADE20K classes and
 17 persistent object identities; people are labeled as moving. No ethics review was carried out because the only person recorded
 is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_home_a,fig:supp_home_b}) animates objects
@@ -115,35 +115,35 @@ moves eight objects, adds five, and removes four between its two runs~\cite{9811
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/a_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of visit A}, from a fixed overview camera.}
+\caption{\textbf{ReviScene-BedRoom at the end of the first visit}, from a fixed overview camera.}
 \label{fig:supp_bed_a}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/b_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of visit B}, from a fixed overview camera.}
+\caption{\textbf{ReviScene-BedRoom at the end of the second visit}, from a fixed overview camera.}
 \label{fig:supp_bed_b}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/c_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of visit C}, from a fixed overview camera.}
+\caption{\textbf{ReviScene-BedRoom at the end of the third visit}, from a fixed overview camera.}
 \label{fig:supp_bed_c}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0139.50_rgb.png}
-\caption{\textbf{ReviScene-Home at the end of visit A}, from a fixed overview camera.}
+\caption{\textbf{ReviScene-Home at the end of the first visit}, from a fixed overview camera.}
 \label{fig:supp_home_a}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/b_0118.40_rgb.png}
-\caption{\textbf{ReviScene-Home at the end of visit B}, from a fixed overview camera.}
+\caption{\textbf{ReviScene-Home at the end of the second visit}, from a fixed overview camera.}
 \label{fig:supp_home_b}
 \end{figure}
 
@@ -235,13 +235,13 @@ render each frame from the map as it was at that time, before refinement, as in 
 \toprule
 & \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Method & A & B & A & B & A & B \\
+Method & First & Second & First & Second & First & Second \\
 \midrule
 GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
 \textbf{Ours} & \textbf{26.64} & \textbf{26.92} & \textbf{0.919} & \textbf{0.926} & \textbf{0.199} & \textbf{0.149} \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Held-out views of both visits on Home, each at its own time.} A: first visit, B: second visit; PSNR in dB.}
+\caption{\textbf{Held-out views of both visits on Home, each at its own time.} First and second visit; PSNR in dB.}
 \label{tab:supp_heldout_history}
 \end{table}
 
@@ -272,10 +272,10 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
 The first four ablations each remove components from one map type. The last one varies the settings.
 
 \paragraph{Change test (TSDF, BedRoom).}
-In visit C, two objects are carried out of the room and two changes happen during the visit. Without the change test,
+In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
 these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
 this recording and misses the same four. Without the coverage weights, repeated views of one patch add up, and the
-test ends two static objects in visit C.
+test ends two static objects in the third visit.
 
 \paragraph{Valid domains (TSDF, Home).}
 Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
@@ -287,7 +287,7 @@ object arrived carve its new site, so change F1 and mesh F1 both fall (\cref{tab
 \begin{minipage}[t]{0.57\linewidth}\centering
 \begin{tabular}[t]{@{}lrrrrrr@{}}
 \toprule
- & \multicolumn{3}{c}{Visit B} & \multicolumn{3}{c}{Visit C} \\
+ & \multicolumn{3}{c}{Second visit} & \multicolumn{3}{c}{Third visit} \\
 \cmidrule(lr){2-4}\cmidrule(l){5-7}
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
@@ -297,19 +297,21 @@ One noise model & 96.0 & 98.3 & 97.1 & 96.0 & 93.0 & 80.0 \\
 No coverage weights & 95.4 & 97.5 & 94.1 & 95.9 & 97.0 & 95.7 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test (TSDF, BedRoom).} Mesh F1 at 5\,cm, object F1, and change F1 (\%) after visits B and C.}
+\caption{\textbf{Change test (TSDF, BedRoom).} Mesh F1 at 5\,cm, object F1, and change F1 (\%) after the second and third visits.}
 \label{tab:supp_change_test}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.41\linewidth}\centering
 \begin{tabular}[t]{@{}lrrrr@{}}
 \toprule
-Variant & Mesh A$\uparrow$ & Mesh B$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+& \multicolumn{2}{c}{Mesh$\uparrow$} & & \\
+\cmidrule(lr){2-3}
+Variant & First & Second & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
 Full & 79.8 & 83.0 & 83.6 & 97.9 \\
 No valid domains & 78.6 & 81.8 & 83.4 & 82.8 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%; mesh F1 at 5\,cm after visits A and B.}
+\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%; mesh F1 at 5\,cm after the first and second visits.}
 \label{tab:supp_valid_domains}
 \end{minipage}
 \end{table}
@@ -391,7 +393,7 @@ Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \begin{tabular}[t]{@{}lrrrrrr@{}}
 \multicolumn{7}{c}{(b) TSDF, BedRoom}\\[3pt]
 \toprule
- & \multicolumn{3}{c}{Visit B} & \multicolumn{3}{c}{Visit C} \\
+ & \multicolumn{3}{c}{Second visit} & \multicolumn{3}{c}{Third visit} \\
 \cmidrule(lr){2-4}\cmidrule(l){5-7}
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
