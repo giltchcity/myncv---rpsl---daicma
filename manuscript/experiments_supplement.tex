@@ -25,7 +25,7 @@
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}{1.5ex \@plus .5ex \@minus .2ex}{-1em}{\normalfont\normalsize\bfseries}}
 \makeatother
 % Space above and below a table set in the text.
-\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
 % Pages end on the same line, as in the two-column main paper.
 \flushbottom
 % The two Home figures fill one page of their own.
@@ -132,11 +132,13 @@ free bound $L_{\min}$. \\
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
 $60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state matches the mean and robust variance of its rounds in
 place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
-at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. A round is scored once it judges
+at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Before scoring, a see-through fraction is clipped to $[\max(0.005,m),0.995]$, with $m$ the
+mean of the model it is scored against. A round is scored once it judges
 $\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
 object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
-the camera looked elsewhere is not observed, so this round is the first time the map can know of it. All three maps use
+the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
+round their site is first seen clearly. All three maps use
 these same intervals.
 
 When an object is observed moving (Sec.~3.1 of the main paper), frames captured during its motion are excluded from
@@ -195,17 +197,17 @@ such as a table together with its contents. Objects move while the camera looks 
 Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}, and we use eight room chains
 of 3RScan~\cite{9010673}.
 
-\begin{figure}[!t]
+\begin{figure}[p]
 \centering
 \setlength{\tabcolsep}{1pt}
 \begin{tabular}{cc}
-\panel{(a)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
-\panel{(b)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
-\panel{(c)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
-\panel{(d)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png}
+\panel{(a)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
+\panel{(b)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
+\panel{(c)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
+\panel{(d)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_middle.png} \\[1pt]
+\panel{(e)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png} &
+\begin{minipage}[c]{0.495\linewidth}\captionsetup{position=below}\caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) start and (b) end of the second visit; (c) start, (d) middle, and (e) end of the third.}\label{fig:supp_bed}\end{minipage}
 \end{tabular}
-\caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) start and (b) end of the second visit; (c) start and (d) end of the third.}
-\label{fig:supp_bed}
 \end{figure}
 
 \begin{figure}[p]
@@ -238,7 +240,7 @@ of 3RScan~\cite{9010673}.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. A false positive is an unchanged object missing from the map at the end of a visit. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
 Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards sampling termination. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction.
@@ -252,7 +254,7 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change.
+\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change. The three motions in view on Home, six events in all (each ends one state and starts another), are scored the same way: with TSDF maps, ours reaches change F1 90.9 (5 of 6 events, no false positive) against 66.7 for Khronos. On Khronos's dynamic-object metric, which matches each moving object within 0.5\,m at every trajectory timestamp, F1 is 73.6 and 73.9 in the two visits against 0.9 and 27.4.
 
 \begin{table}[H]
 \centering
@@ -308,7 +310,8 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
 }{%
-\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} Held-out views after refinement;
+\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} With ground-truth instances, as in the main
+comparison; the rendering table of the main paper uses SAM masks. Held-out views after refinement;
 PSNR in dB and depth L1 in cm.}
 \label{tab:supp_instance_rendering}}{%
 \small
@@ -340,7 +343,7 @@ Aria room1 & 29.13 & 0.944 & 0.126 & 1.14 \\
 The rendering table of the main paper holds out every tenth frame of the last visit and renders all of them from the
 final map. The Home PSNR in Sec.~5.1 of the main paper tests the map over time: every tenth frame of both visits is held
 out (418 and 355 frames). After the second visit, each frame is rendered from the final 4D map queried at its capture
-time, which returns the map of the latest mapping round at or before that time; refinement does not change these
+time, which returns the map of the latest mapping round at or before that time, built only from the frames up to that time; refinement does not change these
 rounds. GaME keeps no history, so we save its map at the same times (\cref{tab:supp_heldout_history}).
 
 \paragraph{CL-Splats.}
@@ -560,9 +563,8 @@ Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \section{Further Qualitative Results}
 
 \Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat.
-\pagebreak
 
-\begin{figure}[!htb]
+\begin{figure}[!b]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
