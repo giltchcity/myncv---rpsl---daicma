@@ -20,6 +20,12 @@
 \newsavebox\panelbox
 \newcommand{\panel}[3]{\sbox\panelbox{\includegraphics[#2]{#3}}\usebox\panelbox
   \llap{\makebox[\wd\panelbox][l]{\raisebox{\dimexpr\ht\panelbox-\height-3pt\relax}{\hspace{3pt}\small #1}}}}
+% Run-in paragraph headings spaced as in the main paper (LaTeX's default adds 3.25ex above each).
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}{1.5ex \@plus .5ex \@minus .2ex}{-1em}{\normalfont\normalsize\bfseries}}
+\makeatother
+% Space above and below a table set in the text.
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
 % Pages end on the same line, as in the two-column main paper.
 \flushbottom
 % The two Home figures fill one page of their own.
@@ -110,8 +116,9 @@ Map & Where $v$ acts \\
 TSDF & A ray counts only while the state it hit still stands. Its band keeps the surface it measured, and its free
 space stops before the first state that arrived after $t_o$. \\
 3D Gaussians & A keyframe renders the map of its capture time, $\mathcal{M}(t_k)$, and its gradient reaches only the
-Gaussians alive both then and now. A frozen Gaussian that lies in front of the surface measured by a frame, as may
-happen between a change and its confirmation, is not updated by that frame, and neither are the Gaussians it occludes. \\
+Gaussians alive both then and now. A Gaussian of an earlier visit is updated by the current visit only once its
+evidence finds it unchanged. A frozen Gaussian that lies in front of the surface measured by a frame is not updated by
+that frame, and neither are the Gaussians it occludes. \\
 Occupancy & A cell keeps only its clamped sum, so $v$ acts at the two ends of a state. Start: the first object reading
 of a visit in a cell that earlier visits saw free withdraws $L_0(c)<0$. End: the cells of the state are set to the
 free bound $L_{\min}$. \\
@@ -192,10 +199,10 @@ of 3RScan~\cite{9010673}.
 \centering
 \setlength{\tabcolsep}{1pt}
 \begin{tabular}{cc}
-\panel{(a)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
-\panel{(b)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
-\panel{(c)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
-\panel{(d)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png}
+\panel{(a)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
+\panel{(b)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
+\panel{(c)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
+\panel{(d)}{width=0.445\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png}
 \end{tabular}
 \caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) start and (b) end of the second visit; (c) start and (d) end of the third.}
 \label{fig:supp_bed}
@@ -231,7 +238,7 @@ of 3RScan~\cite{9010673}.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
 Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards sampling termination. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction.
@@ -242,7 +249,6 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
 
-\newpage
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
@@ -333,8 +339,9 @@ Aria room1 & 29.13 & 0.944 & 0.126 & 1.14 \\
 \paragraph{Rendering over time.}
 The rendering table of the main paper holds out every tenth frame of the last visit and renders all of them from the
 final map. The Home PSNR in Sec.~5.1 of the main paper tests the map over time: every tenth frame of both visits is held
-out (418 and 355 frames), and each frame is rendered from the map saved at its own time, before refinement. GaME keeps
-no history, so we save its map at the same times (\cref{tab:supp_heldout_history}).
+out (418 and 355 frames). After the second visit, each frame is rendered from the final 4D map queried at its capture
+time, which returns the map of the latest mapping round at or before that time; refinement does not change these
+rounds. GaME keeps no history, so we save its map at the same times (\cref{tab:supp_heldout_history}).
 
 \paragraph{CL-Splats.}
 For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
@@ -380,7 +387,6 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
 \vspace{-2mm}
 \end{table}
 
-\newpage
 \section{Further Ablations}
 
 The shared change test is ablated on BedRoom with TSDF maps; the next ablations test the update of each map type, and
@@ -450,9 +456,8 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \emph{No retirement} in the main paper switches off two steps at once, and \cref{tab:supp_ablations} separates them.
 If ended objects are not retired as a whole, moved furniture stays in the map, and change F1 and depth get as bad
 as in \emph{No retirement}. If elements are not tested one by one, every object is still handled correctly and change
-F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Two smaller
-components also help: without the object states of the previous visit one change is missed, and rendering old
-keyframes on the current map instead of the map at their capture time lowers PSNR.
+F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Without the
+object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
 Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
@@ -460,6 +465,7 @@ Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_o
 
 \begin{table}[H]
 \tablepair{%
+\renewcommand{\arraystretch}{1.16}
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -471,7 +477,6 @@ No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
 No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\ \midrule
 No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
-Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
@@ -555,6 +560,7 @@ Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \section{Further Qualitative Results}
 
 \Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat.
+\pagebreak
 
 \begin{figure}[!htb]
 \centering
