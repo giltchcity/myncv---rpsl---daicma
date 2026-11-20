@@ -152,7 +152,10 @@ moves eight objects, adds five, and removes four between its two runs~\cite{9811
 
 \section{Evaluation Details}
 
-Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on
+Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and
+averages the scores. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts
+each reference change once over all visits. Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding
 visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its
 original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from
 geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards
@@ -317,39 +320,49 @@ Full & 96.1 & 96.6 & 98.4 & 30 / 0 / 1 \\
 No change test & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
 One noise model & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
 No coverage weights & 95.9 & 96.1 & 94.9 & 28 / 0 / 3 \\
+\midrule
+No object retirement & 93.0 & 95.3 & 73.5 & 18 / 0 / 13 \\
+No element test & 93.9 & 96.6 & 98.4 & 30 / 0 / 1 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test (TSDF, BedRoom).} F1 in \%, as in the main table. The last column counts the 31 reference changes of the three visits that are found, falsely reported, and missed; change F1 follows from these counts.}
+\caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table. The last column counts the 31 reference changes of the three visits that are found, falsely reported, and missed; change F1 follows from these counts.}
 \label{tab:supp_change_test}
 \end{table}
 
-\paragraph{Valid domains (TSDF, Home).}
+\paragraph{Valid domains (TSDF, Home and Flat).}
 Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
-object arrived carve its new site, so change F1 and mesh F1 both fall (\cref{tab:supp_valid_domains}).
+object arrived carve its new site. On Home, change F1 and mesh F1 both fall
+(\cref{tab:supp_valid_domains}). Flat is not affected: its changes all happen between visits, and an earlier visit
+enters the next one as surfaces only, so no old frame is fused there.
 
 \begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
+ & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full & 83.0 & 83.6 & 97.9 \\
-No valid domains & 81.8 & 83.4 & 82.8 \\
+Full & 83.0 & 83.6 & 97.9 & 90.1 & 50.7 & 76.5 \\
+No valid domains & 81.8 & 83.4 & 82.8 & 90.2 & 50.7 & 76.5 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Valid domains (TSDF, Home).} F1 in \%, as in the main table.}
+\caption{\textbf{Valid domains (TSDF, Home and Flat).} F1 in \%, as in the main table.}
 \label{tab:supp_valid_domains}
 \end{table}
 
-\paragraph{Object and element level (3DGS, Flat).}
+\paragraph{Object and element level (3DGS, Flat, and TSDF, BedRoom).}
 \emph{No retirement} in the main paper switches off two steps at once, and \cref{tab:supp_ablations} separates them.
 If ended objects are not retired as a whole, moved furniture stays in the map, and change F1 and depth get as bad
 as in \emph{No retirement}. If elements are not tested one by one, every object is still handled correctly and change
 F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Two smaller
 components also help: without the object states of the previous visit one change is missed, and rendering old
-keyframes on the current map instead of the map at their capture time lowers PSNR.
+keyframes on the current map instead of the map at their capture time lowers PSNR. TSDF maps on BedRoom behave
+the same way (\cref{tab:supp_change_test}): without object retirement, moved objects stay and 12 more changes are
+missed; without the element test, objects and changes are unaffected, but faces of earlier visits that new views see
+through stay in the map, and mesh F1 falls.
 
 \begin{table}[H]
 \centering
