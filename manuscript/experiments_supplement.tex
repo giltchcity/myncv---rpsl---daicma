@@ -200,9 +200,9 @@ within a room and then over the eight rooms, with 77 pooled reference events; a 
 least half its points lie within 10\,cm of a single mapped object surface. Gaussian evaluation images on 3RScan are
 480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR
 varies by about 0.1\,dB, at most 0.2\,dB. We record changes to map elements over time, so the 4D map can be
-queried at every mapping round. For example, on BedRoom it can be queried at each of 244 rounds (approximately every
-2\,s) across the three visits, and the stored history occupies 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB
-for 3D Gaussians, in addition to the final map.
+queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits,
+with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition
+to the final map.
 
 \section{Additional Results}
 
