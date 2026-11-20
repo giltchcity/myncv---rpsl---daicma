@@ -12,7 +12,39 @@
 \usepackage{placeins}
 \usepackage{float}
 \usepackage{colortbl}
-\definecolor{oursbg}{RGB}{255,247,225}
+\definecolor{oursbg}{RGB}{236,236,236}
+\newcommand{\oursname}{\cellcolor{oursbg}\textbf{Ours}}
+\newcommand{\ob}[1]{\cellcolor{oursbg}\textbf{#1}}
+\newcommand{\oc}[1]{\cellcolor{oursbg}#1}
+% Panel letters set inside the top-left corner of each image.
+\newsavebox\panelbox
+\newcommand{\panel}[3]{\sbox\panelbox{\includegraphics[#2]{#3}}\usebox\panelbox
+  \llap{\makebox[\wd\panelbox][l]{\raisebox{\dimexpr\ht\panelbox-\height-3pt\relax}{\hspace{3pt}\small #1}}}}
+% Pages end on the same line, as in the two-column main paper.
+\flushbottom
+% The two Home figures fill one page of their own.
+\renewcommand{\floatpagefraction}{0.8}
+% Side-by-side tables: both tables in boxes of the same height with their tops aligned, captions on one line.
+\makeatletter
+\newsavebox\pair@a\newsavebox\pair@b\newlength\pair@h
+\newcommand{\pair@set}[4]{%
+  \sbox\pair@a{\begin{minipage}{#1\linewidth}\centering#2\end{minipage}}%
+  \sbox\pair@b{\begin{minipage}{#3\linewidth}\centering#4\end{minipage}}%
+  \setlength\pair@h{\dimexpr\ht\pair@a+\dp\pair@a\relax}%
+  \ifdim\dimexpr\ht\pair@b+\dp\pair@b\relax>\pair@h\setlength\pair@h{\dimexpr\ht\pair@b+\dp\pair@b\relax}\fi
+  \typeout{TABLEPAIR \the\dimexpr\ht\pair@a+\dp\pair@a\relax\space\the\dimexpr\ht\pair@b+\dp\pair@b\relax}%
+  \noindent\vtop to\pair@h{\vskip\z@\copy\pair@a\vfil}\hfill\vtop to\pair@h{\vskip\z@\copy\pair@b\vfil}\par}
+\newcommand{\tablepair}[4]{% table A, caption A, table B, caption B
+  \pair@set{0.485}{#1}{0.485}{#3}%
+  \vspace{-2mm}%
+  \noindent\begin{minipage}[t]{0.485\linewidth}\captionsetup{position=below}#2\end{minipage}\hfill
+  \begin{minipage}[t]{0.485\linewidth}\captionsetup{position=below}#4\end{minipage}\par}
+\newcommand{\tablepanels}[5]{% width A, panel A, width B, panel B; the shared caption ends level with panel A
+  \sbox\pair@a{\begin{minipage}{#1\linewidth}\centering#2\end{minipage}}%
+  \setlength\pair@h{\dimexpr\ht\pair@a+\dp\pair@a\relax}%
+  \noindent\vtop to\pair@h{\vskip\z@\copy\pair@a\vfil}\hfill
+  \begin{minipage}[t][\pair@h][t]{#3\linewidth}\vspace{0pt}\centering#4\par\vfill\captionsetup{position=below}#5\end{minipage}\par}
+\makeatother
 \definecolor{resultgold}{RGB}{153,117,16}
 \definecolor{resultgray}{RGB}{95,102,110}
 \newcommand{\na}{\textcolor{black!40}{n/a}}
@@ -70,7 +102,8 @@ held when the visit began.
 \begin{table}[!htb]
 \centering
 \small
-\begin{tabular}{@{}lp{0.78\linewidth}@{}}
+\sbox0{3D Gaussians}
+\begin{tabular}{@{}lp{\dimexpr\linewidth-\wd0-2\tabcolsep\relax}@{}}
 \toprule
 Map & Where $v$ acts \\
 \midrule
@@ -113,23 +146,28 @@ estimated from the new state's observations.
 \section{Datasets}
 \label{sec:supp_datasets}
 
-\Cref{tab:supp_datasets} summarizes the two ReviScene datasets, and \cref{fig:supp_bed,fig:supp_home} show them.
+\Cref{tab:supp_datasets} summarizes the two ReviScene datasets, and \cref{fig:supp_bed,fig:supp_home_a,fig:supp_home_b} show them.
 
-\begin{table}[!htb]
+\begin{table}[H]
 \centering
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lccccc@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
  & Visits & RGB-D frames per visit & Resolution & Changes within visits & Changes between visits \\
 \midrule
 BedRoom & 3 & 4,003 / 4,041 / 7,216 & 1920$\times$1080 & 5 & 26 \\
 Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lccccc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{lccccc}\resultrows\end{tabular}
+\vspace{-2mm}
 \caption{\textbf{ReviScene.} Both record RGB-D at 30\,Hz. The changes are the reference changes made while the camera
 looks away, as in \cref{tab:supp_change_kinds}; Home also has three motions in view.}
 \label{tab:supp_datasets}
+\vspace{-2mm}
 \end{table}
 
 \paragraph{ReviScene-BedRoom.}
@@ -144,144 +182,152 @@ Home animates objects and camera trajectories in the kujiale\_0021 apartment of 
 Its two visits share a world coordinate frame. We export per-frame object transforms and visibility, which give the
 scene geometry at each timestamp together with the object meshes. Instance labels follow the annotated object groups,
 such as a table together with its contents. Objects move while the camera looks elsewhere, within a visit
-(\cref{fig:supp_home}) and between the visits, and three move in view.
+(\cref{fig:supp_home_a,fig:supp_home_b}) and between the visits, and three move in view.
 
 \paragraph{Public datasets.}
 Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}, and we use eight room chains
 of 3RScan~\cite{9010673}.
 
-\begin{figure}[!htb]
-\centering
-\setlength{\tabcolsep}{1pt}
-\begin{tabular}{ccc}
-\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/a_after.png} &
-\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/b_after.png} &
-\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/c_after.png} \\
-\small (a) & \small (b) & \small (c)
-\end{tabular}
-\caption{\textbf{ReviScene-BedRoom at the end of its (a) first, (b) second, and (c) third visit}, from a fixed overview
-camera.}
-\label{fig:supp_bed}
-\end{figure}
-
-\begin{figure}[!htb]
+\begin{figure}[!t]
 \centering
 \setlength{\tabcolsep}{1pt}
 \begin{tabular}{cc}
-\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0000.00_rgb.png} &
-\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0080.00_rgb.png} \\
-\small (a) & \small (b) \\[2pt]
-\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0095.00_rgb.png} &
-\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0139.50_rgb.png} \\
-\small (c) & \small (d)
+\panel{(a)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
+\panel{(b)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
+\panel{(c)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
+\panel{(d)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png}
 \end{tabular}
-\caption{\textbf{ReviScene-Home during its first visit}, from a fixed overview camera: (a) at the start, (b) at 80\,s,
-(c) at 95\,s, and (d) at the end, 139.5\,s. Objects move between the panels.}
-\label{fig:supp_home}
+\caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) start and (b) end of the second visit; (c) start and (d) end of the third.}
+\label{fig:supp_bed}
 \end{figure}
 
-\FloatBarrier
+\begin{figure}[p]
+\centering
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{cc}
+\panel{(a)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_a_00000.jpg} &
+\panel{(b)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_a_02460.jpg} \\[1pt]
+\panel{(c)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_a_03000.jpg} &
+\panel{(d)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_a_04185.jpg}
+\end{tabular}
+\caption{\textbf{ReviScene-Home, first visit}, rendered from the ground truth at (a) 0\,s, (b) 82\,s, (c) 100\,s, and (d) 139.5\,s, the end of the visit.}
+\label{fig:supp_home_a}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{cc}
+\panel{(a)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_b_00000.jpg} &
+\panel{(b)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_b_01500.jpg} \\[1pt]
+\panel{(c)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_b_02700.jpg} &
+\panel{(d)}{width=0.495\linewidth,trim=0 0 52bp 0,clip}{figures/dataset_stages_gt/home_b_03555.jpg}
+\end{tabular}
+\caption{\textbf{ReviScene-Home, second visit}, rendered from the ground truth at (a) 0\,s, (b) 50\,s, (c) 90\,s, and (d) 118.5\,s, the end of the visit.}
+\label{fig:supp_home_b}
+\end{figure}
 
 \section{Evaluation Details}
 
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on
-Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and
-averages the scores. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts
-each reference change once over all visits. Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding
-visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its
-original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from
-geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards
-sampling termination. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and
-scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and
-occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of
-0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true
-positives, false positives, and false negatives across the complete chain. For 3RScan, scores are averaged over visits
-within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at
-least half its points lie within 10\,cm of a single mapped object surface. Gaussian evaluation images on 3RScan are
-480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR
-varies by about 0.1\,dB, at most 0.2\,dB. We record changes to map elements over time, so the 4D map can be
-queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits,
-with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition
-to the final map.
 
+\paragraph{Metrics.}
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+
+\paragraph{Methods.}
+Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards sampling termination. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction.
+
+\paragraph{3RScan.}
+For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface. Gaussian evaluation images on 3RScan are 480$\times$270, and three rooms are mapped at 240$\times$135 to fit memory.
+
+\paragraph{Map history.}
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
+
+\newpage
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
 \Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change.
 
-\begin{table}[!htb]
+\begin{table}[H]
 \centering
-\fontsize{9}{10.3}\selectfont
-\setlength{\tabcolsep}{3.2pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{@{}ll*{4}{r}@{}}
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
 & & \multicolumn{2}{c}{BedRoom} & \multicolumn{2}{c}{Home} \\ \cmidrule(lr){3-4}\cmidrule(lr){5-6}
 Map & Method & Away & Across & Away & Across \\ \midrule
-TSDF & Khronos & 57.1 & 73.2 & 81.7 & 86.7 \\
+ & Khronos & 57.1 & 73.2 & 81.7 & 86.7 \\
  & Panoptic & 36.4 & 54.1 & 76.9 & 69.2 \\
- & Ours & 100.0 & 98.0 & 100.0 & 95.4 \\
+\multirow{-3}{*}{TSDF} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
 \midrule
-3DGS & GaME & 100.0 & 96.0 & 83.1 & 82.8 \\
- & Ours & 100.0 & 98.0 & 100.0 & 95.4 \\
+ & GaME & \textbf{100.0} & 96.0 & 83.1 & 82.8 \\
+\multirow{-2}{*}{3DGS} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
 \midrule
-Occupancy & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
- & Ours & 100.0 & 100.0 & 100.0 & 97.0 \\
+ & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
+\multirow{-2}{*}{Occupancy} & \oursname & \ob{100.0} & \ob{100.0} & \ob{100.0} & \ob{97.0} \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+\vspace{-2mm}
 \caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes after looking away within a visit (\emph{Away}) and across visits. The change F1 of the main paper pools the two. BedRoom has 5 and 26 such events; Home has 38 and 34.}
 \label{tab:supp_change_kinds}
+\vspace{-2mm}
 \end{table}
 
 \paragraph{Rendering.}
 \Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison.
-
-\begin{table}[!htb]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llrrrr@{}}
-\toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$\\
-\midrule
-BedRoom & GaME & 18.22 & 0.758 & 0.454 & 6.03\\
- & Ours & 19.90 & 0.811 & 0.370 & 4.96\\
-Home & GaME & 21.85 & 0.757 & 0.313 & 23.94\\
- & Ours & 24.90 & 0.824 & 0.215 & 15.32\\
-Flat & GaME & 24.21 & 0.917 & 0.164 & 1.07\\
- & Ours & 28.43 & 0.955 & 0.107 & 0.41\\
-3RScan & GaME & 20.10 & 0.739 & 0.401 & 4.95\\
- & Ours & 21.06 & 0.774 & 0.366 & 2.79\\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} Held-out views after refinement;
-PSNR in dB and depth L1 in cm.}
-\label{tab:supp_instance_rendering}
-\end{table}
-
 The rendering tables of the main paper and \cref{tab:supp_instance_rendering} report the maps after the final
 refinement, as GaME does. \Cref{tab:supp_before_refinement} gives our maps before it.
 
-\begin{table}[!htb]
-\centering
+\begin{table}[H]
+\tablepair{%
 \small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
-Scene & Masks & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\
-\midrule
-BedRoom & instances & 19.14 & 0.795 & 0.407 & 5.11 \\
-Home & instances & 23.49 & 0.816 & 0.247 & 14.96 \\
-Flat & instances & 23.84 & 0.935 & 0.135 & 0.57 \\
-3RScan & instances & 19.50 & 0.741 & 0.429 & 3.87 \\
-\midrule
-Flat & SAM & 23.83 & 0.935 & 0.137 & 0.57 \\
-Aria room0 & SAM & 30.03 & 0.944 & 0.155 & 0.85 \\
-Aria room1 & SAM & 29.13 & 0.944 & 0.126 & 1.14 \\
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+ & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
+\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\ \midrule
+ & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
+\multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\ \midrule
+ & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
+\multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\ \midrule
+ & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
+\multirow{-2}{*}{3RScan} & \oursname & \ob{21.06} & \ob{0.774} & \ob{0.366} & \ob{2.79} \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} Held-out views after refinement;
+PSNR in dB and depth L1 in cm.}
+\label{tab:supp_instance_rendering}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+\multicolumn{5}{l}{\textit{Instance masks}} \\
+BedRoom & 19.14 & 0.795 & 0.407 & 5.11 \\
+Home & 23.49 & 0.816 & 0.247 & 14.96 \\
+Flat & 23.84 & 0.935 & 0.135 & 0.57 \\
+3RScan & 19.50 & 0.741 & 0.429 & 3.87 \\ \midrule
+\multicolumn{5}{l}{\textit{SAM masks}} \\
+Flat & 23.83 & 0.935 & 0.137 & 0.57 \\
+Aria room0 & 30.03 & 0.944 & 0.155 & 0.85 \\
+Aria room1 & 29.13 & 0.944 & 0.126 & 1.14 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{Our Gaussian maps before the final refinement.} Same held-out views as after refinement; PSNR in dB and depth L1 in cm.}
-\label{tab:supp_before_refinement}
+\label{tab:supp_before_refinement}}
+\vspace{-2mm}
 \end{table}
 
 \paragraph{Rendering over time.}
@@ -290,46 +336,51 @@ final map. The Home PSNR in Sec.~5.1 of the main paper tests the map over time: 
 out (418 and 355 frames), and each frame is rendered from the map saved at its own time, before refinement. GaME keeps
 no history, so we save its map at the same times (\cref{tab:supp_heldout_history}).
 
-\begin{table}[!htb]
-\centering
-\small
-\setlength{\tabcolsep}{3.2pt}
-\begin{tabular}{@{}lrrrrrr@{}}
-\toprule
-& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Method & First & Second & First & Second & First & Second \\
-\midrule
-GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
-\textbf{Ours} & \textbf{26.64} & \textbf{26.92} & \textbf{0.919} & \textbf{0.926} & \textbf{0.199} & \textbf{0.149} \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Held-out views of both visits on Home, each at its own time.} First and second visit; PSNR in dB.}
-\label{tab:supp_heldout_history}
-\end{table}
-
 \paragraph{CL-Splats.}
 For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
 released default configuration on the same poses, RGB images, and held-out views
-(\cref{tab:supp_clsplats}). 
+(\cref{tab:supp_clsplats}).
 
-\begin{table}[!htb]
-\centering
+\begin{table}[H]
+\tablepair{%
 \small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
-Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$\\
-\midrule
-Flat & 17.91 & 0.677 & 0.397 & 34.8\\
-Aria room0 & 21.18 & 0.784 & 0.338 & 32.2\\
-Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
+& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Method & First & Second & First & Second & First & Second \\ \midrule
+GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
+\oursname & \ob{26.64} & \ob{26.92} & \ob{0.919} & \ob{0.926} & \ob{0.199} & \ob{0.149} \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Held-out views of both visits on Home, each at its own time.} First and second visit; PSNR in dB.}
+\label{tab:supp_heldout_history}}{%
+\renewcommand{\arraystretch}{1.11}
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
+Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
+Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{CL-Splats with its released code and default configuration.} Same held-out views and metrics as Tab.~4 of the main paper; PSNR in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}
+\label{tab:supp_clsplats}}
+\vspace{-2mm}
 \end{table}
 
+\newpage
 \section{Further Ablations}
 
 The shared change test is ablated on BedRoom with TSDF maps; the next ablations test the update of each map type, and
@@ -343,27 +394,6 @@ that did not change; without them, object F1 and change F1 fall. The lower rows 
 are not retired as a whole, moved objects stay and 12 more changes are missed; if elements are not tested one by one,
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
-\midrule
-Full & 96.1 & 96.6 & 98.4 \\
-No change test & 96.0 & 94.4 & 91.2 \\
-One noise model & 96.0 & 94.4 & 91.2 \\
-No coverage weights & 95.9 & 96.1 & 94.9 \\
-\midrule
-No object retirement & 93.0 & 95.3 & 73.5 \\
-No element test & 93.9 & 96.6 & 98.4 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table.}
-\label{tab:supp_change_test}
-\end{table}
-
 \paragraph{Valid domains (TSDF, Home and Flat).}
 Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
 object arrived carve its new site. On Home, change F1 and mesh F1 both fall
@@ -371,21 +401,49 @@ object arrived carve its new site. On Home, change F1 and mesh F1 both fall
 enters the next one as surfaces only, so no old frame is fused there.
 
 \begin{table}[H]
-\centering
+\tablepair{%
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
- & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
-\midrule
-Full & 83.0 & 83.6 & 97.9 & 90.1 & 50.7 & 76.5 \\
-No valid domains & 81.8 & 83.4 & 82.8 & 90.2 & 50.7 & 76.5 \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} \\
+No change test & 96.0 & 94.4 & 91.2 \\
+One noise model & 96.0 & 94.4 & 91.2 \\
+No coverage weights & 95.9 & 96.1 & 94.9 \\ \midrule
+No object retirement & 93.0 & 95.3 & 73.5 \\
+No element test & 93.9 & 96.6 & 98.4 \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/8\relax}
+\begin{tabular}{lrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table.}
+\label{tab:supp_change_test}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+\multicolumn{4}{l}{\textit{Home}} \\
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{83.0} & \textbf{83.6} & \textbf{97.9} \\
+No valid domains & 81.8 & 83.4 & 82.8 \\ \midrule
+\multicolumn{4}{l}{\textit{Flat}} \\
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{90.1} & \textbf{50.7} & \textbf{76.5} \\
+No valid domains & 90.2 & 50.7 & 76.5 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/8\relax}
+\begin{tabular}{lrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{Valid domains (TSDF, Home and Flat).} F1 in \%, as in the main table.}
-\label{tab:supp_valid_domains}
+\label{tab:supp_valid_domains}}
+\vspace{-2mm}
 \end{table}
 
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
@@ -396,50 +454,53 @@ F1 stays the same, but the rest of the old map is no longer confirmed against ne
 components also help: without the object states of the previous visit one change is missed, and rendering old
 keyframes on the current map instead of the map at their capture time lowers PSNR.
 
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\
-\midrule
-Full & 89.8 & 83.3 & 28.43 & 0.41 \\
-No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
-No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
-No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
-\midrule
-No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
-Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{Gaussian state and keyframe updates (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
-\label{tab:supp_ablations}
-\end{table}
-
 \paragraph{Occupancy update (Home, Flat).}
 Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
 Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
-\centering
+\tablepair{%
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
- & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
-\midrule
-Full & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
+Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \midrule
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.41} \\
+No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
+No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
+No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\ \midrule
+No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
+Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Gaussian state and keyframe updates (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
+\label{tab:supp_ablations}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+ & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\ \cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{80.8} & \textbf{86.5} & \textbf{98.6} & \textbf{82.4} & \textbf{55.4} & \textbf{95.0} \\
 No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
 No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
 Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
 Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{Occupancy update (Home, Flat).} F1 in \%, as in the main table. \emph{No subtraction}: without saved-log-odds subtraction.}
-\label{tab:supp_occupancy_ablation}
+\label{tab:supp_occupancy_ablation}}
+\vspace{-2mm}
 \end{table}
 
 \paragraph{Settings.}
@@ -449,14 +510,15 @@ scores and PSNR stay within 5\% of the full method.
 
 \begin{table}[H]
 \centering
+\tablepanels{0.54}{%
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}[t]{@{}lrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \multicolumn{5}{c}{(a) 3DGS, Flat}\\[3pt]
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ \\
-\midrule
-Full & 89.8 & 67.1 & 83.3 & 28.43 \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ \\ \midrule
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{89.8} & \textbf{67.1} & \textbf{83.3} & \textbf{28.43} \\
 Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 \\
 Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 \\
 Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 \\
@@ -464,19 +526,30 @@ Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
 Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \bottomrule
-\end{tabular}\hfill
-\begin{tabular}[t]{@{}lrrr@{}}
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
+}{0.43}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \multicolumn{4}{c}{(b) TSDF, BedRoom}\\[3pt]
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
-\midrule
-Full & 96.1 & 96.6 & 98.4 \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+\rowcolor{oursbg}
+\textbf{Full} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} \\
 Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
 Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/8\relax}
+\begin{tabular}{lrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB.}
-\label{tab:supp_settings}
+\label{tab:supp_settings}}
+\vspace{-2mm}
 \end{table}
 
 \section{Further Qualitative Results}
