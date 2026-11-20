@@ -77,7 +77,8 @@ Map & Where $v$ acts \\
 TSDF & A ray counts only while the state it hit still stands. Its band keeps the surface it measured, and its free
 space stops before the first state that arrived after $t_o$. \\
 3D Gaussians & A keyframe renders the map of its capture time, $\mathcal{M}(t_k)$, and its gradient reaches only the
-Gaussians alive both then and now. \\
+Gaussians alive both then and now. A frozen Gaussian that lies in front of the surface measured by a frame, as may
+happen between a change and its confirmation, is not updated by that frame, and neither are the Gaussians it occludes. \\
 Occupancy & A cell keeps only its clamped sum, so $v$ acts at the two ends of a state. Start: the first object reading
 of a visit in a cell that earlier visits saw free withdraws $L_0(c)<0$. End: the cells of the state are set to the
 free bound $L_{\min}$. \\
