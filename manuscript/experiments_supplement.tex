@@ -99,6 +99,17 @@ when it is first seen and ends at the round that confirms its change (Sec.~3.1 o
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. All three maps use
 these same intervals.
 
+When an object is observed moving (Sec.~3.1 of the main paper), frames captured during its motion are excluded from
+successor reconstruction. After it settles, a few seconds of subsequent frames are retained to reconstruct its
+successor; all other frames are fused once.
+
+Across visits, association relies on geometry: an observation matching the surface of an earlier state continues
+that state and inherits its identity, including with SAM or semantic masks. An earlier state ends when the change
+test confirms its absence. Linking a state to a new location additionally requires persistent object identities
+across frames. In that case, the new state replaces the earlier one when $(1-q)B > q+L$, where $B\leq 2$ increases
+with the fraction of the new surface outside the earlier one, and $L$ is the odds of that surface being invalid,
+estimated from the new state's observations.
+
 \section{Datasets}
 \label{sec:supp_datasets}
 
@@ -300,14 +311,16 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3\\
 
 \section{Further Ablations}
 
-The first four ablations each remove components from one map type. The last one varies the settings. All scores follow
-the main paper.
+The shared change test is ablated on BedRoom with TSDF maps; the next ablations test the update of each map type, and
+the last one varies the settings. All scores follow the main paper.
 
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
 these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
 this recording and misses the same four. The coverage weights keep repeated views of one patch from ending a state
-that did not change; without them, object F1 and change F1 fall.
+that did not change; without them, object F1 and change F1 fall. The lower rows test the map update: if ended objects
+are not retired as a whole, moved objects stay and 12 more changes are missed; if elements are not tested one by one,
+faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
 \begin{table}[H]
 \centering
@@ -354,16 +367,13 @@ No valid domains & 81.8 & 83.4 & 82.8 & 90.2 & 50.7 & 76.5 \\
 \label{tab:supp_valid_domains}
 \end{table}
 
-\paragraph{Object and element level (3DGS, Flat, and TSDF, BedRoom).}
+\paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} in the main paper switches off two steps at once, and \cref{tab:supp_ablations} separates them.
 If ended objects are not retired as a whole, moved furniture stays in the map, and change F1 and depth get as bad
 as in \emph{No retirement}. If elements are not tested one by one, every object is still handled correctly and change
 F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Two smaller
 components also help: without the object states of the previous visit one change is missed, and rendering old
-keyframes on the current map instead of the map at their capture time lowers PSNR. TSDF maps on BedRoom behave
-the same way (\cref{tab:supp_change_test}): without object retirement, moved objects stay and 12 more changes are
-missed; without the element test, objects and changes are unaffected, but faces of earlier visits that new views see
-through stay in the map, and mesh F1 falls.
+keyframes on the current map instead of the map at their capture time lowers PSNR.
 
 \begin{table}[H]
 \centering
@@ -382,7 +392,7 @@ No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
 Current-map rendering & 90.4 & 83.3 & 27.83 & 0.46 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Object and element level (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
+\caption{\textbf{Gaussian state and keyframe updates (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
 \label{tab:supp_ablations}
 \end{table}
 
