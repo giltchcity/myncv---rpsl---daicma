@@ -113,51 +113,71 @@ estimated from the new state's observations.
 \section{Datasets}
 \label{sec:supp_datasets}
 
-ReviScene-BedRoom (\cref{fig:supp_bed_a,fig:supp_bed_b,fig:supp_bed_c}) has 4,003, 4,041, and 7,216 RGB-D frames in its three visits, at
-1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register the second and third visits to the first using landmark correspondences,
-automatic registration, and manual refinement. Masks combine SAM assistance and manual review, with ADE20K classes and
-17 persistent object identities; people are labeled as moving. No ethics review was carried out because the only person recorded
-is a volunteer who consented to the recording; faces are blurred. ReviScene-Home (\cref{fig:supp_home_a,fig:supp_home_b}) animates objects
-and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}. Its two visits share a
-world coordinate frame and have 4,186 and 3,555 RGB-D frames at 680$\times$480 and 30\,Hz. We export per-frame object
-transforms and visibility, which give the scene geometry at each timestamp together with the object meshes. Instance
-labels follow the annotated object groups, such as a table together with its contents. Among the public datasets, Flat
-moves eight objects, adds five, and removes four between its two runs~\cite{9811877}, and we use eight room chains of
-3RScan~\cite{9010673}.
+\Cref{tab:supp_datasets} summarizes the two ReviScene datasets, and \cref{fig:supp_bed,fig:supp_home} show them.
+
+\begin{table}[!htb]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & Visits & RGB-D frames per visit & Resolution & Changes within visits & Changes between visits \\
+\midrule
+BedRoom & 3 & 4,003 / 4,041 / 7,216 & 1920$\times$1080 & 5 & 26 \\
+Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{ReviScene.} Both record RGB-D at 30\,Hz. The changes are the reference changes made while the camera
+looks away, as in \cref{tab:supp_change_kinds}; Home also has three motions in view.}
+\label{tab:supp_datasets}
+\end{table}
+
+\paragraph{ReviScene-BedRoom.}
+Three visits to a real bedroom are recorded at 1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register the
+second and third visits to the first using landmark correspondences, automatic registration, and manual refinement.
+Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities; people are
+labeled as moving. No ethics review was carried out because the only person recorded is a volunteer who consented to
+the recording; faces are blurred.
+
+\paragraph{ReviScene-Home.}
+Home animates objects and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}.
+Its two visits share a world coordinate frame. We export per-frame object transforms and visibility, which give the
+scene geometry at each timestamp together with the object meshes. Instance labels follow the annotated object groups,
+such as a table together with its contents. Objects move while the camera looks elsewhere, within a visit
+(\cref{fig:supp_home}) and between the visits, and three move in view.
+
+\paragraph{Public datasets.}
+Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}, and we use eight room chains
+of 3RScan~\cite{9010673}.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/a_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of the first visit}, from a fixed overview camera.}
-\label{fig:supp_bed_a}
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{ccc}
+\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/a_after.png} &
+\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/b_after.png} &
+\includegraphics[width=0.325\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/c_after.png} \\
+\small (a) & \small (b) & \small (c)
+\end{tabular}
+\caption{\textbf{ReviScene-BedRoom at the end of its (a) first, (b) second, and (c) third visit}, from a fixed overview
+camera.}
+\label{fig:supp_bed}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/b_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of the second visit}, from a fixed overview camera.}
-\label{fig:supp_bed_b}
-\end{figure}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=0.75\linewidth,trim=215bp 198bp 212bp 25bp,clip]{figures/real_stages_original/c_after.png}
-\caption{\textbf{ReviScene-BedRoom at the end of the third visit}, from a fixed overview camera.}
-\label{fig:supp_bed_c}
-\end{figure}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0139.50_rgb.png}
-\caption{\textbf{ReviScene-Home at the end of the first visit}, from a fixed overview camera.}
-\label{fig:supp_home_a}
-\end{figure}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=0.9\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/b_0118.40_rgb.png}
-\caption{\textbf{ReviScene-Home at the end of the second visit}, from a fixed overview camera.}
-\label{fig:supp_home_b}
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{cc}
+\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0000.00_rgb.png} &
+\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0080.00_rgb.png} \\
+\small (a) & \small (b) \\[2pt]
+\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0095.00_rgb.png} &
+\includegraphics[width=0.49\linewidth,trim=119bp 182bp 39bp 65bp,clip]{figures/dataset_stages/a_0139.50_rgb.png} \\
+\small (c) & \small (d)
+\end{tabular}
+\caption{\textbf{ReviScene-Home during its first visit}, from a fixed overview camera: (a) at the start, (b) at 80\,s,
+(c) at 95\,s, and (d) at the end, 139.5\,s. Objects move between the panels.}
+\label{fig:supp_home}
 \end{figure}
 
 \FloatBarrier
