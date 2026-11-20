@@ -94,10 +94,9 @@ place, with the pooled statistics of all objects counted as three more rounds; i
 at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. A round is scored once it judges
 $\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
 object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
-when it is first seen. Its end is decided at the round that confirms the change, but a change made while the camera
-looked elsewhere is not observed: it happened after the last observation that supported the state and before that
-round. All three maps receive the same decisions; the TSDF, Gaussian and occupancy maps place the end at the
-confirming round, or at the start of the current visit for a state that changed between visits.
+when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
+the camera looked elsewhere is not observed, so this round is the first time the map can know of it. All three maps use
+these same intervals.
 
 \section{Datasets}
 \label{sec:supp_datasets}
