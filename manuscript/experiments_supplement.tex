@@ -54,15 +54,15 @@ now (Eq.~3 of the main paper),
   v_o(e,t)=\bigl[\,e\in\mathcal{M}(t_o)\cap\mathcal{M}(t)\,\bigr]\in\{0,1\},
   \label{eq:supp_valid}
 \end{equation}
-and each map applies $v$ inside its own update:
+and each map applies $v$ inside its own update, occupancy at the two ends of a state (\cref{tab:supp_validity}):
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
   \theta_e&\leftarrow\theta_e-\alpha\sum_k v_k(e,t)\,\frac{\partial\,\ell\bigl(I_k,R(\mathcal{M}(t_k))\bigr)}{\partial\theta_e},\label{eq:supp_gs}\\
-  L(c)&\leftarrow\mathrm{clamp}\bigl(L(c)+v_o(c,t)\,\Delta_o(c)\bigr).\label{eq:supp_occ}
+  L(c)&\leftarrow\mathrm{clamp}\bigl(L(c)+\Delta_o(c)\bigr).\label{eq:supp_occ}
 \end{align}
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
-$x$, a pixel ray $o$ ends on a state $\sigma_o$, $\mathcal{S}(t)$ is the set of states alive at $t$ (the background
+$x$, a pixel ray $o$ ends on a state $\sigma_o$, $d_o(x)$ and $w_o(x)$ are the truncated signed distance and weight it gives $x$, $\mathcal{S}(t)$ is the set of states alive at $t$ (the background
 always is), and $\Omega_o(t)$ is the valid domain (Eq.~4 of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
 $I_k$ and $R$ renders. In \cref{eq:supp_occ}, $\Delta_o$ is the update of cell $c$, and $L_0(c)$ is the value the cell
 held when the visit began.
@@ -89,14 +89,15 @@ free bound $L_{\min}$. \\
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
-$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state is fitted to its earlier rounds while it was in place and
-regularized toward pooled statistics; without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Persistence $q$
-combines the object's history of unchanged and moved outcomes with a Beta prior from its class. All three maps receive the same state
-interval: a state begins when it is first seen and ends at its confirming round, which bounds the unobserved change
-from above. Two maps place the end earlier inside this bound when they record history: the exported TSDF map uses the
-midpoint between the last supporting observation and the confirming round for a removed object, as
-Khronos~\cite{Schmid-RSS-24} does, and Gaussians of a state that changed between visits end at the start of the
-current visit.
+$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state matches the mean and robust variance of its rounds in
+place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
+at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. A round is scored once it judges
+$\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
+object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
+when it is first seen. Its end is decided at the round that confirms the change, but a change made while the camera
+looked elsewhere is not observed: it happened after the last observation that supported the state and before that
+round. All three maps receive the same decisions; the TSDF, Gaussian and occupancy maps place the end at the
+confirming round, or at the start of the current visit for a state that changed between visits.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -305,27 +306,27 @@ the main paper.
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
 these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
-this recording and misses the same four. Without the coverage weights, repeated views of one patch add up, and the
-test ends two static objects in the third visit: object F1 falls, and two more reference changes are missed.
+this recording and misses the same four. The coverage weights keep repeated views of one patch from ending a state
+that did not change; without them, object F1 and change F1 fall.
 
 \begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}lrrrc@{}}
+\begin{tabular}{@{}lrrr@{}}
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Found / false / missed \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full & 96.1 & 96.6 & 98.4 & 30 / 0 / 1 \\
-No change test & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
-One noise model & 96.0 & 94.4 & 91.2 & 26 / 0 / 5 \\
-No coverage weights & 95.9 & 96.1 & 94.9 & 28 / 0 / 3 \\
+Full & 96.1 & 96.6 & 98.4 \\
+No change test & 96.0 & 94.4 & 91.2 \\
+One noise model & 96.0 & 94.4 & 91.2 \\
+No coverage weights & 95.9 & 96.1 & 94.9 \\
 \midrule
-No object retirement & 93.0 & 95.3 & 73.5 & 18 / 0 / 13 \\
-No element test & 93.9 & 96.6 & 98.4 & 30 / 0 / 1 \\
+No object retirement & 93.0 & 95.3 & 73.5 \\
+No element test & 93.9 & 96.6 & 98.4 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table. The last column counts the 31 reference changes of the three visits that are found, falsely reported, and missed; change F1 follows from these counts.}
+\caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table.}
 \label{tab:supp_change_test}
 \end{table}
 
@@ -433,17 +434,17 @@ Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
 Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \bottomrule
 \end{tabular}\hfill
-\begin{tabular}[t]{@{}lrrrc@{}}
-\multicolumn{5}{c}{(b) TSDF, BedRoom}\\[3pt]
+\begin{tabular}[t]{@{}lrrr@{}}
+\multicolumn{4}{c}{(b) TSDF, BedRoom}\\[3pt]
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Found / false / missed \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\
 \midrule
-Full & 96.1 & 96.6 & 98.4 & 30 / 0 / 1 \\
-Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 & 30 / 0 / 1 \\
-Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 & 29 / 0 / 2 \\
+Full & 96.1 & 96.6 & 98.4 \\
+Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
+Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB; counts as in \cref{tab:supp_change_test}.}
+\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB.}
 \label{tab:supp_settings}
 \end{table}
 
