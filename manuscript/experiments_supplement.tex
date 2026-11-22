@@ -85,14 +85,24 @@
 \label{sec:supp_method}
 
 Every dense map fuses observations into its elements: TSDF volumes average them, Gaussian maps take gradient steps on a
-rendering loss, and occupancy maps sum log-odds. \ours keeps each rule and only decides which observations may
-enter it. An observation $o$ captured at $t_o$ is valid for an element $e$ at time $t$ if $e$ existed then and exists
-now (Eq.~3 of the main paper),
+rendering loss, and occupancy maps sum log-odds. \ours makes one change decision per object state by comparing its
+mapped surface with new depth observations. A state is represented by a group of map elements---surface geometry in a
+TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
+together.
+
+The same decision determines which past observations remain valid. An observation $o$ captured at $t_o$ may update an
+element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~3 of the main paper),
 \begin{equation}
-  v_o(e,t)=\bigl[\,e\in\mathcal{M}(t_o)\cap\mathcal{M}(t)\,\bigr]\in\{0,1\},
+  v_o(e,t)=\bigl[\,e\in\mathcal{M}(t_o)\cap\mathcal{M}(t)\,\bigr]\in\{0,1\}.
   \label{eq:supp_valid}
 \end{equation}
-and each map applies $v$ inside its own update, occupancy at the two ends of a state (\cref{tab:supp_validity}):
+The two conditions are identical across representations: an ended state receives no further updates, and an
+observation cannot update a state that began after its capture. Where these conditions are enforced depends on what
+each representation retains of its observations. Gaussian maps re-read keyframes at every optimization step and apply
+$v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion, rebuilding affected blocks
+from archived frames when valid domains change. Occupancy maps retain only clamped log-odds sums, from which individual
+observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
+Each map applies $v$ inside its own update:
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -108,25 +118,37 @@ held when the visit began.
 \begin{table}[!htb]
 \centering
 \small
-\sbox0{3D Gaussians}
-\begin{tabular}{@{}lp{\dimexpr\linewidth-\wd0-2\tabcolsep\relax}@{}}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{@{}p{0.19\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.25\linewidth}@{}}
 \toprule
-Map & Where $v$ acts \\
+& TSDF & 3D Gaussians & Occupancy \\
 \midrule
-TSDF & A ray counts only while the state it hit still stands. Its band keeps the surface it measured, and its free
-space stops before the first state that arrived after $t_o$. \\
-3D Gaussians & A keyframe renders the map of its capture time, $\mathcal{M}(t_k)$, and its gradient reaches only the
-Gaussians alive both then and now. A Gaussian of an earlier visit is updated by the current visit only once its
-evidence finds it unchanged. A frozen Gaussian that lies in front of the surface measured by a frame is not updated by
-that frame, and neither are the Gaussians it occludes. \\
-Occupancy & A cell keeps only its clamped sum, so $v$ acts at the two ends of a state. Start: the first object reading
-of a visit in a cell that earlier visits saw free withdraws $L_0(c)<0$. End: the cells of the state are set to the
-free bound $L_{\min}$. \\
+Ended state, $e\notin\mathcal{M}(t)$ &
+Rays that measured the ended state no longer contribute. &
+Its Gaussians are frozen and receive no further updates. A frame does not update a frozen Gaussian in front of the
+surface it measured, nor the Gaussians behind it. &
+Its occupied cells are set to the free bound $L_{\min}$. \\
+\addlinespace[3pt]
+Later state, $e\notin\mathcal{M}(t_o)$ &
+An earlier ray's free space stops before the new state, while its surface band remains. &
+An earlier keyframe renders $\mathcal{M}(t_k)$ without Gaussians that appeared later. &
+When an object reading of a visit first reaches a cell earlier visits saw free, it withdraws their free space,
+$L_0(c)<0$. \\
+\midrule
+Earlier visit, undecided &
+Earlier visits contribute surfaces but no free space. &
+Earlier Gaussians receive current updates only after being confirmed unchanged. &
+The log-odds $L_0(c)$ is saved at the start of the visit for later withdrawal. \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{One validity, three maps.} Each map keeps its own update and applies $v$ of \cref{eq:supp_valid} inside it.}
+\caption{\textbf{One validity, three maps.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
+enforced in each representation. The last row shows how earlier visits are handled before the state decision.}
 \label{tab:supp_validity}
 \end{table}
+
+Even when a state continues, its stale elements can be retired one by one, as can background elements without a state:
+the element test of the main paper retires an element that more views see through than support.
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
@@ -514,7 +536,7 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \paragraph{Settings.}
 The method is robust to its settings (\cref{tab:supp_settings}): with thresholds $\eta$ from 9 to 999, a fixed
 persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated identity, the F1
-scores and PSNR stay within 5\% of the full method.
+scores and PSNR stay within 5\% of the full method. On BedRoom with TSDF maps and OneFormer semantic labels, mesh, object and change F1 are 96.0, 87.0 and 91.2.
 
 \begin{table}[H]
 \centering
