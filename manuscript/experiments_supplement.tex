@@ -169,6 +169,14 @@ When an object is observed moving (Sec.~3.1 of the main paper), frames captured 
 successor reconstruction. After it settles, a few seconds of subsequent frames are retained to reconstruct its
 successor; all other frames are fused once.
 
+For BedRoom's annotated semantic masks, each 8-connected image region of an
+object class gives one instance observation in that frame. We associate
+observations of the same class across frames by their overlap in 3D.
+
+SAM provides class-agnostic masks whose indices are local to each frame.
+We match depth samples to existing object surfaces in 3D and use the masks
+to group unmatched samples into new objects or extend existing ones.
+
 Across visits, association relies on geometry: an observation matching the surface of an earlier state continues
 that state and inherits its identity, including with SAM or semantic masks. An earlier state ends when the change
 test confirms its absence. Linking a state to a new location additionally requires persistent object identities
@@ -279,7 +287,9 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
-The TSDF mapper retains the depth frames used to rebuild voxel blocks only for the duration of the current visit.
+At the end of each mapping round, the TSDF mapper releases the depth
+frames used for block reconstruction, retaining their accumulated support and
+free-space votes per grid cell.
 
 \section{Additional Results}
 
