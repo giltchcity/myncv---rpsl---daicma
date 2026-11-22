@@ -314,6 +314,21 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 \vspace{-2mm}
 \end{table}
 
+\paragraph{Predicted segmentation.}
+We additionally report results with OneFormer-predicted
+segmentation. On BedRoom, both methods use the same
+OneFormer predictions without fine-tuning. Our TSDF
+map obtains mesh, object, and change F1 scores of
+96.1, 79.2, and 89.7; Khronos obtains 87.7, 42.8,
+and 59.1. On Flat, we evaluate GaME using the same
+OneFormer masks as our predicted-mask ablation in
+the main paper. GaME obtains mesh F1 of 85.8,
+object F1 of 39.43, change F1 of 68.75, and
+24.44\,dB PSNR after refinement.
+Predicted segmentation affects the reconstruction and
+change-detection accuracy of all methods, including ours.
+All F1 scores are in percent.
+
 \paragraph{Rendering.}
 \Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison.
 
@@ -526,7 +541,7 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \paragraph{Settings.}
 Across the tested decision thresholds ($\eta=9$ to $999$) and fixed persistence
 values ($q=1/4$ to $3/4$), the F1 scores and PSNR stay within 5\% of the full
-method (\cref{tab:supp_settings}). On BedRoom with TSDF maps and OneFormer semantic labels, mesh, object and change F1 are 96.0, 87.0 and 91.2.
+method (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
