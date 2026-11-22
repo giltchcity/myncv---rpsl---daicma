@@ -343,7 +343,9 @@ The rendering tables evaluate the final maps after refinement, following GaME. T
 out (418 and 355 frames). After the second visit, each frame is rendered from the 4D map queried at its capture time,
 which returns the latest mapping round at or before that time, built only from the frames up to it; final refinement
 does not modify these rounds. GaME keeps no history, so we save its maps at the same times
-(\cref{tab:supp_heldout_history}).
+(\cref{tab:supp_heldout_history}). Frames of a visit captured before a change show the scene as it was then; the final
+map no longer holds it, while the map of their capture time does, so the temporal PSNR exceeds that of the final map,
+for GaME as for ours.
 
 \paragraph{CL-Splats.}
 For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
