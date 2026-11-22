@@ -154,8 +154,10 @@ the element test of the main paper retires an element that more views see throug
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
 $60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state matches the mean and robust variance of its rounds in
 place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
-at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. Before scoring, a see-through fraction is clipped to $[\max(0.005,m),0.995]$, with $m$ the
-mean of the model it is scored against. A round is scored once it judges
+at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
+In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
+$\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the in-place mean for state $s$.
+A round is scored once it judges
 $\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
 object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
@@ -170,9 +172,14 @@ successor; all other frames are fused once.
 Across visits, association relies on geometry: an observation matching the surface of an earlier state continues
 that state and inherits its identity, including with SAM or semantic masks. An earlier state ends when the change
 test confirms its absence. Linking a state to a new location additionally requires persistent object identities
-across frames. In that case, the new state replaces the earlier one when $(1-q)B > q+L$, where $B\leq 2$ increases
-with the fraction of the new surface outside the earlier one, and $L$ is the odds of that surface being invalid,
-estimated from the new state's observations.
+across frames. Within a visit, succession requires seeing the old site again with no sample supported there
+(Sec.~3.1 of the main paper). Across visits, a supported candidate of the same object can also establish relocation
+from its new site. Given the observations $D$, the posterior probabilities of persistence ($S$), relocation ($M$),
+and an invalid candidate ($U$) are proportional to $q$, $(1-q)B$, and $L$, respectively.
+The candidate is accepted as the successor when $P(M\mid D)>P(S\mid D)+P(U\mid D)$, equivalently $(1-q)B>q+L$.
+The geometry Bayes factor $B\leq 2$ increases with the fraction of the new surface outside the earlier one.
+We assign equal prior odds to a valid and an invalid candidate, so $L$ is the likelihood ratio of an invalid
+surface to a valid one from the candidate's own depth observations.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -272,6 +279,7 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
+The TSDF mapper retains the depth frames used to rebuild voxel blocks only for the duration of the current visit.
 
 \section{Additional Results}
 
@@ -348,9 +356,10 @@ map no longer holds it, while the map of their capture time does, so the tempora
 for GaME as for ours.
 
 \paragraph{CL-Splats.}
-For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
-released default configuration on the same poses, RGB images, and held-out views
-(\cref{tab:supp_clsplats}).
+CL-Splats~\cite{Ackermann_2025_ICCV} updates an existing Gaussian scene locally
+from sparse sets of views acquired at different times. For reference, we evaluate
+its released implementation on the same RGB images, camera poses, and held-out
+views (\cref{tab:supp_clsplats}).
 
 \begin{table}[H]
 \tablepair{%
@@ -399,8 +408,10 @@ the last one varies the settings. All scores follow the main paper.
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
 these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
-this recording and misses the same four. The coverage weights keep repeated views of one patch from ending a state
-that did not change; without them, object F1 and change F1 fall. The lower rows test the map update: if ended objects
+this recording and misses the same four. Without coverage weights, repeated views of the same patch prematurely end two
+static object states. Both objects are present again at visit end, when false positives are counted. This variant
+detects 28 of 31 reference changes with no false positives (94.9\% change F1), compared with 30 of 31 for the
+full method. The lower rows test the map update: if ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed; if elements are not tested one by one,
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
@@ -513,9 +524,9 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \end{table}
 
 \paragraph{Settings.}
-The method is robust to its settings (\cref{tab:supp_settings}): with thresholds $\eta$ from 9 to 999, a fixed
-persistence $q$ from $1/4$ to $3/4$, or masks associated by geometry instead of by the annotated identity, the F1
-scores and PSNR stay within 5\% of the full method. On BedRoom with TSDF maps and OneFormer semantic labels, mesh, object and change F1 are 96.0, 87.0 and 91.2.
+Across the tested decision thresholds ($\eta=9$ to $999$) and fixed persistence
+values ($q=1/4$ to $3/4$), the F1 scores and PSNR stay within 5\% of the full
+method (\cref{tab:supp_settings}). On BedRoom with TSDF maps and OneFormer semantic labels, mesh, object and change F1 are 96.0, 87.0 and 91.2.
 
 \begin{table}[H]
 \centering
@@ -533,7 +544,6 @@ Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 \\
 Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 \\
 Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
 Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
-Geometric association & 90.0 & 66.8 & 83.3 & 28.14 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
