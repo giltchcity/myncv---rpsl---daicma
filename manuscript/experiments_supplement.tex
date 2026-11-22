@@ -308,11 +308,9 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 
 \paragraph{Rendering.}
 \Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison.
-The rendering tables of the main paper and \cref{tab:supp_instance_rendering} report the maps after the final
-refinement, as GaME does. \Cref{tab:supp_before_refinement} gives our maps before it.
 
 \begin{table}[H]
-\tablepair{%
+\centering
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -331,42 +329,21 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
-}{%
+\vspace{-2mm}
 \caption{\textbf{Rendering of the Gaussian maps of the main comparison.} With ground-truth instances, as in the main
 comparison; the rendering table of the main paper uses SAM masks. Held-out views after refinement;
 PSNR in dB and depth L1 in cm.}
-\label{tab:supp_instance_rendering}}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-\multicolumn{5}{l}{\textit{Instance masks}} \\
-BedRoom & 19.14 & 0.795 & 0.407 & 5.11 \\
-Home & 23.49 & 0.816 & 0.247 & 14.96 \\
-Flat & 23.84 & 0.935 & 0.135 & 0.57 \\
-3RScan & 19.50 & 0.741 & 0.429 & 3.87 \\ \midrule
-\multicolumn{5}{l}{\textit{SAM masks}} \\
-Flat & 23.83 & 0.935 & 0.137 & 0.57 \\
-Aria room0 & 30.03 & 0.944 & 0.155 & 0.85 \\
-Aria room1 & 29.13 & 0.944 & 0.126 & 1.14 \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{lrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Our Gaussian maps before the final refinement.} Same held-out views as after refinement; PSNR in dB and depth L1 in cm.}
-\label{tab:supp_before_refinement}}
+\label{tab:supp_instance_rendering}
 \vspace{-2mm}
 \end{table}
 
 \paragraph{Rendering over time.}
-The rendering table of the main paper holds out every tenth frame of the last visit and renders all of them from the
-final map. The Home PSNR in Sec.~5.1 of the main paper tests the map over time: every tenth frame of both visits is held
-out (418 and 355 frames). After the second visit, each frame is rendered from the final 4D map queried at its capture
-time, which returns the map of the latest mapping round at or before that time, built only from the frames up to that time; refinement does not change these
-rounds. GaME keeps no history, so we save its map at the same times (\cref{tab:supp_heldout_history}).
+The rendering tables evaluate the final maps after refinement, following GaME. The temporal PSNR on Home
+(Sec.~5.1 of the main paper) instead evaluates the map at successive times: every tenth frame of both visits is held
+out (418 and 355 frames). After the second visit, each frame is rendered from the 4D map queried at its capture time,
+which returns the latest mapping round at or before that time, built only from the frames up to it; final refinement
+does not modify these rounds. GaME keeps no history, so we save its maps at the same times
+(\cref{tab:supp_heldout_history}).
 
 \paragraph{CL-Splats.}
 For reference, we run the public code of CL-Splats~\cite{Ackermann_2025_ICCV} with its
