@@ -392,12 +392,14 @@ would require refining each round's map separately.
 The table below shows which map is rendered for a frame captured at $t_i$ and our PSNR in dB for each visit.
 \begin{center}
 \small
-\begin{tabular}{@{}llcc@{}}
+\begin{tabular}{@{}llccc@{}}
 \toprule
-Protocol & Map rendered at the frame's camera pose & Visit 1 (418 views) & Visit 2 (355 views) \\
+Protocol & \shortstack[l]{Map rendered at the\\frame's camera pose} &
+\shortstack{Visit 1\\(418 views)} & \shortstack{Visit 2\\(355 views)} &
+\shortstack{After refinement\\(Visit 2)} \\
 \midrule
-Final-map PSNR & Same refined final map for every frame & --- & 24.90 \\
-Temporal PSNR & Map at the first round ending at or after $t_i$ & 26.64 & 26.92 \\
+Final-map PSNR & Same refined final map for every frame & --- & 24.90 & 24.90 \\
+Temporal PSNR & Map at the first round ending at or after $t_i$ & 26.64 & 26.92 & --- \\
 \bottomrule
 \end{tabular}
 \end{center}
