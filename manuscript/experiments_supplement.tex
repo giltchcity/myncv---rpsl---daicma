@@ -289,6 +289,9 @@ Change F1 pools events across visits. An unchanged object counts as a false posi
 LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
+In Table~2 of the main paper, \ours uses the annotated object IDs, including cross-visit IDs where the dataset provides them.
+All methods have access to the same masks and IDs.
+The BedRoom semantic-input runs and the Flat and Aria SAM runs use no annotated instance IDs.
 Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
 
 \paragraph{3RScan.}
@@ -383,13 +386,15 @@ PSNR in dB and depth L1 in cm.}
 \end{table}
 
 \paragraph{Rendering over time.}
-The rendering tables evaluate the final maps after refinement, following GaME. For temporal PSNR on Home
-(Sec.~5.1 of the main paper), we render each held-out frame after the second visit using the first stored
-mapping round at or after its capture time. The frame itself is excluded from mapping, but the selected round may include later observations.
-Final refinement does not modify these rounds. GaME keeps no history, so we save its maps at the same round times
-(\cref{tab:supp_heldout_history}). Frames of a visit captured before a change show the scene as it was then; the final
-map no longer holds it, while the map of their capture time does, so the temporal PSNR exceeds that of the final map,
-for GaME as for ours.
+The rendering tables evaluate the final maps after refinement, following GaME. On Home, mapping continues from
+the first visit into the second. For temporal PSNR (Sec.~5.1 of the main paper), both methods exclude the same
+held-out frames from mapping. For a held-out frame captured at time $t$, we select the first mapping round ending
+at or after $t$. After both visits, we query our 4D history to retrieve the map as it stood at the end of the selected round.
+We compare it with GaME's snapshot saved at that same time, so neither rendering uses updates from later rounds.
+We render each from the held-out frame's camera pose and compute PSNR against the captured image
+(\cref{tab:supp_heldout_history}).
+An earlier round can still show the layout seen in frames captured
+before a change, which helps explain the higher temporal PSNR for both methods.
 
 \paragraph{CL-Splats.}
 CL-Splats~\cite{Ackermann_2025_ICCV} updates an existing Gaussian scene locally
