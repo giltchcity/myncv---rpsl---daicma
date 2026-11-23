@@ -301,7 +301,11 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change. The three motions in view on Home, six events in all (each ends one state and starts another), are scored separately using the same event criterion: with TSDF maps, ours reaches change F1 90.9 (5 of 6 events, no false positive) against 66.7 for Khronos. On Khronos's dynamic-object metric, which matches each moving object within 0.5\,m at every trajectory timestamp, F1 is 73.6 and 73.9 in the two visits against 0.9 and 27.4.
+\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change.
+We score the three motions in view on Home separately. Each ends one state and starts another.
+Our three maps, GaME, and Wavemap each capture five of the six state transitions, while Khronos and Panoptic Mapping each capture three. None produces a false positive.
+Khronos's dynamic-object metric (\emph{Dyn.}) matches positions within 0.5\,m at each trajectory timestamp.
+In single-visit runs on Home A and B, our TSDF maps score 73.6\% and 73.9\%, respectively, and Khronos with its official motion settings scores 2.8\% and 62.6\%.
 
 \begin{table}[H]
 \centering
