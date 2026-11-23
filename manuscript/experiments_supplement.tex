@@ -91,7 +91,7 @@ TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending
 together.
 
 The same decision determines which past observations remain valid. An observation $o$ captured at $t_o$ may update an
-element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~3 of the main paper),
+element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(3) of the main paper),
 \begin{equation}
   v_o(e,t)=\bigl[\,e\in\mathcal{M}(t_o)\cap\mathcal{M}(t)\,\bigr]\in\{0,1\}.
   \label{eq:supp_valid}
@@ -102,7 +102,7 @@ each representation retains of its observations. Gaussian maps re-read keyframes
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion, rebuilding affected blocks
 from archived frames when valid domains change. Occupancy maps retain only clamped log-odds sums, from which individual
 observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
-Each map applies $v$ inside its own update:
+The three map updates are given below.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -111,9 +111,9 @@ Each map applies $v$ inside its own update:
 \end{align}
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
 $x$, a pixel ray $o$ ends on a state $\sigma_o$, $d_o(x)$ and $w_o(x)$ are the truncated signed distance and weight it gives $x$, $\mathcal{S}(t)$ is the set of states alive at $t$ (the background
-always is), and $\Omega_o(t)$ is the valid domain (Eq.~4 of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
-$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $\Delta_o$ is the update of cell $c$, and $L_0(c)$ is the value the cell
-held when the visit began.
+always is), and $\Omega_o(t)$ is the valid domain (Eq.~(4) of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $\Delta_o(c)$ is the log-odds update for cell $c$.
+In \cref{tab:supp_validity}, $L_0(c)$ is its log-odds at the start of the visit.
 
 \begin{table}[!htb]
 \centering
@@ -165,6 +165,7 @@ place, with the pooled statistics of all objects counted as three more rounds; i
 at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
 In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
 $\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the in-place mean for state $s$.
+Thus, reducing the see-through fraction below the in-place mean does not increase the change score.
 A round is scored once it judges
 $\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
 object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
@@ -227,8 +228,7 @@ looks away, as in \cref{tab:supp_change_kinds}; Home also has three motions in v
 Three visits to a real bedroom are recorded at 1920$\times$1080 and 30\,Hz, with depth aligned to RGB. We register the
 second and third visits to the first using landmark correspondences, automatic registration, and manual refinement.
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities; people are
-labeled as moving. No ethics review was carried out because the only person recorded is a volunteer who consented to
-the recording; faces are blurred.
+labeled as moving. The only person recorded consented to the recording. Faces are blurred. No ethics review was conducted.
 
 \paragraph{ReviScene-Home.}
 Home animates objects and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}.
@@ -302,10 +302,11 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 
 \paragraph{Changes by kind.}
 \Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change.
-We score the three motions in view on Home separately. Each ends one state and starts another.
-Our three maps, GaME, and Wavemap each capture five of the six state transitions, while Khronos and Panoptic Mapping each capture three. None produces a false positive.
-Khronos's dynamic-object metric (\emph{Dyn.}) matches positions within 0.5\,m at each trajectory timestamp.
-In single-visit runs on Home A and B, our TSDF maps score 73.6\% and 73.9\%, respectively, and Khronos with its official motion settings scores 2.8\% and 62.6\%.
+We score the three motions observed on Home separately. They yield six state transitions, one departure and one arrival per motion.
+Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%, respectively).
+Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
+In separate runs on the first and second visits to Home, \emph{Dyn.} F1 is 73.6\% and 73.9\% for ours,
+and 2.8\% and 62.6\% for Khronos with its official motion settings.
 
 \begin{table}[H]
 \centering
@@ -344,7 +345,7 @@ map obtains mesh, object, and change F1 scores of
 and 59.1. On Flat, GaME originally uses SAM masks; we additionally
 evaluate it with the same OneFormer masks as our
 predicted-mask ablation in the main paper. GaME obtains mesh F1 of 85.8,
-object F1 of 39.43, change F1 of 68.75, and
+object F1 of 39.4, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
 Predicted segmentation affects the reconstruction and
 change-detection accuracy of all methods, including ours.
