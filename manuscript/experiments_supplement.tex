@@ -184,10 +184,9 @@ SAM provides class-agnostic masks whose indices are local to each frame.
 We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
-Across visits, association relies on geometry: an observation matching the surface of an earlier state continues
-that state and inherits its identity, including with SAM or semantic masks. An earlier state ends when the change
-test confirms its absence. Linking a state to a new location additionally requires persistent object identities
-across frames. Within a visit, succession requires seeing the old site again with no sample supported there
+Across visits, an object observed again at the same site can continue its earlier state through 3D surface overlap,
+even with frame-local mask IDs. When it moves to a disjoint site, linking the old and new states requires persistent
+object identity. An earlier state ends when the change test confirms its absence. Within a visit, succession requires seeing the old site again with no sample supported there
 (Sec.~3.1 of the main paper). Across visits, a supported candidate of the same object can also establish relocation
 from its new site. Given the observations $D$, the posterior probabilities of persistence ($S$), relocation ($M$),
 and an invalid candidate ($U$) are proportional to $q$, $(1-q)B$, and $L$, respectively.
@@ -238,8 +237,10 @@ such as a table together with its contents. Objects move while the camera looks 
 (\cref{fig:supp_home_a,fig:supp_home_b}) and between the visits, and three move in view.
 
 \paragraph{Public datasets.}
-Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}, and we use eight room chains
-of 3RScan~\cite{9010673}.
+Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}.
+We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
+room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
+the reference scan.
 
 \begin{figure}[p]
 \centering
@@ -335,9 +336,9 @@ segmentation. On BedRoom, both methods use the same
 OneFormer predictions without fine-tuning. Our TSDF
 map obtains mesh, object, and change F1 scores of
 95.9, 79.2, and 89.7; Khronos obtains 87.7, 42.8,
-and 59.1. On Flat, we evaluate GaME using the same
-OneFormer masks as our predicted-mask ablation in
-the main paper. GaME obtains mesh F1 of 85.8,
+and 59.1. On Flat, GaME originally uses SAM masks; we additionally
+evaluate it with the same OneFormer masks as our
+predicted-mask ablation in the main paper. GaME obtains mesh F1 of 85.8,
 object F1 of 39.43, change F1 of 68.75, and
 24.44\,dB PSNR after refinement.
 Predicted segmentation affects the reconstruction and
@@ -378,9 +379,9 @@ PSNR in dB and depth L1 in cm.}
 \paragraph{Rendering over time.}
 The rendering tables evaluate the final maps after refinement, following GaME. The temporal PSNR on Home
 (Sec.~5.1 of the main paper) instead evaluates the map at successive times: every tenth frame of both visits is held
-out (418 and 355 frames). After the second visit, each frame is rendered from the 4D map queried at its capture time,
-which returns the latest mapping round at or before that time, built only from the frames up to it; final refinement
-does not modify these rounds. GaME keeps no history, so we save its maps at the same times
+out (418 and 355 frames). After the second visit, each held-out frame is rendered from the first map snapshot at or after its capture
+time. The snapshot may include later observations from the same mapping round; final refinement does not modify
+these snapshots. GaME keeps no history, so we save its maps at the same snapshot times
 (\cref{tab:supp_heldout_history}). Frames of a visit captured before a change show the scene as it was then; the final
 map no longer holds it, while the map of their capture time does, so the temporal PSNR exceeds that of the final map,
 for GaME as for ours.
@@ -505,8 +506,10 @@ F1 stays the same, but the rest of the old map is no longer confirmed against ne
 object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
-Saved-log-odds subtraction and local replacement both act on geometry: without them, mesh F1 returns to that of
-Wavemap, while object and change F1 stay as in the full method (\cref{tab:supp_occupancy_ablation}).
+Saved-log-odds subtraction removes free-space evidence from earlier visits that would otherwise oppose newly
+occupied cells. Local replacement clears stale occupied cells behind newly measured surfaces. Both operations
+improve the reconstructed geometry without changing the object-level change decisions, so change F1 remains
+unchanged when either is disabled (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
