@@ -379,9 +379,9 @@ PSNR in dB and depth L1 in cm.}
 \paragraph{Rendering over time.}
 The rendering tables evaluate the final maps after refinement, following GaME. The temporal PSNR on Home
 (Sec.~5.1 of the main paper) instead evaluates the map at successive times: every tenth frame of both visits is held
-out (418 and 355 frames). After the second visit, each held-out frame is rendered from the first map snapshot at or after its capture
-time. The snapshot may include later observations from the same mapping round; final refinement does not modify
-these snapshots. GaME keeps no history, so we save its maps at the same snapshot times
+out (418 and 355 frames). After the second visit, for each held-out frame, we render the first stored mapping round at or after
+its capture time. The frame itself is excluded from mapping, but the selected round may include later observations.
+Final refinement does not modify these rounds. GaME keeps no history, so we save its maps at the same round times
 (\cref{tab:supp_heldout_history}). Frames of a visit captured before a change show the scene as it was then; the final
 map no longer holds it, while the map of their capture time does, so the temporal PSNR exceeds that of the final map,
 for GaME as for ours.
@@ -460,7 +460,7 @@ enters the next one as surfaces only, so no old frame is fused there.
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} \\
+\textbf{Full} & 96.1 & 96.6 & 98.4 \\
 No change test & 96.0 & 94.4 & 91.2 \\
 One noise model & 96.0 & 94.4 & 91.2 \\
 No coverage weights & 95.9 & 96.1 & 94.9 \\ \midrule
@@ -481,11 +481,11 @@ No element test & 93.9 & 96.6 & 98.4 \\
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \multicolumn{4}{l}{\textit{Home}} \\
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{83.0} & \textbf{83.6} & \textbf{97.9} \\
+\textbf{Full} & 83.0 & 83.6 & 97.9 \\
 No valid domains & 81.8 & 83.4 & 82.8 \\ \midrule
 \multicolumn{4}{l}{\textit{Flat}} \\
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{90.1} & \textbf{50.7} & \textbf{76.5} \\
+\textbf{Full} & 90.1 & 50.7 & 76.5 \\
 No valid domains & 90.2 & 50.7 & 76.5 \\
 \bottomrule
 }
@@ -520,7 +520,7 @@ unchanged when either is disabled (\cref{tab:supp_occupancy_ablation}).
 \toprule
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{89.8} & \textbf{83.3} & \textbf{28.43} & \textbf{0.41} \\
+\textbf{Full} & 89.8 & 83.3 & 28.43 & 0.41 \\
 No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
 No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\ \midrule
@@ -540,7 +540,7 @@ No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
  & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\ \cmidrule(lr){2-4}\cmidrule(l){5-7}
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{80.8} & \textbf{86.5} & \textbf{98.6} & \textbf{82.4} & \textbf{55.4} & \textbf{95.0} \\
+\textbf{Full} & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
 No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
 No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
 Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
@@ -571,7 +571,7 @@ method (\cref{tab:supp_settings}).
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ \\ \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{89.8} & \textbf{67.1} & \textbf{83.3} & \textbf{28.43} \\
+\textbf{Full} & 89.8 & 67.1 & 83.3 & 28.43 \\
 Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 \\
 Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 \\
 Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 \\
@@ -590,7 +590,7 @@ Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \rowcolor{oursbg}
-\textbf{Full} & \textbf{96.1} & \textbf{96.6} & \textbf{98.4} \\
+\textbf{Full} & 96.1 & 96.6 & 98.4 \\
 Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
 Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
 \bottomrule
