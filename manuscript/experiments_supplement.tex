@@ -504,9 +504,9 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} keeps Gaussians that would otherwise retire with their object or individually.
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
-With the element test disabled, object-state decisions are unchanged and change F1 remains 83.3.
-Gaussians from the previous visit remain fixed during refinement, and held-out PSNR falls to 23.80\,dB. Without the
-object states of the previous visit, one change is missed.
+We disable the per-element surface test of Sec.~3.2. Objects are still retired as a whole,
+but Gaussians from the previous visit remain fixed during refinement.
+Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
 Saved-log-odds subtraction removes free-space evidence from earlier visits that would otherwise oppose newly
