@@ -153,8 +153,8 @@ the element test of the main paper retires an element that more views see throug
 
 \paragraph{TSDF updates.}
 The TSDF backend stores object states and background in separate volumes,
-so ending a state lets us retire its surface directly. During observed motion, we briefly
-archive depth frames because later views establish when the object settled. We rebuild the
+so ending a state lets us retire its surface directly. We archive depth frames for TSDF reconstruction
+\textbf{only for observed motion}, because later views establish when the object settled. We rebuild the
 affected blocks of its successor from views showing the object at rest in its new position,
 then discard the archived frames.
 
