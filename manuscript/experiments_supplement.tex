@@ -150,6 +150,14 @@ enforced in each representation. The last row shows how earlier visits are handl
 Even when a state continues, its stale elements can be retired one by one, as can background elements without a state:
 the element test of the main paper retires an element that more views see through than support.
 
+\paragraph{TSDF updates.}
+The TSDF backend stores object states and background in separate volumes,
+so ending a state lets us retire its surface directly. Each TSDF voxel
+stores an aggregate of the rays fused into it. When a later decision changes
+which rays may contribute, we rebuild the affected blocks from archived
+depth frames. For observed motion, we retain a short buffer because later
+views establish which earlier frames already showed the object at rest.
+
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
 $60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state matches the mean and robust variance of its rounds in
@@ -165,9 +173,8 @@ the camera looked elsewhere is not observed, so this round is the first time the
 round their site is first seen clearly. All three maps use
 these same intervals.
 
-When an object is observed moving (Sec.~3.1 of the main paper), frames captured during its motion are excluded from
-successor reconstruction. After it settles, a few seconds of subsequent frames are retained to reconstruct its
-successor; all other frames are fused once.
+For an object observed moving (Sec.~3.1 of the main paper), we reconstruct
+its successor using only buffered views that show it at rest in its new position.
 
 For BedRoom's annotated semantic masks, each 8-connected image region of an
 object class gives one instance observation in that frame. We associate
@@ -287,9 +294,7 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
-At the end of each mapping round, the TSDF mapper releases the depth
-frames used for block reconstruction, retaining their accumulated support and
-free-space votes per grid cell.
+
 
 \section{Additional Results}
 
