@@ -190,7 +190,8 @@ object identity. An earlier state ends when the change test confirms its absence
 (Sec.~3.1 of the main paper). Across visits, a supported candidate of the same object can also establish relocation
 from its new site. Given the observations $D$, the posterior probabilities of persistence ($S$), relocation ($M$),
 and an invalid candidate ($U$) are proportional to $q$, $(1-q)B$, and $L$, respectively.
-The candidate is accepted as the successor when $P(M\mid D)>P(S\mid D)+P(U\mid D)$, equivalently $(1-q)B>q+L$.
+Evidence from the new site alone establishes relocation when
+$P(M\mid D)>P(S\mid D)+P(U\mid D)$, equivalently $(1-q)B>q+L$.
 The geometry Bayes factor $B\leq 2$ increases with the fraction of the new surface outside the earlier one.
 We assign equal prior odds to a valid and an invalid candidate, so $L$ is the likelihood ratio of an invalid
 surface to a valid one from the candidate's own depth observations.
@@ -300,7 +301,7 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change. The three motions in view on Home, six events in all (each ends one state and starts another), are scored the same way: with TSDF maps, ours reaches change F1 90.9 (5 of 6 events, no false positive) against 66.7 for Khronos. On Khronos's dynamic-object metric, which matches each moving object within 0.5\,m at every trajectory timestamp, F1 is 73.6 and 73.9 in the two visits against 0.9 and 27.4.
+\Cref{tab:supp_change_kinds} splits the change F1 of the main paper by kind of change. The three motions in view on Home, six events in all (each ends one state and starts another), are scored separately using the same event criterion: with TSDF maps, ours reaches change F1 90.9 (5 of 6 events, no false positive) against 66.7 for Khronos. On Khronos's dynamic-object metric, which matches each moving object within 0.5\,m at every trajectory timestamp, F1 is 73.6 and 73.9 in the two visits against 0.9 and 27.4.
 
 \begin{table}[H]
 \centering
