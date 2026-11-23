@@ -100,8 +100,8 @@ element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(
 The two conditions are identical across representations: an ended state receives no further updates, and an
 observation cannot update a state that began after its capture. Where these conditions are enforced depends on what
 each representation retains of its observations. Gaussian maps re-read keyframes at every optimization step and apply
-$v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion, rebuilding affected blocks
-from archived frames when valid domains change. Occupancy maps retain only clamped log-odds sums, from which individual
+$v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
+Occupancy maps retain only clamped log-odds sums, from which individual
 observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
 The three map updates are given below.
 \begin{align}
@@ -153,16 +153,14 @@ the element test of the main paper retires an element that more views see throug
 
 \paragraph{TSDF updates.}
 The TSDF backend stores object states and background in separate volumes,
-so ending a state lets us retire its surface directly. Each TSDF voxel
-stores an aggregate of the rays fused into it. When observation validity changes,
-we rebuild the affected TSDF blocks. For observed motion, we briefly archive recent
-depth frames until we can confirm that the object has settled. We reconstruct its
-successor from the archived views that show it at rest in its new position, then
-discard the frames.
+so ending a state lets us retire its surface directly. During observed motion, we briefly
+archive depth frames because later views establish when the object settled. We rebuild the
+affected blocks of its successor from views showing the object at rest in its new position,
+then discard the archived frames.
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
-$60^\circ$, and $\eta=99$ in all experiments. The Beta model of a state matches the mean and robust variance of its rounds in
+$60^\circ$, and the default threshold is $\eta=99$. The Beta model of a state matches the mean and robust variance of its rounds in
 place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
 at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
 In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
@@ -176,9 +174,8 @@ the camera looked elsewhere is not observed, so this round is the first time the
 round their site is first seen clearly. All three maps use
 these same intervals.
 
-For BedRoom's annotated semantic masks, each 8-connected image region of an
-object class gives one instance observation in that frame. We associate
-observations of the same class across frames by their overlap in 3D.
+With semantic labels alone, each 8-connected region of an object class gives one instance
+observation in that frame. We associate observations of the same class across frames by their 3D overlap.
 
 SAM provides class-agnostic masks whose indices are local to each frame.
 We match depth samples to existing object surfaces in 3D and use the masks
@@ -236,7 +233,7 @@ scene geometry at each timestamp together with the object meshes. Instance label
 such as a table together with its contents. Objects move while the camera looks elsewhere, within a visit
 (\cref{fig:supp_home_a,fig:supp_home_b}) and between the visits, and three move in view.
 
-\paragraph{Public datasets.}
+\paragraph{Flat and 3RScan.}
 Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
 room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
@@ -285,10 +282,14 @@ the reference scan.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times. Object F1 scores the objects of the map at successive times in the same way, and change F1 counts each reference change once over all visits. Following Khronos~\cite{Schmid-RSS-24}, object matching uses a 0.5\,m distance threshold, and scores at successive snapshots are weighted by the duration for which each snapshot is current. For Gaussian and occupancy maps, the objects are the connected components of each identity on a 10\,cm grid with a volume of 0.005--10\,m$^3$, following the Khronos object construction settings, for baselines and ours alike. Change F1 pools true positives, false positives, and false negatives across the complete chain. A false positive is an unchanged object missing from the map at the end of a visit. LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times.
+Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
+For both our method and the baselines, we extract objects from Gaussian and occupancy maps as connected components within each instance.
+Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
+LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-Each method continues through the chain of visits using its own map updates; Panoptic Mapping loads the preceding visit's map through its own interface, and its Absent submaps supply its disappearance decisions. GaME uses its original configuration on Flat and its dataset adapters elsewhere: on real RGB-D, invalid depths are excluded from geometry supervision and allocation, and the synthetic adapter corrects relative-pose keyframe selection and guards sampling termination. For the predicted masks of the main paper, OneFormer Swin-L uses ADE20K weights and confidence threshold 0.5, and the predicted instances are associated by overlap across frames before reconstruction.
+Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
 
 \paragraph{3RScan.}
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
@@ -304,7 +305,7 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 We score the three motions observed on Home separately. They yield six state transitions, one departure and one arrival per motion.
 Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%, respectively).
 Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
-In separate runs on the first and second visits to Home, \emph{Dyn.} F1 is 73.6\% and 73.9\% for ours,
+On Home visits 1 and 2, single-visit \emph{Dyn.} F1 is 73.6\% and 73.9\% for ours,
 and 2.8\% and 62.6\% for Khronos with its official motion settings.
 
 \begin{table}[H]
@@ -341,9 +342,9 @@ segmentation. On BedRoom, both methods use the same
 OneFormer predictions without fine-tuning. Our TSDF
 map obtains mesh, object, and change F1 scores of
 95.9, 79.2, and 89.7; Khronos obtains 87.7, 42.8,
-and 59.1. On Flat, GaME originally uses SAM masks; we additionally
-evaluate it with the same OneFormer masks as our
-predicted-mask ablation in the main paper. GaME obtains mesh F1 of 85.8,
+and 59.1. For the Flat ablation, we use OneFormer Swin-L with ADE20K weights
+and a confidence threshold of 0.5. We evaluate GaME with the same predicted
+masks as our method. GaME obtains mesh F1 of 85.8,
 object F1 of 39.4, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
 Predicted segmentation affects the reconstruction and
@@ -382,10 +383,9 @@ PSNR in dB and depth L1 in cm.}
 \end{table}
 
 \paragraph{Rendering over time.}
-The rendering tables evaluate the final maps after refinement, following GaME. The temporal PSNR on Home
-(Sec.~5.1 of the main paper) instead evaluates the map at successive times: every tenth frame of both visits is held
-out (418 and 355 frames). After the second visit, for each held-out frame, we render the first stored mapping round at or after
-its capture time. The frame itself is excluded from mapping, but the selected round may include later observations.
+The rendering tables evaluate the final maps after refinement, following GaME. For temporal PSNR on Home
+(Sec.~5.1 of the main paper), we render each held-out frame after the second visit using the first stored
+mapping round at or after its capture time. The frame itself is excluded from mapping, but the selected round may include later observations.
 Final refinement does not modify these rounds. GaME keeps no history, so we save its maps at the same round times
 (\cref{tab:supp_heldout_history}). Frames of a visit captured before a change show the scene as it was then; the final
 map no longer holds it, while the map of their capture time does, so the temporal PSNR exceeds that of the final map,
@@ -443,11 +443,12 @@ the last one varies the settings. All scores follow the main paper.
 
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
-these four are missed (\cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
-this recording and misses the same four. Without coverage weights, repeated views of the same patch prematurely end two
-static object states. Both objects are present again at visit end, when false positives are counted. This variant
-detects 28 of 31 reference changes with no false positives (94.9\% change F1), compared with 30 of 31 for the
-full method. The lower rows test the map update: if ended objects
+these four additional changes are missed (26 of 31 detected, \cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
+this recording and misses the same four. Without coverage weights, repeated views of the same patch prematurely end
+two static object states mid-visit. Later views rebuild both before the visit
+ends, so neither counts as a visit-end false positive. Overall, this variant
+detects 28 of 31 reference changes with no false positives, compared with 30
+of 31 for the full method. The lower rows test the map update: if ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed; if elements are not tested one by one,
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
@@ -464,8 +465,7 @@ enters the next one as surfaces only, so no old frame is fused there.
 \def\resultrows{
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-\rowcolor{oursbg}
-\textbf{Full} & 96.1 & 96.6 & 98.4 \\
+Full & 96.1 & 96.6 & 98.4 \\
 No change test & 96.0 & 94.4 & 91.2 \\
 One noise model & 96.0 & 94.4 & 91.2 \\
 No coverage weights & 95.9 & 96.1 & 94.9 \\ \midrule
@@ -485,12 +485,10 @@ No element test & 93.9 & 96.6 & 98.4 \\
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \multicolumn{4}{l}{\textit{Home}} \\
-\rowcolor{oursbg}
-\textbf{Full} & 83.0 & 83.6 & 97.9 \\
+Full & 83.0 & 83.6 & 97.9 \\
 No valid domains & 81.8 & 83.4 & 82.8 \\ \midrule
 \multicolumn{4}{l}{\textit{Flat}} \\
-\rowcolor{oursbg}
-\textbf{Full} & 90.1 & 50.7 & 76.5 \\
+Full & 90.1 & 50.7 & 76.5 \\
 No valid domains & 90.2 & 50.7 & 76.5 \\
 \bottomrule
 }
@@ -504,10 +502,10 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \end{table}
 
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
-\emph{No retirement} in the main paper switches off two steps at once, and \cref{tab:supp_ablations} separates them.
-If ended objects are not retired as a whole, moved furniture stays in the map, and change F1 and depth get as bad
-as in \emph{No retirement}. If elements are not tested one by one, every object is still handled correctly and change
-F1 stays the same, but the rest of the old map is no longer confirmed against new views and PSNR drops. Without the
+\emph{No retirement} keeps Gaussians that would otherwise retire with their object or individually.
+Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
+With the element test disabled, object-state decisions are unchanged and change F1 remains 83.3.
+Gaussians from the previous visit remain fixed during refinement, and held-out PSNR falls to 23.80\,dB. Without the
 object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
@@ -524,8 +522,7 @@ unchanged when either is disabled (\cref{tab:supp_occupancy_ablation}).
 \def\resultrows{
 \toprule
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \midrule
-\rowcolor{oursbg}
-\textbf{Full} & 89.8 & 83.3 & 28.43 & 0.41 \\
+Full & 89.8 & 83.3 & 28.43 & 0.41 \\
 No object retirement & 83.5 & 68.8 & 24.02 & 3.20 \\
 No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\ \midrule
@@ -544,12 +541,10 @@ No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
 \toprule
  & \multicolumn{3}{c}{Home} & \multicolumn{3}{c}{Flat} \\ \cmidrule(lr){2-4}\cmidrule(l){5-7}
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-\rowcolor{oursbg}
-\textbf{Full} & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
+Full & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
 No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
 No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
 Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
-Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
@@ -562,50 +557,26 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \end{table}
 
 \paragraph{Settings.}
-Across the tested decision thresholds ($\eta=9$ to $999$) and fixed persistence
-values ($q=1/4$ to $3/4$), the F1 scores and PSNR stay within 5\% of the full
-method (\cref{tab:supp_settings}).
+On BedRoom, TSDF change F1 ranges from 96.7 to 98.4 across the tested decision thresholds
+and persistence values (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
-\tablepanels{0.54}{%
 \small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\multicolumn{5}{c}{(a) 3DGS, Flat}\\[3pt]
-\toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ \\ \midrule
-\rowcolor{oursbg}
-\textbf{Full} & 89.8 & 67.1 & 83.3 & 28.43 \\
-Threshold $\eta=9$ & 89.9 & 66.2 & 80.0 & 27.67 \\
-Threshold $\eta=999$ & 90.0 & 66.2 & 83.3 & 27.81 \\
-Fixed $q=1/4$ & 90.0 & 66.2 & 80.0 & 27.75 \\
-Fixed $q=1/2$ & 90.0 & 66.6 & 83.3 & 27.85 \\
-Fixed $q=3/4$ & 90.0 & 66.5 & 80.0 & 27.78 \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{lrrrr}\resultrows\end{tabular}
-}{0.43}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\multicolumn{4}{c}{(b) TSDF, BedRoom}\\[3pt]
+\begin{tabular}{lrrr}
 \toprule
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-\rowcolor{oursbg}
-\textbf{Full} & 96.1 & 96.6 & 98.4 \\
+Full & 96.1 & 96.6 & 98.4 \\
 Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
 Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
+Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 \\
+Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 \\
+Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 \\
 \bottomrule
-}
-\sbox0{\begin{tabular}{lrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/8\relax}
-\begin{tabular}{lrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Settings.} The full method uses $\eta=99$ and one persistence $q$ per object. F1 in \%, PSNR in dB.}
-\label{tab:supp_settings}}
+\end{tabular}
+\caption{\textbf{Parameter sensitivity (TSDF, BedRoom).} The full method uses $\eta=99$ and learns $q$ per object.
+Each variant changes one setting. F1 in \%.}
+\label{tab:supp_settings}
 \vspace{-2mm}
 \end{table}
 
