@@ -378,15 +378,30 @@ PSNR in dB and depth L1 in cm.}
 \end{table}
 
 \paragraph{Rendering over time.}
-The rendering tables evaluate the final maps after refinement, following GaME. On Home, mapping continues from
-the first visit into the second. For temporal PSNR (Sec.~5.1 of the main paper), both methods exclude the same
-held-out frames from mapping. For a held-out frame captured at time $t$, we select the first mapping round ending
-at or after $t$. After both visits, we query our 4D history to retrieve the map as it stood at the end of the selected round.
-We compare it with GaME's snapshot saved at that same time, so neither rendering uses updates from later rounds.
-We render each from the held-out frame's camera pose and compute PSNR against the captured image
-(\cref{tab:supp_heldout_history}).
-An earlier round can still show the layout seen in frames captured
-before a change, which helps explain the higher temporal PSNR for both methods.
+Both protocols render each held-out image $I_i$ from its camera pose. Let $R_i(M_i)$ denote this rendering of map $M_i$.
+With RGB values in $[0,1]$ and $\mathrm{MSE}_c$ averaged over the pixels of channel $c$, the score over held-out frames $H$ is
+\[
+  \mathrm{PSNR}(H)=\frac{1}{3|H|}\sum_{i\in H}\sum_{c\in\{R,G,B\}}
+  10\log_{10}\!\frac{1}{\mathrm{MSE}_c\bigl(I_i,R_i(M_i)\bigr)}.
+\]
+On Home, we refine the final map once, after the second visit. Reporting a refined PSNR for every mapping round
+would require refining each round's map separately.
+The table shows which map is rendered for a frame captured at $t_i$ and our PSNR in dB for each visit.
+\begin{center}
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Protocol & Map rendered at the frame's camera pose & Visit 1 (418 views) & Visit 2 (355 views) \\
+\midrule
+Final-map PSNR & Same refined final map for every frame & --- & 24.90 \\
+Temporal PSNR & Map at the first round ending at or after $t_i$ & 26.64 & 26.92 \\
+\bottomrule
+\end{tabular}
+\end{center}
+For temporal PSNR, we query our 4D history after both visits to retrieve the map as it stood at the end of each
+selected round, before final refinement. For GaME we render the snapshot saved at the same round, using the same
+held-out views (\cref{tab:supp_heldout_history}). Thus an object that moved during a visit can still appear at its
+earlier position when rendering an earlier view.
 
 \paragraph{CL-Splats.}
 CL-Splats~\cite{Ackermann_2025_ICCV} updates an existing Gaussian scene locally
@@ -441,11 +456,12 @@ the last one varies the settings. All scores follow the main paper.
 \paragraph{Change test (TSDF, BedRoom).}
 In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
 these four additional changes are missed (26 of 31 detected, \cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
-this recording and misses the same four. Without coverage weights, repeated views of the same patch prematurely end
-two static object states mid-visit. Later views rebuild both before the visit
-ends, so neither counts as a visit-end false positive. Overall, this variant
-detects 28 of 31 reference changes with no false positives, compared with 30
-of 31 for the full method. The lower rows test the map update: if ended objects
+this recording and misses the same four. Without coverage weights, repeated views of the same patch accumulate evidence
+of absence. The mapper temporarily removes two static objects, lowering object F1 during their absence. Later views
+rebuild both before the visit ends. In the second visit, the same effect ends a chair's state too early. Only part of
+the chair is rebuilt, so it goes unmatched in that visit's map and both its arrival and its subsequent departure are
+missed (28 of 31 changes detected, compared with 30 for the full method).
+The lower rows test the map update: if ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed; if elements are not tested one by one,
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
@@ -501,8 +517,9 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} keeps Gaussians that would otherwise retire with their object or individually.
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
-We disable the per-element surface test of Sec.~3.2. Objects are still retired as a whole,
-but Gaussians from the previous visit remain fixed during refinement.
+In \emph{No element test}, objects are still retired as a whole. Without the per-element surface test
+(Sec.~3.2; \cref{tab:supp_validity}) to confirm which earlier Gaussians remain present, refinement updates
+only Gaussians added during the current visit.
 Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
