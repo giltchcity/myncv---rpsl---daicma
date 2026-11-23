@@ -79,6 +79,7 @@
 \vspace{-9mm}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\theequation}{S\arabic{equation}}
 % ===== BEGIN sec / method_details =====
 \renewcommand{\thesection}{\Alph{section}}
 \section{Method Details}
@@ -153,11 +154,11 @@ the element test of the main paper retires an element that more views see throug
 \paragraph{TSDF updates.}
 The TSDF backend stores object states and background in separate volumes,
 so ending a state lets us retire its surface directly. Each TSDF voxel
-stores an aggregate of the rays fused into it. When a later decision changes
-which rays may contribute, we rebuild the affected blocks from archived
-depth frames. For observed motion, we keep recent depth frames in a short buffer.
-Once we confirm that the object has settled, we reconstruct its successor from the
-buffered views that show it at rest in its new position. We discard the frames after use.
+stores an aggregate of the rays fused into it. When observation validity changes,
+we rebuild the affected TSDF blocks. For observed motion, we briefly archive recent
+depth frames until we can confirm that the object has settled. We reconstruct its
+successor from the archived views that show it at rest in its new position, then
+discard the frames.
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
