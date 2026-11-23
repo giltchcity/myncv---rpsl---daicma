@@ -174,8 +174,8 @@ the camera looked elsewhere is not observed, so this round is the first time the
 round their site is first seen clearly. All three maps use
 these same intervals.
 
-With semantic labels alone, each 8-connected region of an object class gives one instance
-observation in that frame. We associate observations of the same class across frames by their 3D overlap.
+With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
+We associate regions of the same class across frames by their 3D overlap.
 
 SAM provides class-agnostic masks whose indices are local to each frame.
 We match depth samples to existing object surfaces in 3D and use the masks
@@ -339,18 +339,14 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 \vspace{-2mm}
 \end{table}
 
-\paragraph{Predicted segmentation.}
-We additionally report results with OneFormer-predicted
-segmentation. On BedRoom, both methods use the same
-OneFormer predictions without fine-tuning. Our TSDF
-map obtains mesh, object, and change F1 scores of
-95.9, 79.2, and 89.7; Khronos obtains 87.7, 42.8,
-and 59.1. For the Flat ablation, we use OneFormer Swin-L with ADE20K weights
+\paragraph{Segmentation inputs.}
+On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
+With annotated semantic labels, mesh, object, and change F1 are 96.0, 95.7, and 96.7.
+With OneFormer predictions obtained without fine-tuning, the scores are 95.8, 79.2, and 89.7.
+For the Flat ablation, we use OneFormer Swin-L with ADE20K weights
 and a confidence threshold of 0.5. We evaluate GaME with the same predicted
 masks as our method. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
-Predicted segmentation affects the reconstruction and
-change-detection accuracy of all methods, including ours.
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
