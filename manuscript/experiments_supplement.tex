@@ -155,8 +155,9 @@ The TSDF backend stores object states and background in separate volumes,
 so ending a state lets us retire its surface directly. Each TSDF voxel
 stores an aggregate of the rays fused into it. When a later decision changes
 which rays may contribute, we rebuild the affected blocks from archived
-depth frames. For observed motion, we retain a short buffer because later
-views establish which earlier frames already showed the object at rest.
+depth frames. For observed motion, we keep recent depth frames in a short buffer.
+Once we confirm that the object has settled, we reconstruct its successor from the
+buffered views that show it at rest in its new position. We discard the frames after use.
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
@@ -173,9 +174,6 @@ when it is first seen and ends at the round that confirms its change (Sec.~3.1 o
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
 round their site is first seen clearly. All three maps use
 these same intervals.
-
-For an object observed moving (Sec.~3.1 of the main paper), we reconstruct
-its successor using only buffered views that show it at rest in its new position.
 
 For BedRoom's annotated semantic masks, each 8-connected image region of an
 object class gives one instance observation in that frame. We associate
