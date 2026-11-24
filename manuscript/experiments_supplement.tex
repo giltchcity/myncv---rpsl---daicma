@@ -178,17 +178,12 @@ SAM provides class-agnostic masks whose indices are local to each frame.
 We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
-Across visits, an object observed again at the same site can continue its earlier state through 3D surface overlap,
+Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
 even with frame-local mask IDs. When it moves to a disjoint site, linking the old and new states requires persistent
-object identity. An earlier state ends when the change test confirms its absence. Within a visit, succession requires seeing the old site again with no sample supported there
-(Sec.~3.1 of the main paper). Across visits, a supported candidate of the same object can also establish relocation
-from its new site. Given the observations $D$, the posterior probabilities of persistence ($S$), relocation ($M$),
-and an invalid candidate ($U$) are proportional to $q$, $(1-q)B$, and $\Lambda_U$, respectively.
-Evidence from the new site alone establishes relocation when
-$P(M\mid D)>P(S\mid D)+P(U\mid D)$, equivalently $(1-q)B>q+\Lambda_U$.
-The geometry Bayes factor $B\leq 2$ increases with the fraction of the new surface outside the earlier one.
-We assign equal prior odds to a valid and an invalid candidate, so $\Lambda_U$ is the likelihood ratio of an invalid
-surface to a valid one from the candidate's own depth observations.
+object identity. An earlier state ends when the change test confirms its absence. Within a visit, a successor requires
+seeing the old site again with no sample supported there (Sec.~3.1 of the main paper). Across visits, a supported
+candidate of the same object can also establish the move from its new site alone, when the move is more probable than
+not given the persistence $q$ of the object and how much of the new surface lies outside the earlier one.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -432,13 +427,12 @@ For temporal rendering on BedRoom and Home, we hold out every tenth frame of eac
 as it stood at the end of the round containing each held-out frame. GaME renders its snapshot from the same round
 at the same camera pose (\cref{tab:supp_heldout_history}).
 
-\paragraph{Querying past layouts.}
-After both Home visits, we render the same 773 held-out views from the unrefined Gaussian map.
-With the final background fixed, restoring the objects present at each frame's round raises mean PSNR from
-19.74 to 22.10\,dB. At 24 scene times, we also compare renders from keyframe poses with the corresponding
-Isaac reference images. Restoring the object layout raises PSNR from 18.61 to 20.25\,dB, averaged first over
-poses at each time and then over times. The left table gives Mesh$_{\mathrm{4D}}$ F1 (\%) for the same two
-layouts, using each method's 25 Home queries and the ground-truth mesh at each time.
+\paragraph{What the history adds.}
+All comparisons of the main paper are on equal terms: every method answers a past time with its map of that time,
+with the background and the objects as known then. A map with a history can also use what was observed later, as ours
+and that of Khronos can: it returns the objects of that time on the final background, which later observations have
+completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) for all three of our map types and
+for Khronos (left table).
 
 \begin{table}[H]
 \noindent\begin{minipage}[t]{0.485\linewidth}
@@ -447,15 +441,13 @@ layouts, using each method's 25 Home queries and the ground-truth mesh at each t
 \toprule
  & \multicolumn{3}{c}{\ours} & \\
 \cmidrule(lr){2-4}
-Object layout & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
-Final & 79.57 & 77.11 & 77.64 & 73.70 \\
-At query time & 81.93 & 79.79 & 78.76 & 76.82 \\
+Background & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
+Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
+Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 \end{tabular*}
 \par\smallskip\raggedright
-Later observations also improve the background. For the 13 TSDF queries in Visit~1, we keep the objects at their
-respective times. Using the background from the end of Visit~2 in place of the Visit~1 background raises
-Mesh$_{\mathrm{4D}}$ F1 from 79.07 to 81.36.
+Both rows use the objects of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.
 \end{minipage}\hfill
 \begin{minipage}[t]{0.485\linewidth}
 \vspace{0pt}\centering\small
