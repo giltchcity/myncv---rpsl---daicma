@@ -596,10 +596,9 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 
 \pagebreak
 \paragraph{Settings.}
-On BedRoom, the result changes little with the threshold. With ground-truth instances, the default $\eta=99$ gives 96.1\% mesh, 96.6\% object, and 98.4\%
-change F1, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
-On a revisit, an object that often moves should need less evidence than one that usually stays, and this is what the prior encodes. With ground-truth instances, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1. With the noisier OneFormer semantic labels, the learned
-prior gives 89.7\%, against 83.0 to 85.2 for the fixed priors (\cref{tab:supp_settings}).
+On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
+prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
