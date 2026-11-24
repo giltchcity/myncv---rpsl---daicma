@@ -85,10 +85,12 @@
 \section{Method Details}
 \label{sec:supp_method}
 
-Every dense map fuses observations into its elements: TSDF volumes average them, Gaussian maps take gradient steps on a
-rendering loss, and occupancy maps sum log-odds. \ours can be used with any of these representations. In our
-experiments, each run builds one of them. It makes one change decision per object state by comparing its
-mapped surface with new depth observations. A state is represented by a group of map elements. These are surface geometry in a
+\ours lets a dense map follow a scene that changes within and across visits, and keeps its history. It does so with
+one change detection and one map update, which can be used with any of three dense map representations, a TSDF volume,
+a 3D Gaussian map, or an occupancy map. Every run in the main paper and here builds only one of them. The
+representations fuse observations differently. TSDF volumes average them, Gaussian maps take gradient steps on a
+rendering loss, and occupancy maps sum log-odds. In each, \ours makes one change decision per object state by comparing
+its mapped surface with new depth observations. A state is represented by a group of map elements. These are surface geometry in a
 TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
 together.
 
@@ -159,7 +161,7 @@ At the end of each visit, we release the archive and carry only the reconstructe
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
 $60^\circ$, and the default threshold is $\eta=99$. With the coverage weights, the score of Eq.~(2) of the main
 paper is a coverage-weighted variant of a sequential test, so $\eta$ is a threshold on this score and not an error rate
-(\cref{tab:supp_settings} varies it). The Beta model of a state matches the mean and robust variance of its rounds in
+(\cref{sec:supp_ablations} varies it). The Beta model of a state matches the mean and robust variance of its rounds in
 place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
 at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
 In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
@@ -180,7 +182,7 @@ has none. The maximum over candidates therefore lets the prior lower the evidenc
 moves, while an object that rarely moves needs at most the evidence of a change within the visit. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
-round their site is first seen clearly. The same intervals are used with every representation.
+round their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
 
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
 We associate regions of the same class across frames by their 3D overlap.
@@ -296,7 +298,7 @@ the reference scan.
 \paragraph{Metrics.}
 Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
-For both our method and the baselines, we extract objects from Gaussian and occupancy maps as connected components within each instance.
+For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance.
 Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
@@ -308,8 +310,8 @@ Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segment
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
 system supports: Khronos with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic
 Mapping and GaME as their segmented RGB-D input.
-All TSDF maps, ours and those of the baselines, use 5\,cm voxels on all four datasets, with the same
-truncation distance and maximum depth, and all occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
+All TSDF maps, ours and those of the baselines, use standard weighted-average fusion with 5\,cm voxels on all four
+datasets and the same truncation distance and maximum depth, and all occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
 use standard 3D Gaussian splatting with the same optimization settings.
 No map is reset between visits: Khronos, GaME, and Wavemap keep their map and continue on it in the next visit, and
 Panoptic Mapping loads the map of the preceding visit through its own interface.
@@ -410,8 +412,8 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
-\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV} on the
-images, poses, and held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
+\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV}, which takes
+images and poses without depth, on the held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
 \label{tab:supp_clsplats}
 \vspace{-2mm}
 \end{table}
@@ -477,6 +479,7 @@ of the query time; the first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
 \end{table}
 
 \section{Further Ablations}
+\label{sec:supp_ablations}
 
 The shared change test is ablated on BedRoom with TSDF maps; the next ablations test the update of each map type, and
 the last one varies the settings. All scores follow the main paper.
@@ -605,9 +608,10 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 
 \pagebreak
 \paragraph{Settings.}
-With annotated instances on BedRoom, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1.
-With OneFormer semantic labels, the learned prior gives 89.7\% change F1, against 83.0 to 85.2 for the fixed priors
-(\cref{tab:supp_settings}).
+With annotated instances on BedRoom, the default threshold $\eta=99$ gives 96.1\% mesh, 96.6\% object, and 98.4\%
+change F1. A threshold of $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+Learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1. With OneFormer semantic labels, the learned
+prior gives 89.7\% change F1, against 83.0 to 85.2 for the fixed priors (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
@@ -619,8 +623,6 @@ With OneFormer semantic labels, the learned prior gives 89.7\% change F1, agains
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
-Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 & \multicolumn{3}{c}{---} \\
-Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 & \multicolumn{3}{c}{---} \\
 Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
 Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
 Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
@@ -629,8 +631,8 @@ Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{lrrrrrr}\resultrows\end{tabular}
-\caption{\textbf{Parameter sensitivity (TSDF, BedRoom).} The full method uses $\eta=99$ and learns $q$ per object.
-Each variant changes one setting. F1 in \%.}
+\caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
+to one value. F1 in \%.}
 \label{tab:supp_settings}
 \vspace{-2mm}
 \end{table}
