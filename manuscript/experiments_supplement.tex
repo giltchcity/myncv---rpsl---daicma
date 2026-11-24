@@ -310,7 +310,7 @@ Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segment
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
 system supports: Khronos with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic
 Mapping and GaME as their segmented RGB-D input.
-All TSDF maps, ours and those of the baselines, use standard weighted-average fusion with 5\,cm voxels on all four
+All TSDF maps, ours and those of the baselines, are built by standard projective fusion~\cite{10.1145/237170.237269,6162880} with 5\,cm voxels on all four
 datasets and the same truncation distance and maximum depth, and all occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
 use standard 3D Gaussian splatting with the same optimization settings.
 No map is reset between visits: Khronos, GaME, and Wavemap keep their map and continue on it in the next visit, and
