@@ -105,8 +105,7 @@ observation cannot update a state that began after its capture. Where these cond
 each representation retains of its observations. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
 Occupancy maps retain only clamped log-odds sums, from which individual
-observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
-The update of each representation is given below.
+observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}). Free space of earlier visits is withdrawn when the object is first read (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives stays, but the clamp bounds it. With the Wavemap defaults, a cell at the lower bound of $-2$ gains 0.40 to 0.68 per reading just behind the measured surface, so the object appears within three to five readings.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -246,7 +245,7 @@ such as a table with its contents. Objects move while the camera looks elsewhere
 (\cref{fig:supp_home_a,fig:supp_home_b}) and between the visits, and three move in view.
 
 \paragraph{Flat and 3RScan.}
-Flat moves eight objects, adds five, and removes four between its two runs~\cite{9811877}.
+Flat is the two-run scene of Panoptic Mapping~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
 room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
 the reference scan.
@@ -542,7 +541,7 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
-Without the retention test, whole objects still retire and change F1 stays at 83.3, but PSNR falls from 28.43 to 23.80\,dB.
+Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}).
 
 \paragraph{Occupancy update (Home, Flat).}
 A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
@@ -558,7 +557,7 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \
 Full & 89.8 & 83.3 & 28.43 & 0.41 \\
 \addlinespace[7.5pt]
 No object retirement & 84.4 & 68.8 & 24.02 & 3.20 \\
-No retention test & 88.0 & 83.3 & 23.80 & 0.82 \\
+No retention test & 88.5 & 83.3 & 28.28 & 0.42 \\
 \addlinespace[7.5pt]
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
 \bottomrule
@@ -592,7 +591,6 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \vspace{-2mm}
 \end{table}
 
-\pagebreak
 \paragraph{Settings.}
 On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
 On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
