@@ -181,7 +181,7 @@ paper, only the candidate that spans the gap between visits carries this prior, 
 has none. The maximum over candidates therefore lets the prior lower the evidence needed for an object that often
 moves, while an object that rarely moves needs at most the evidence of a change within the visit. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
-the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
+the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home, and Flat, 51 of the 65 earlier states ended by the change test end in the
 round their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
 
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
@@ -296,7 +296,7 @@ the reference scan.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance.
 Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
@@ -386,7 +386,7 @@ instances; Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \end{table}
 
 \paragraph{Segmentation inputs.}
-For predicted segmentation on BedRoom and Flat, we use OneFormer Swin-L pretrained on ADE20K without further fine-tuning.
+For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
 Annotated and predicted semantic labels both give 96.0\% mesh F1.
 Object and change F1 are 95.7 and 96.7 with annotated labels, and 79.2 and 89.7 with predicted labels.
@@ -551,7 +551,7 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \emph{No retirement} keeps Gaussians that would otherwise retire with their object or individually.
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
 In \emph{No element test}, objects are still retired as a whole. Without the per-element surface test
-(Sec.~3.2; \cref{tab:supp_validity}) to confirm which earlier Gaussians remain present, refinement updates
+(Sec.~3.2 of the main paper; \cref{tab:supp_validity}) to confirm which earlier Gaussians remain present, refinement updates
 only Gaussians added during the current visit.
 Without the object states of the previous visit, one change is missed.
 
