@@ -280,7 +280,7 @@ Mesh F1 scores the map at the end of the last visit against the scene at that ti
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
 For both our method and the baselines, we extract objects from Gaussian and occupancy maps as connected components within each instance.
 Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
-LPIPS uses the AlexNet backbone. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
 In Table~2 of the main paper, \ours uses the annotated object IDs, including cross-visit IDs where the dataset provides them.
@@ -292,7 +292,7 @@ Each method continues through the chain of visits using its own map updates. Pan
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
 
 \paragraph{Map history.}
-We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map.
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds (approximately every 2\,s) across three visits, with the stored history occupying 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
 
 
 \section{Additional Results}
@@ -344,7 +344,7 @@ masks as our method. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
-\Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores maps from successive rounds on BedRoom and Home.
+\Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores the maps of successive rounds on Home.
 
 \begin{table}[H]
 \tablepair{%
@@ -378,54 +378,32 @@ PSNR in dB and depth L1 in cm.}
 & \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Visit (views) & GaME & Ours & GaME & Ours & GaME & Ours \\ \midrule
-\multicolumn{7}{l}{\emph{BedRoom}} \\
-1 (400) & 18.20 & \ob{18.60} & 0.782 & \ob{0.797} & 0.419 & \ob{0.406} \\
-2 (404) & 20.44 & \ob{21.46} & 0.797 & \ob{0.826} & 0.429 & \ob{0.382} \\
-3 (721) & 19.41 & \ob{20.68} & 0.782 & \ob{0.826} & 0.434 & \ob{0.369} \\
-All (1,525) & 19.37 & \ob{20.34} & 0.786 & \ob{0.819} & 0.428 & \ob{0.382} \\
-\midrule
-\multicolumn{7}{l}{\emph{Home}} \\
 1 (418) & 24.19 & \ob{26.64} & 0.872 & \ob{0.919} & 0.245 & \ob{0.199} \\
 2 (355) & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
-All (773) & 24.96 & \ob{26.77} & 0.884 & \ob{0.922} & 0.228 & \ob{0.176} \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{lrrrrrr}\resultrows\end{tabular}
 }{%
-\caption{\textbf{Rendering held-out views from their mapping rounds.} All scores are before refinement.
-PSNR is in dB. The pooled scores weight each view equally.}
+\caption{\textbf{Rendering over time on Home.} Each held-out view is rendered from the map of its round, before
+refinement. PSNR is in dB.}
 \label{tab:supp_heldout_history}}
 \vspace{-2mm}
 \end{table}
 
 \paragraph{Rendering over time.}
-For a held-out image $I_i$ captured at $t_i$, let $R_i(M_i)$ be the image rendered from map $M_i$ at its camera pose.
-Following GaME's evaluator, we compute PSNR per RGB channel and average over channels and held-out frames $H$.
-For RGB values in $[0,1]$ and mean squared pixel error $\mathrm{MSE}_c$ in channel $c$, this gives
-\[
-  \mathrm{PSNR}(H)=\frac{1}{3|H|}\sum_{i\in H}\sum_{c\in\{R,G,B\}}
-  10\log_{10}\!\frac{1}{\mathrm{MSE}_c\bigl(I_i,R_i(M_i)\bigr)}.
-\]
-The table below gives our Home PSNR before refinement. For the last column, we refine the Visit~2 end map
-and render the same 355 views again.
-\begin{center}
-\small
-\begin{tabular}{@{}llccc@{}}
-\toprule
-Protocol & \shortstack[l]{Map rendered at the\\frame's camera pose} &
-\shortstack{Visit 1\\(418 views)} & \shortstack{Visit 2\\(355 views)} &
-\shortstack{After refinement\\(Visit 2)} \\
-\midrule
-Final-map PSNR & Single map at the end of Visit~2 & --- & 23.49 & 24.90 \\
-Temporal PSNR & Map at the first round ending at or after $t_i$ & 26.64 & 26.92 & --- \\
-\bottomrule
-\end{tabular}
-\end{center}
-For temporal rendering on BedRoom and Home, we hold out every tenth frame of each visit. After the visits, we query our 4D map
-as it stood at the end of the round containing each held-out frame. GaME renders its snapshot from the same round
-at the same camera pose (\cref{tab:supp_heldout_history}).
+As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times as well as of the current
+time, each against its own photograph. We hold out every tenth frame of each visit and render each held-out frame from
+our 4D map as it stood at the end of the round containing it, before refinement. GaME renders its snapshot from the
+same round at the same camera pose (\cref{tab:supp_heldout_history}). On BedRoom, the same test gives 20.34\,dB for
+ours and 19.37\,dB for GaME over the three visits.
+
+On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
+final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
+renders all of them from the final map, which shows every object at its last place and cannot match frames taken
+before an object moved during the visit. Rendering over time holds out frames of every visit and renders each from the
+map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
 All comparisons of the main paper are on equal terms: every method answers a past time with its map of that time,
