@@ -349,10 +349,10 @@ masks as our method. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
-\Cref{tab:supp_instance_rendering} reports the rendering quality of the Gaussian runs of the main comparison.
+\Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores maps from successive rounds on BedRoom and Home.
 
 \begin{table}[H]
-\centering
+\tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -371,25 +371,50 @@ Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\do
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
-\vspace{-2mm}
+}{%
 \caption{\textbf{Rendering of the Gaussian maps of the main comparison.} With ground-truth instances, as in the main
 comparison; the rendering table of the main paper uses SAM masks. Held-out views after refinement;
 PSNR in dB and depth L1 in cm.}
-\label{tab:supp_instance_rendering}
+\label{tab:supp_instance_rendering}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Visit (views) & GaME & Ours & GaME & Ours & GaME & Ours \\ \midrule
+\multicolumn{7}{l}{\emph{BedRoom}} \\
+1 (400) & 18.20 & \ob{18.60} & 0.782 & \ob{0.797} & 0.419 & \ob{0.406} \\
+2 (404) & 20.44 & \ob{21.46} & 0.797 & \ob{0.826} & 0.429 & \ob{0.382} \\
+3 (721) & 19.41 & \ob{20.68} & 0.782 & \ob{0.826} & 0.434 & \ob{0.369} \\
+All (1,525) & 19.37 & \ob{20.34} & 0.786 & \ob{0.819} & 0.428 & \ob{0.382} \\
+\midrule
+\multicolumn{7}{l}{\emph{Home}} \\
+1 (418) & 24.19 & \ob{26.64} & 0.872 & \ob{0.919} & 0.245 & \ob{0.199} \\
+2 (355) & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
+All (773) & 24.96 & \ob{26.77} & 0.884 & \ob{0.922} & 0.228 & \ob{0.176} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Rendering held-out views from their mapping rounds.} All scores are before refinement.
+PSNR is in dB. The pooled scores weight each view equally.}
+\label{tab:supp_heldout_history}}
 \vspace{-2mm}
 \end{table}
 
 \paragraph{Rendering over time.}
-Both protocols render each held-out image $I_i$ from its camera pose. Let $R_i(M_i)$ denote this rendering of map $M_i$.
+For a held-out image $I_i$ captured at $t_i$, let $R_i(M_i)$ be the image rendered from map $M_i$ at its camera pose.
 Following GaME's evaluator, we compute PSNR per RGB channel and average over channels and held-out frames $H$.
 For RGB values in $[0,1]$ and mean squared pixel error $\mathrm{MSE}_c$ in channel $c$, this gives
 \[
   \mathrm{PSNR}(H)=\frac{1}{3|H|}\sum_{i\in H}\sum_{c\in\{R,G,B\}}
   10\log_{10}\!\frac{1}{\mathrm{MSE}_c\bigl(I_i,R_i(M_i)\bigr)}.
 \]
-On Home, we refine the final map once, after the second visit. Reporting a refined PSNR for every mapping round
-would require refining each round's map separately.
-The table below shows which map is rendered for a frame captured at $t_i$ and our PSNR in dB for each visit.
+The table below gives our Home PSNR before refinement. For the last column, we refine the Visit~2 end map
+and render the same 355 views again.
 \begin{center}
 \small
 \begin{tabular}{@{}llccc@{}}
@@ -398,58 +423,56 @@ Protocol & \shortstack[l]{Map rendered at the\\frame's camera pose} &
 \shortstack{Visit 1\\(418 views)} & \shortstack{Visit 2\\(355 views)} &
 \shortstack{After refinement\\(Visit 2)} \\
 \midrule
-Final-map PSNR & Same refined final map for every frame & --- & 24.90 & 24.90 \\
+Final-map PSNR & Single map at the end of Visit~2 & --- & 23.49 & 24.90 \\
 Temporal PSNR & Map at the first round ending at or after $t_i$ & 26.64 & 26.92 & --- \\
 \bottomrule
 \end{tabular}
 \end{center}
-For temporal PSNR, we query our 4D history after both visits to retrieve the map as it stood at the end of each
-selected round, before refinement. For GaME we render the snapshot saved at the same round, using the same
-held-out views (\cref{tab:supp_heldout_history}). Thus an object that moved during a visit can still appear at its
-earlier position when rendering an earlier view.
+For temporal rendering on BedRoom and Home, we hold out every tenth frame of each visit. After the visits, we query our 4D map
+as it stood at the end of the round containing each held-out frame. GaME renders its snapshot from the same round
+at the same camera pose (\cref{tab:supp_heldout_history}).
 
-\paragraph{CL-Splats.}
-CL-Splats~\cite{Ackermann_2025_ICCV} updates an existing Gaussian scene locally
-from sparse sets of views acquired at different times. For reference, we evaluate
-its released implementation on the same RGB images, camera poses, and held-out
-views (\cref{tab:supp_clsplats}).
+\paragraph{Querying past layouts.}
+After both Home visits, we render the same 773 held-out views from the unrefined Gaussian map.
+With the final background fixed, restoring the objects present at each frame's round raises mean PSNR from
+19.74 to 22.10\,dB. At 24 scene times, we also compare renders from keyframe poses with the corresponding
+Isaac reference images. Restoring the object layout raises PSNR from 18.61 to 20.25\,dB, averaged first over
+poses at each time and then over times. The left table gives Mesh$_{\mathrm{4D}}$ F1 (\%) for the same two
+layouts, using each method's 25 Home queries and the ground-truth mesh at each time.
 
 \begin{table}[H]
-\tablepair{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
+\noindent\begin{minipage}[t]{0.485\linewidth}
+\vspace{0pt}\centering\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
-& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Method & First & Second & First & Second & First & Second \\ \midrule
-GaME & 24.19 & 25.87 & 0.872 & 0.898 & 0.245 & 0.207 \\
-\oursname & \ob{26.64} & \ob{26.92} & \ob{0.919} & \ob{0.926} & \ob{0.199} & \ob{0.149} \\
+ & \multicolumn{3}{c}{\ours} & \\
+\cmidrule(lr){2-4}
+Object layout & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
+Final & 79.57 & 77.11 & 77.64 & 73.70 \\
+At query time & 81.93 & 79.79 & 78.76 & 76.82 \\
 \bottomrule
-}
-\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Held-out views of both visits on Home, each at its own time.} First and second visit; PSNR in dB.}
-\label{tab:supp_heldout_history}}{%
-\renewcommand{\arraystretch}{1.11}
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
+\end{tabular*}
+\par\smallskip\raggedright
+Later observations also improve the background. For the 13 TSDF queries in Visit~1, we keep the objects at their
+respective times. Using the background from the end of Visit~2 in place of the Visit~1 background raises
+Mesh$_{\mathrm{4D}}$ F1 from 79.07 to 81.36.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\linewidth}
+\vspace{0pt}\centering\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
 Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
 Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
 Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
 \bottomrule
-}
-\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{lrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{CL-Splats with its released code and default configuration.} Same held-out views and metrics as Tab.~4 of the main paper; PSNR in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}}
+\end{tabular*}
+\vspace{-2mm}
+\caption{\textbf{CL-Splats on held-out views.} CL-Splats~\cite{Ackermann_2025_ICCV} updates a Gaussian scene from
+sparse views acquired at different times. We use its released defaults with the RGB images, poses and held-out views
+of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
+\label{tab:supp_clsplats}
+\end{minipage}
 \vspace{-2mm}
 \end{table}
 
