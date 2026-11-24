@@ -283,7 +283,8 @@ Change F1 pools events across visits. An unchanged object counts as a false posi
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-All methods receive the same input data in Table~2 of the main paper.
+In each comparison in Table~2 of the main paper, our method and the baselines are given the same RGB-D frames,
+camera poses, and segmentation inputs.
 Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
 
 \paragraph{3RScan.}
@@ -332,12 +333,11 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 \end{table}
 
 \paragraph{Segmentation inputs.}
+For predicted segmentation on BedRoom and Flat, we use OneFormer Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
-Annotated semantic labels and OneFormer predictions obtained without fine-tuning both give about 96\% mesh F1.
+Annotated and predicted semantic labels both give about 96\% mesh F1.
 Object and change F1 are 95.7 and 96.7 with annotated labels, and 79.2 and 89.7 with predicted labels.
-For the Flat ablation, we use OneFormer Swin-L with ADE20K weights
-and a confidence threshold of 0.5. We evaluate GaME with the same predicted
-masks as our method. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
+On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
 All F1 scores are in percent.
 
