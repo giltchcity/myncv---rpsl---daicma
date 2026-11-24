@@ -159,30 +159,6 @@ The retention test of the main paper retires an element that more views see thro
 During a visit, we archive every depth frame with its pose and instance labels. Ranges are delta coded and labels run-length coded, and the archive peaks at roughly 0.7\,GB over all evaluated visits. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from it, so \cref{eq:supp_tsdf} holds for every ray of the visit. The surface band of an earlier ray stays valid, because the surface it ended on is still in the map.
 At the end of each visit, we release the archive and carry only the reconstructed surfaces forward.
 
-\paragraph{Change detection.}
-The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
-$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, and a small part of the surface cannot end a state. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate
-(\cref{sec:supp_ablations} varies it). The Beta model of a state matches the mean and robust variance of its rounds in
-place, with the pooled statistics of all objects counted as three more rounds. Its variance is at least that of the pool and
-at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
-In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
-$\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the mean of $f$ over the rounds of state $s$ in place.
-A see-through fraction below this mean therefore does not raise the score.
-Persistence $q$ is the mean of a Beta-Bernoulli model over the
-outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$). It is
-$q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and
-$g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other
-classes of its group. We set $\kappa=1$ for classes of small objects that are easily moved, such as chairs, tables, and bags, and $0$ for
-the others, such as beds. This choice
-counts as one outcome and only sets the starting value of $q$, $1/4$ for the easily moved classes and $3/4$ for the others. It does not
-decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen
-again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often
-moves. An object that rarely moves needs at most the evidence of a change within the visit. A state begins
-when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper). A change made while
-the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the
-round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
-
-
 \begin{figure}[!t]
 \centering
 \begin{minipage}{0.66\linewidth}
@@ -191,18 +167,18 @@ round in which their site is first seen clearly. Every run sets these intervals 
 \label{alg:supp_state}
 \begin{algorithmic}[1]
 \State $n,k\gets$ samples of $s$ seen and seen through in this round
-\If{$n\ge\min(30,\text{all reliable})$}
-  \State $\ell\gets-\log p_{\mathrm{Beta},s}(k/n)$
+\If{enough of $s$ is in view}
+  \State $\ell\gets\ell_s(k/n)$
   \State $P_j\gets P_j+w(j)\,\ell$ for every candidate change time $j$
 \EndIf
-\State $L\gets\max_j\bigl(\pi_s(j)+P_j\bigr)$
-\If{$L>\ln\eta$ \textbf{and} see-through rays outnumber supporting rays}
+\State $L\gets\max_j\bigl(\pi_s(j)+P_j\bigr)$, reached at $j^\ast$
+\If{$L>\ln\eta$ \textbf{and} see-through samples since $j^\ast$ outnumber supported ones}
   \State end $s$ at this round
 \EndIf
 \If{a candidate $c$ of the same object is at another place}
   \If{the old site is seen again with no support}
     \State end $s$, and $c$ succeeds it
-  \ElsIf{across visits \textbf{and} $(1-q)\,B>q+\Lambda$}
+  \ElsIf{across visits \textbf{and} a move is more likely than a stay}
     \State end $s$, and $c$ succeeds it
   \EndIf
 \EndIf
@@ -211,6 +187,20 @@ round in which their site is first seen clearly. Every run sets these intervals 
 \end{minipage}
 \end{figure}
 
+\paragraph{Change detection.}
+The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
+$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, and a small part of the surface cannot end a state. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
+
+\paragraph{Noise model.}
+Each state has its own Beta model of the see-through fraction $f$, fitted to its rounds in place together with the pooled statistics of all objects. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\max\{m_s,f\})$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
+
+\paragraph{Persistence prior.}
+Persistence $q$ is learned from the outcomes of earlier revisits, at which a state had either continued or changed. It is the mean of a Beta-Bernoulli model over the outcomes of the object, with those of its class and of its group as the prior. Classes of small objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome and does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
+
+\paragraph{State intervals.}
+A state begins when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper). A change made while the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
+
+\paragraph{Masks.}
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
 We associate regions of the same class across frames by their 3D overlap.
 
@@ -219,7 +209,7 @@ We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
 Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
-even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. $B\le 2$ grows with the share of the candidate that lies outside the earlier surface, and $\Lambda$ is the evidence from the surface of the candidate itself, 1 if there is none. A successor replaces the earlier state, so no map shows the object at both places.
+even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. Across visits, a move is judged more likely than a stay from $q$ and from the share of the candidate that lies outside the earlier surface. A successor replaces the earlier state, so no map shows the object at both places.
 
 \section{Datasets}
 \label{sec:supp_datasets}
