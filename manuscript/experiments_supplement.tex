@@ -299,7 +299,7 @@ the reference scan.
 Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance.
-Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
+Change F1 is scored on the map at the end of each visit and pools the events of all visits. An unchanged object counts as a false positive if it is missing at visit end.
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
