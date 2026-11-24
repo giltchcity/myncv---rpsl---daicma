@@ -543,7 +543,6 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
 Without the retention test, whole objects still retire and change F1 stays at 83.3, but PSNR falls from 28.43 to 23.80\,dB.
-The last row drops the object states that a new visit normally resumes from the previous one. With no earlier state to judge, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
 A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
@@ -559,9 +558,8 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \
 Full & 89.8 & 83.3 & 28.43 & 0.41 \\
 No object retirement & 84.4 & 68.8 & 24.02 & 3.20 \\
 No retention test & 88.0 & 83.3 & 23.80 & 0.82 \\
+\addlinespace[15pt]
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
-\addlinespace[4pt]
-No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
