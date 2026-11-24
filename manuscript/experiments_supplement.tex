@@ -168,9 +168,10 @@ $\min(30, \text{all reliable})$ samples. Persistence $q$ is the mean of a Beta--
 outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$):
 $q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and
 $g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other
-classes of its group; $\kappa=1$ for classes on a fixed list of easily moved objects and $0$ otherwise. The list
-weighs as a single outcome and only sets the starting value of $q$, $1/4$ for listed classes and $3/4$ for the others. It does not
-decide the result: on Home, the bed is not on the list and starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen
+classes of its group; $\kappa=1$ for classes of small objects that are easily moved, such as chairs, tables, and bags, and $0$ for
+the others, such as beds. This choice
+weighs as a single outcome and only sets the starting value of $q$, $1/4$ for the easily moved classes and $3/4$ for the others. It does not
+decide the result: on Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen
 again at the same site continues its state by 3D overlap, so the outcomes are still counted. In Eq.~(2) of the main
 paper, only the candidate that spans the gap between visits carries this prior, and every candidate within the visit
 has none. The maximum over candidates therefore lets the prior lower the evidence needed for an object that often
@@ -226,6 +227,9 @@ field-of-view unbinned depth mode, with depth aligned to RGB.
 For mapping, we downsample the RGB-D frames to 960$\times$540. Within each visit, camera poses come from
 ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the
 second and third visits to the first using landmark correspondences, automatic registration, and manual refinement.
+The geometry reference of each visit is a mesh at 1\,cm resolution, fused by TSDF integration in Open3D. Pixels of
+the person are left out, and an object that moves within the visit is fused only from the frames after it has settled,
+so the reference shows the scene at the end of the visit.
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities; people are
 labeled as moving. The only person in the recordings is a volunteer, who gave explicit consent to the recording and to the
 publication and sharing of the data for research. No ethics review was carried out, because the only person recorded
@@ -301,7 +305,11 @@ Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segment
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
 system supports: Khronos with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic
 Mapping and GaME as their segmented RGB-D input.
-Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
+All TSDF maps, ours and those of the baselines, use 5\,cm voxels on all four datasets, with the same
+truncation distance and maximum depth, and all occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
+use standard 3D Gaussian splatting with the same optimization settings.
+No map is reset between visits: Khronos, GaME, and Wavemap keep their map and continue on it in the next visit, and
+Panoptic Mapping loads the map of the preceding visit through its own interface.
 
 \paragraph{3RScan.}
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events; a reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
@@ -415,7 +423,7 @@ same round at the same camera pose (\cref{tab:supp_heldout_history}).
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
 final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
 renders all of them from the final map, which shows every object at its last place and cannot match frames taken
-before an object moved during the visit. Rendering over time holds out frames of every visit and renders each from the
+before an object moved during the visit. The same mismatch raises its depth L1 on Home. Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
