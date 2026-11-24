@@ -481,26 +481,18 @@ of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
 \section{Further Ablations}
 \label{sec:supp_ablations}
 
-The shared change test is ablated on BedRoom with TSDF maps. The next ablations test the update of each map type, and
-the last one varies the settings. All scores follow the main paper.
-
 \paragraph{Change test (TSDF, BedRoom).}
-In the third visit, two objects are carried out of the room and two changes happen during the visit. Without the change test,
-these four additional changes are missed (26 of 31 detected, \cref{tab:supp_change_test}). One noise model for all objects never reaches the threshold on
-this recording and misses the same four. Without coverage weights, repeated views of the same patch accumulate evidence
-of absence. The mapper temporarily removes two static objects, which lowers object F1 during their absence. Later views
-rebuild both before the visit ends. In the second visit, the same effect ends a chair's state too early. Only part of
-the chair is rebuilt, so it goes unmatched in that visit's map. Both its arrival and its later departure are
-missed (28 of 31 changes detected, against 30 for the full method).
-The lower rows test the map update. If ended objects
-are not retired as a whole, moved objects stay and 12 more changes are missed. Without the retention test,
+In the third visit to BedRoom, two objects are carried out of the room. Neither is seen moving or found elsewhere. The evidence of their departure is at the old sites, where new depth rays pass through their former surfaces. Two more changes happen during the visit. Without the change test, these four are missed (26 of 31 detected, \cref{tab:supp_change_test}).
+The same see-through fraction can be routine for one object and unusual for another. With one noise model for all objects, the threshold is never reached on this recording, and the same four are missed.
+Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up. Two static objects are removed until later views rebuild them, which lowers object F1. In the second visit, a chair's state ends too early and only part of it is rebuilt, so its arrival and its later departure are both missed (28 of 31 detected).
+A decision helps only once the map follows it. If ended objects
+are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test does a different job, because not every stale surface belongs to a state. Without it, change F1 is unchanged, but
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
-Without valid domains, frames that saw a moved object at its old site fuse it back, and frames captured before an
-object arrived carve its new site. On Home, change F1 and mesh F1 both fall
-(\cref{tab:supp_valid_domains}). Flat is not affected. Its changes all happen between visits, and an earlier visit
-enters the next one as surfaces only, so no old frame is fused there.
+A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
+(\cref{tab:supp_valid_domains}). On Flat, all changes happen between visits, and an earlier visit
+enters the next one as surfaces only, so no earlier frame remains and nothing changes.
 
 \begin{table}[H]
 \tablepair{%
@@ -548,18 +540,14 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \end{table}
 
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
-\emph{No retirement} keeps Gaussians that would otherwise retire with their object or individually.
+In Gaussian maps, object retirement and the retention test show in different scores.
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
-In \emph{No retention test}, objects are still retired as a whole. Without the retention test
-(Sec.~3.2 of the main paper and \cref{tab:supp_validity}), no earlier Gaussian is confirmed present, and refinement updates
-only the Gaussians added during the current visit.
+The retention test (\cref{tab:supp_validity}) also confirms which earlier Gaussians can still be refined. Without it, whole objects still retire, but refinement updates
+only the Gaussians added during the current visit. Change F1 stays at 83.3 while PSNR falls from 28.43 to 23.80\,dB. \emph{No retirement} of the main paper removes both.
 Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
-Subtracting the saved log-odds removes free space of earlier visits that would otherwise oppose newly
-occupied cells. Local replacement clears stale occupied cells behind newly measured surfaces. Both
-improve the geometry and leave the change decisions as they are, so change F1 stays
-the same when either is disabled (\cref{tab:supp_occupancy_ablation}).
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
@@ -608,10 +596,10 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 
 \pagebreak
 \paragraph{Settings.}
-With ground-truth instances on BedRoom, the default threshold $\eta=99$ gives 96.1\% mesh, 96.6\% object, and 98.4\%
-change F1. A threshold of $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
-Learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1. With OneFormer semantic labels, the learned
-prior gives 89.7\% change F1, against 83.0 to 85.2 for the fixed priors (\cref{tab:supp_settings}).
+On BedRoom, the result changes little with the threshold. With ground-truth instances, the default $\eta=99$ gives 96.1\% mesh, 96.6\% object, and 98.4\%
+change F1, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+On a revisit, an object that often moves should need less evidence than one that usually stays, and this is what the prior encodes. With ground-truth instances, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1. With the noisier OneFormer semantic labels, the learned
+prior gives 89.7\%, against 83.0 to 85.2 for the fixed priors (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
