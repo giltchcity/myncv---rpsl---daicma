@@ -165,7 +165,7 @@ $\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the in-place mean for 
 Thus, reducing the see-through fraction below the in-place mean does not increase the change score.
 A round is scored once it judges
 $\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
-object's own outcomes update a prior from its class, whose own prior is the mean of its mobility group. A state begins
+object's own outcomes update a prior from its class. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
 round their site is first seen clearly. All three maps use
