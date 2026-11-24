@@ -283,9 +283,7 @@ Change F1 pools events across visits. An unchanged object counts as a false posi
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-In Table~2 of the main paper, \ours uses the annotated object IDs, including cross-visit IDs where the dataset provides them.
-All methods have access to the same masks and IDs.
-The BedRoom semantic-input runs and the Flat and Aria SAM runs use no annotated instance IDs.
+All methods receive the same input data in Table~2 of the main paper.
 Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
 
 \paragraph{3RScan.}
@@ -335,8 +333,8 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 
 \paragraph{Segmentation inputs.}
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
-With annotated semantic labels, mesh, object, and change F1 are 96.0, 95.7, and 96.7.
-With OneFormer predictions obtained without fine-tuning, the scores are 95.8, 79.2, and 89.7.
+Annotated semantic labels and OneFormer predictions obtained without fine-tuning both give about 96\% mesh F1.
+Object and change F1 are 95.7 and 96.7 with annotated labels, and 79.2 and 89.7 with predicted labels.
 For the Flat ablation, we use OneFormer Swin-L with ADE20K weights
 and a confidence threshold of 0.5. We evaluate GaME with the same predicted
 masks as our method. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
@@ -396,8 +394,7 @@ refinement. PSNR is in dB.}
 As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times as well as of the current
 time, each against its own photograph. We hold out every tenth frame of each visit and render each held-out frame from
 our 4D map as it stood at the end of the round containing it, before refinement. GaME renders its snapshot from the
-same round at the same camera pose (\cref{tab:supp_heldout_history}). On BedRoom, the same test gives 20.34\,dB for
-ours and 19.37\,dB for GaME over the three visits.
+same round at the same camera pose (\cref{tab:supp_heldout_history}).
 
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
 final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
@@ -569,25 +566,28 @@ Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
 \end{table}
 
 \paragraph{Settings.}
-On BedRoom, TSDF change F1 ranges from 96.7 to 98.4 across the tested decision thresholds
-and persistence values (\cref{tab:supp_settings}).
+With annotated instances on BedRoom, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1.
+With OneFormer semantic labels, the learned prior detects 26 of 31 changes, compared with 22 or 23 for the fixed priors
+(\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{lrrr}
+\begin{tabular}{lrrrrrc}
 \toprule
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-Full & 96.1 & 96.6 & 98.4 \\
-Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 \\
-Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 \\
-Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 \\
-Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 \\
-Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 \\
+& \multicolumn{3}{c}{Annotated instances} & \multicolumn{3}{c}{OneFormer semantic labels} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & TP/FP/FN \\ \midrule
+Full & 96.1 & 96.6 & 98.4 & 79.2 & 89.7 & 26/1/5 \\
+Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 & \multicolumn{3}{c}{---} \\
+Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 & \multicolumn{3}{c}{---} \\
+Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 78.7 & 85.2 & 23/0/8 \\
+Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 77.7 & 83.0 & 22/0/9 \\
+Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 79.5 & 83.6 & 23/1/8 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Parameter sensitivity (TSDF, BedRoom).} The full method uses $\eta=99$ and learns $q$ per object.
-Each variant changes one setting. F1 in \%.}
+Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
 \label{tab:supp_settings}
 \vspace{-2mm}
 \end{table}
