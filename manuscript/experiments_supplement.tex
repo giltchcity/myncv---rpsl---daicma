@@ -141,7 +141,7 @@ The first object reading in a cell that earlier visits saw free withdraws their 
 \midrule
 Earlier visit\newline undecided &
 Earlier visits contribute surfaces but no free space. &
-Earlier Gaussians receive current updates only after being confirmed unchanged. &
+Earlier Gaussians are resumed with their object states and judged by the same rule. &
 The log-odds $L_0(c)$ is saved at the start of the visit for later withdrawal. \\
 \bottomrule
 \end{tabular}
@@ -492,7 +492,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
 (\cref{tab:supp_valid_domains}). On Flat, all changes happen between visits, and an earlier visit
-enters the next one as surfaces only, so no earlier frame remains and nothing changes.
+enters the next one as surfaces only, so no earlier frame remains and the scores stay within 0.1 points.
 
 \begin{table}[H]
 \tablepair{%
@@ -542,8 +542,7 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
-The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. It also confirms the Gaussians of the previous visit before they are refined (\cref{tab:supp_validity}). Without it, whole objects still retire and change F1 stays at 83.3, but refinement updates
-only the Gaussians added during the current visit, and PSNR falls from 28.43 to 23.80\,dB.
+The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, whole objects still retire and change F1 stays at 83.3, but PSNR falls from 28.43 to 23.80\,dB.
 Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
