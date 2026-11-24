@@ -72,9 +72,13 @@
 \usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
 \def\confName{CVPR}
 \def\confYear{2027}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\renewcommand{\thealgorithm}{S\arabic{algorithm}}
 \title{REVAMAP: Reconstruction from Evolving Views Across Maps and Passes\\Supplementary Material}
 \author{Anonymous Authors}
 \begin{document}
+\crefname{algorithm}{Alg.}{Algs.}\Crefname{algorithm}{Algorithm}{Algorithms}
 \maketitle
 \vspace{-9mm}
 \renewcommand{\thetable}{S\arabic{table}}
@@ -166,8 +170,7 @@ at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see
 In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
 $\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the mean of $f$ over the rounds of state $s$ in place.
 A see-through fraction below this mean therefore does not raise the score.
-A round is scored once it judges
-$\min(30, \text{all reliable})$ samples. Persistence $q$ is the mean of a Beta-Bernoulli model over the
+Persistence $q$ is the mean of a Beta-Bernoulli model over the
 outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$). It is
 $q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and
 $g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other
@@ -175,13 +178,40 @@ classes of its group. We set $\kappa=1$ for classes of small objects that are ea
 the others, such as beds. This choice
 counts as one outcome and only sets the starting value of $q$, $1/4$ for the easily moved classes and $3/4$ for the others. It does not
 decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen
-again at the same site continues its state by 3D overlap, so the outcomes are still counted. In Eq.~(2) of the main
-paper, only the candidate that spans the gap between visits carries this prior, and every candidate within the visit
-has none. With the maximum over candidates, the prior lowers the evidence needed for an object that often
+again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often
 moves. An object that rarely moves needs at most the evidence of a change within the visit. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper). A change made while
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the
 round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
+
+
+\begin{figure}[!t]
+\centering
+\begin{minipage}{0.66\linewidth}
+\begin{algorithm}[H]
+\caption{Update of an object state $s$ in one round}
+\label{alg:supp_state}
+\begin{algorithmic}[1]
+\State $n,k\gets$ samples of $s$ seen and seen through in this round
+\If{$n\ge\min(30,\text{all reliable})$}
+  \State $\ell\gets-\log p_{\mathrm{Beta},s}(k/n)$
+  \State $P_j\gets P_j+w(j)\,\ell$ for every candidate change time $j$
+\EndIf
+\State $L\gets\max_j\bigl(\pi_s(j)+P_j\bigr)$
+\If{$L>\ln\eta$ \textbf{and} see-through rays outnumber supporting rays}
+  \State end $s$ at this round
+\EndIf
+\If{a candidate $c$ of the same object is at another place}
+  \If{the old site is seen again with no support}
+    \State end $s$, and $c$ succeeds it
+  \ElsIf{across visits \textbf{and} $(1-q)\,B>q+\Lambda$}
+    \State end $s$, and $c$ succeeds it
+  \EndIf
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{figure}
 
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
 We associate regions of the same class across frames by their 3D overlap.
@@ -191,10 +221,7 @@ We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
 Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
-even with frame-local mask IDs. An earlier state ends when the change test confirms its absence. Within a visit, a successor requires
-seeing the old site again with no sample supported there (Sec.~3.1 of the main paper). Across visits, a supported
-candidate of the same object can also establish the move from its new site alone. The move must then be more probable than
-not, given the persistence $q$ of the object and how much of the new surface lies outside the earlier one.
+even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. $B\le 2$ grows with the share of the candidate that lies outside the earlier surface, and $\Lambda$ is the evidence from the surface of the candidate itself, 1 if there is none. A successor starts at its first frame at the new site.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -387,14 +414,14 @@ instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \paragraph{Segmentation inputs.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
-Ground-truth and predicted semantic labels both give 96.0\% mesh F1.
-Object and change F1 are 95.7 and 96.7 with ground-truth labels, and 79.2 and 89.7 with predicted labels.
+Ground-truth and predicted semantic labels both give 96.0\% mesh F1, and object F1 is 95.7 and 79.2.
+Identities are not what detects a change. A state ends by the test on its own surface at the old site, and an identity only links it to the state at the new site (Sec.~3.1 of the main paper). Semantic labels carry no instances and no identities. With ground-truth semantic labels, change F1 is 96.7, against 98.4 with instances. With OneFormer labels it is 89.7, still above the 70.8 of Khronos with ground-truth instances.
 On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
-With ground-truth instances, \ours renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}). For reference, \cref{tab:supp_clsplats} reports CL-Splats~\cite{Ackermann_2025_ICCV} on the held-out views of Tab.~4 of the main paper.
+With ground-truth instances, \ours renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}). On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME skips a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME skips a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map. For reference, \cref{tab:supp_clsplats} reports CL-Splats~\cite{Ackermann_2025_ICCV} on the held-out views of Tab.~4 of the main paper.
 
 \begin{table}[H]
 \centering
@@ -624,7 +651,7 @@ to one value. F1 in \%.}
 
 \Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat. The supplementary video shows the maps over time, with observed changes and changes while away, within and between visits.
 
-\begin{figure}[H]
+\begin{figure}[!t]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
@@ -690,7 +717,6 @@ to one value. F1 in \%.}
 \label{fig:supp_qual}
 \end{figure}
 
-\FloatBarrier
 {\footnotesize
 \setlength{\bibsep}{0pt plus 0.3ex}
 \bibliographystyle{ieeenat_fullname}
