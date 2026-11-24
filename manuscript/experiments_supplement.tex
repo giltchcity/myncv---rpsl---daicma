@@ -167,7 +167,7 @@ At the end of each visit, we release the archive and carry only the reconstructe
 \label{alg:supp_state}
 \begin{algorithmic}[1]
 \State $n,k\gets$ samples of $s$ seen and seen through in this round
-\If{enough of $s$ is in view}
+\If{$n\ge\min(30,\text{all reliable})$}
   \State $\ell\gets\ell_s(k/n)$
   \State $P_j\gets P_j+w(j)\,\ell$ for every candidate change time $j$
 \EndIf
@@ -178,7 +178,7 @@ At the end of each visit, we release the archive and carry only the reconstructe
 \If{a candidate $c$ of the same object is at another place}
   \If{the old site is seen again with no support}
     \State end $s$, and $c$ succeeds it
-  \ElsIf{across visits \textbf{and} a move is more likely than a stay}
+  \ElsIf{across visits \textbf{and} $(1-q)\,B>q+\Lambda$}
     \State end $s$, and $c$ succeeds it
   \EndIf
 \EndIf
@@ -192,10 +192,10 @@ The depth tolerance equals the map resolution (a 5\,cm reference scale for Gauss
 $60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, so repeated views of a small patch add no further evidence. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
 
 \paragraph{Noise model.}
-Each state has its own Beta model of the see-through fraction $f$, fitted to its rounds in place together with the pooled statistics of all objects. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\max\{m_s,f\})$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
+Each state has its own Beta model of the see-through fraction $f$. It matches the mean and robust variance of the rounds of the state in place, with the pooled statistics of all objects counted as three more rounds. Without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\max\{m_s,f\})$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
 
 \paragraph{Persistence prior.}
-Persistence $q$ is learned from the outcomes of earlier revisits, at which a state had either continued or changed. It is the mean of a Beta-Bernoulli model over the outcomes of the object, with those of its class and of its group as the prior. Classes of small objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome and does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
+Persistence $q$ is learned from the outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$). It is the mean of a Beta-Bernoulli model, $q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and $g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other classes of its group. We set $\kappa=1$ for classes of small objects that are easily moved, such as chairs, tables, and bags, and $0$ for the others, such as beds. This choice counts as one outcome and only sets the starting value of $q$, $1/4$ for the easily moved classes and $3/4$ for the others. It does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
 
 \paragraph{State intervals.}
 A state begins when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper). A change made while the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
@@ -209,7 +209,7 @@ We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
 Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
-even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. Across visits, this decision uses persistence $q$, the overlap of the candidate with the earlier surface, and the evidence from its own surface. A successor replaces the earlier state, so no map shows the object at both places.
+even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. In line 11, $B=2\Pr(\theta>\tfrac12)$ with $\theta\sim\mathrm{Beta}(\tfrac12+N\rho,\,\tfrac12+N(1-\rho))$, where $\rho$ is the share of the candidate that lies outside the earlier surface and $N$ its effective number of cells. $\Lambda$ is the likelihood ratio of the change test on the surface of the candidate itself, 1 if that surface has not been tested. A successor replaces the earlier state, so no map shows the object at both places.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -262,7 +262,7 @@ such as a table with its contents. Objects move while the camera looks elsewhere
 Flat is the two-run scene of Panoptic Mapping~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
 room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
-the reference scan. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated.
+the reference scan. The eight rooms were picked arbitrarily among those that meet this criterion, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated.
 
 \begin{figure}[p]
 \centering
