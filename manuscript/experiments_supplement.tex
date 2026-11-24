@@ -164,8 +164,14 @@ In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, w
 $\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$ and $m_s$ is the in-place mean for state $s$.
 Thus, reducing the see-through fraction below the in-place mean does not increase the change score.
 A round is scored once it judges
-$\min(30, \text{all reliable})$ samples. Persistence $q$ follows a Beta--Bernoulli model of unchanged and moved outcomes: the
-object's own outcomes update a prior from its class. A state begins
+$\min(30, \text{all reliable})$ samples. Persistence $q$ is the mean of a Beta--Bernoulli model over the
+outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$):
+$q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and
+$g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other
+classes of its group; $\kappa=1$ for classes on a fixed list of easily moved objects and $0$ otherwise. The list
+weighs as a single outcome and only sets the starting value of $q$, $1/4$ for listed classes and $3/4$ for the others. It does not
+decide the result: on Home, the bed is not on the list and starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen
+again at the same site continues its state by 3D overlap, so the outcomes are still counted. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
 round their site is first seen clearly. All three maps use
@@ -183,7 +189,8 @@ even with frame-local mask IDs. When it moves to a disjoint site, linking the ol
 object identity. An earlier state ends when the change test confirms its absence. Within a visit, a successor requires
 seeing the old site again with no sample supported there (Sec.~3.1 of the main paper). Across visits, a supported
 candidate of the same object can also establish the move from its new site alone, when the move is more probable than
-not given the persistence $q$ of the object and how much of the new surface lies outside the earlier one.
+not given the persistence $q$ of the object and how much of the new surface lies outside the earlier one. Without a
+shared identity, this last case does not apply, and the earlier state ends only once its site is seen again.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -213,12 +220,15 @@ looks away, as in \cref{tab:supp_change_kinds}; Home also has three motions in v
 \end{table}
 
 \paragraph{ReviScene-BedRoom.}
-We record three visits to a real bedroom at 1920$\times$1080 and 30\,Hz, with depth aligned to RGB.
-For mapping, we downsample the RGB-D frames to 960$\times$540. We register the
+We record three visits to a real bedroom with an Azure Kinect at 1920$\times$1080 and 30\,Hz, in its narrow
+field-of-view unbinned depth mode, with depth aligned to RGB.
+For mapping, we downsample the RGB-D frames to 960$\times$540. Within each visit, camera poses come from
+ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the
 second and third visits to the first using landmark correspondences, automatic registration, and manual refinement.
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities; people are
-labeled as moving. The participant consented to being recorded, and we blur their face in the figures.
-No ethics review was conducted.
+labeled as moving. The only person in the recordings is a volunteer, who gave explicit consent to the recording and to the
+publication and sharing of the data for research. No ethics review was carried out, because the only person recorded
+is this consenting volunteer. To protect privacy, the face is masked in the released data and blurred in the figures.
 
 \paragraph{ReviScene-Home.}
 Home animates objects and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}.
@@ -276,15 +286,19 @@ the reference scan.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. These maps are read after the last visit has finished: ours and Khronos' from their 4D maps, those of methods without a history from maps recorded at the same times.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
 For both our method and the baselines, we extract objects from Gaussian and occupancy maps as connected components within each instance.
 Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-In each comparison in Table~2 of the main paper, our method and the baselines are given the same RGB-D frames,
-camera poses, and segmentation inputs.
+In each comparison in Tab.~2 of the main paper, our method and the baselines are given exactly the same input.
+The baselines were published with different mask sources: Khronos~\cite{Schmid-RSS-24} with simulator semantics,
+Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segmentation, and
+GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
+system supports: Khronos with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic
+Mapping and GaME as their segmented RGB-D input.
 Each method continues through the chain of visits using its own map updates. Panoptic Mapping loads the preceding visit's map through its own interface.
 
 \paragraph{3RScan.}
@@ -301,8 +315,8 @@ We record changes to map elements over time, so the 4D map can be queried at eve
 We score the three motions observed on Home separately. They yield six state transitions, one departure and one arrival per motion.
 Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%, respectively).
 Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
-On Home visits 1 and 2, single-visit \emph{Dyn.} F1 is 73.6\% and 73.9\% for ours,
-and 2.8\% and 62.6\% for Khronos with its official motion settings.
+Averaged over the two visits of Home, \emph{Dyn.} F1 is 73.8\% for ours and 32.7\% for Khronos with its official
+motion settings.
 
 \begin{table}[H]
 \centering
@@ -342,7 +356,7 @@ On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
-\Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores the maps of successive rounds on Home.
+\Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores the maps of successive rounds on Home. For reference, \cref{tab:supp_clsplats} reports CL-Splats~\cite{Ackermann_2025_ICCV} on the held-out views of Tab.~4 of the main paper.
 
 \begin{table}[H]
 \tablepair{%
@@ -407,11 +421,11 @@ All comparisons of the main paper are on equal terms: every method answers a pas
 with the background and the objects as known then. A map with a history can also use what was observed later, as ours
 and that of Khronos can: it returns the objects of that time on the final background, which later observations have
 completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) for all three of our map types and
-for Khronos (left table).
+for Khronos (\cref{tab:supp_history_bg}).
 
 \begin{table}[H]
-\noindent\begin{minipage}[t]{0.485\linewidth}
-\vspace{0pt}\centering\small
+\tablepair{%
+\small
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
  & \multicolumn{3}{c}{\ours} & \\
@@ -421,11 +435,11 @@ Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
 Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 \end{tabular*}
-\par\smallskip\raggedright
-Both rows use the objects of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.
-\end{minipage}\hfill
-\begin{minipage}[t]{0.485\linewidth}
-\vspace{0pt}\centering\small
+}{%
+\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
+of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
+\label{tab:supp_history_bg}}{%
+\small
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 \toprule
 Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
@@ -434,12 +448,11 @@ Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
 Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
 \bottomrule
 \end{tabular*}
-\vspace{-2mm}
+}{%
 \caption{\textbf{CL-Splats on held-out views.} CL-Splats~\cite{Ackermann_2025_ICCV} updates a Gaussian scene from
 sparse views acquired at different times. We use its released defaults with the RGB images, poses and held-out views
 of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}
-\end{minipage}
+\label{tab:supp_clsplats}}
 \vspace{-2mm}
 \end{table}
 
