@@ -87,7 +87,7 @@
 
 Every dense map fuses observations into its elements: TSDF volumes average them, Gaussian maps take gradient steps on a
 rendering loss, and occupancy maps sum log-odds. \ours makes one change decision per object state by comparing its
-mapped surface with new depth observations. A state is represented by a group of map elements---surface geometry in a
+mapped surface with new depth observations. A state is represented by a group of map elements. These are surface geometry in a
 TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
 together.
 
@@ -119,25 +119,24 @@ In \cref{tab:supp_validity}, $L_0(c)$ is its log-odds at the start of the visit.
 \begin{table}[!htb]
 \centering
 \small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular}{@{}p{0.19\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.25\linewidth}@{}}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.1}
+\newcolumntype{Y}[1]{>{\raggedright\arraybackslash}p{#1\linewidth}}
+\begin{tabular}{@{}Y{0.125}Y{0.268}Y{0.268}Y{0.268}@{}}
 \toprule
 & TSDF & 3D Gaussians & Occupancy \\
 \midrule
-Ended state, $e\notin\mathcal{M}(t)$ &
+Ended state\newline $e\notin\mathcal{M}(t)$ &
 Rays that measured the ended state no longer contribute. &
-When the state ends, its Gaussians are frozen. They still occlude surfaces behind them
-in renderings of keyframes captured during the state. &
+Its Gaussians are frozen and still rendered in keyframes captured during the state. &
 Its occupied cells are set to the free bound $L_{\min}$. \\
-\addlinespace[3pt]
-Later state, $e\notin\mathcal{M}(t_o)$ &
+\addlinespace[5pt]
+Later state\newline $e\notin\mathcal{M}(t_o)$ &
 An earlier ray's free space stops before the new state, while its surface band remains. &
-An earlier keyframe renders $\mathcal{M}(t_k)$ without Gaussians that appeared later. &
-When an object reading of a visit first reaches a cell earlier visits saw free, it withdraws their free space,
-$L_0(c)<0$. \\
+An earlier keyframe renders $\mathcal{M}(t_k)$, without Gaussians that appeared later. &
+The first object reading in a cell that earlier visits saw free withdraws their free space, $L_0(c)<0$. \\
 \midrule
-Earlier visit, undecided &
+Earlier visit\newline undecided &
 Earlier visits contribute surfaces but no free space. &
 Earlier Gaussians receive current updates only after being confirmed unchanged. &
 The log-odds $L_0(c)$ is saved at the start of the visit for later withdrawal. \\
@@ -252,13 +251,15 @@ the reference scan.
 \centering
 \setlength{\tabcolsep}{1pt}
 \begin{tabular}{cc}
-\panel{(a)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} &
-\panel{(b)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} \\[1pt]
-\panel{(c)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} &
-\panel{(d)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_middle.png} \\[1pt]
-\panel{(e)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png} &
-\begin{minipage}[c]{0.495\linewidth}\captionsetup{position=below}\caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) start and (b) end of the second visit; (c) start, (d) middle, and (e) end of the third.}\label{fig:supp_bed}\end{minipage}
+\panel{(a)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/a_after.png} &
+\panel{(b)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_before.png} \\[1pt]
+\panel{(c)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/b_after.png} &
+\panel{(d)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_before.png} \\[1pt]
+\panel{(e)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_middle.png} &
+\panel{(f)}{width=0.495\linewidth,trim=222bp 204bp 303bp 31bp,clip}{figures/real_stages_original/c_after.png}
 \end{tabular}
+\caption{\textbf{ReviScene-BedRoom} from a fixed overview camera: (a) end of the first visit; (b) start and (c) end of the second; (d) start, (e) middle, and (f) end of the third.}
+\label{fig:supp_bed}
 \end{figure}
 
 \begin{figure}[p]
@@ -329,7 +330,7 @@ Averaged over the two visits of Home, \emph{Dyn.} F1 is 73.8\% for ours and 32.7
 motion settings.
 
 \begin{table}[H]
-\centering
+\tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -345,14 +346,38 @@ Map & Method & Away & Across & Away & Across \\ \midrule
 \midrule
  & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
 \multirow{-2}{*}{Occupancy} & \oursname & \ob{100.0} & \ob{100.0} & \ob{100.0} & \ob{97.0} \\
+\addlinespace[0.2pt]
 \bottomrule
 }
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
 \begin{tabular}{llrrrr}\resultrows\end{tabular}
-\vspace{-2mm}
-\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes after looking away within a visit (\emph{Away}) and across visits. The change F1 of the main paper pools the two. BedRoom has 5 and 26 such events; Home has 38 and 34.}
-\label{tab:supp_change_kinds}
+}{%
+\caption{\textbf{Change F1 by kind of change.} F1 (\%) after looking away within a visit (\emph{Away}) and across
+visits; the main paper pools the two. BedRoom has 5 and 26 such events, Home 38 and 34.}
+\label{tab:supp_change_kinds}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+ & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
+\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\ \midrule
+ & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
+\multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\ \midrule
+ & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
+\multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\ \midrule
+ & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
+\multirow{-2}{*}{3RScan} & \oursname & \ob{21.06} & \ob{0.774} & \ob{0.366} & \ob{2.79} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} After refinement, with ground-truth
+instances; Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
+\label{tab:supp_instance_rendering}}
 \vspace{-2mm}
 \end{table}
 
@@ -374,43 +399,34 @@ All F1 scores are in percent.
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
- & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
-\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\ \midrule
- & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
-\multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\ \midrule
- & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
-\multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\ \midrule
- & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
-\multirow{-2}{*}{3RScan} & \oursname & \ob{21.06} & \ob{0.774} & \ob{0.366} & \ob{2.79} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Rendering of the Gaussian maps of the main comparison.} With ground-truth instances, as in the main
-comparison; the rendering table of the main paper uses SAM masks. Held-out views after refinement;
-PSNR in dB and depth L1 in cm.}
-\label{tab:supp_instance_rendering}}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
 & \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Visit (views) & GaME & Ours & GaME & Ours & GaME & Ours \\ \midrule
-1 (418) & 24.19 & \ob{26.64} & 0.872 & \ob{0.919} & 0.245 & \ob{0.199} \\
-2 (355) & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
+Visit & GaME & Ours & GaME & Ours & GaME & Ours \\ \midrule
+First & 24.19 & \ob{26.64} & 0.872 & \ob{0.919} & 0.245 & \ob{0.199} \\
+Second & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
 \begin{tabular}{lrrrrrr}\resultrows\end{tabular}
 }{%
-\caption{\textbf{Rendering over time on Home.} Each held-out view is rendered from the map of its round, before
-refinement. PSNR is in dB.}
-\label{tab:supp_heldout_history}}
+\caption{\textbf{Rendering over time on Home.} The 418 and 355 held-out views of the two visits, each rendered from
+the map of its round, before refinement. PSNR is in dB.}
+\label{tab:supp_heldout_history}}{%
+\small
+\renewcommand{\arraystretch}{1.1095}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\toprule
+Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
+Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
+Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
+\bottomrule
+\end{tabular*}
+}{%
+\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV} on the
+images, poses, and held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
+\label{tab:supp_clsplats}}
 \vspace{-2mm}
 \end{table}
 
@@ -434,9 +450,10 @@ completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) 
 for Khronos (\cref{tab:supp_history_bg}).
 
 \begin{table}[H]
-\tablepair{%
+\centering
 \small
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
  & \multicolumn{3}{c}{\ours} & \\
 \cmidrule(lr){2-4}
@@ -444,25 +461,13 @@ Background & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
 Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
 Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
-\end{tabular*}
-}{%
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
 \caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
 of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
-\label{tab:supp_history_bg}}{%
-\small
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
-\toprule
-Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
-Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
-Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
-\bottomrule
-\end{tabular*}
-}{%
-\caption{\textbf{CL-Splats on held-out views.} CL-Splats~\cite{Ackermann_2025_ICCV} updates a Gaussian scene from
-sparse views acquired at different times. We use its released defaults with the RGB images, poses and held-out views
-of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}}
+\label{tab:supp_history_bg}
 \vspace{-2mm}
 \end{table}
 
@@ -548,7 +553,6 @@ unchanged when either is disabled (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
-\renewcommand{\arraystretch}{1.16}
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -565,7 +569,7 @@ No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 }{%
-\caption{\textbf{Gaussian state and keyframe updates (3DGS, Flat).} Columns as in the ablation table of the main paper: F1 in \%, PSNR in dB, depth L1 in cm.}
+\caption{\textbf{Gaussian state and keyframe updates (3DGS, Flat).} F1 in \%, PSNR in dB, depth L1 in cm.}
 \label{tab:supp_ablations}}{%
 \small
 \setlength{\tabcolsep}{3pt}
@@ -577,6 +581,7 @@ Full & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
 No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
 No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
 Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
+\addlinespace[0.2pt]
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
@@ -588,6 +593,7 @@ Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
 \vspace{-2mm}
 \end{table}
 
+\pagebreak
 \paragraph{Settings.}
 With annotated instances on BedRoom, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1.
 With OneFormer semantic labels, the learned prior detects 26 of 31 changes, compared with 22 or 23 for the fixed priors
@@ -596,7 +602,8 @@ With OneFormer semantic labels, the learned prior detects 26 of 31 changes, comp
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{lrrrrrc}
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
 \toprule
 & \multicolumn{3}{c}{Annotated instances} & \multicolumn{3}{c}{OneFormer semantic labels} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
@@ -608,7 +615,10 @@ Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 78.7 & 85.2 & 23/0/8 \\
 Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 77.7 & 83.0 & 22/0/9 \\
 Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 79.5 & 83.6 & 23/1/8 \\
 \bottomrule
-\end{tabular}
+}
+\sbox0{\begin{tabular}{lrrrrrc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{lrrrrrc}\resultrows\end{tabular}
 \caption{\textbf{Parameter sensitivity (TSDF, BedRoom).} The full method uses $\eta=99$ and learns $q$ per object.
 Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
 \label{tab:supp_settings}
@@ -619,7 +629,7 @@ Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
 
 \Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat.
 
-\begin{figure}[!b]
+\begin{figure}[H]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
@@ -681,12 +691,13 @@ Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png}\\[1.2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Maps after scene changes.} Rows 1 to 5 are the views of Fig.~4 of the main paper. TSDF and occupancy maps use reference colors, and occupancy is shown at 2\,cm resolution.}
+\caption{\textbf{Maps after scene changes.} Same views and display as Fig.~4 of the main paper, extended with one more view of Flat and with all three of our maps.}
 \label{fig:supp_qual}
 \end{figure}
 
 \FloatBarrier
-{\small
+{\footnotesize
+\setlength{\bibsep}{0pt plus 0.3ex}
 \bibliographystyle{ieeenat_fullname}
 \bibliography{main}
 }
