@@ -486,7 +486,7 @@ In the third visit to BedRoom, two objects are carried out of the room. Neither 
 The same see-through fraction can be routine for one object and unusual for another. With one noise model for all objects, the threshold is never reached on this recording, and the same four are missed.
 Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up. Two static objects are removed and rebuilt before the visit ends, so they lower object F1 and not change F1. In the second visit, a chair's state ends too early and only part of it is rebuilt, so its arrival and its later departure are both missed (28 of 31 detected).
 A decision helps only once the map follows it. If ended objects
-are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test does a different job, because not every stale surface belongs to a state. Without it, change F1 is unchanged, but
+are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
@@ -542,7 +542,7 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
 \emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
-The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, whole objects still retire and change F1 stays at 83.3, but PSNR falls from 28.43 to 23.80\,dB.
+Without the retention test, whole objects still retire and change F1 stays at 83.3, but PSNR falls from 28.43 to 23.80\,dB.
 Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
