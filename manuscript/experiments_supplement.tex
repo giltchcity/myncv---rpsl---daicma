@@ -540,10 +540,10 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \end{table}
 
 \paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
-In Gaussian maps, object retirement and the retention test show in different scores.
-Without object retirement, moved furniture remains in the map and change F1 falls to 68.8 (\cref{tab:supp_ablations}).
-The retention test (\cref{tab:supp_validity}) also confirms which earlier Gaussians can still be refined. Without it, whole objects still retire, but refinement updates
-only the Gaussians added during the current visit. Change F1 stays at 83.3 while PSNR falls from 28.43 to 23.80\,dB. \emph{No retirement} of the main paper removes both.
+\emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
+Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
+The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. It also confirms the Gaussians of the previous visit before they are refined (\cref{tab:supp_validity}). Without it, whole objects still retire and change F1 stays at 83.3, but refinement updates
+only the Gaussians added during the current visit, and PSNR falls from 28.43 to 23.80\,dB.
 Without the object states of the previous visit, one change is missed.
 
 \paragraph{Occupancy update (Home, Flat).}
