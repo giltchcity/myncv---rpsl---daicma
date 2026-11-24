@@ -86,7 +86,8 @@
 \label{sec:supp_method}
 
 Every dense map fuses observations into its elements: TSDF volumes average them, Gaussian maps take gradient steps on a
-rendering loss, and occupancy maps sum log-odds. \ours makes one change decision per object state by comparing its
+rendering loss, and occupancy maps sum log-odds. \ours can be used with any of these representations. In our
+experiments, each run builds one of them. It makes one change decision per object state by comparing its
 mapped surface with new depth observations. A state is represented by a group of map elements. These are surface geometry in a
 TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
 together.
@@ -103,7 +104,7 @@ each representation retains of its observations. Gaussian maps re-read keyframes
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
 Occupancy maps retain only clamped log-odds sums, from which individual
 observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
-The three map updates are given below.
+The update of each representation is given below.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -142,7 +143,7 @@ Earlier Gaussians receive current updates only after being confirmed unchanged. 
 The log-odds $L_0(c)$ is saved at the start of the visit for later withdrawal. \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{One validity, three maps.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
+\caption{\textbf{One validity rule across representations.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
 enforced in each representation. The last row shows how earlier visits are handled before the state decision.}
 \label{tab:supp_validity}
 \end{table}
@@ -179,8 +180,7 @@ has none. The maximum over candidates therefore lets the prior lower the evidenc
 moves, while an object that rarely moves needs at most the evidence of a change within the visit. A state begins
 when it is first seen and ends at the round that confirms its change (Sec.~3.1 of the main paper); a change made while
 the camera looked elsewhere is not observed, so this round is the first time the map can know of it. Across BedRoom, Home and Flat, 51 of the 65 earlier states ended by the change test end in the
-round their site is first seen clearly. All three maps use
-these same intervals.
+round their site is first seen clearly. The same intervals are used with every representation.
 
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
 We associate regions of the same class across frames by their 3D overlap.
@@ -386,7 +386,7 @@ instances; Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \paragraph{Segmentation inputs.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
-Annotated and predicted semantic labels both give about 96\% mesh F1.
+Annotated and predicted semantic labels both give 96.0\% mesh F1.
 Object and change F1 are 95.7 and 96.7 with annotated labels, and 79.2 and 89.7 with predicted labels.
 On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
@@ -429,10 +429,10 @@ before an object moved during the visit. The same mismatch raises its depth L1 o
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
-All comparisons of the main paper are on equal terms: every method answers a past time with its map of that time,
-with the background and the objects as known then. Eq.~(1) of the main paper also defines the map of a past time
+When the main paper scores a past time, every method answers with its map of that time, with the background and
+the objects as known then, so all methods are on equal terms. Eq.~(1) of the main paper also defines the map of a past time
 as known now, and a map with a history can answer with it, as ours and that of Khronos can: it returns the objects of
-that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) for all three of our map types and
+that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
 for Khronos (\cref{tab:supp_history_bg}).
 
 \begin{table}[H]
@@ -606,7 +606,7 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \pagebreak
 \paragraph{Settings.}
 With annotated instances on BedRoom, learning $q$ and fixing it at $1/4$ or $1/2$ each give 98.4\% change F1.
-With OneFormer semantic labels, the learned prior detects 26 of 31 changes, compared with 22 or 23 for the fixed priors
+With OneFormer semantic labels, the learned prior gives 89.7\% change F1, against 83.0 to 85.2 for the fixed priors
 (\cref{tab:supp_settings}).
 
 \begin{table}[H]
@@ -617,20 +617,20 @@ With OneFormer semantic labels, the learned prior detects 26 of 31 changes, comp
 \toprule
 & \multicolumn{3}{c}{Annotated instances} & \multicolumn{3}{c}{OneFormer semantic labels} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & TP/FP/FN \\ \midrule
-Full & 96.1 & 96.6 & 98.4 & 79.2 & 89.7 & 26/1/5 \\
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
 Threshold $\eta=9$ & 96.0 & 96.1 & 98.4 & \multicolumn{3}{c}{---} \\
 Threshold $\eta=999$ & 96.0 & 95.7 & 96.7 & \multicolumn{3}{c}{---} \\
-Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 78.7 & 85.2 & 23/0/8 \\
-Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 77.7 & 83.0 & 22/0/9 \\
-Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 79.5 & 83.6 & 23/1/8 \\
+Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
+Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
+Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrrrc}\resultrows\end{tabular}}
+\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lrrrrrc}\resultrows\end{tabular}
+\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
 \caption{\textbf{Parameter sensitivity (TSDF, BedRoom).} The full method uses $\eta=99$ and learns $q$ per object.
-Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
+Each variant changes one setting. F1 in \%.}
 \label{tab:supp_settings}
 \vspace{-2mm}
 \end{table}
@@ -701,7 +701,7 @@ Each variant changes one setting. F1 in \%. TP/FP/FN count change events.}
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/1_khronos.png} &
 \includegraphics[width=\qwidth,trim={100.0000bp 25.0000bp 115.0000bp 30.0000bp},clip]{figures/results_native/qual/6_flat_00225/2_panoptic.png}\\[1.2pt]
 \end{tabular}\endgroup
-\caption{\textbf{Maps after scene changes.} Same views and display as Fig.~4 of the main paper, extended with one more view of Flat and with all three of our maps.}
+\caption{\textbf{Maps after scene changes.} Same views and display as Fig.~4 of the main paper, extended with one more view of Flat and with our method on each of the three representations.}
 \label{fig:supp_qual}
 \end{figure}
 
