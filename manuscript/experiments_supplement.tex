@@ -104,11 +104,11 @@ element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(
   v_o(e,t)=\bigl[\,e\in\mathcal{M}(t_o)\cap\mathcal{M}(t)\,\bigr]\in\{0,1\}.
   \label{eq:supp_valid}
 \end{equation}
-The two conditions are identical across representations. An ended state receives no further updates, and an
-observation cannot update a state that began after its capture. Where these conditions are enforced depends on what each representation retains of its observations, since a map can only filter what it still holds. Gaussian maps re-read keyframes at every optimization step and apply
+All three representations share the same two conditions. An ended state receives no further updates, and an
+observation cannot update a state that began after its capture. How these conditions are enforced depends on what each representation retains of its observations. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
 Occupancy maps retain only clamped log-odds sums, from which individual
-observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}). Free space of earlier visits is withdrawn when the object is first read (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives stays, but the clamp bounds it. With the Wavemap defaults, a cell at the lower bound of $-2$ gains 0.40 to 0.68 per reading just behind the measured surface, so the object appears within three to five readings.
+observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}). Free space of earlier visits is withdrawn when the object is first read (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives is bounded by the clamp. With the Wavemap defaults, a cell at the lower bound of $-2$ gains 0.40 to 0.68 per reading just behind the measured surface, so the object appears within three to five readings.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -189,7 +189,7 @@ At the end of each visit, we release the archive and carry only the reconstructe
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
-$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, and a small part of the surface cannot end a state. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
+$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, so repeated views of a small patch add no further evidence. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
 
 \paragraph{Noise model.}
 Each state has its own Beta model of the see-through fraction $f$, fitted to its rounds in place together with the pooled statistics of all objects. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\max\{m_s,f\})$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
@@ -209,7 +209,7 @@ We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
 Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
-even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. Across visits, a move is judged more likely than a stay from $q$ and from the share of the candidate that lies outside the earlier surface. A successor replaces the earlier state, so no map shows the object at both places.
+even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. Across visits, this decision uses persistence $q$, the overlap of the candidate with the earlier surface, and the evidence from its own surface. A successor replaces the earlier state, so no map shows the object at both places.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -402,7 +402,7 @@ instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
 Ground-truth and predicted semantic labels both give 96.0\% mesh F1, and object F1 is 95.7 and 79.2.
-Identities are not what detects a change. A state ends by the test on its own surface at the old site, and an identity only links it to the state at the new site (Sec.~3.1 of the main paper). Semantic labels carry no instances and no identities. With ground-truth semantic labels, change F1 is 96.7, against 98.4 with instances. With OneFormer labels it is 89.7, still above the 70.8 of Khronos with ground-truth instances.
+Change detection does not need identities. The surface test ends a state at its old site, and identities help to confirm a move and to link the two states (Sec.~3.1 of the main paper). Semantic labels carry no instances and no identities. With ground-truth semantic labels, change F1 is 96.7, against 98.4 with instances. With OneFormer labels it is 89.7, still above the 70.8 of Khronos with ground-truth instances.
 On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement.
 All F1 scores are in percent.
