@@ -156,7 +156,9 @@ At the end of each visit, we release the archive and carry only the reconstructe
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the incidence limit is
-$60^\circ$, and the default threshold is $\eta=99$. The Beta model of a state matches the mean and robust variance of its rounds in
+$60^\circ$, and the default threshold is $\eta=99$. With the coverage weights, the score of Eq.~(2) of the main
+paper is a coverage-weighted variant of a sequential test, so $\eta$ is a threshold on this score and not an error rate
+(\cref{tab:supp_settings} varies it). The Beta model of a state matches the mean and robust variance of its rounds in
 place, with the pooled statistics of all objects counted as three more rounds; its variance is at least that of the pool and
 at least $10^{-4}$, and without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate.
 In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$, where
@@ -340,13 +342,12 @@ Map & Method & Away & Across & Away & Across \\ \midrule
  & Khronos & 57.1 & 73.2 & 81.7 & 86.7 \\
  & Panoptic & 36.4 & 54.1 & 76.9 & 69.2 \\
 \multirow{-3}{*}{TSDF} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
-\midrule
+\addlinespace[5.5pt]
  & GaME & \textbf{100.0} & 96.0 & 83.1 & 82.8 \\
 \multirow{-2}{*}{3DGS} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
-\midrule
+\addlinespace[5.5pt]
  & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
 \multirow{-2}{*}{Occupancy} & \oursname & \ob{100.0} & \ob{100.0} & \ob{100.0} & \ob{97.0} \\
-\addlinespace[0.2pt]
 \bottomrule
 }
 \sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
@@ -360,13 +361,14 @@ visits; the main paper pools the two. BedRoom has 5 and 26 such events, Home 38 
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
+& & \multicolumn{4}{c}{Held-out views} \\ \cmidrule(l){3-6}
 Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
  & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
-\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\ \midrule
+\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\
  & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
-\multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\ \midrule
+\multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\
  & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
-\multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\ \midrule
+\multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\
  & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
 \multirow{-2}{*}{3RScan} & \oursname & \ob{21.06} & \ob{0.774} & \ob{0.366} & \ob{2.79} \\
 \bottomrule
@@ -394,6 +396,46 @@ All F1 scores are in percent.
 \Cref{tab:supp_instance_rendering} scores the refined Gaussian maps of the main comparison. \Cref{tab:supp_heldout_history} scores the maps of successive rounds on Home. For reference, \cref{tab:supp_clsplats} reports CL-Splats~\cite{Ackermann_2025_ICCV} on the held-out views of Tab.~4 of the main paper.
 
 \begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
+Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
+Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lrrrr}\resultrows\end{tabular}
+\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV} on the
+images, poses, and held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
+\label{tab:supp_clsplats}
+\vspace{-2mm}
+\end{table}
+
+\paragraph{Rendering over time.}
+As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times as well as of the current
+time, each against its own photograph. We hold out every tenth frame of each visit and render each held-out frame from
+our 4D map as it stood at the end of the round containing it, before refinement. GaME renders its snapshot from the
+same round at the same camera pose (\cref{tab:supp_heldout_history}).
+
+On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
+final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
+renders all of them from the final map, which shows every object at its last place and cannot match frames taken
+before an object moved during the visit. The same mismatch raises its depth L1 on Home. Rendering over time holds out frames of every visit and renders each from the
+map of its round, which shows the scene as it was then.
+
+\paragraph{What the history adds.}
+All comparisons of the main paper are on equal terms: every method answers a past time with its map of that time,
+with the background and the objects as known then. Eq.~(1) of the main paper also defines the map of a past time
+as known now, and a map with a history can answer with it, as ours and that of Khronos can: it returns the objects of
+that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) for all three of our map types and
+for Khronos (\cref{tab:supp_history_bg}).
+
+\begin{table}[H]
 \tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
@@ -414,44 +456,6 @@ Second & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
 the map of its round, before refinement. PSNR is in dB.}
 \label{tab:supp_heldout_history}}{%
 \small
-\renewcommand{\arraystretch}{1.1095}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
-\toprule
-Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
-Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
-Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
-\bottomrule
-\end{tabular*}
-}{%
-\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV} on the
-images, poses, and held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}}
-\vspace{-2mm}
-\end{table}
-
-\paragraph{Rendering over time.}
-As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times as well as of the current
-time, each against its own photograph. We hold out every tenth frame of each visit and render each held-out frame from
-our 4D map as it stood at the end of the round containing it, before refinement. GaME renders its snapshot from the
-same round at the same camera pose (\cref{tab:supp_heldout_history}).
-
-On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
-final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
-renders all of them from the final map, which shows every object at its last place and cannot match frames taken
-before an object moved during the visit. The same mismatch raises its depth L1 on Home. Rendering over time holds out frames of every visit and renders each from the
-map of its round, which shows the scene as it was then.
-
-\paragraph{What the history adds.}
-All comparisons of the main paper are on equal terms: every method answers a past time with its map of that time,
-with the background and the objects as known then. A map with a history can also use what was observed later, as ours
-and that of Khronos can: it returns the objects of that time on the final background, which later observations have
-completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) for all three of our map types and
-for Khronos (\cref{tab:supp_history_bg}).
-
-\begin{table}[H]
-\centering
-\small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
@@ -465,9 +469,10 @@ Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
+}{%
 \caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
-of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
-\label{tab:supp_history_bg}
+of the query time; the first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
+\label{tab:supp_history_bg}}
 \vspace{-2mm}
 \end{table}
 
@@ -504,7 +509,8 @@ Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 Full & 96.1 & 96.6 & 98.4 \\
 No change test & 96.0 & 94.4 & 91.2 \\
 One noise model & 96.0 & 94.4 & 91.2 \\
-No coverage weights & 95.9 & 96.1 & 94.9 \\ \midrule
+No coverage weights & 95.9 & 96.1 & 94.9 \\
+\addlinespace[4pt]
 No object retirement & 93.0 & 95.3 & 73.5 \\
 No element test & 93.9 & 96.6 & 98.4 \\
 \bottomrule
@@ -522,7 +528,8 @@ No element test & 93.9 & 96.6 & 98.4 \\
 Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
 \multicolumn{4}{l}{\textit{Home}} \\
 Full & 83.0 & 83.6 & 97.9 \\
-No valid domains & 81.8 & 83.4 & 82.8 \\ \midrule
+No valid domains & 81.8 & 83.4 & 82.8 \\
+\addlinespace[4pt]
 \multicolumn{4}{l}{\textit{Flat}} \\
 Full & 90.1 & 50.7 & 76.5 \\
 No valid domains & 90.2 & 50.7 & 76.5 \\
@@ -557,11 +564,13 @@ unchanged when either is disabled (\cref{tab:supp_occupancy_ablation}).
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
+ & \multicolumn{4}{c}{Flat} \\ \cmidrule(l){2-5}
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \midrule
 Full & 89.8 & 83.3 & 28.43 & 0.41 \\
 No object retirement & 84.4 & 68.8 & 24.02 & 3.20 \\
 No element test & 88.0 & 83.3 & 23.80 & 0.82 \\
-No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\ \midrule
+No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
+\addlinespace[4pt]
 No previous states & 89.4 & 80.0 & 27.73 & 0.48 \\
 \bottomrule
 }
@@ -581,7 +590,8 @@ Full & 80.8 & 86.5 & 98.6 & 82.4 & 55.4 & 95.0 \\
 No subtraction & 80.3 & 86.6 & 98.6 & 81.8 & 54.8 & 95.0 \\
 No local replacement & 80.6 & 86.5 & 98.6 & 80.9 & 55.6 & 95.0 \\
 Neither & 80.0 & 86.6 & 98.6 & 80.3 & 55.1 & 95.0 \\
-\addlinespace[0.2pt]
+\addlinespace[4pt]
+Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
