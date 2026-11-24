@@ -187,7 +187,7 @@ round their site is first seen clearly. Every run sets these intervals in the sa
 With semantic labels alone, we treat each 8-connected region of an object class as one instance observation in that frame.
 We associate regions of the same class across frames by their 3D overlap.
 
-SAM provides class-agnostic masks whose indices are local to each frame.
+The SAM masks, provided with GaME~\cite{Yugay_2026_CVPR}, are class-agnostic with frame-local indices.
 We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
@@ -240,9 +240,9 @@ is this consenting volunteer. To protect privacy, the face is masked in the rele
 
 \paragraph{ReviScene-Home.}
 Home animates objects and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}.
-Its two visits share a world coordinate frame. We export per-frame object transforms and visibility, which give the
-scene geometry at each timestamp together with the object meshes. Instance labels follow the annotated object groups,
-such as a table together with its contents. Objects move while the camera looks elsewhere, within a visit
+Its two visits share one world frame. We export per-frame object transforms and visibility, which give the
+scene geometry at each timestamp with the object meshes. Instance labels follow the annotated object groups,
+such as a table with its contents. Objects move while the camera looks elsewhere, within a visit
 (\cref{fig:supp_home_a,fig:supp_home_b}) and between the visits, and three move in view.
 
 \paragraph{Flat and 3RScan.}
@@ -296,7 +296,7 @@ the reference scan.
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times: we and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 Following Khronos~\cite{Schmid-RSS-24}, we match objects within 0.5\,m and weight each snapshot's object F1 by the time it represents.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance.
 Change F1 pools events across visits. An unchanged object counts as a false positive if it is missing at visit end.
