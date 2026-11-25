@@ -179,7 +179,7 @@ During a visit, we archive every depth frame with its pose and instance labels. 
 At the end of each visit, we release the archive and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell, the free space that earlier visits left there is withdrawn in full. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
+We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell, we subtract the log-odds saved for it at the start of the visit, which removes the free space of earlier visits there. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
 
 \begin{figure}[!b]
 \begin{minipage}[t]{0.492\linewidth}\centering
@@ -198,7 +198,7 @@ We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
 $60^\circ$, and the default threshold is $\eta=99$.
 
-Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper is thus a CUSUM test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
+Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper thus adapts a standard sequential test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
 
 \begin{figure}[!t]
 \centering
@@ -239,7 +239,7 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \end{figure}
 
 \paragraph{Noise model.}
-Each state has its own Beta model~\cite{smithson2006lemon} of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance from the median absolute deviation. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model. The model is fitted to what these rounds show, so the see-through that depth noise and pose error cause on an object in place is part of it.
+Each state has its own Beta model~\cite{smithson2006lemon} of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance from the median absolute deviation of at least $10^{-4}$. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model. The model is fitted to what these rounds show, so the see-through that depth noise and pose error cause on an object in place is part of it.
 
 The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
 
@@ -269,7 +269,22 @@ even with frame-local mask IDs.
 \paragraph{Decisions of one round.}
 \Cref{alg:supp_state} lists the steps of one round with their edge conditions. The candidate change time that spans the gap between visits starts at $\pi_s$ of the main paper, and every other one at zero. \Cref{fig:supp_schem_state} shows the cases.
 
-The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen.
+The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen. \Cref{tab:supp_forms} gives the exact forms of the models of this section.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}p{0.19\linewidth}p{0.78\linewidth}@{}}
+\toprule
+Noise model & $\mathrm{Beta}\bigl(\mu c,\,(1-\mu)c\bigr)$ with $c=\max\{2,\ \mu(1-\mu)/v-1\}$ \\ \addlinespace[4pt]
+Persistence & $q=1-\dfrac{\alpha+m_o}{\alpha+\beta+m_o+u_o}$ with $\alpha=2g+m_c$, \ $\beta=2(1-g)+u_c$, \ $g=\dfrac{m_g+\frac12+\kappa}{m_g+u_g+2}$ \\ \addlinespace[4pt]
+Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $B=2\Pr(\theta>\tfrac12)$ and $\theta\sim\mathrm{Beta}\bigl(\tfrac12+N\rho,\ \tfrac12+N(1-\rho)\bigr)$ \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Exact forms of the models of this section.} $\mu$ and $v$ are the mean and variance of the see-through fraction of a state. $m$ and $u$ count the earlier revisits at which a state changed or continued, for the object ($o$), the other objects of its class ($c$), and the other classes of its group ($g$), and $\kappa$ is 1 for classes that are easily moved and 0 otherwise. $\rho$ is the share of the candidate outside the earlier surface, $N$ its effective number of cells, and $\Lambda$ the likelihood ratio of the change test on the candidate, 1 if untested.}
+\label{tab:supp_forms}
+\vspace{-2mm}
+\end{table}
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -302,7 +317,7 @@ looks away, as in \cref{tab:supp_change_kinds}. Home also has three motions in v
 We record three visits to a real bedroom with an Azure Kinect at 1920$\times$1080 and 30\,Hz, in its narrow
 field-of-view unbinned depth mode, with depth aligned to RGB.
 For mapping, we downsample the RGB-D frames to 960$\times$540. Within each visit, camera poses come from
-ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits to the first using landmark correspondences, automatic registration, and manual refinement.
+ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits to the first from coarse to fine. Landmark correspondences give the initial alignment, automatic registration on the static surfaces follows, and ICP refines it. A final manual inspection confirms that the static surfaces of all visits coincide.
 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
@@ -371,12 +386,14 @@ the reference scan. The eight rooms were picked arbitrarily among those that mee
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. There are 25 such times, about one every 10.8\,s and one at the end of each visit. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
 
-Change F1 is scored on the map at the end of each visit and pools the events of all visits. An unchanged object counts as a false positive if it is missing at visit end. Object F1 and Mesh$_{\mathrm{4D}}$ instead compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change that is recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
+Change F1 of Tab.~2 of the main paper is scored on the map at the end of each visit and pools the events of all visits. An unchanged object counts as a false positive if it is missing at visit end. The official evaluator of Khronos instead integrates over the time of one continuous run, which does not carry over to several visits. No map is built between two visits, so an integral would charge every method for the time away, and it would weight a change by the length of its visit. Here every change counts once. Tab.~3 of the main paper keeps the official evaluator, since TESSE is a single continuous run.
+
+Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change that is recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
 
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
@@ -386,7 +403,7 @@ none receives anything else.
 The baselines were published with different mask sources, Khronos~\cite{Schmid-RSS-24} with simulator semantics,
 Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segmentation, and
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
-system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input.
+system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input. Wavemap takes no instance input. We therefore give each of its occupied cells the instance and class of most of its readings, from the same masks, for Wavemap and for our occupancy maps alike.
 
 All TSDF maps, ours and those of the baselines, are built by standard projective fusion~\cite{10.1145/237170.237269,6162880} with 5\,cm voxels on all four datasets. They share the truncation distance and the maximum depth. All occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
 use standard 3D Gaussian splatting with the same optimization settings.
@@ -495,6 +512,9 @@ instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \label{fig:supp_4d}
 \end{figure}
 
+\paragraph{Scores across representations.}
+The rule is the same in all three maps. What it tests is the surface that each map holds, and a change is counted only if the map represents the object before or after it. The scores therefore depend on the representation, for the baselines as for \ours. On Flat, for example, change F1 rises from TSDF to Gaussian to occupancy maps for the baselines and for \ours alike (Tab.~2 of the main paper).
+
 \paragraph{Segmentation inputs.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
@@ -547,8 +567,8 @@ map of its round, which shows the scene as it was then.
 When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
 for Khronos (\cref{tab:supp_history_bg}).
 
-\begin{table}[H]
-\tablepairw{0.5275}{%
+\begin{table}[!t]
+\tablepairw{0.485}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -566,7 +586,7 @@ Ours & \ob{26.64} & \ob{26.92} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77
 }{%
 \caption{\textbf{Rendering over time on Home.} The 418 and 355 held-out views of the two visits, each rendered from
 the map of its round, before refinement. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_heldout_history}}{0.4425}{%
+\label{tab:supp_heldout_history}}{0.485}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -596,7 +616,7 @@ In the third visit to BedRoom, two objects are carried out of the room. Neither 
 
 The same see-through fraction can be routine for one object and unusual for another. With one noise model for all objects, the threshold is never reached on this recording, so the result equals that without the test.
 
-Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up. Two static objects are removed and rebuilt before the visit ends, so they lower object F1 and not change F1. In the second visit, a chair's state ends too early and only part of it is rebuilt. Its arrival and its later departure are then both missed (28 detected).
+Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up and end states too early. Two static objects are ended by mistake and have to be rebuilt later in the visit, which lowers object F1. A chair in the second visit is only partly rebuilt, so its arrival and its later departure are both missed (28 detected), which lowers change F1.
 
 A decision helps only once the map follows it. If ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
@@ -607,7 +627,7 @@ A depth ray that was correct when captured can harm the map later. Before an obj
 (\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
 
 \begin{table}[!t]
-\tablepair{%
+\tablepairw{0.485}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -627,7 +647,7 @@ No retention test & 93.9 & 96.6 & 98.4 \\
 \begin{tabular}{lrrr}\resultrows\end{tabular}
 }{%
 \caption{\textbf{Change test and map update (TSDF, BedRoom).} F1 in \%, as in the main table.}
-\label{tab:supp_change_test}}{%
+\label{tab:supp_change_test}}{0.485}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
