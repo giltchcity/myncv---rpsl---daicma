@@ -198,7 +198,7 @@ We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
 $60^\circ$, and the default threshold is $\eta=99$.
 
-Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample is marked once it has been inspected (\cref{fig:supp_schem_cov} and lines 6 to 8 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper is thus a CUSUM test~\cite{Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
+Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper is thus a CUSUM test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
 
 \begin{figure}[!t]
 \centering
@@ -214,13 +214,16 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \Statex \textit{Update the evidence}
 \If{at least 30 samples are judged, or all reliable samples of $s$}
   \State $f\gets$ share of the judged samples that are seen through
-  \State $w\gets$ share of the samples of $s$ judged for the first time, which are then marked \Comment{repeated views add nothing}
-  \State add $w\,\ell_s(f)$ to the score $L$ and keep $L\ge 0$ \Comment{Eq.~(2) of the main paper}
-  \State \textbf{if} $L=0$ \textbf{then} unmark all samples \Comment{the candidate change time moves here}
+  \State open a new candidate change time at this round \Comment{every round is tried}
+  \For{each candidate change time $j$}
+    \State $w\gets$ share of the samples of $s$ judged for the first time since $j$ \Comment{repeated views add nothing}
+    \State add $w\,\ell_s(f)$ to the score of $j$
+  \EndFor
+  \State $L\gets$ the largest score of a candidate change time \Comment{Eq.~(2) of the main paper}
   \State \textbf{if} the object is identified in place \textbf{then} add $f$ to the noise model of $s$ \Comment{no learning after a change}
 \EndIf
 \Statex \textit{Decide}
-\If{$L>\ln\eta$ \textbf{and} see-through samples since the candidate change time outnumber supported ones}
+\If{$L>\ln\eta$ \textbf{and} see-through samples since that change time outnumber supported ones}
   \State end $s$ at this round and retire its elements
 \EndIf
 \If{a candidate of the same object stands at another place}
@@ -236,7 +239,7 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \end{figure}
 
 \paragraph{Noise model.}
-Each state has its own Beta model of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model.
+Each state has its own Beta model~\cite{smithson2006lemon} of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance from the median absolute deviation. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model. The model is fitted to what these rounds show, so the see-through that depth noise and pose error cause on an object in place is part of it.
 
 The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
 
@@ -264,9 +267,9 @@ Across visits, an object observed again at the same site continues its earlier s
 even with frame-local mask IDs.
 
 \paragraph{Decisions of one round.}
-\Cref{alg:supp_state} lists the steps of one round with their edge conditions. \Cref{fig:supp_schem_state} shows the cases.
+\Cref{alg:supp_state} lists the steps of one round with their edge conditions. The candidate change time that spans the gap between visits starts at $\pi_s$ of the main paper, and every other one at zero. \Cref{fig:supp_schem_state} shows the cases.
 
-The move in line 13 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen.
+The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -308,9 +311,7 @@ so the reference shows the scene at the end of the visit.
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities. People are
 labeled as moving.
 
-The only person in the recordings is a volunteer, who gave explicit consent to the recording and to the
-publication and sharing of the data for research. No ethics review was carried out, because the only person recorded
-is this consenting volunteer. To protect privacy, the face is masked in the released data and blurred in the figures.
+One person appears in the recordings, a volunteer who gave informed consent to the recording and to the publication and sharing of the data for research. The person is not a subject of the study. To protect privacy, the face is masked in the released data and blurred in the figures.
 
 \paragraph{ReviScene-Home.}
 Home animates objects and camera trajectories in the kujiale\_0021 apartment of InteriorAgent~\cite{InteriorAgent2025}.
@@ -323,7 +324,7 @@ such as a table with its contents. Objects move while the camera looks elsewhere
 Flat is the two-run scene of Panoptic Mapping~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
 room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
-the reference scan. The eight rooms were picked arbitrarily among those that meet it, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated.
+the reference scan. The eight rooms were picked arbitrarily among those that meet it, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated. With these estimated poses, our TSDF maps detect 30 of the 31 changes on BedRoom and report no false change.
 
 \begin{figure}[p]
 \centering
@@ -373,7 +374,7 @@ the reference scan. The eight rooms were picked arbitrarily among those that mee
 Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
 
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
-For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance.
+For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
 
 Change F1 is scored on the map at the end of each visit and pools the events of all visits. An unchanged object counts as a false positive if it is missing at visit end. Object F1 and Mesh$_{\mathrm{4D}}$ instead compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change that is recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
 
@@ -508,7 +509,9 @@ All F1 scores are in percent.
 \paragraph{Rendering.}
 Tab.~4 of the main paper compares with GaME on its own SAM masks. With ground-truth instances, \ours also renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}).
 
-On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME skips a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME skips a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map. For reference, \cref{tab:supp_clsplats} reports CL-Splats~\cite{Ackermann_2025_ICCV} on the held-out views of Tab.~4 of the main paper.
+On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME skips a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME skips a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map.
+
+CL-Splats~\cite{Ackermann_2025_ICCV} aims at a different task. By its own description, it updates an existing reconstruction from intermittent, sparse captures and not from continuous video, and it assumes that these views focus on local changes. Our input is the continuous RGB-D video of a whole visit. For reference, \cref{tab:supp_clsplats} reports it on the held-out views of Tab.~4 of the main paper.
 
 \begin{table}[!t]
 \centering
@@ -517,9 +520,9 @@ On Flat, GaME scores lower with ground-truth instances than with the SAM masks o
 \def\resultrows{
 \toprule
 Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & 17.91 & 0.677 & 0.397 & 34.8 \\
-Aria room0 & 21.18 & 0.784 & 0.338 & 32.2 \\
-Aria room1 & 21.73 & 0.753 & 0.508 & 96.3 \\
+Flat & 17.91 & 0.677 & 0.397 & 34.77 \\
+Aria room0 & 21.18 & 0.784 & 0.338 & 32.19 \\
+Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
