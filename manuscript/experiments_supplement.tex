@@ -321,7 +321,6 @@ ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
 so the reference shows the scene at the end of the visit.
-
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities. People are
 labeled as moving.
 
@@ -415,6 +414,9 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
+
+\paragraph{Mapping cost.}
+On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos. On BedRoom, our Gaussian maps run at 2.1 FPS with 23.4\,GB of RAM and 3.90\,GB of VRAM, against 1.9 FPS, 41.8\,GB, and 3.07\,GB for GaME. Our occupancy maps run at 133 FPS with 3.01\,GB of RAM, against 148 FPS and 2.14\,GB for Wavemap.
 
 
 \section{Additional Results}
@@ -623,7 +625,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
 
 \begin{table}[!t]
 \tablepairw{0.485}{%
