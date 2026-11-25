@@ -45,6 +45,11 @@
   \vspace{-2mm}%
   \noindent\begin{minipage}[t]{0.485\linewidth}\captionsetup{position=below}#2\end{minipage}\hfill
   \begin{minipage}[t]{0.485\linewidth}\captionsetup{position=below}#4\end{minipage}\par}
+\newcommand{\tablepairw}[6]{% width A, table A, caption A, width B, table B, caption B
+  \pair@set{#1}{#2}{#4}{#5}%
+  \vspace{-2mm}%
+  \noindent\begin{minipage}[t]{#1\linewidth}\captionsetup{position=below}#3\end{minipage}\hfill
+  \begin{minipage}[t]{#4\linewidth}\captionsetup{position=below}#6\end{minipage}\par}
 \newcommand{\tablepanels}[5]{% width A, panel A, width B, panel B; the shared caption ends level with panel A
   \sbox\pair@a{\begin{minipage}{#1\linewidth}\centering#2\end{minipage}}%
   \setlength\pair@h{\dimexpr\ht\pair@a+\dp\pair@a\relax}%
@@ -440,7 +445,7 @@ same round at the same camera pose (\cref{tab:supp_heldout_history}).
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
 final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
 renders all of them from the final map. This map shows every object at its last place and cannot match frames taken
-before an object moved during the visit. The same mismatch raises its depth L1 on Home. Rendering over time holds out frames of every visit and renders each from the
+before an object moved during the visit. The same mismatch raises its depth L1 on Home, which is 15.32\,cm from the final map and 2.77\,cm over time. Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
@@ -451,25 +456,25 @@ that time on the final background, which later observations have completed. On H
 for Khronos (\cref{tab:supp_history_bg}).
 
 \begin{table}[H]
-\tablepair{%
+\tablepairw{0.5275}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
-& \multicolumn{2}{c}{PSNR$\uparrow$} & \multicolumn{2}{c}{MS-SSIM$\uparrow$} & \multicolumn{2}{c}{LPIPS$\downarrow$} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Visit & GaME & Ours & GaME & Ours & GaME & Ours \\ \midrule
-First & 24.19 & \ob{26.64} & 0.872 & \ob{0.919} & 0.245 & \ob{0.199} \\
-Second & 25.87 & \ob{26.92} & 0.898 & \ob{0.926} & 0.207 & \ob{0.149} \\
+& Visit 1 & Visit 2 & \multicolumn{4}{c}{Both visits} \\
+\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-7}
+Method & PSNR$\uparrow$ & PSNR$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+GaME & 24.19 & 25.87 & 24.96 & 0.884 & 0.228 & 7.49 \\
+Ours & \ob{26.64} & \ob{26.92} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
+\sbox0{\begin{tabular}{lcccccwc{27pt}}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+\begin{tabular}{lcccccwc{27pt}}\resultrows\end{tabular}
 }{%
 \caption{\textbf{Rendering over time on Home.} The 418 and 355 held-out views of the two visits, each rendered from
-the map of its round, before refinement. PSNR is in dB.}
-\label{tab:supp_heldout_history}}{%
+the map of its round, before refinement. PSNR is in dB and depth L1 in cm.}
+\label{tab:supp_heldout_history}}{0.4425}{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -481,9 +486,9 @@ Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
 Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
+\sbox0{\begin{tabular}{l*{4}{wc{34pt}}}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{lrrrr}\resultrows\end{tabular}
+\begin{tabular}{l*{4}{wc{34pt}}}\resultrows\end{tabular}
 }{%
 \caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
 of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
