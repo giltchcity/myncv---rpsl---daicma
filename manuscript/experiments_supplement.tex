@@ -179,35 +179,9 @@ During a visit, we archive every depth frame with its pose and instance labels. 
 At the end of each visit, we release the archive and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-When an object is first read in a cell, the free space that earlier visits left there is withdrawn (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives is bounded by the clamp. With the Wavemap defaults, this bound is $-2$, and a cell just behind the measured surface gains 0.40 to 0.68 per reading. The object therefore appears within three to five readings. Local replacement (Sec.~3.2 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a new surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap.
+We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell, the free space that earlier visits left there is withdrawn in full. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
 
 \begin{figure}[!b]
-\centering
-\begin{minipage}{0.74\linewidth}
-\begin{algorithm}[H]
-\caption{Update of an object state $s$ in one round}
-\label{alg:supp_state}
-\begin{algorithmic}[1]
-\State $f\gets$ share of the samples of $s$ in view that are seen through
-\If{at least 30 reliable samples are in view, or all that $s$ has}
-  \State update the score $L$ of Eq.~(2) of the main paper with $f$ and the weight of the round
-\EndIf
-\If{$L>\ln\eta$ \textbf{and} most samples since the chosen change time are seen through}
-  \State end $s$ at this round
-\EndIf
-\If{a candidate of the same object is at another place}
-  \If{the old site is seen again with no support}
-    \State end $s$, and the candidate succeeds it
-  \ElsIf{across visits \textbf{and} a move is more probable than not}
-    \State end $s$, and the candidate succeeds it
-  \EndIf
-\EndIf
-\end{algorithmic}
-\end{algorithm}
-\end{minipage}
-\end{figure}
-
-\begin{figure}[!t]
 \begin{minipage}[t]{0.492\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/schematics/coverage_weighted_change.pdf}
 \caption{\textbf{Coverage weights.} A round is weighted by the surface it inspects for the first time, shown in orange. A later view of the same patch meets the same surface samples, from any direction, and adds no weight. Views of new patches each add their share, so the accumulated weight follows the inspected surface.}
@@ -224,12 +198,47 @@ When an object is first read in a cell, the free space that earlier visits left 
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
 $60^\circ$, and the default threshold is $\eta=99$.
 
-Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample is marked once it has been inspected (\cref{fig:supp_schem_cov}). The score of Eq.~(2) of the main paper is thus a CUSUM test~\cite{Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
+Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample is marked once it has been inspected (\cref{fig:supp_schem_cov} and lines 6 to 8 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper is thus a CUSUM test~\cite{Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
+
+\begin{figure}[!t]
+\centering
+\begin{minipage}{0.94\linewidth}
+\begin{algorithm}[H]
+\caption{One round for an object state $s$}
+\label{alg:supp_state}
+\begin{algorithmic}[1]
+\Statex \textit{Judge each reliable surface sample of $s$ that is in view}
+\State \textbf{supported} if the depth reading lies on it, within the depth tolerance
+\State \textbf{seen through} if the reading lies beyond it, at an incidence of at most $60^\circ$
+\State \textbf{not judged} for any other reading \Comment{occluded or grazing}
+\Statex \textit{Update the evidence}
+\If{at least 30 samples are judged, or all reliable samples of $s$}
+  \State $f\gets$ share of the judged samples that are seen through
+  \State $w\gets$ share of the samples of $s$ judged for the first time, which are then marked \Comment{repeated views add nothing}
+  \State add $w\,\ell_s(f)$ to the score $L$ and keep $L\ge 0$ \Comment{Eq.~(2) of the main paper}
+  \State \textbf{if} $L=0$ \textbf{then} unmark all samples \Comment{the candidate change time moves here}
+  \State \textbf{if} the object is identified in place \textbf{then} add $f$ to the noise model of $s$ \Comment{no learning after a change}
+\EndIf
+\Statex \textit{Decide}
+\If{$L>\ln\eta$ \textbf{and} see-through samples since the candidate change time outnumber supported ones}
+  \State end $s$ at this round and retire its elements
+\EndIf
+\If{a candidate of the same object stands at another place}
+  \If{the old site is seen through with no support, \textbf{or} across visits a move is more probable than not}
+    \State end $s$ where the candidate began, and the candidate succeeds it
+  \Else
+    \State keep $s$ and wait for more views
+  \EndIf
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{figure}
 
 \paragraph{Noise model.}
 Each state has its own Beta model of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model.
 
-The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
+The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
 
 \paragraph{Persistence prior.}
 Persistence $q$ is the posterior mean of a hierarchical Beta-Bernoulli model over the outcomes of earlier revisits, at which a state had either continued or changed. It pools the outcomes of the object with those of the other objects of its class, on a prior from the other classes of its group that counts as two outcomes.
@@ -255,9 +264,9 @@ Across visits, an object observed again at the same site continues its earlier s
 even with frame-local mask IDs.
 
 \paragraph{Decisions of one round.}
-\Cref{alg:supp_state} puts the decisions of one round together. \Cref{fig:supp_schem_state} shows the cases.
+\Cref{alg:supp_state} lists the steps of one round with their edge conditions. \Cref{fig:supp_schem_state} shows the cases.
 
-Line 9 is a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate.
+The move in line 13 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -376,8 +385,7 @@ none receives anything else.
 The baselines were published with different mask sources, Khronos~\cite{Schmid-RSS-24} with simulator semantics,
 Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segmentation, and
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
-system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic
-Mapping and GaME as their segmented RGB-D input.
+system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input.
 
 All TSDF maps, ours and those of the baselines, are built by standard projective fusion~\cite{10.1145/237170.237269,6162880} with 5\,cm voxels on all four datasets. They share the truncation distance and the maximum depth. All occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
 use standard 3D Gaussian splatting with the same optimization settings.
@@ -581,11 +589,11 @@ of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
 \label{sec:supp_ablations}
 
 \paragraph{Change test (TSDF, BedRoom).}
-In the third visit to BedRoom, two objects are carried out of the room. Neither is seen moving or found elsewhere. The evidence of their departure is at the old sites, where new depth rays pass through their former surfaces. Two more changes happen during the visit. Without the change test, these four are missed (26 of 31 detected, \cref{tab:supp_change_test}).
+In the third visit to BedRoom, two objects are carried out of the room. Neither is seen moving or found elsewhere. The evidence of their departure is at the old sites, where new depth rays pass through their former surfaces. Two more changes happen during the visit. The full method detects 30 of the 31 changes on BedRoom. Without the change test, these four are missed as well, and 26 are detected (\cref{tab:supp_change_test}).
 
 The same see-through fraction can be routine for one object and unusual for another. With one noise model for all objects, the threshold is never reached on this recording, so the result equals that without the test.
 
-Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up. Two static objects are removed and rebuilt before the visit ends, so they lower object F1 and not change F1. In the second visit, a chair's state ends too early and only part of it is rebuilt. Its arrival and its later departure are then both missed (28 of 31 detected).
+Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up. Two static objects are removed and rebuilt before the visit ends, so they lower object F1 and not change F1. In the second visit, a chair's state ends too early and only part of it is rebuilt. Its arrival and its later departure are then both missed (28 detected).
 
 A decision helps only once the map follows it. If ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
@@ -595,7 +603,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
 (\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
 
-\begin{table}[H]
+\begin{table}[!t]
 \tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
