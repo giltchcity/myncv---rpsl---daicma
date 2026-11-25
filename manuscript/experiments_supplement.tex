@@ -275,7 +275,8 @@ The move in line 15 is judged by a Bayes decision with equal losses. It weighs t
 \small
 \begin{tabular}{@{}p{0.19\linewidth}p{0.78\linewidth}@{}}
 \toprule
-Noise model & $\mathrm{Beta}\bigl(\mu c,\,(1-\mu)c\bigr)$ with $c=\max\{2,\ \mu(1-\mu)/v-1\}$ \\ \addlinespace[4pt]
+Noise model & $\mathrm{Beta}\bigl(\mu c,\,(1-\mu)c\bigr)$ with $c=\max\{2,\ \mu(1-\mu)/v-1\}$ \\
+Evidence of a round & $\ell_s(f)=-\ln\mathrm{Beta}\bigl(\tilde f;\ \mu c,\,(1-\mu)c\bigr)$ with $\tilde f=\min\{0.995,\ \max\{f,\ \mu,\ 0.005\}\}$ \\ \addlinespace[4pt]
 Persistence & $q=1-\dfrac{\alpha+m_o}{\alpha+\beta+m_o+u_o}$ with $\alpha=2g+m_c$, \ $\beta=2(1-g)+u_c$, \ $g=\dfrac{m_g+\frac12+\kappa}{m_g+u_g+2}$ \\ \addlinespace[4pt]
 Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $B=2\Pr(\theta>\tfrac12)$ and $\theta\sim\mathrm{Beta}\bigl(\tfrac12+N\rho,\ \tfrac12+N(1-\rho)\bigr)$ \\
 \bottomrule
@@ -321,6 +322,7 @@ ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
 so the reference shows the scene at the end of the visit.
+
 Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities. People are
 labeled as moving.
 
@@ -415,8 +417,6 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
 
-\paragraph{Mapping cost.}
-On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos. On BedRoom, our Gaussian maps run at 2.1 FPS with 23.4\,GB of RAM and 3.90\,GB of VRAM, against 1.9 FPS, 41.8\,GB, and 3.07\,GB for GaME. Our occupancy maps run at 133 FPS with 3.01\,GB of RAM, against 148 FPS and 2.14\,GB for Wavemap.
 
 
 \section{Additional Results}
@@ -578,7 +578,7 @@ for Khronos (\cref{tab:supp_history_bg}).
 \cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-7}
 Method & PSNR$\uparrow$ & PSNR$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 GaME & 24.19 & 25.87 & 24.96 & 0.884 & 0.228 & 7.49 \\
-Ours & \ob{26.64} & \ob{26.92} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
+\oursname & \ob{26.64} & \ob{26.92} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lcccccwc{27pt}}\resultrows\end{tabular}}
@@ -625,7 +625,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos.
 
 \begin{table}[!t]
 \tablepairw{0.485}{%
@@ -679,10 +679,7 @@ Without the retention test, whole objects still retire and change F1 stays at 83
 
 \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends.
 
-\paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
-
-\begin{table}[H]
+\begin{table}[!p]
 \tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
@@ -727,12 +724,7 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \vspace{-2mm}
 \end{table}
 
-\paragraph{Settings.}
-On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
-On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
-prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
-
-\begin{table}[H]
+\begin{table}[!p]
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -756,11 +748,7 @@ to one value. F1 in \%.}
 \vspace{-2mm}
 \end{table}
 
-\section{Further Qualitative Results}
-
-\Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat. The supplementary video shows the maps over time, with observed changes and changes while away, within and between visits.
-
-\begin{figure}[!t]
+\begin{figure}[!p]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
@@ -825,6 +813,21 @@ to one value. F1 in \%.}
 \caption{\textbf{Maps after scene changes.} Same views and display as Fig.~4 of the main paper, extended with one more view of Flat and with our method on each of the three representations.}
 \label{fig:supp_qual}
 \end{figure}
+
+\paragraph{Occupancy update (Home, Flat).}
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
+
+
+\paragraph{Settings.}
+On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
+prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
+
+
+\section{Further Qualitative Results}
+
+\Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat. The supplementary video shows the maps over time, with observed changes and changes while away, within and between visits.
+
 
 
 
