@@ -113,7 +113,7 @@ All three representations share the same two conditions. An ended state receives
 observation cannot update a state that began after its capture. How these conditions are enforced depends on what each representation retains of its observations. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
 Occupancy maps retain only clamped log-odds sums, from which individual
-observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}). Free space of earlier visits is withdrawn when the object is first read (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives is bounded by the clamp. With the Wavemap defaults, a cell at the lower bound of $-2$ gains 0.40 to 0.68 per reading just behind the measured surface, so the object appears within three to five readings.
+observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}). Free space of earlier visits is withdrawn when the object is first read (\cref{tab:supp_validity}). Free space gathered within the visit before the object arrives is bounded by the clamp. With the Wavemap defaults, a cell at the lower bound of $-2$ gains 0.40 to 0.68 per reading just behind the measured surface, so the object appears within three to five readings. Local replacement (Sec.~3.2 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a new surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -194,10 +194,10 @@ At the end of each visit, we release the archive and carry only the reconstructe
 
 \paragraph{Change detection.}
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
-$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, so repeated views of a small patch add no further evidence. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
+$60^\circ$, and the default threshold is $\eta=99$. Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, so the evidence grows with the part of the surface that has been inspected and not with the number of views. The score of Eq.~(2) of the main paper is thus a sequential test with coverage weights, so $\eta$ is a threshold on this score and not an error rate (\cref{sec:supp_ablations} varies it).
 
 \paragraph{Noise model.}
-Each state has its own Beta model of the see-through fraction $f$. It matches the mean and robust variance of the rounds of the state in place, with the pooled statistics of all objects counted as three more rounds. Without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\max\{m_s,f\})$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
+Each state has its own Beta model of the see-through fraction $f$. It matches the mean and robust variance of its rounds in place, with the pooled statistics of all objects counted as three more rounds. A round is in place only when the object is identified there, so rounds after a change do not enter the model. Without a pool it is $\mathrm{Beta}(0.1,1.9)$, a 5\% see-through rate. In Eq.~(2) of the main paper, $\ell_s(f)=-\log p_{\mathrm{Beta},s}(\tilde f)$ with $\tilde f=\min\{0.995,\max\{0.005,m_s,f\}\}$, where $m_s$ is the mean of $f$ for state $s$. The test is thus one-sided, and a see-through fraction below this mean counts as the mean.
 
 \paragraph{Persistence prior.}
 Persistence $q$ is learned from the outcomes of earlier revisits, at which a state had either continued ($u$) or changed ($m$). It is the mean of a Beta-Bernoulli model, $q=1-(\alpha+m_o)/(\alpha+\beta+m_o+u_o)$ with $\alpha=2g+m_c$, $\beta=2(1-g)+u_c$, and $g=(m_g+\tfrac12+\kappa)/(m_g+u_g+2)$. The subscripts denote the object, the other objects of its class, and the other classes of its group. We set $\kappa=1$ for classes of small objects that are easily moved, such as chairs, tables, and bags, and $0$ for the others, such as beds. This choice counts as one outcome and only sets the starting value of $q$, $1/4$ for the easily moved classes and $3/4$ for the others. It does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected. With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
@@ -267,7 +267,7 @@ such as a table with its contents. Objects move while the camera looks elsewhere
 Flat is the two-run scene of Panoptic Mapping~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
 room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
-the reference scan. The eight rooms were picked arbitrarily among those that meet this criterion, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated.
+the reference scan. The eight rooms were picked arbitrarily among those that meet it, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated.
 
 \begin{figure}[p]
 \centering
@@ -338,7 +338,7 @@ Panoptic Mapping loads the map of the preceding visit through its own interface.
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events. A reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
 
 \paragraph{Map history.}
-We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, with a round every 2\,s, this covers 244 rounds across three visits. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
 
 
 \section{Additional Results}
@@ -437,14 +437,11 @@ images and poses without depth, on the held-out views of Tab.~4 of the main pape
 \end{table}
 
 \paragraph{Rendering over time.}
-As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times as well as of the current
-time, each against its own photograph. We hold out every tenth frame of each visit and render each held-out frame from
-our 4D map as it stood at the end of the round containing it, before refinement. GaME renders its snapshot from the
+As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times and of the current time, each against its own photograph. We hold out every tenth frame of each visit and render it from our 4D map as it stood at the end of its round, before refinement. GaME renders its snapshot from the
 same round at the same camera pose (\cref{tab:supp_heldout_history}).
 
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
-final map after refinement (\cref{tab:supp_instance_rendering}). The two scores come from different protocols. The final-map protocol holds out frames of the last visit only and
-renders all of them from the final map. This map shows every object at its last place and cannot match frames taken
+final map after refinement (\cref{tab:supp_instance_rendering}). The final-map protocol holds out frames of the last visit only and renders them from the final map. This map shows every object at its last place and cannot match frames taken
 before an object moved during the visit. The same mismatch raises its depth L1 on Home, which is 15.32\,cm from the final map and 2.77\,cm over time. Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
@@ -562,7 +559,7 @@ Without object retirement, moved furniture remains in the map and change F1 fall
 Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}). \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends.
 
 \paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement (Sec.~3.2 of the main paper) clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
