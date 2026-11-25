@@ -214,7 +214,7 @@ We match depth samples to existing object surfaces in 3D and use the masks
 to group unmatched samples into new objects or extend existing ones.
 
 Across visits, an object observed again at the same site continues its earlier state through 3D surface overlap,
-even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together. In it, $w(j)$ is the share of the surface first inspected since $j$, and $\pi_s(j)=\ln\frac{1-q}{q}$ for the candidate that spans the gap between visits and $0$ otherwise. In line 11, $B=2\Pr(\theta>\tfrac12)$ with $\theta\sim\mathrm{Beta}(\tfrac12+N\rho,\,\tfrac12+N(1-\rho))$, where $\rho$ is the share of the candidate that lies outside the earlier surface and $N$ its effective number of cells. $\Lambda$ is the likelihood ratio of the change test on the surface of the candidate itself, 1 if that surface has not been tested. A successor replaces the earlier state, so no map shows the object at both places.
+even with frame-local mask IDs. \Cref{alg:supp_state} puts the decisions of one round together, with $w(j)$ and $\pi_s(j)$ as in Eq.~(2) of the main paper. In line 11, $B=2\Pr(\theta>\tfrac12)$ with $\theta\sim\mathrm{Beta}(\tfrac12+N\rho,\,\tfrac12+N(1-\rho))$, where $\rho$ is the share of the candidate outside the earlier surface and $N$ its effective number of cells. $\Lambda$ is the likelihood ratio of the change test on the candidate, 1 if untested. The three terms are the posterior weights of a move, a stay, and a candidate that is not a surface of this object, and with equal losses the rule is the Bayes decision. A successor replaces the earlier state, so no map shows the object at both places.
 
 \section{Datasets}
 \label{sec:supp_datasets}
@@ -562,7 +562,7 @@ Without object retirement, moved furniture remains in the map and change F1 fall
 Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}). \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends.
 
 \paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes that evidence, and local replacement (Sec.~3.2 of the main paper) clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Across all four settings, change F1 is 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
