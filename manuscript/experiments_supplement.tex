@@ -509,8 +509,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, all changes happen between visits, and an earlier visit
-enters the next one as surfaces only, so no earlier frame remains and the scores stay within 0.1 points.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
 
 \begin{table}[H]
 \tablepair{%
