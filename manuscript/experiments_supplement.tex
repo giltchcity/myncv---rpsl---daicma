@@ -183,25 +183,23 @@ When an object is first read in a cell, the free space that earlier visits left 
 
 \begin{figure}[!b]
 \centering
-\begin{minipage}{0.66\linewidth}
+\begin{minipage}{0.74\linewidth}
 \begin{algorithm}[H]
 \caption{Update of an object state $s$ in one round}
 \label{alg:supp_state}
 \begin{algorithmic}[1]
-\State $n,k\gets$ samples of $s$ seen and seen through in this round
-\If{$n\ge\min(30,\text{all reliable})$}
-  \State $\ell\gets\ell_s(k/n)$
-  \State $P_j\gets P_j+w(j)\,\ell$ for every candidate change time $j$
+\State $f\gets$ share of the samples of $s$ in view that are seen through
+\If{at least 30 reliable samples are in view, or all that $s$ has}
+  \State update the score $L$ of Eq.~(2) of the main paper with $f$ and the weight of the round
 \EndIf
-\State $L\gets\max_j\bigl(\pi_s(j)+P_j\bigr)$, reached at $j^\ast$
-\If{$L>\ln\eta$ \textbf{and} see-through samples since $j^\ast$ outnumber supported ones}
+\If{$L>\ln\eta$ \textbf{and} most samples since the chosen change time are seen through}
   \State end $s$ at this round
 \EndIf
-\If{a candidate $c$ of the same object is at another place}
+\If{a candidate of the same object is at another place}
   \If{the old site is seen again with no support}
-    \State end $s$, and $c$ succeeds it
+    \State end $s$, and the candidate succeeds it
   \ElsIf{across visits \textbf{and} a move is more probable than not}
-    \State end $s$, and $c$ succeeds it
+    \State end $s$, and the candidate succeeds it
   \EndIf
 \EndIf
 \end{algorithmic}
@@ -257,9 +255,9 @@ Across visits, an object observed again at the same site continues its earlier s
 even with frame-local mask IDs.
 
 \paragraph{Decisions of one round.}
-\Cref{alg:supp_state} puts the decisions of one round together, with $w(j)$ and $\pi_s(j)$ as in Eq.~(2) of the main paper. \Cref{fig:supp_schem_state} shows the cases.
+\Cref{alg:supp_state} puts the decisions of one round together. \Cref{fig:supp_schem_state} shows the cases.
 
-Line 11 is a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate.
+Line 9 is a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate.
 
 \section{Datasets}
 \label{sec:supp_datasets}
