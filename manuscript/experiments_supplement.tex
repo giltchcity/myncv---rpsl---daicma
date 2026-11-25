@@ -158,12 +158,12 @@ Its occupied cells are set to the free bound $L_{\min}$. \\
 Later state\newline $e\notin\mathcal{M}(t_o)$ &
 An earlier ray's free space stops before the new state, while its surface band remains. &
 An earlier keyframe renders $\mathcal{M}(t_k)$, without Gaussians that appeared later. &
-The first object reading in a cell that earlier visits saw free withdraws their free space, $L_0(c)<0$. \\
+The first object reading in a cell that earlier visits saw free removes their free space, $L_0(c)<0$. \\
 \midrule
 Earlier visit\newline undecided &
 Earlier visits contribute surfaces but no free space. &
 Earlier Gaussians are resumed with their object states and judged by the same rule. &
-The log-odds $L_0(c)$ is saved at the start of the visit for later withdrawal. \\
+The log-odds $L_0(c)$ is saved at the start of the visit for this subtraction. \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{One validity rule across representations.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
@@ -171,15 +171,14 @@ enforced in each representation. The last row shows how earlier visits are handl
 \label{tab:supp_validity}
 \end{table}
 
-Even when a state continues, its stale elements can be retired one by one, as can background elements without a state.
-The retention test of the main paper retires an element that more views see through than support.
+Background elements have no state to end. The retention test of the main paper tests them one by one and retires an element that more views see through than support.
 
 \paragraph{TSDF updates.}
 During a visit, we archive every depth frame with its pose and instance labels. Ranges are delta coded and labels run-length coded, and the archive peaks at roughly 0.7\,GB over all evaluated visits. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from it, so \cref{eq:supp_tsdf} holds for every ray of the visit.
 At the end of each visit, we release the archive and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell, we subtract the log-odds saved for it at the start of the visit, which removes the free space of earlier visits there. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
+We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell that was free at the start of the visit, we subtract the log-odds saved for it, which removes the free space of earlier visits there. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
 
 \begin{figure}[!b]
 \begin{minipage}[t]{0.492\linewidth}\centering
@@ -216,7 +215,7 @@ Repeated views of one patch are not independent evidence. Each round is therefor
   \State $f\gets$ share of the judged samples that are seen through
   \State open a new candidate change time at this round \Comment{every round is tried}
   \For{each candidate change time $j$}
-    \State $w\gets$ share of the samples of $s$ judged for the first time since $j$ \Comment{repeated views add nothing}
+    \State $w\gets$ share of the reliable samples of $s$ judged for the first time since $j$ \Comment{repeated views add nothing}
     \State add $w\,\ell_s(f)$ to the score of $j$
   \EndFor
   \State $L\gets$ the largest score of a candidate change time \Comment{Eq.~(2) of the main paper}
@@ -269,7 +268,7 @@ even with frame-local mask IDs.
 \paragraph{Decisions of one round.}
 \Cref{alg:supp_state} lists the steps of one round with their edge conditions. The candidate change time that spans the gap between visits starts at $\pi_s$ of the main paper, and every other one at zero. \Cref{fig:supp_schem_state} shows the cases.
 
-The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never handed over by this rule and waits until its old site is seen. \Cref{tab:supp_forms} gives the exact forms of the models of this section.
+The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never succeeded under this rule and waits until its old site is seen. \Cref{tab:supp_forms} gives the exact forms of the models of this section.
 
 \begin{table}[H]
 \centering
@@ -415,7 +414,7 @@ Panoptic Mapping loads the map of the preceding visit through its own interface.
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events. A reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
 
 \paragraph{Map history.}
-We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, with a round every 2\,s, this covers 244 rounds across three visits. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
 
 
 \section{Additional Results}
@@ -529,7 +528,7 @@ All F1 scores are in percent.
 \paragraph{Rendering.}
 Tab.~4 of the main paper compares with GaME on its own SAM masks. With ground-truth instances, \ours also renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}).
 
-On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME skips a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME skips a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map.
+On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME drops a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME drops a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map.
 
 CL-Splats~\cite{Ackermann_2025_ICCV} aims at a different task. By its own description, it updates an existing reconstruction from intermittent, sparse captures and not from continuous video, and it assumes that these views focus on local changes. Our input is the continuous RGB-D video of a whole visit. For reference, \cref{tab:supp_clsplats} reports it on the held-out views of Tab.~4 of the main paper.
 
@@ -616,7 +615,7 @@ In the third visit to BedRoom, two objects are carried out of the room. Neither 
 
 The same see-through fraction can be routine for one object and unusual for another. With one noise model for all objects, the threshold is never reached on this recording, so the result equals that without the test.
 
-Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up and end states too early. Two static objects are ended by mistake and have to be rebuilt later in the visit, which lowers object F1. A chair in the second visit is only partly rebuilt, so its arrival and its later departure are both missed (28 detected), which lowers change F1.
+Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up and end states too early. Two static objects are removed by mistake and have to be rebuilt later in the visit, which lowers object F1. A chair in the second visit is only partly rebuilt, so its arrival and its later departure are both missed (28 detected), which lowers change F1.
 
 A decision helps only once the map follows it. If ended objects
 are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
@@ -624,7 +623,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos.
 
 \begin{table}[!t]
 \tablepairw{0.485}{%
@@ -679,7 +678,7 @@ Without the retention test, whole objects still retire and change F1 stays at 83
 \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends.
 
 \paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind new surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
 
 \begin{table}[H]
 \tablepair{%
