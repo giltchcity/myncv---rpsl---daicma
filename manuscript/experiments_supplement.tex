@@ -301,9 +301,8 @@ BedRoom & 3 & 4,003 / 4,041 / 7,216 & 960$\times$540 & 5 & 26 \\
 Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lccccc}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{lccccc}\resultrows\end{tabular}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/6\relax}*{5}{wc{\dimexpr\linewidth/6\relax}}@{}}\resultrows\end{tabular}
 \vspace{-2mm}
 \caption{\textbf{ReviScene.} Both record RGB-D at 30\,Hz. The changes are the reference changes made while the camera
 looks away, as in \cref{tab:supp_change_kinds}. Home also has three motions in view.}
@@ -487,10 +486,10 @@ instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \begin{figure}[!t]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
-\newcommand{\fw}{\dimexpr(\textwidth-14pt)/4\relax}
+\newcommand{\fw}{\dimexpr(\textwidth-24pt)/4\relax}
 \fontsize{7}{8}\selectfont
-\begin{tabular}{@{}c*{4}{c}@{}}
- & Ground Truth & \textbf{Ours (3DGS)} & \textbf{Ours (Occupancy)} & \textbf{Ours (TSDF)}\\[3pt]
+\begin{tabular}{@{}c*{4}{c}c@{}}
+ & Ground Truth & \textbf{Ours (3DGS)} & \textbf{Ours (Occupancy)} & \textbf{Ours (TSDF)} & \hphantom{\rotatebox{90}{First}}\\[3pt]
 \rotatebox{90}{\makebox[0.706\fw][c]{First visit, 1:26}} &
 \includegraphics[width=\fw]{figures/results_native/fourd/A087p4s_GT.png} &
 \includegraphics[width=\fw]{figures/results_native/fourd/A087p4s_3DGS.png} &
@@ -549,9 +548,8 @@ Aria room0 & 21.18 & 0.784 & 0.338 & 32.19 \\
 Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{lrrrr}\resultrows\end{tabular}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/5\relax}*{4}{wc{\dimexpr\linewidth/5\relax}}@{}}\resultrows\end{tabular}
 \caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV}, which takes
 images and poses without depth, on the held-out views of Tab.~4 of the main paper. Aria denotes the Aria Digital Twin~\cite{Pan_2023_ICCV} rooms of GaME~\cite{Yugay_2026_CVPR}. PSNR is in dB and depth L1 in cm.}
 \label{tab:supp_clsplats}
@@ -578,9 +576,8 @@ Scene & Method & Visit 1 & Visit 2 & Visit 3 & PSNR$\uparrow$ & MS-SSIM$\uparrow
 \multirow{-2}{*}{Home} & \oursname & \ob{26.64} & \ob{26.92} & \oc{--} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{llccccccc}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/18\relax}
-\begin{tabular}{llccccccc}\resultrows\end{tabular}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/9\relax}*{8}{wc{\dimexpr\linewidth/9\relax}}@{}}\resultrows\end{tabular}
 \caption{\textbf{Rendering over time on BedRoom and Home.} The 1,525 and 773 held-out views, each rendered from the map of its round, before refinement. Home has two visits. PSNR is in dB and depth L1 in cm.}
 \label{tab:supp_heldout_history}
 \vspace{-2mm}
@@ -610,9 +607,8 @@ Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
 Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{l*{4}{wc{60pt}}}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{l*{4}{wc{60pt}}}\resultrows\end{tabular}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/5\relax}*{4}{wc{\dimexpr\linewidth/5\relax}}@{}}\resultrows\end{tabular}
 \caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
 \label{tab:supp_history_bg}
 \vspace{-2mm}
@@ -757,9 +753,8 @@ Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
 Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/7\relax}*{6}{wc{\dimexpr\linewidth/7\relax}}@{}}\resultrows\end{tabular}
 \caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
 to one value. F1 in \%.}
 \label{tab:supp_settings}
@@ -774,10 +769,10 @@ to one value. F1 in \%.}
 \begin{figure}[H]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
-\newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
+\newcommand{\qwidth}{\dimexpr(\textwidth-34pt)/8\relax}
 \fontsize{7}{8}\selectfont
-\begin{tabular}{@{}c*{8}{c}@{}}
- & Ground Truth & \textbf{Ours (3DGS)} & \textbf{Ours (Occupancy)} & \textbf{Ours (TSDF)} & GaME & Wavemap & Khronos & Panoptic Mapping\\[3pt]
+\begin{tabular}{@{}c*{8}{c}c@{}}
+ & Ground Truth & \textbf{Ours (3DGS)} & \textbf{Ours (Occupancy)} & \textbf{Ours (TSDF)} & GaME & Wavemap & Khronos & Panoptic Mapping & \hphantom{\rotatebox{90}{Flat}}\\[3pt]
 \rotatebox{90}{\makebox[\qwidth][c]{BedRoom}} &
 \includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/0_image.png} &
 \includegraphics[width=\qwidth,trim={236bp 52bp 242bp 0bp},clip]{figures/results_native/qual/1_real_05320/5_ours_3dgs.png} &
