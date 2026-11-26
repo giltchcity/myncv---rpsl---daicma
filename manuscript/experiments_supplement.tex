@@ -391,11 +391,11 @@ Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times 
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. MS-SSIM and depth L1 also follow this evaluator, which reports MS-SSIM under the name SSIM. Its loader scales the depth of Flat by ten, and we report depth L1 in centimetres of the unscaled scene. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-In each comparison in Tab.~2 of the main paper, all methods, ours included, are given exactly the same input, and none receives anything else. The one exception is Wavemap, which takes no masks.
+In each comparison in Tab.~2 of the main paper, all methods, ours included, are given exactly the same input, and none receives anything else.
 The baselines were published with different mask sources, Khronos~\cite{Schmid-RSS-24} with simulator semantics,
 Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segmentation, and
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
-system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input. Wavemap takes no instance input. We therefore give each of its occupied cells the instance and class of most of its readings, from the same masks, for Wavemap and for our occupancy maps alike.
+system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input. The update of Wavemap uses no instances. We therefore give each of its occupied cells the instance and class of most of its readings, from the same masks, for Wavemap and for our occupancy maps alike.
 
 All TSDF maps, ours and those of the baselines, are built by standard projective fusion~\cite{10.1145/237170.237269,6162880} with 5\,cm voxels on all four datasets. They share the truncation distance and the maximum depth. All occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
 use standard 3D Gaussian splatting with the same optimization settings, including the number of refinement iterations. Mapping time excludes the final refinement.
@@ -725,7 +725,7 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
 Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}).
 
-\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
+\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points lower (\cref{tab:supp_ablations}). The three keyframe variants change how old keyframes are trained, not which object states end, so change F1 is the same.
 
 \emph{GaME with our change detection} gives GaME our change decisions and keeps the rest of GaME as released. Its PSNR rises from 24.21 to 24.81\,dB, against 28.43\,dB for the full method. It drops 220 of its 442 keyframes.
 
