@@ -94,7 +94,7 @@
 \section{Method Details}
 \label{sec:supp_method}
 
-\ours lets a dense map follow a scene that changes within and across visits, and keeps its history. It does so with one change detection and one map update. Both can be used with any of three dense map representations, a TSDF volume, a 3D Gaussian map, or an occupancy map. Every run in the main paper and here builds only one of them.
+\ours lets a dense map follow a scene that changes within and across visits, and keeps its history. It does so with one change detection and one map update. Both can be used with any of three dense map representations, a TSDF volume, a 3D Gaussian map, or an occupancy map.
 
 The representations fuse observations differently. TSDF volumes average them, Gaussian maps take gradient steps on a
 rendering loss, and occupancy maps sum log-odds. In each, \ours makes one change decision per object state by comparing
@@ -126,19 +126,17 @@ observation cannot update a state that began after its capture.
 
 How these conditions are enforced depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
-Occupancy maps retain only clamped log-odds sums, from which individual
-observations cannot be recovered, so they enforce the conditions when states begin and end (\cref{tab:supp_validity}).
+Occupancy maps retain a log-odds sum per cell and apply $v$ to that sum (\cref{tab:supp_validity}).
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
   \theta_e&\leftarrow\theta_e-\alpha\sum_k v_k(e,t)\,\frac{\partial\,\ell\bigl(I_k,R(\mathcal{M}(t_k))\bigr)}{\partial\theta_e},\label{eq:supp_gs}\\
-  L(c)&\leftarrow\mathrm{clamp}\bigl(L(c)+\Delta_o(c)\bigr).\label{eq:supp_occ}
+  L_t(c)&=v_0(c,t)\,L_0(c)+\sum_{o\in\mathrm{visit}}\Delta_o(c).\label{eq:supp_occ}
 \end{align}
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
 $x$. A pixel ray $o$ ends on a state $\sigma_o$ and gives $x$ the truncated signed distance $d_o(x)$ and weight $w_o(x)$. $\mathcal{S}(t)$ is the set of states alive at $t$, which always includes the background,
 and $\Omega_o(t)$ is the valid domain (Eq.~(4) of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
-$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $\Delta_o(c)$ is the log-odds update for cell $c$.
-In \cref{tab:supp_validity}, $L_0(c)$ is its log-odds at the start of the visit.
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. The earlier visits were all captured before an object of the current visit arrived, so they share one validity $v_0(c,t)$. It turns to zero at the first reading of such an object in a cell that they saw free.
 
 \begin{table}[!htb]
 \centering
@@ -153,7 +151,7 @@ In \cref{tab:supp_validity}, $L_0(c)$ is its log-odds at the start of the visit.
 Ended state\newline $e\notin\mathcal{M}(t)$ &
 Rays that measured the ended state no longer contribute. &
 Its Gaussians are frozen and still rendered in keyframes captured during the state. &
-Its occupied cells are set to the free bound $L_{\min}$. \\
+Its occupied cells are retired at once and kept for past times. \\
 \addlinespace[5pt]
 Later state\newline $e\notin\mathcal{M}(t_o)$ &
 An earlier ray's free space stops before the new state, while its surface band remains. &
@@ -163,7 +161,7 @@ The first object reading in a cell that earlier visits saw free removes their fr
 Earlier visit\newline undecided &
 Earlier visits contribute surfaces but no free space. &
 Earlier Gaussians are resumed with their object states and judged by the same rule. &
-The log-odds $L_0(c)$ is saved at the start of the visit for this subtraction. \\
+The log-odds $L_0(c)$ is saved at the start of the visit. \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{One validity rule across representations.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
@@ -175,10 +173,10 @@ Background elements have no state to end. The retention test of the main paper t
 
 \paragraph{TSDF updates.}
 During a visit, we archive every depth frame with its pose and instance labels. Ranges are delta coded and labels run-length coded, and the archive peaks at roughly 0.7\,GB over all evaluated visits. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from it, so \cref{eq:supp_tsdf} holds for every ray of the visit.
-At the end of each visit, we release the archive and carry only the reconstructed surfaces forward.
+The archive is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-We keep the log-odds update of Wavemap unchanged and add three steps (\cref{tab:supp_validity}). When a state ends, within a visit or across visits, its occupied cells are set to the free bound together. When an object is first read in a cell that was free at the start of the visit, we subtract the log-odds saved for it, which removes the free space of earlier visits there. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The free space gathered within the visit before an object arrives is left to the clamped update of Wavemap.
+The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, the evidence that earlier visits left there is removed (\cref{eq:supp_occ}), so the free space recorded before the object arrived does not hold it back. When a state ends, within a visit or across visits, its cells are retired together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The wavelet representation and the log-odds update of Wavemap are retained.
 
 \begin{figure}[!b]
 \begin{minipage}[t]{0.492\linewidth}\centering
@@ -215,7 +213,7 @@ Repeated views of one patch are not independent evidence. Each round is therefor
   \State $f\gets$ share of the judged samples that are seen through
   \State open a new candidate change time at this round \Comment{every round is tried}
   \For{each candidate change time $j$}
-    \State $w\gets$ share of the reliable samples of $s$ judged for the first time since $j$ \Comment{repeated views add nothing}
+    \State $w\gets$ share of the reliable samples of $s$ judged for the first time since $j$ \Comment{repeated views add no weight}
     \State add $w\,\ell_s(f)$ to the score of $j$
   \EndFor
   \State $L\gets$ the largest score of a candidate change time \Comment{Eq.~(2) of the main paper}
@@ -300,7 +298,7 @@ Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $
  & Visits & RGB-D frames per visit & Mapping input & Changes within visits & Changes between visits \\
 \midrule
 BedRoom & 3 & 4,003 / 4,041 / 7,216 & 960$\times$540 & 5 & 26 \\
-Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
+Home & 2 & 4,186 / 3,555 & 640$\times$480 & 38 & 34 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lccccc}\resultrows\end{tabular}}
@@ -317,13 +315,13 @@ looks away, as in \cref{tab:supp_change_kinds}. Home also has three motions in v
 We record three visits to a real bedroom with an Azure Kinect at 1920$\times$1080 and 30\,Hz, in its narrow
 field-of-view unbinned depth mode, with depth aligned to RGB.
 For mapping, we downsample the RGB-D frames to 960$\times$540. Within each visit, camera poses come from
-ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits to the first from coarse to fine. Landmark correspondences give the initial alignment, automatic registration on the static surfaces follows, and ICP refines it. A final manual inspection confirms that the static surfaces of all visits coincide.
+ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits to the first from coarse to fine. Landmark correspondences give the initial alignment, automatic registration on the static surfaces follows, and ICP refines it. We verify that the static surfaces of all visits coincide.
 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
 so the reference shows the scene at the end of the visit.
 
-Masks combine SAM assistance and manual review, with ADE20K classes and 17 persistent object identities. People are
+Masks combine SAM assistance and manual review, with ADE20K classes. There are 17 single-instance objects shared between the three visits, 11 of them dynamic. People are
 labeled as moving.
 
 One person appears in the recordings, a volunteer who gave informed consent to the recording and to the publication and sharing of the data for research. The person is not a subject of the study. To protect privacy, the face is masked in the released data and blurred in the figures.
@@ -338,8 +336,7 @@ such as a table with its contents. Objects move while the camera looks elsewhere
 \paragraph{Flat and 3RScan.}
 Flat is the two-run scene of Panoptic Mapping~\cite{9811877}.
 We use eight 3RScan~\cite{9010673} room chains with three or four scans each to evaluate repeated updates in the same
-room. We selected rescans with an object removal or an object centroid displacement of at least 0.3\,m relative to
-the reference scan. The eight rooms were picked arbitrarily among those that meet it, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated. With these estimated poses, our TSDF maps detect 30 of the 31 changes on BedRoom and report no false change.
+room. We randomly selected the eight rooms among those with object changes, and we report all of them. We use the alignment between scans that 3RScan provides. Home and Flat are simulated with exact poses. BedRoom and 3RScan are real recordings, so their poses and the alignment between visits are estimated. With these estimated poses, our TSDF maps detect 30 of the 31 changes on BedRoom and report no false change.
 
 \begin{figure}[p]
 \centering
@@ -550,7 +547,7 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
 \begin{tabular}{lrrrr}\resultrows\end{tabular}
 \caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV}, which takes
-images and poses without depth, on the held-out views of Tab.~4 of the main paper. PSNR is in dB and depth L1 in cm.}
+images and poses without depth, on the held-out views of Tab.~4 of the main paper. Aria denotes the Aria Digital Twin~\cite{Pan_2023_ICCV} rooms of GaME~\cite{Yugay_2026_CVPR}. PSNR is in dB and depth L1 in cm.}
 \label{tab:supp_clsplats}
 \vspace{-2mm}
 \end{table}
@@ -620,7 +617,7 @@ The same see-through fraction can be routine for one object and unusual for anot
 Seeing through the same patch a second time tells little about the rest of the object. Without coverage weights, such views still add up and end states too early. Two static objects are removed by mistake and have to be rebuilt later in the visit, which lowers object F1. A chair in the second visit is only partly rebuilt, so its arrival and its later departure are both missed (28 detected), which lowers change F1.
 
 A decision helps only once the map follows it. If ended objects
-are not retired as a whole, moved objects stay and 12 more changes are missed. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
+are not retired as a whole, moved objects stay and 12 more changes are missed. Change F1 then falls to 73.5, close to the 70.8 of Khronos. The retention test removes what object retirement cannot reach, such as duplicates left by drift or small changes of the background. Without it, change F1 is unchanged, but
 faces of earlier visits that new views see through stay in the map, and mesh F1 falls.
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
@@ -677,7 +674,7 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
 Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}).
 
-\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends.
+\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
 
 \begin{table}[!p]
 \tablepair{%
@@ -688,11 +685,11 @@ Without the retention test, whole objects still retire and change F1 stays at 83
  & \multicolumn{4}{c}{Flat} \\ \cmidrule(l){2-5}
 Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \midrule
 Full & 89.8 & 83.3 & 28.43 & 0.41 \\
-\addlinespace[7.5pt]
 No object retirement & 84.4 & 68.8 & 24.02 & 3.20 \\
 No retention test & 88.5 & 83.3 & 28.28 & 0.42 \\
-\addlinespace[7.5pt]
 No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
+\addlinespace[4pt]
+Masked dynamic views & 88.2 & 83.3 & 24.00 & 1.93 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
