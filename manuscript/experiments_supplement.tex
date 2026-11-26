@@ -123,7 +123,7 @@ element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(
   \label{eq:supp_valid}
 \end{equation}
 All three representations share the same two conditions. An ended state receives no further updates, and an
-observation cannot update a state that began after its capture.
+observation should not update a state that began after its capture.
 
 How these conditions are applied depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
@@ -545,13 +545,7 @@ Scene & Method & Visit 1 & Visit 2 & Visit 3 & PSNR$\uparrow$ & MS-SSIM$\uparrow
 \label{tab:supp_heldout_history}
 \vspace{-2mm}
 \end{table}
-
-On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
-final map after refinement (\cref{tab:supp_instance_rendering}). The final-map protocol holds out frames of the last visit only and renders them from the final map. This map shows every object at its last place and cannot match frames taken
-before an object moved during the visit. Its depth L1 on Home is high for the same reason and is low again when each frame is rendered from the map of its round (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
-map of its round, which shows the scene as it was then.
-
-\begin{table}[!b]
+\begin{table}[!t]
 \tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
@@ -560,8 +554,8 @@ map of its round, which shows the scene as it was then.
  & \multicolumn{3}{c}{\ours} & \\
 \cmidrule(lr){2-4}
 Background & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
-Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
-Final & 81.9 & 79.8 & 78.8 & 76.8 \\
+\rule[-5.3pt]{0pt}{16.5pt}Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
+\rule[-5.3pt]{0pt}{16.5pt}Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lcccc}\resultrows\end{tabular}}
@@ -575,6 +569,8 @@ of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
+ & \multicolumn{4}{c}{Held-out views} \\
+\cmidrule(l){2-5}
 Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
 Flat & 17.91 & 0.677 & 0.397 & 34.77 \\
 Aria room0 & 21.18 & 0.784 & 0.338 & 32.19 \\
@@ -589,6 +585,11 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
 \label{tab:supp_clsplats}}
 \vspace{-2mm}
 \end{table}
+
+On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
+final map after refinement (\cref{tab:supp_instance_rendering}). The final-map protocol holds out frames of the last visit only and renders them from the final map. This map shows every object at its last place and cannot match frames taken
+before an object moved during the visit. Its depth L1 on Home is high for the same reason and is low again when each frame is rendered from the map of its round (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
+map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
 When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
