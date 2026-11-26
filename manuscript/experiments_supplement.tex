@@ -99,7 +99,7 @@
 
 The representations fuse observations differently. TSDF volumes average them, Gaussian maps take gradient steps on a
 rendering loss, and occupancy maps sum log-odds. In each, \ours makes one change decision per object state by comparing
-its mapped surface with new depth observations. A state is represented by a group of map elements. These are surface geometry in a
+the surface of the state with new depth observations. This surface is built from the depth observations of the object, in the same way in all three maps. The map holds the state as a group of elements. These are surface geometry in a
 TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
 together.
 
@@ -515,7 +515,7 @@ instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
 \end{figure}
 
 \paragraph{Scores across representations.}
-The rule is the same in all three maps. It tests the surface that each map holds, and a change counts only if the map represents the object before or after it. The scores therefore depend on the representation, for the baselines as for \ours. On Flat, for example, change F1 rises from TSDF to Gaussian to occupancy maps for the baselines and for \ours alike (Tab.~2 of the main paper).
+The rule is the same in all three maps. It tests the surface of each object state, and a change counts only if the map represents the object before or after it. The scores therefore depend on the representation, for the baselines as for \ours. On Flat, for example, change F1 rises from TSDF to Gaussian to occupancy maps for the baselines and for \ours alike (Tab.~2 of the main paper).
 
 \paragraph{Segmentation inputs.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
