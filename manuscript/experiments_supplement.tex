@@ -177,7 +177,7 @@ During a visit, we archive each fused depth frame with its pose and instance lab
 Our reported peak memory includes the archive. We read it only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, we remove the evidence that earlier visits left there (\cref{eq:supp_occ}). The free space recorded before the object arrived then does not hold it back. Within the visit, the log-odds are bounded. This limits the free space gathered before an object arrives, so the readings of the object can outweigh it. Our occupancy maps detect every change made while the camera looks away within the visits of BedRoom and Home (\cref{tab:supp_change_kinds}). When a state ends, within a visit or across visits, we retire its cells together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. We retain the wavelet representation and the log-odds update of Wavemap.
+The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, we remove the evidence that earlier visits left there (\cref{eq:supp_occ}). The free space recorded before the object arrived then does not hold it back. Within the visit, the log-odds are bounded. This limits the free space gathered before an object arrives, so the readings of the object can outweigh it. Our occupancy maps detect every change made while the camera looks away within the visits of BedRoom and Home (\cref{fig:supp_change_kinds}). When a state ends, within a visit or across visits, we retire its cells together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. We retain the wavelet representation and the log-odds update of Wavemap.
 
 \afterpage{\begin{figure}[!t]
 \begin{minipage}[t]{0.492\linewidth}\centering
@@ -305,7 +305,7 @@ Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
 \begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/6\relax}*{5}{wc{\dimexpr\linewidth/6\relax}}@{}}\resultrows\end{tabular}
 \vspace{-2mm}
 \caption{\textbf{ReviScene.} Both record RGB-D at 30\,Hz. The changes are the reference changes made while the camera
-looks away, as in \cref{tab:supp_change_kinds}. Home also has three motions in view.}
+looks away, as in \cref{fig:supp_change_kinds}. Home also has three motions in view.}
 \label{tab:supp_datasets}
 \vspace{-2mm}
 \end{table}
@@ -416,7 +416,7 @@ Tab.~6 of the main paper reports speed and memory. Khronos keeps its history as 
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\ours matches or beats every baseline for both kinds of change, after looking away within a visit and across visits (\cref{tab:supp_change_kinds,fig:supp_change_kinds}).
+\ours matches or beats every baseline for both kinds of change, after looking away within a visit and across visits (\cref{fig:supp_change_kinds}).
 We score the three motions observed on Home separately. They yield six events, one departure and one arrival per motion.
 Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%).
 Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
@@ -426,62 +426,47 @@ motion settings.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/change_f1_by_kind.pdf}
-\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes made while the camera looks away within a visit and for changes across visits. The numbers are those of \cref{tab:supp_change_kinds}.}
+\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes made while the camera looks away within a visit and for changes across visits. The main paper pools the two.}
 \label{fig:supp_change_kinds}
 \end{figure}
 
 \begin{table}[!t]
-\tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
-\def\resultrows{
+\def\headrow{Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule}
+\def\leftrows{
 \toprule
-& & \multicolumn{2}{c}{BedRoom} & \multicolumn{2}{c}{Home} \\ \cmidrule(lr){3-4}\cmidrule(lr){5-6}
-Map & Method & Away & Across & Away & Across \\ \midrule
- & Khronos & 57.1 & 73.2 & 81.7 & 86.7 \\
- & Panoptic & 36.4 & 54.1 & 76.9 & 69.2 \\
-\multirow{-3}{*}{TSDF} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
-\addlinespace[5.5pt]
- & GaME & \textbf{100.0} & 96.0 & 83.1 & 82.8 \\
-\multirow{-2}{*}{3DGS} & \oursname & \ob{100.0} & \ob{98.0} & \ob{100.0} & \ob{95.4} \\
-\addlinespace[5.5pt]
- & Wavemap & 90.9 & 89.4 & 98.7 & 93.8 \\
-\multirow{-2}{*}{Occupancy} & \oursname & \ob{100.0} & \ob{100.0} & \ob{100.0} & \ob{97.0} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Change F1 by kind of change.} F1 (\%) after looking away within a visit (\emph{Away}) and across
-visits. The main paper pools the two. BedRoom has 5 and 26 such events, Home 38 and 34.}
-\label{tab:supp_change_kinds}}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-& & \multicolumn{4}{c}{Held-out views} \\ \cmidrule(l){3-6}
-Scene & Method & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+\headrow
  & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
 \multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\
  & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
 \multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\
+\bottomrule
+}
+\def\rightrows{
+\toprule
+\headrow
  & GaME & 24.21 & 0.917 & 0.164 & 1.07 \\
 \multirow{-2}{*}{Flat} & \oursname & \ob{28.43} & \ob{0.955} & \ob{0.107} & \ob{0.41} \\
  & GaME & 20.10 & 0.739 & 0.401 & 4.95 \\
 \multirow{-2}{*}{3RScan} & \oursname & \ob{21.06} & \ob{0.774} & \ob{0.366} & \ob{2.79} \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{llrrrr}\resultrows\end{tabular}}
+\noindent\begin{minipage}{0.485\linewidth}\centering
+\sbox0{\begin{tabular}{llrrrr}\leftrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\resultrows\end{tabular}
-}{%
+\begin{tabular}{llrrrr}\leftrows\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}{0.485\linewidth}\centering
+\sbox0{\begin{tabular}{llrrrr}\rightrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
+\begin{tabular}{llrrrr}\rightrows\end{tabular}
+\end{minipage}
 \caption{\textbf{Rendering of the Gaussian maps of the main comparison.} After refinement, with ground-truth
 instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
-\label{tab:supp_instance_rendering}}
+\label{tab:supp_instance_rendering}
 \vspace{-2mm}
 \end{table}
-
 \begin{figure}[!t]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
@@ -548,7 +533,7 @@ Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
 \bottomrule
 }
 \setlength{\tabcolsep}{0pt}
-\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/5\relax}*{4}{wc{\dimexpr\linewidth/5\relax}}@{}}\resultrows\end{tabular}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr 0.6\linewidth/5\relax}*{4}{wc{\dimexpr 0.6\linewidth/5\relax}}@{}}\resultrows\end{tabular}
 \caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV}, which takes
 images and poses without depth, on the held-out views of Tab.~4 of the main paper. Aria denotes the Aria Digital Twin~\cite{Pan_2023_ICCV} rooms of GaME~\cite{Yugay_2026_CVPR}. PSNR is in dB and depth L1 in cm.}
 \label{tab:supp_clsplats}
@@ -594,25 +579,48 @@ for Khronos (\cref{tab:supp_history_bg}).
 
 
 \begin{table}[!t]
-\centering
+\tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
 \toprule
- & \multicolumn{3}{c}{\ours} & \\
-\cmidrule(lr){2-4}
-Background & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
-Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
-Final & 81.9 & 79.8 & 78.8 & 76.8 \\
+ & \multicolumn{2}{c}{Background} \\ \cmidrule(l){2-3}
+Method & Of that time & Final \\ \midrule
+Khronos & 69.5 & 76.8 \\
+\oursname{} (TSDF) & \ob{75.3} & \ob{81.9} \\
+\oursname{} (3DGS) & \ob{76.9} & \ob{79.8} \\
+\oursname{} (Occupancy) & \ob{72.8} & \ob{78.8} \\
 \bottomrule
 }
-\setlength{\tabcolsep}{0pt}
-\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/5\relax}*{4}{wc{\dimexpr\linewidth/5\relax}}@{}}\resultrows\end{tabular}
-\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
-\label{tab:supp_history_bg}
+\sbox0{\begin{tabular}{lcc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/6\relax}
+\begin{tabular}{lcc}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both columns use the objects
+of the query time. The first is the Mesh$_{\mathrm{4D}}$ of the main paper.}
+\label{tab:supp_history_bg}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+& \multicolumn{3}{c}{Ground-truth instances} & \multicolumn{3}{c}{OneFormer labels} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
+Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
+Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
+Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
+\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
+to one value. F1 in \%, with semantic labels on the right.}
+\label{tab:supp_settings}}
 \vspace{-2mm}
 \end{table}
-
 \section{Further Ablations}
 \label{sec:supp_ablations}
 
@@ -735,29 +743,6 @@ Subtracting the saved log-odds removes the free space that earlier visits left i
 \paragraph{Settings.}
 On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
 With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With OneFormer labels, the learned prior leads every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
-
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-& \multicolumn{3}{c}{Ground-truth instances} & \multicolumn{3}{c}{OneFormer semantic labels} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
-Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
-Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
-Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
-\bottomrule
-}
-\setlength{\tabcolsep}{0pt}
-\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr\linewidth/7\relax}*{6}{wc{\dimexpr\linewidth/7\relax}}@{}}\resultrows\end{tabular}
-\caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
-to one value. F1 in \%.}
-\label{tab:supp_settings}
-\vspace{-2mm}
-\end{table}
 
 \section{Further Qualitative Results}
 
