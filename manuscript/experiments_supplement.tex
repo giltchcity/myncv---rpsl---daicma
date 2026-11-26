@@ -11,6 +11,7 @@
 \usepackage{microtype}
 \usepackage{placeins}
 \usepackage{float}
+\usepackage{afterpage}
 \usepackage{colortbl}
 \definecolor{oursbg}{RGB}{236,236,236}
 \newcommand{\oursname}{\cellcolor{oursbg}\textbf{Ours}}
@@ -102,7 +103,7 @@ its mapped surface with new depth observations. A state is represented by a grou
 TSDF, Gaussians in a Gaussian map, or occupied cells in an occupancy map. Ending the state retires all its elements
 together.
 
-\begin{figure}[!b]
+\afterpage{\begin{figure}[!t]
 \begin{minipage}[t]{0.492\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/schematics/tsdf_valid_domains.pdf}
 \caption{\textbf{Valid domains in a TSDF.} A ray keeps its surface band, since the surface it ended on is still in the map. Its free space stops before an object that arrives later, and a ray that measured an ended state no longer contributes.}
@@ -113,7 +114,7 @@ together.
 \caption{\textbf{Capture-time keyframes.} A keyframe renders the Gaussians of its capture time, without those that appeared later. After the armchair ends, its Gaussians stay in that render but are frozen, and only the wall receives gradients.}
 \label{fig:supp_schem_gs}
 \end{minipage}
-\end{figure}
+\end{figure}}
 
 The same decision determines which past observations remain valid. An observation $o$ captured at $t_o$ may update an
 element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(3) of the main paper),
@@ -126,7 +127,7 @@ observation cannot update a state that began after its capture.
 
 How these conditions are applied depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
-Occupancy maps retain a log-odds sum per cell and apply $v$ to that sum (\cref{tab:supp_validity}).
+Occupancy maps retain a log-odds sum per cell and apply $v$ to it.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -178,7 +179,7 @@ The archive is counted in the peak memory that we report and is read only when v
 \paragraph{Occupancy updates.}
 The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, the evidence that earlier visits left there is removed (\cref{eq:supp_occ}), so the free space recorded before the object arrived does not hold it back. When a state ends, within a visit or across visits, its cells are retired together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The wavelet representation and the log-odds update of Wavemap are retained.
 
-\begin{figure}[!b]
+\afterpage{\begin{figure}[!t]
 \begin{minipage}[t]{0.492\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/schematics/coverage_weighted_change.pdf}
 \caption{\textbf{Coverage weights.} A round is weighted by the surface it inspects for the first time, shown in orange. A later view of the same patch meets the same surface samples, from any direction, and adds no weight. Views of new patches each add their share, so the accumulated weight follows the inspected surface.}
@@ -190,13 +191,6 @@ The evidence of a cell follows the state it belongs to. When an object is first 
 \label{fig:supp_schem_state}
 \end{minipage}
 \end{figure}
-
-\paragraph{Change detection.}
-The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
-$60^\circ$, and the default threshold is $\eta=99$.
-
-Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, while its fraction $f$ is taken over all samples it judges. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper thus adapts a standard sequential test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
-
 \begin{figure}[!t]
 \centering
 \begin{minipage}{0.94\linewidth}
@@ -233,17 +227,23 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \end{algorithmic}
 \end{algorithm}
 \end{minipage}
-\end{figure}
+\end{figure}}
+
+\paragraph{Change detection.}
+The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
+$60^\circ$, and the default threshold is $\eta=99$.
+
+Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, while its fraction $f$ is taken over all samples it judges. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper thus adapts a standard sequential test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
 
 \paragraph{Noise model.}
 Each state has its own Beta model~\cite{smithson2006lemon} of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance from the median absolute deviation of at least $10^{-4}$. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model. The model is fitted to what these rounds show, so the see-through that depth noise and pose error cause on an object in place is part of it.
 
-The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
+The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round. A round seen through in full can still exceed $\ln\eta$.
 
 \paragraph{Persistence prior.}
 Persistence $q$ is the posterior mean of a hierarchical Beta-Bernoulli model over the outcomes of earlier revisits, at which a state had either continued or changed. It pools the outcomes of the object with those of the other objects of its class, on a prior from the other classes of its group that counts as two outcomes.
 
-Classes of small objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome and does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected.
+Classes of objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome and does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected.
 
 With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
 
@@ -315,12 +315,12 @@ looks away, as in \cref{tab:supp_change_kinds}. Home also has three motions in v
 We record three visits to a real bedroom with an Azure Kinect at 1920$\times$1080 and 30\,Hz, in its narrow
 field-of-view unbinned depth mode, with depth aligned to RGB.
 For mapping, we downsample the RGB-D frames to 960$\times$540. Within each visit, camera poses come from
-ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits to the first from coarse to fine. Landmark correspondences give the initial alignment, automatic registration on the static surfaces follows, and ICP refines it. We verify that the static surfaces of all visits coincide.
+ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the three visits into one frame with ICP and verify that their static surfaces coincide.
 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
 so the reference shows the scene at the end of the visit.
-Masks combine SAM assistance and manual review, with ADE20K classes. There are 17 single-instance objects shared between the three visits, 11 of them dynamic. People are
+Masks combine SAM assistance and manual review, with ADE20K classes. There are 17 objects shared between the three visits, 11 of them dynamic. People are
 labeled as moving.
 
 One person appears in the recordings, a volunteer who gave informed consent to the recording and to the publication and sharing of the data for research. The person is not a subject of the study. To protect privacy, the face is masked in the released data and blurred in the figures.
@@ -391,7 +391,7 @@ Change F1 of Tab.~2 of the main paper is scored on the map at the end of each vi
 
 Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change that is recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
 
-LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
+LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. MS-SSIM and depth L1 also follow this evaluator, which reports MS-SSIM under the name SSIM. Its loader scales the depth of Flat by ten, and we report depth L1 in centimetres of the unscaled scene. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
 In each comparison in Tab.~2 of the main paper, all methods, ours included, are given exactly the same input, and
@@ -408,7 +408,7 @@ No map is reset between visits. Khronos, GaME, and Wavemap keep their map and co
 Panoptic Mapping loads the map of the preceding visit through its own interface.
 
 \paragraph{3RScan.}
-For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events.
+For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 reference events.
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at any time.
