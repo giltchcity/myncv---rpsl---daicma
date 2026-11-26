@@ -271,13 +271,13 @@ The move in line 15 weighs three hypotheses, that the object moved, that it stay
 \small
 \begin{tabular}{@{}p{0.19\linewidth}p{0.78\linewidth}@{}}
 \toprule
-Noise model & $\mathrm{Beta}\bigl(\mu c,\,(1-\mu)c\bigr)$ with $c=\max\{2,\ \mu(1-\mu)/v-1\}$ \\
-Evidence of a round & $\ell_s(f)=-\ln\mathrm{Beta}\bigl(\tilde f;\ \mu c,\,(1-\mu)c\bigr)$ with $\tilde f=\min\{0.995,\ \max\{f,\ \mu,\ 0.005\}\}$ \\ \addlinespace[4pt]
+Noise model & $\mathrm{Beta}\bigl(\mu\phi,\,(1-\mu)\phi\bigr)$ with $\phi=\max\{2,\ \mu(1-\mu)/V-1\}$ \\
+Evidence of a round & $\ell_s(f)=-\ln\mathrm{Beta}\bigl(\tilde f;\ \mu\phi,\,(1-\mu)\phi\bigr)$ with $\tilde f=\min\{0.995,\ \max\{f,\ \mu,\ 0.005\}\}$ \\ \addlinespace[4pt]
 Persistence & $q=1-\dfrac{\alpha+m_o}{\alpha+\beta+m_o+u_o}$ with $\alpha=2g+m_c$, \ $\beta=2(1-g)+u_c$, \ $g=\dfrac{m_g+\frac12+\kappa}{m_g+u_g+2}$ \\ \addlinespace[4pt]
 Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $B=2\Pr(\theta>\tfrac12)$ and $\theta\sim\mathrm{Beta}\bigl(\tfrac12+N\rho,\ \tfrac12+N(1-\rho)\bigr)$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Exact forms of the models of this section.} $\mu$ and $v$ are the mean and variance of the see-through fraction of a state. $m$ and $u$ count the earlier revisits at which a state changed or continued, for the object ($o$), the other objects of its class ($c$), and the other classes of its group ($g$). $\kappa$ is 1 for classes that are easily moved and 0 otherwise. $\rho$ is the share of the candidate outside the earlier surface, $N$ its effective number of cells, $(\sum_c n_c)^2/\sum_c n_c^2$ for $n_c$ vertices in cell $c$, and $\Lambda$ the likelihood ratio of the change test on the candidate, accumulated over its rounds without the prior, 1 if untested.}
+\caption{\textbf{Exact forms of the models of this section.} $\mu$ and $V$ are the mean and variance of the see-through fraction of a state. $m$ and $u$ count the earlier revisits at which a state changed or continued, for the object ($o$), the other objects of its class ($c$), and the other classes of its group ($g$). $\kappa$ is 1 for classes that are easily moved and 0 otherwise. $\rho$ is the share of the candidate outside the earlier surface, $N$ its effective number of cells, $(\sum_c n_c)^2/\sum_c n_c^2$ for $n_c$ vertices in cell $c$, and $\Lambda$ the likelihood ratio of the change test on the candidate, accumulated over its rounds without the prior, 1 if untested.}
 \label{tab:supp_forms}
 \vspace{-2mm}
 \end{table}
