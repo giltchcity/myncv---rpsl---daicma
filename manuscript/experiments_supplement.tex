@@ -124,7 +124,7 @@ element $e$ at time $t$ only if $e$ belonged to the map both then and now (Eq.~(
 All three representations share the same two conditions. An ended state receives no further updates, and an
 observation cannot update a state that began after its capture.
 
-How these conditions are enforced depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
+How these conditions are applied depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
 Occupancy maps retain a log-odds sum per cell and apply $v$ to that sum (\cref{tab:supp_validity}).
 \begin{align}
@@ -136,7 +136,7 @@ Occupancy maps retain a log-odds sum per cell and apply $v$ to that sum (\cref{t
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
 $x$. A pixel ray $o$ ends on a state $\sigma_o$ and gives $x$ the truncated signed distance $d_o(x)$ and weight $w_o(x)$. $\mathcal{S}(t)$ is the set of states alive at $t$, which always includes the background,
 and $\Omega_o(t)$ is the valid domain (Eq.~(4) of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
-$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. The earlier visits were all captured before an object of the current visit arrived, so they share one validity $v_0(c,t)$. It turns to zero at the first reading of such an object in a cell that they saw free.
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. All earlier visits precede an object that arrives in the current visit, so they share one validity $v_0(c,t)$, which turns to zero at its first reading in a cell that they saw free.
 
 \begin{table}[!htb]
 \centering
@@ -164,16 +164,16 @@ Earlier Gaussians are resumed with their object states and judged by the same ru
 The log-odds $L_0(c)$ is saved at the start of the visit. \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{One validity rule across representations.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
-enforced in each representation. The last row shows how earlier visits are handled before the state decision.}
+\caption{\textbf{The validity rule in each representation.} The first two rows show how the two conditions of \cref{eq:supp_valid} are
+applied in each representation. The last row shows how earlier visits are handled before the state decision.}
 \label{tab:supp_validity}
 \end{table}
 
 Background elements have no state to end. The retention test of the main paper tests them one by one and retires an element that more views see through than support.
 
 \paragraph{TSDF updates.}
-During a visit, we archive every depth frame with its pose and instance labels. Ranges are delta coded and labels run-length coded, and the archive peaks at roughly 0.7\,GB over all evaluated visits. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from it, so \cref{eq:supp_tsdf} holds for every ray of the visit.
-The archive is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward.
+During a visit, each fused depth frame is archived with its pose and instance labels. Ranges are delta coded and labels run-length coded. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from the archive, so \cref{eq:supp_tsdf} holds for every ray of the visit.
+The archive is counted in the peak memory that we report and is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward. A long run can therefore be split into consecutive visits to bound the archive.
 
 \paragraph{Occupancy updates.}
 The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, the evidence that earlier visits left there is removed (\cref{eq:supp_occ}), so the free space recorded before the object arrived does not hold it back. When a state ends, within a visit or across visits, its cells are retired together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The wavelet representation and the log-odds update of Wavemap are retained.
@@ -195,7 +195,7 @@ The evidence of a cell follows the state it belongs to. When an object is first 
 The depth tolerance equals the map resolution (a 5\,cm reference scale for Gaussians), the maximum incidence angle is
 $60^\circ$, and the default threshold is $\eta=99$.
 
-Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper thus adapts a standard sequential test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
+Repeated views of one patch are not independent evidence. Each round is therefore weighted by the surface it newly covers, while its fraction $f$ is taken over all samples it judges. The evidence then grows with the part of the surface that has been inspected, not with the number of views. To this end, a state keeps samples of its surface, and each sample remembers the round that last inspected it (\cref{fig:supp_schem_cov} and lines 6 to 10 of \cref{alg:supp_state}). The score of Eq.~(2) of the main paper thus adapts a standard sequential test~\cite{Wald1945,Page1954} with coverage weights. Its threshold $\eta$ applies to this score and is not an error rate (\cref{sec:supp_ablations} varies it).
 
 \begin{figure}[!t]
 \centering
@@ -221,9 +221,9 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \EndIf
 \Statex \textit{Decide}
 \If{$L>\ln\eta$ \textbf{and} see-through samples since that change time outnumber supported ones}
-  \State end $s$ at this round and retire its elements
+  \State end $s$ at this round and retire its elements \Comment{needs no identity}
 \EndIf
-\If{a candidate of the same object stands at another place}
+\If{a candidate shares the identity of $s$ and stands at another place} \Comment{otherwise it starts a new state}
   \If{the old site is seen through with no support, \textbf{or} across visits a move is more probable than not}
     \State end $s$ where the candidate began, and the candidate succeeds it
   \Else
@@ -266,7 +266,7 @@ even with frame-local mask IDs.
 \paragraph{Decisions of one round.}
 \Cref{alg:supp_state} lists the steps of one round with their edge conditions. The candidate change time that spans the gap between visits starts at $\pi_s$ of the main paper, and every other one at zero. \Cref{fig:supp_schem_state} shows the cases.
 
-The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never succeeded under this rule and waits until its old site is seen. \Cref{tab:supp_forms} gives the exact forms of the models of this section.
+The move in line 15 is judged by a Bayes decision with equal losses. It weighs three hypotheses, that the object moved, that it stayed, and that the candidate is not a surface of this object. The weights come from persistence $q$, from a Bayes factor on the share of the candidate outside the earlier surface, and from the likelihood ratio of the change test on the candidate. An object with $q\ge 2/3$, such as a bed at its starting value, is never succeeded under this rule and waits until its old site is seen. Without identities, lines 14 to 18 are skipped. \Cref{tab:supp_forms} gives the exact forms of the models of this section.
 
 \begin{table}[H]
 \centering
@@ -298,7 +298,7 @@ Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $
  & Visits & RGB-D frames per visit & Mapping input & Changes within visits & Changes between visits \\
 \midrule
 BedRoom & 3 & 4,003 / 4,041 / 7,216 & 960$\times$540 & 5 & 26 \\
-Home & 2 & 4,186 / 3,555 & 640$\times$480 & 38 & 34 \\
+Home & 2 & 4,186 / 3,555 & 680$\times$480 & 38 & 34 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lccccc}\resultrows\end{tabular}}
@@ -320,7 +320,6 @@ ORB-SLAM3~\cite{9440682} in RGB-D mode. We register the second and third visits 
 The reference mesh of each visit has 1\,cm resolution and is fused by TSDF integration in Open3D. Pixels of
 the person are left out. An object that moves within the visit is fused only from the frames after it has settled,
 so the reference shows the scene at the end of the visit.
-
 Masks combine SAM assistance and manual review, with ADE20K classes. There are 17 single-instance objects shared between the three visits, 11 of them dynamic. People are
 labeled as moving.
 
@@ -388,7 +387,7 @@ Mesh F1 scores the map at the end of the last visit against the scene at that ti
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
 
-Change F1 of Tab.~2 of the main paper is scored on the map at the end of each visit and pools the events of all visits. An unchanged object counts as a false positive if it is missing at visit end. The official evaluator of Khronos instead integrates over the time of one continuous run, which does not carry over to several visits. No map is built between two visits, so an integral would charge every method for the time away, and it would weight a change by the length of its visit. Here every change counts once. Tab.~3 of the main paper keeps the official evaluator, since TESSE is a single continuous run.
+Change F1 of Tab.~2 of the main paper is scored on the map at the end of each visit and pools the events of all visits. A reference state is represented when at least half of its points lie within 10\,cm of the corresponding mapped object surface. An unchanged object counts as a false positive if it is missing at visit end. The official evaluator of Khronos instead integrates over the time of one continuous run, which does not carry over to several visits. No map is built between two visits, so an integral would charge every method for the time away, and it would weight a change by the length of its visit. Here every change counts once. Tab.~3 of the main paper keeps the official evaluator, since TESSE is a single continuous run.
 
 Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change that is recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
 
@@ -403,28 +402,35 @@ GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instanc
 system supports. Khronos takes them with its \texttt{InstanceForwarding} detector and \texttt{ExternalTracker}, and Panoptic Mapping and GaME as segmented RGB-D input. Wavemap takes no instance input. We therefore give each of its occupied cells the instance and class of most of its readings, from the same masks, for Wavemap and for our occupancy maps alike.
 
 All TSDF maps, ours and those of the baselines, are built by standard projective fusion~\cite{10.1145/237170.237269,6162880} with 5\,cm voxels on all four datasets. They share the truncation distance and the maximum depth. All occupancy maps use a minimum cell width of 5\,cm. The Gaussian maps of both methods
-use standard 3D Gaussian splatting with the same optimization settings.
+use standard 3D Gaussian splatting with the same optimization settings, including the number of refinement iterations. Mapping time excludes the final refinement.
 
 No map is reset between visits. Khronos, GaME, and Wavemap keep their map and continue on it in the next visit, and
 Panoptic Mapping loads the map of the preceding visit through its own interface.
 
 \paragraph{3RScan.}
-For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events. A reference state is represented when at least half its points lie within 10\,cm of a single mapped object surface.
+For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 pooled reference events.
 
 \paragraph{Map history.}
-We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time.
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at any time.
 
 
 
 \section{Additional Results}
 
 \paragraph{Changes by kind.}
-\ours matches or beats every baseline for both kinds of change, after looking away within a visit and across visits (\cref{tab:supp_change_kinds}).
+\ours matches or beats every baseline for both kinds of change, after looking away within a visit and across visits (\cref{tab:supp_change_kinds,fig:supp_change_kinds}).
 We score the three motions observed on Home separately. They yield six events, one departure and one arrival per motion.
 Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%, respectively).
 Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
 Averaged over the two visits of Home, \emph{Dyn.} F1 is 73.8\% for ours and 32.7\% for Khronos with its official
 motion settings.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/change_f1_by_kind.pdf}
+\caption{\textbf{Change F1 by kind of change.} F1 (\%) for changes made while the camera looks away within a visit and for changes across visits. The numbers are those of \cref{tab:supp_change_kinds}.}
+\label{fig:supp_change_kinds}
+\end{figure}
 
 \begin{table}[!t]
 \tablepair{%
@@ -527,7 +533,7 @@ All F1 scores are in percent.
 \paragraph{Rendering.}
 Tab.~4 of the main paper compares with GaME on its own SAM masks. With ground-truth instances, \ours also renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}).
 
-On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME drops a keyframe when one of its masks is mostly marked as changed. SAM splits the blanket from the bed, so GaME drops a keyframe of the old bed. With ground-truth instances the bed is one mask, the keyframe stays, and the old bed remains in its map.
+On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME drops a keyframe when one of its masks is mostly marked as changed, so its result depends on how the masks split an object.
 
 CL-Splats~\cite{Ackermann_2025_ICCV} aims at a different task. By its own description, it updates an existing reconstruction from intermittent, sparse captures and not from continuous video, and it assumes that these views focus on local changes. Our input is the continuous RGB-D video of a whole visit. For reference, \cref{tab:supp_clsplats} reports it on the held-out views of Tab.~4 of the main paper.
 
@@ -554,37 +560,45 @@ images and poses without depth, on the held-out views of Tab.~4 of the main pape
 
 \paragraph{Rendering over time.}
 As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times and of the current time, each against its own photograph. We hold out every tenth frame of each visit and render it from our 4D map as it stood at the end of its round, before refinement. GaME renders its snapshot from the
-same round at the same camera pose (\cref{tab:supp_heldout_history}). \Cref{fig:supp_4d} shows our three maps of Home at two times of each visit.
+same round at the same camera pose (\cref{tab:supp_heldout_history}). This tests the map during mapping, without refinement, whereas Tab.~4 of the main paper tests the final map after refinement. \Cref{fig:supp_4d} shows our three maps of Home at two times of each visit.
+
+\begin{table}[!b]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+& & \multicolumn{3}{c}{PSNR$\uparrow$ of each visit} & \multicolumn{4}{c}{All visits} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-9}
+Scene & Method & Visit 1 & Visit 2 & Visit 3 & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+ & GaME & 18.20 & 20.44 & 19.41 & 19.37 & 0.786 & 0.428 & 3.55 \\
+\multirow{-2}{*}{BedRoom} & \oursname & \ob{18.60} & \ob{21.46} & \ob{20.68} & \ob{20.34} & \ob{0.819} & \ob{0.382} & \ob{2.22} \\
+\addlinespace[3pt]
+ & GaME & 24.19 & 25.87 & -- & 24.96 & 0.884 & 0.228 & 7.49 \\
+\multirow{-2}{*}{Home} & \oursname & \ob{26.64} & \ob{26.92} & \oc{--} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{llccccccc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/18\relax}
+\begin{tabular}{llccccccc}\resultrows\end{tabular}
+\caption{\textbf{Rendering over time on BedRoom and Home.} The 1,525 and 773 held-out views, each rendered from the map of its round, before refinement. Home has two visits. PSNR is in dB and depth L1 in cm.}
+\label{tab:supp_heldout_history}
+\vspace{-2mm}
+\end{table}
 
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
 final map after refinement (\cref{tab:supp_instance_rendering}). The final-map protocol holds out frames of the last visit only and renders them from the final map. This map shows every object at its last place and cannot match frames taken
-before an object moved during the visit. The same mismatch raises its depth L1 on Home, which is 15.32\,cm from the final map and 2.77\,cm over time. Rendering over time holds out frames of every visit and renders each from the
+before an object moved during the visit. This also explains its high depth L1 on Home. When each frame is rendered from the map of its round, the depth L1 is low again (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
 When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
 for Khronos (\cref{tab:supp_history_bg}).
 
+
+
 \begin{table}[!t]
-\tablepairw{0.485}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-& Visit 1 & Visit 2 & \multicolumn{4}{c}{Both visits} \\
-\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-7}
-Method & PSNR$\uparrow$ & PSNR$\uparrow$ & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-GaME & 24.19 & 25.87 & 24.96 & 0.884 & 0.228 & 7.49 \\
-\oursname & \ob{26.64} & \ob{26.92} & \ob{26.77} & \ob{0.922} & \ob{0.176} & \ob{2.77} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{lcccccwc{27pt}}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lcccccwc{27pt}}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Rendering over time on Home.} The 418 and 355 held-out views of the two visits, each rendered from
-the map of its round, before refinement. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_heldout_history}}{0.485}{%
+\centering
 \small
 \setlength{\tabcolsep}{3pt}
 \def\resultrows{
@@ -596,13 +610,11 @@ Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
 Final & 81.9 & 79.8 & 78.8 & 76.8 \\
 \bottomrule
 }
-\sbox0{\begin{tabular}{l*{4}{wc{34pt}}}\resultrows\end{tabular}}
+\sbox0{\begin{tabular}{l*{4}{wc{60pt}}}\resultrows\end{tabular}}
 \setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
-\begin{tabular}{l*{4}{wc{34pt}}}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
-of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
-\label{tab:supp_history_bg}}
+\begin{tabular}{l*{4}{wc{60pt}}}\resultrows\end{tabular}
+\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
+\label{tab:supp_history_bg}
 \vspace{-2mm}
 \end{table}
 
@@ -622,7 +634,7 @@ faces of earlier visits that new views see through stay in the map, and mesh F1 
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, of which the frame archive takes about 0.7\,GB, against 5.0 FPS and 39.22\,GB for Khronos.
 
 \begin{table}[!t]
 \tablepairw{0.485}{%
@@ -676,7 +688,10 @@ Without the retention test, whole objects still retire and change F1 stays at 83
 
 \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
 
-\begin{table}[!p]
+\paragraph{Occupancy update (Home, Flat).}
+A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
+
+\begin{table}[!t]
 \tablepair{%
 \small
 \setlength{\tabcolsep}{3pt}
@@ -721,7 +736,13 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \vspace{-2mm}
 \end{table}
 
-\begin{table}[!p]
+
+\paragraph{Settings.}
+On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
+prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
+
+\begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -745,7 +766,12 @@ to one value. F1 in \%.}
 \vspace{-2mm}
 \end{table}
 
-\begin{figure}[!p]
+\section{Further Qualitative Results}
+
+
+\Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat. The supplementary video shows the maps over time, with observed changes and changes while away, within and between visits.
+
+\begin{figure}[H]
 \centering
 \begingroup\setlength{\tabcolsep}{0.6pt}\renewcommand{\arraystretch}{0}
 \newcommand{\qwidth}{\dimexpr(\textwidth-23pt)/8\relax}
@@ -811,23 +837,7 @@ to one value. F1 in \%.}
 \label{fig:supp_qual}
 \end{figure}
 
-\paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
-
-
-\paragraph{Settings.}
-On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
-On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
-prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
-
-
-\section{Further Qualitative Results}
-
-\Cref{fig:supp_qual} extends Fig.~4 of the main paper with our TSDF and occupancy maps and one more view of Flat. The supplementary video shows the maps over time, with observed changes and changes while away, within and between visits.
-
-
-
-
+\clearpage
 {\footnotesize
 \setlength{\bibsep}{0pt plus 0.3ex}
 \bibliographystyle{ieeenat_fullname}
