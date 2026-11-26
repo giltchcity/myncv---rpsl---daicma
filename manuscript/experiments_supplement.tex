@@ -137,7 +137,7 @@ Occupancy maps retain a log-odds sum per cell and apply $v$ to it.
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
 $x$. A pixel ray $o$ ends on a state $\sigma_o$ and gives $x$ the truncated signed distance $d_o(x)$ and weight $w_o(x)$. $\mathcal{S}(t)$ is the set of states alive at $t$, which always includes the background,
 and $\Omega_o(t)$ is the valid domain (Eq.~(4) of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
-$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. The earlier visits all precede an object that arrives in the current visit and share one validity $v_0(c,t)$. It turns to zero at the first reading of that object in a cell that they saw free.
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update that Wavemap applies for a reading $o$ of the current visit, within its bounds. The earlier visits all precede an object that arrives in the current visit and share one validity $v_0(c,t)$. It turns to zero at the first reading of that object in a cell that they saw free.
 
 \begin{table}[!htb]
 \centering
@@ -384,7 +384,7 @@ Mesh F1 scores the map at the end of the last visit against the scene at that ti
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
 
-Change F1 of Tab.~2 of the main paper is scored on the map at the end of each visit and pools the events of all visits. A reference state is represented when at least half of its points lie within 10\,cm of the corresponding mapped object surface. An unchanged object counts as a false positive if it is missing at visit end. The official evaluator of Khronos instead integrates over the time of one continuous run, which does not carry over to several visits. No map is built between two visits, so an integral would charge every method for the time away. It would also weight a change by the length of its visit. Here every change counts once. Tab.~3 of the main paper keeps the official evaluator, since TESSE is a single continuous run.
+Change F1 of Tab.~2 of the main paper pools the events of all visits. Each event is scored on two maps, the map just before the change can first be observed and the map at the end of its visit. For a change between visits, the first is the map at the end of the previous visit. Methods without a history provide these maps from the snapshots that they record during mapping, as for Mesh$_{\mathrm{4D}}$. A reference state is represented when at least half of its points lie within 10\,cm of the corresponding mapped object surface. An unchanged object counts as a false positive if it is missing at visit end. The official evaluator of Khronos instead integrates over the time of one continuous run, which does not carry over to several visits. No map is built between two visits, so an integral would charge every method for the time away. It would also weight a change by the length of its visit. Here every change counts once. Tab.~3 of the main paper keeps the official evaluator, since TESSE is a single continuous run.
 
 Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times and average. At each time, the map must show every object in the state it had then. A change recorded late leaves the map wrong at every moment in between, so these two scores also measure how late changes are recorded.
 
@@ -675,18 +675,6 @@ No valid domains & 90.2 & 50.7 & 76.5 \\
 \vspace{-2mm}
 \end{table}
 
-\paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
-\emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
-Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
-Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}).
-
-\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
-
-\emph{GaME with our change detection} gives GaME our change decisions and keeps the rest of GaME as released. Its PSNR rises from 24.21 to 24.81\,dB, against 28.43\,dB for the full method. It drops 220 of its 442 keyframes.
-
-\paragraph{Occupancy update (Home, Flat).}
-A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
-
 \begin{table}[!t]
 \tablepair{%
 \small
@@ -732,11 +720,21 @@ Wavemap & 79.9 & 82.6 & 96.4 & 80.2 & 54.1 & 92.3 \\
 \vspace{-2mm}
 \end{table}
 
+\paragraph{Gaussian state and keyframe updates (3DGS, Flat).}
+\emph{No retirement} of the main paper disables two things at once, the retirement of whole objects and the retention test on single Gaussians (Sec.~3.2 of the main paper). Here we disable them one at a time (\cref{tab:supp_ablations}).
+Without object retirement, moved furniture remains in the map and change F1 falls to 68.8.
+Without the retention test, whole objects still retire and change F1 stays at 83.3. Flat is simulated, with exact poses and a static background, so little is left for the test to remove. Mesh F1 falls from 89.8 to 88.5, and PSNR stays within the variation between runs. On the real BedRoom recording the test matters more (\cref{tab:supp_change_test}).
+
+\emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
+
+\emph{GaME with our change detection} gives GaME our change decisions and keeps the rest of GaME as released. Its PSNR rises from 24.21 to 24.81\,dB, against 28.43\,dB for the full method. It drops 220 of its 442 keyframes.
+
+\paragraph{Occupancy update (Home, Flat).}
+Subtracting the saved log-odds removes the free space that earlier visits left in a cell, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat, while change F1 stays at 98.6 and 95.0 (\cref{tab:supp_occupancy_ablation}).
 
 \paragraph{Settings.}
 On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
-On a revisit, the prior lets an object that often moves need less evidence than one that usually stays. With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With the noisier OneFormer labels, the learned
-prior is ahead of every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
+With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With OneFormer labels, the learned prior leads every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
 
 \begin{table}[H]
 \centering
