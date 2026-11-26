@@ -137,7 +137,7 @@ Occupancy maps retain a log-odds sum per cell and apply $v$ to it.
 \Cref{tab:supp_validity} states where $v$ acts in each map. In \cref{eq:supp_tsdf}, $D$ is the signed distance of voxel
 $x$. A pixel ray $o$ ends on a state $\sigma_o$ and gives $x$ the truncated signed distance $d_o(x)$ and weight $w_o(x)$. $\mathcal{S}(t)$ is the set of states alive at $t$, which always includes the background,
 and $\Omega_o(t)$ is the valid domain (Eq.~(4) of the main paper). In \cref{eq:supp_gs}, keyframe $k$ has image
-$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. All earlier visits precede an object that arrives in the current visit, so they share one validity $v_0(c,t)$, which turns to zero at its first reading in a cell that they saw free.
+$I_k$ and $R$ renders. In \cref{eq:supp_occ}, $L_0(c)$ is the log-odds that earlier visits left in cell $c$, and $\Delta_o(c)$ is the update of Wavemap for a reading $o$ of the current visit. The earlier visits all precede an object that arrives in the current visit and share one validity $v_0(c,t)$. It turns to zero at the first reading of that object in a cell that they saw free.
 
 \begin{table}[!htb]
 \centering
@@ -173,7 +173,7 @@ applied in each representation. The last row shows how earlier visits are handle
 Background elements have no state to end. The retention test of the main paper tests them one by one and retires an element that more views see through than support.
 
 \paragraph{TSDF updates.}
-During a visit, each fused depth frame is archived with its pose and instance labels. Ranges are delta coded and labels run-length coded. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from the archive, so \cref{eq:supp_tsdf} holds for every ray of the visit.
+During a visit, each fused depth frame is archived with its pose and instance labels. Ranges are delta coded and labels run-length coded. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from the archive, so \cref{eq:supp_tsdf} holds for the rays of the visit.
 The archive is counted in the peak memory that we report and is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
@@ -243,12 +243,12 @@ The alternative after a change is uniform, so the evidence of a round depends on
 \paragraph{Persistence prior.}
 Persistence $q$ is the posterior mean of a hierarchical Beta-Bernoulli model over the outcomes of earlier revisits, at which a state had either continued or changed. It pools the outcomes of the object with those of the other objects of its class, on a prior from the other classes of its group that counts as two outcomes.
 
-Classes of objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome and does not decide the result. On Home, the bed starts at $q=3/4$, and its move is still detected.
+Classes of objects that are easily moved, such as chairs, tables, and bags, start at $q=1/4$, and the others, such as beds, at $3/4$. This choice counts as one outcome. On Home, the bed starts at $q=3/4$, and its move is still detected.
 
 With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
 
 \paragraph{State intervals.}
-A state begins when it is first seen. It ends at the round that confirms its change (Sec.~3.1 of the main paper), or where its successor begins. The history thus shows the object at one place at every time. The two are set differently because they are known differently. A beginning is observed directly, as the object is seen at its place in that frame. An end is observed only when the object moves in view, and the state then ends with that motion. For a change while away, no frame shows when the object left, so the state ends at the confirming round.
+A state begins when it is first seen. It ends at the round that confirms its change (Sec.~3.1 of the main paper), or where its successor begins. The history thus shows the object at one place at a time. The two are set differently because they are known differently. A beginning is observed directly, as the object is seen at its place in that frame. An end is observed only when the object moves in view, and the state then ends with that motion. For a change while away, no frame shows when the object left, so the state ends at the confirming round.
 
 Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
 
@@ -381,7 +381,7 @@ room. We randomly selected the eight rooms among those with object changes, and 
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. There are 25 such times, about one every 10.8\,s and one at the end of each visit. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Only the simulated Home provides the ground-truth scene at every time.
+Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. There are 25 such times, about one every 10.8\,s and one at the end of each visit. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Among the datasets of Tab.~2 of the main paper, only the simulated Home provides the ground-truth scene at every time.
 
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
@@ -393,8 +393,7 @@ Object F1 and Mesh$_{\mathrm{4D}}$ compare the map with the scene at many times 
 LPIPS uses the AlexNet backbone, and PSNR is computed per RGB channel and averaged over channels and frames, following GaME's evaluator. MS-SSIM and depth L1 also follow this evaluator, which reports MS-SSIM under the name SSIM. Its loader scales the depth of Flat by ten, and we report depth L1 in centimetres of the unscaled scene. Repeated runs give identical TSDF and occupancy scores, and the Gaussian PSNR varies by about 0.1\,dB, at most 0.2\,dB.
 
 \paragraph{Methods.}
-In each comparison in Tab.~2 of the main paper, all methods, ours included, are given exactly the same input, and
-none receives anything else.
+In each comparison in Tab.~2 of the main paper, all methods, ours included, are given the same frames, poses, and masks.
 The baselines were published with different mask sources, Khronos~\cite{Schmid-RSS-24} with simulator semantics,
 Panoptic Mapping~\cite{9811877} with ground-truth and predicted panoptic segmentation, and
 GaME~\cite{Yugay_2026_CVPR} with SAM masks. We give all of them the same instance masks, an input that each released
@@ -410,7 +409,7 @@ Panoptic Mapping loads the map of the preceding visit through its own interface.
 For 3RScan, scores are averaged over visits within a room and then over the eight rooms, with 77 reference events.
 
 \paragraph{Map history.}
-We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at any time.
+We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at each of these rounds.
 
 \paragraph{Cost.}
 Tab.~6 of the main paper reports speed and memory. Khronos keeps its history as a full copy of the map at every update, whereas \ours stores only what each update changes. In Gaussian maps, a new object begins a new state, and earlier keyframes, rendered at their capture time, do not contain it, so no stored keyframe has to be masked. Our occupancy maps add object states to Wavemap and run slower than it.
@@ -526,10 +525,10 @@ For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
 Ground-truth and predicted semantic labels both give 96.0\% mesh F1, and object F1 is 95.7 and 79.2.
 
-Change detection does not need identities. The surface test ends a state at its old site, and identities help to confirm a move and to link the two states (Sec.~3.1 of the main paper). Semantic labels carry no instances and no identities. With ground-truth semantic labels, change F1 is 96.7, against 98.4 with instances. With OneFormer labels it is 89.7, still above the 70.8 of Khronos with ground-truth instances.
+Change detection does not need identities. The surface test ends a state at its old site, and identities help to confirm a move and to link the two states (Sec.~3.1 of the main paper). Semantic labels carry neither instances nor identities. Ground-truth semantic labels thus remove the identities and keep the segmentation exact, and change F1 is 96.7, against 98.4 with instances. OneFormer labels add segmentation errors and give 89.7, still above the 70.8 of Khronos with ground-truth instances.
 
 On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
-24.44\,dB PSNR after refinement.
+24.44\,dB PSNR after refinement, against 89.8, 72.7, and 27.56\,dB for \ours (Tab.~5 of the main paper).
 All F1 scores are in percent.
 
 \paragraph{Rendering.}
@@ -588,7 +587,7 @@ Scene & Method & Visit 1 & Visit 2 & Visit 3 & PSNR$\uparrow$ & MS-SSIM$\uparrow
 
 On the second visit of Home, rendering over time gives 26.92\,dB before refinement, more than the 24.90\,dB of the
 final map after refinement (\cref{tab:supp_instance_rendering}). The final-map protocol holds out frames of the last visit only and renders them from the final map. This map shows every object at its last place and cannot match frames taken
-before an object moved during the visit. This also explains its high depth L1 on Home. When each frame is rendered from the map of its round, the depth L1 is low again (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
+before an object moved during the visit. Its depth L1 on Home is high for the same reason and is low again when each frame is rendered from the map of its round (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
