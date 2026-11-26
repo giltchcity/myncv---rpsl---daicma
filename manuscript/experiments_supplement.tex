@@ -437,8 +437,8 @@ motion settings.
 \def\leftrows{
 \toprule
 \headrow
- & GaME & 18.22 & 0.758 & 0.454 & 6.03 \\
-\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{4.96} \\
+ & GaME & 18.22 & 0.758 & 0.454 & \phantom{0}6.03 \\
+\multirow{-2}{*}{BedRoom} & \oursname & \ob{19.90} & \ob{0.811} & \ob{0.370} & \ob{\phantom{0}4.96} \\
  & GaME & 21.85 & 0.757 & 0.313 & 23.94 \\
 \multirow{-2}{*}{Home} & \oursname & \ob{24.90} & \ob{0.824} & \ob{0.215} & \ob{15.32} \\
 \bottomrule
@@ -453,14 +453,14 @@ motion settings.
 \bottomrule
 }
 \noindent\begin{minipage}{0.485\linewidth}\centering
-\sbox0{\begin{tabular}{llrrrr}\leftrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\leftrows\end{tabular}
+\sbox0{\begin{tabular}{@{\hspace{4pt}}llcccc@{\hspace{4pt}}}\leftrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{@{\hspace{4pt}}llcccc@{\hspace{4pt}}}\leftrows\end{tabular}
 \end{minipage}\hfill
 \begin{minipage}{0.485\linewidth}\centering
-\sbox0{\begin{tabular}{llrrrr}\rightrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/12\relax}
-\begin{tabular}{llrrrr}\rightrows\end{tabular}
+\sbox0{\begin{tabular}{@{\hspace{4pt}}llcccc@{\hspace{4pt}}}\rightrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{@{\hspace{4pt}}llcccc@{\hspace{4pt}}}\rightrows\end{tabular}
 \end{minipage}
 \caption{\textbf{Rendering of the Gaussian maps of the main comparison.} After refinement, with ground-truth
 instances. Tab.~4 of the main paper uses SAM masks. PSNR in dB, depth L1 in cm.}
