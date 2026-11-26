@@ -127,7 +127,7 @@ observation cannot update a state that began after its capture.
 
 How these conditions are applied depends on what each representation retains of its observations. \Cref{fig:supp_schem_tsdf,fig:supp_schem_gs} illustrate two of them. Gaussian maps re-read keyframes at every optimization step and apply
 $v$ at each step. TSDF volumes retain per-voxel weighted sums and apply $v$ during fusion.
-Occupancy maps retain a log-odds sum per cell and apply $v$ to it.
+Occupancy maps retain a log-odds sum per cell and apply $v$ to the sum that earlier visits left.
 \begin{align}
   D_t(x)&=\frac{\sum_o v_o(x,t)\,w_o(x)\,d_o(x)}{\sum_o v_o(x,t)\,w_o(x)},
   \qquad v_o(x,t)=\bigl[\sigma_o\in\mathcal{S}(t)\bigr]\,\bigl[x\in\Omega_o(t)\bigr],\label{eq:supp_tsdf}\\
@@ -248,7 +248,7 @@ Classes of objects that are easily moved, such as chairs, tables, and bags, star
 With semantic labels alone, an object seen again at the same site continues its state by 3D overlap, so the outcomes are still counted. With the maximum over candidates, the prior lowers the evidence needed for an object that often moves. An object that rarely moves needs at most the evidence of a change within the visit.
 
 \paragraph{State intervals.}
-A state begins when it is first seen. It ends at the round that confirms its change (Sec.~3.1 of the main paper), or where its successor begins. The history thus never shows the object at two places at once. The two are set differently because they are known differently. A beginning is observed directly, as the object is seen at its place in that frame. An end is observed only when the object moves in view, and the state then ends with that motion. For a change while away, no frame shows when the object left, so the state ends at the confirming round.
+A state begins when it is first seen. It ends at the round that confirms its change (Sec.~3.1 of the main paper), or where its successor begins. The states of one object thus never overlap in time. The two are set differently because they are known differently. A beginning is observed directly, as the object is seen at its place in that frame. An end is observed only when the object moves in view, and the state then ends with that motion. For a change while away, no frame shows when the object left, so the state ends at the confirming round.
 
 Across BedRoom, Home, and Flat, the change test ends 65 earlier states, 51 of them in the round in which their site is first seen clearly. Every run sets these intervals in the same way, from its own map.
 
@@ -279,7 +279,7 @@ Persistence & $q=1-\dfrac{\alpha+m_o}{\alpha+\beta+m_o+u_o}$ with $\alpha=2g+m_c
 Successor across visits & the candidate succeeds if $(1-q)\,B>q+\Lambda$, with $B=2\Pr(\theta>\tfrac12)$ and $\theta\sim\mathrm{Beta}\bigl(\tfrac12+N\rho,\ \tfrac12+N(1-\rho)\bigr)$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Exact forms of the models of this section.} $\mu$ and $v$ are the mean and variance of the see-through fraction of a state. $m$ and $u$ count the earlier revisits at which a state changed or continued, for the object ($o$), the other objects of its class ($c$), and the other classes of its group ($g$). $\kappa$ is 1 for classes that are easily moved and 0 otherwise. $\rho$ is the share of the candidate outside the earlier surface, $N$ its effective number of cells, and $\Lambda$ the likelihood ratio of the change test on the candidate, 1 if untested.}
+\caption{\textbf{Exact forms of the models of this section.} $\mu$ and $v$ are the mean and variance of the see-through fraction of a state. $m$ and $u$ count the earlier revisits at which a state changed or continued, for the object ($o$), the other objects of its class ($c$), and the other classes of its group ($g$). $\kappa$ is 1 for classes that are easily moved and 0 otherwise. $\rho$ is the share of the candidate outside the earlier surface, $N$ its effective number of cells, $(\sum_c n_c)^2/\sum_c n_c^2$ for $n_c$ vertices in cell $c$, and $\Lambda$ the likelihood ratio of the change test on the candidate, accumulated over its rounds without the prior, 1 if untested.}
 \label{tab:supp_forms}
 \vspace{-2mm}
 \end{table}
@@ -518,33 +518,12 @@ Tab.~4 of the main paper compares with GaME on its own SAM masks. With ground-tr
 
 On Flat, GaME scores lower with ground-truth instances than with the SAM masks of Tab.~4 of the main paper (24.21 against 24.86\,dB). GaME drops a keyframe when one of its masks is mostly marked as changed, so its result depends on how the masks split an object.
 
-CL-Splats~\cite{Ackermann_2025_ICCV} aims at a different task. By its own description, it updates an existing reconstruction from intermittent, sparse captures and not from continuous video, and it assumes that these views focus on local changes. Our input is the continuous RGB-D video of a whole visit. For reference, \cref{tab:supp_clsplats} reports it on the held-out views of Tab.~4 of the main paper.
-
-\begin{table}[!t]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
-Flat & 17.91 & 0.677 & 0.397 & 34.77 \\
-Aria room0 & 21.18 & 0.784 & 0.338 & 32.19 \\
-Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
-\bottomrule
-}
-\setlength{\tabcolsep}{0pt}
-\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr 0.6\linewidth/5\relax}*{4}{wc{\dimexpr 0.6\linewidth/5\relax}}@{}}\resultrows\end{tabular}
-\caption{\textbf{CL-Splats on held-out views.} Released defaults of CL-Splats~\cite{Ackermann_2025_ICCV}, which takes
-images and poses without depth, on the held-out views of Tab.~4 of the main paper. Aria denotes the Aria Digital Twin~\cite{Pan_2023_ICCV} rooms of GaME~\cite{Yugay_2026_CVPR}. PSNR is in dB and depth L1 in cm.}
-\label{tab:supp_clsplats}
-\vspace{-2mm}
-\end{table}
 
 \paragraph{Rendering over time.}
 As in continual scene update~\cite{Zeng_2025_ICCV}, we test held-out views of earlier times and of the current time, each against its own photograph. We hold out every tenth frame of each visit and render it from our 4D map as it stood at the end of its round, before refinement. GaME renders its snapshot from the
 same round at the same camera pose (\cref{tab:supp_heldout_history}). This tests the map during mapping, without refinement, whereas Tab.~4 of the main paper tests the final map after refinement. \Cref{fig:supp_4d} shows our three maps of Home at two times of each visit.
 
-\begin{table}[!b]
+\begin{table}[!t]
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -572,55 +551,54 @@ final map after refinement (\cref{tab:supp_instance_rendering}). The final-map p
 before an object moved during the visit. Its depth L1 on Home is high for the same reason and is low again when each frame is rendered from the map of its round (\cref{tab:supp_heldout_history}). Rendering over time holds out frames of every visit and renders each from the
 map of its round, which shows the scene as it was then.
 
+\begin{table}[!b]
+\tablepair{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+ & \multicolumn{3}{c}{\ours} & \\
+\cmidrule(lr){2-4}
+Background & TSDF & 3DGS & Occupancy & Khronos \\ \midrule
+Of that time & 75.3 & 76.9 & 72.8 & 69.5 \\
+Final & 81.9 & 79.8 & 78.8 & 76.8 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lcccc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lcccc}\resultrows\end{tabular}
+}{%
+\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both rows use the objects
+of the query time. The first row is the Mesh$_{\mathrm{4D}}$ of the main paper.}
+\label{tab:supp_history_bg}}{%
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+Scene & PSNR$\uparrow$ & MS-SSIM$\uparrow$ & LPIPS$\downarrow$ & L1$\downarrow$ \\ \midrule
+Flat & 17.91 & 0.677 & 0.397 & 34.77 \\
+Aria room0 & 21.18 & 0.784 & 0.338 & 32.19 \\
+Aria room1 & 21.73 & 0.753 & 0.508 & 96.27 \\
+\bottomrule
+}
+\sbox0{\begin{tabular}{lcccc}\resultrows\end{tabular}}
+\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/10\relax}
+\begin{tabular}{lcccc}\resultrows\end{tabular}
+}{%
+\caption{\textbf{CL-Splats on held-out views.} Released defaults, on the held-out views of Tab.~4 of the main paper. Aria denotes the Aria Digital Twin~\cite{Pan_2023_ICCV} rooms of GaME~\cite{Yugay_2026_CVPR}. PSNR in dB, depth L1 in cm.}
+\label{tab:supp_clsplats}}
+\vspace{-2mm}
+\end{table}
+
 \paragraph{What the history adds.}
 When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
 for Khronos (\cref{tab:supp_history_bg}).
 
 
 
-\begin{table}[!t]
-\tablepair{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
- & \multicolumn{2}{c}{Background} \\ \cmidrule(l){2-3}
-Method & Of that time & Final \\ \midrule
-Khronos & 69.5 & 76.8 \\
-\oursname{} (TSDF) & \ob{75.3} & \ob{81.9} \\
-\oursname{} (3DGS) & \ob{76.9} & \ob{79.8} \\
-\oursname{} (Occupancy) & \ob{72.8} & \ob{78.8} \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{lcc}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/6\relax}
-\begin{tabular}{lcc}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Later observations for past times (Home).} Mesh$_{\mathrm{4D}}$ F1 (\%). Both columns use the objects
-of the query time. The first is the Mesh$_{\mathrm{4D}}$ of the main paper.}
-\label{tab:supp_history_bg}}{%
-\small
-\setlength{\tabcolsep}{3pt}
-\def\resultrows{
-\toprule
-& \multicolumn{3}{c}{Ground-truth instances} & \multicolumn{3}{c}{OneFormer labels} \\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
-Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
-Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
-Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
-Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
-\bottomrule
-}
-\sbox0{\begin{tabular}{lrrrrrr}\resultrows\end{tabular}}
-\setlength{\tabcolsep}{\dimexpr\tabcolsep+(\linewidth-\wd0)/14\relax}
-\begin{tabular}{lrrrrrr}\resultrows\end{tabular}
-}{%
-\caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
-to one value. F1 in \%, with semantic labels on the right.}
-\label{tab:supp_settings}}
-\vspace{-2mm}
-\end{table}
+\paragraph{CL-Splats.}
+CL-Splats~\cite{Ackermann_2025_ICCV} aims at a different task. By its own description, it updates an existing reconstruction from intermittent, sparse captures and not from continuous video, and it assumes that these views focus on local changes. Our input is the continuous RGB-D video of a whole visit. It takes images and poses without depth. For reference, \cref{tab:supp_clsplats} reports it.
+
 \section{Further Ablations}
 \label{sec:supp_ablations}
 
@@ -736,6 +714,29 @@ Without the retention test, whole objects still retire and change F1 stays at 83
 \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points lower (\cref{tab:supp_ablations}). The three keyframe variants change how old keyframes are trained, not which object states end, so change F1 is the same.
 
 \emph{GaME with our change detection} gives GaME our change decisions and keeps the rest of GaME as released. Its PSNR rises from 24.21 to 24.81\,dB, against 28.43\,dB for the full method. It drops 220 of its 442 keyframes.
+
+\begin{table}[!t]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\def\resultrows{
+\toprule
+& \multicolumn{3}{c}{Ground-truth instances} & \multicolumn{3}{c}{OneFormer semantic labels} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Variant & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ & Mesh$\uparrow$ & Obj.$\uparrow$ & Chg.$\uparrow$ \\ \midrule
+Full & 96.1 & 96.6 & 98.4 & 96.0 & 79.2 & 89.7 \\
+Fixed $q=1/4$ & 96.0 & 96.7 & 98.4 & 95.9 & 78.7 & 85.2 \\
+Fixed $q=1/2$ & 96.0 & 96.5 & 98.4 & 95.9 & 77.7 & 83.0 \\
+Fixed $q=3/4$ & 96.0 & 96.7 & 96.7 & 95.9 & 79.5 & 83.6 \\
+\bottomrule
+}
+\setlength{\tabcolsep}{0pt}
+\begin{tabular}{@{}>{\hspace{6pt}}wl{\dimexpr 0.7\linewidth/7\relax}*{6}{wc{\dimexpr 0.7\linewidth/7\relax}}@{}}\resultrows\end{tabular}
+\caption{\textbf{Persistence prior (TSDF, BedRoom).} The full method learns $q$ per object. Each variant fixes it
+to one value. F1 in \%.}
+\label{tab:supp_settings}
+\vspace{-2mm}
+\end{table}
 
 \paragraph{Occupancy update (Home, Flat).}
 Subtracting the saved log-odds removes the free space that earlier visits left in a cell, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat, while change F1 stays at 98.6 and 95.0 (\cref{tab:supp_occupancy_ablation}).
