@@ -174,10 +174,10 @@ Background elements have no state to end. The retention test of the main paper t
 
 \paragraph{TSDF updates.}
 During a visit, each fused depth frame is archived with its pose and instance labels. Ranges are delta coded and labels run-length coded. When valid domains change (Eq.~(4) of the main paper), we rebuild the affected voxel blocks from the archive, so \cref{eq:supp_tsdf} holds for every ray of the visit.
-The archive is counted in the peak memory that we report and is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward. A long run can therefore be split into consecutive visits to bound the archive.
+The archive is counted in the peak memory that we report and is read only when valid domains change, so longer visits can keep it on disk. At the end of each visit, we release it and carry only the reconstructed surfaces forward.
 
 \paragraph{Occupancy updates.}
-The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, the evidence that earlier visits left there is removed (\cref{eq:supp_occ}), so the free space recorded before the object arrived does not hold it back. When a state ends, within a visit or across visits, its cells are retired together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The wavelet representation and the log-odds update of Wavemap are retained.
+The evidence of a cell follows the state it belongs to. When an object is first read in a cell that was free at the start of the visit, the evidence that earlier visits left there is removed (\cref{eq:supp_occ}), so the free space recorded before the object arrived does not hold it back. Within the visit, the log-odds are bounded, which limits the free space gathered before an object arrives, so the readings of the object can outweigh it. Our occupancy maps detect every change made while the camera looks away within the visits of BedRoom and Home (\cref{tab:supp_change_kinds}). When a state ends, within a visit or across visits, its cells are retired together, including those that no later ray reaches. Local replacement (Sec.~3.3 of the main paper) clears stale cells up to $6\sigma+\sqrt{3}\,w_{\mathrm{cell}}$ behind a re-measured surface, with the range noise $\sigma$ and cell width $w_{\mathrm{cell}}$ of Wavemap. The wavelet representation and the log-odds update of Wavemap are retained.
 
 \afterpage{\begin{figure}[!t]
 \begin{minipage}[t]{0.492\linewidth}\centering
@@ -238,7 +238,7 @@ Repeated views of one patch are not independent evidence. Each round is therefor
 \paragraph{Noise model.}
 Each state has its own Beta model~\cite{smithson2006lemon} of the see-through fraction $f$. We fit it by the method of moments to the rounds of the state in place, with a robust variance from the median absolute deviation of at least $10^{-4}$. The pooled statistics of all objects serve as a prior that counts as three rounds, and without a pool the model starts at a 5\% see-through rate. A round is in place only when the object is identified there, so rounds after a change do not enter the model. The model is fitted to what these rounds show, so the see-through that depth noise and pose error cause on an object in place is part of it.
 
-The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round. A round seen through in full can still exceed $\ln\eta$.
+The alternative after a change is uniform, so the evidence of a round depends only on how unlikely its see-through fraction is while the state is in place. The test is one-sided. A see-through fraction below the mean of the state counts as the mean. We also clip $f$ to $[0.005,0.995]$, which bounds the evidence of a round.
 
 \paragraph{Persistence prior.}
 Persistence $q$ is the posterior mean of a hierarchical Beta-Bernoulli model over the outcomes of earlier revisits, at which a state had either continued or changed. It pools the outcomes of the object with those of the other objects of its class, on a prior from the other classes of its group that counts as two outcomes.
@@ -411,6 +411,9 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 
 \paragraph{Map history.}
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at any time.
+
+\paragraph{Cost.}
+Tab.~6 of the main paper reports speed and memory. Khronos keeps its history as a full copy of the map at every update, whereas \ours stores only what each update changes. In Gaussian maps, a new object begins a new state, and earlier keyframes, rendered at their capture time, do not contain it, so no stored keyframe has to be masked. Our occupancy maps add object states to Wavemap and run slower than it.
 
 
 
@@ -684,6 +687,8 @@ Without the retention test, whole objects still retire and change F1 stays at 83
 
 \emph{No dynamic views} of the main paper follows the \emph{Full KF Filtering} ablation of GaME~\cite{Yugay_2026_CVPR}. A keyframe of any visit is dropped once it has measured a Gaussian that later ends. \emph{Masked dynamic views} instead keeps every keyframe and trains it on the current map, with the pixels masked where rendered and measured depth differ by more than the depth threshold of GaME. This keeps the static supervision that dropping loses, yet PSNR is 4.43\,dB and mesh F1 1.6 points below the full method (\cref{tab:supp_ablations}). Change F1 is the same, since the variant does not change which objects the map keeps or removes.
 
+\emph{GaME with our change detection} gives GaME our change decisions and keeps the rest of GaME as released. Its PSNR rises from 24.21 to 24.81\,dB, against 28.43\,dB for the full method, and it drops 220 of its 442 keyframes.
+
 \paragraph{Occupancy update (Home, Flat).}
 A cell that a new object occupies may still retain free-space evidence from an earlier visit. Subtracting the saved log-odds removes it, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat. Change F1 stays at 98.6 on Home and 95.0 on Flat (\cref{tab:supp_occupancy_ablation}).
 
@@ -698,9 +703,9 @@ Variant & Mesh$\uparrow$ & Chg.$\uparrow$ & PSNR$\uparrow$ & L1$\downarrow$ \\ \
 Full & 89.8 & 83.3 & 28.43 & 0.41 \\
 No object retirement & 84.4 & 68.8 & 24.02 & 3.20 \\
 No retention test & 88.5 & 83.3 & 28.28 & 0.42 \\
-No retirement (main paper) & 84.5 & 68.8 & 23.79 & 3.31 \\
 \addlinespace[4pt]
 Masked dynamic views & 88.2 & 83.3 & 24.00 & 1.93 \\
+GaME with our change detection & 87.2 & 83.3 & 24.81 & 0.49 \\
 \bottomrule
 }
 \sbox0{\begin{tabular}{lrrrr}\resultrows\end{tabular}}
