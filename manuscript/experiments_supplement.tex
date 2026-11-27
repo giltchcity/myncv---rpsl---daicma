@@ -377,7 +377,7 @@ room. We randomly selected the eight rooms among those with object changes, and 
 
 
 \paragraph{Metrics.}
-Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. There are 25 such times, about one every 10.8\,s and one at the end of each visit. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Among the datasets of Tab.~2 of the main paper, only the simulated Home provides the ground-truth scene at every time.
+All F1 scores are reported in percent. Mesh F1 scores the map at the end of the last visit against the scene at that time. Occupancy maps are scored on the points that Wavemap~\cite{Reijgwart-RSS-23} exports from its occupied cells. Mesh$_{\mathrm{4D}}$, on Home, scores the map at successive times of both visits, each against the ground-truth scene of that time, and averages the scores. There are 25 such times, about one every 10.8\,s and one at the end of each visit. Every method is scored on its map as it was at each of these times. We and Khronos read that map from the 4D map, and methods without a history record it during mapping. Among the datasets of Tab.~2 of the main paper, only the simulated Home provides the ground-truth scene at every time.
 
 Following Khronos~\cite{Schmid-RSS-24}, object F1 matches objects within 0.5\,m and is averaged over the time of all visits.
 For all methods, we extract objects from Gaussian and occupancy maps as connected components within each instance. Flat contains many small objects, which the maps often miss at this resolution, so object F1 on Flat is low for all methods.
@@ -416,9 +416,9 @@ Tab.~6 of the main paper reports speed and memory. Khronos accumulates object fr
 \paragraph{Changes by kind.}
 \ours matches or beats every baseline for both kinds of change, after looking away within a visit and across visits (\cref{fig:supp_change_kinds}).
 We score the three motions observed on Home separately. They yield six events, one departure and one arrival per motion.
-Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9\% and 66.7\%).
+Our TSDF map captures five and Khronos captures three, with no false positives (change F1 of 90.9 and 66.7).
 Khronos's \emph{Dyn.} metric matches positions within 0.5\,m at each trajectory timestamp.
-Averaged over the two visits of Home, \emph{Dyn.} F1 is 73.8\% for ours and 32.7\% for Khronos with its official
+Averaged over the two visits of Home, \emph{Dyn.} F1 is 73.8 for ours and 32.7 for Khronos with its official
 motion settings.
 
 \begin{figure}[H]
@@ -503,13 +503,12 @@ The rule is the same in all three maps. It tests the surface of each object stat
 \paragraph{Segmentation inputs.}
 For predicted segmentation on BedRoom and Flat, we use OneFormer~\cite{Jain_2023_CVPR} Swin-L pretrained on ADE20K without further fine-tuning.
 On BedRoom, we feed per-pixel semantic labels directly to our TSDF mapper.
-Ground-truth and predicted semantic labels both give 96.0\% mesh F1, and object F1 is 95.7 and 79.2.
+Ground-truth and predicted semantic labels both give a mesh F1 of 96.0, and object F1 is 95.7 and 79.2.
 
 Change detection does not need identities. The surface test ends a state at its old site, and identities help to confirm a move and to link the two states (Sec.~3.1 of the main paper). Semantic labels carry neither instances nor identities. Ground-truth semantic labels thus remove the identities and keep the segmentation exact, and change F1 is 96.7, against 98.4 with instances. OneFormer labels add segmentation errors and give 89.7, still above the 70.8 of Khronos with ground-truth instances.
 
 On Flat, GaME and our method use the same predicted masks. GaME obtains mesh F1 of 85.8, change F1 of 68.8, and
 24.44\,dB PSNR after refinement, against 89.8, 72.7, and 27.56\,dB for \ours (Tab.~5 of the main paper).
-All F1 scores are in percent.
 
 \paragraph{Rendering.}
 Tab.~4 of the main paper compares with GaME on its own SAM masks. With ground-truth instances, \ours also renders held-out views better than GaME on all four datasets and in every metric (\cref{tab:supp_instance_rendering}).
@@ -590,7 +589,7 @@ before an object moved during the visit. Its depth L1 on Home is high for the sa
 map of its round, which shows the scene as it was then.
 
 \paragraph{What the history adds.}
-When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 (\%) with each of the three representations and
+When the main paper scores a past time, every method answers with its map of that time, with the background and the objects as known then. All methods are thus on equal terms. Eq.~(1) of the main paper also defines the map of a past time as known now. A map with a history can answer with it, as ours and that of Khronos can. This answer shows the objects of that time on the final background, which later observations have completed. On Home, these later observations raise Mesh$_{\mathrm{4D}}$ F1 with each of the three representations and
 for Khronos (\cref{tab:supp_history_bg}).
 
 
@@ -741,7 +740,7 @@ to one value. F1 in \%.}
 Subtracting the saved log-odds removes the free space that earlier visits left in a cell, and local replacement clears stale occupied cells behind re-measured surfaces. Enabling both raises mesh F1 from 80.0 to 80.8 on Home and from 80.3 to 82.4 on Flat, while change F1 stays at 98.6 and 95.0 (\cref{tab:supp_occupancy_ablation}).
 
 \paragraph{Settings.}
-On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1\%, 96.6\%, and 98.4\%, $\eta=9$ gives 96.0\%, 96.1\%, and 98.4\%, and $\eta=999$ gives 96.0\%, 95.7\%, and 96.7\%.
+On BedRoom with ground-truth instances, a tenfold change of the threshold moves mesh F1 by 0.1 points, object F1 by at most 0.9, and change F1 by at most 1.7. The default $\eta=99$ gives 96.1, 96.6, and 98.4, $\eta=9$ gives 96.0, 96.1, and 98.4, and $\eta=999$ gives 96.0, 95.7, and 96.7.
 With ground-truth instances, change F1 differs by at most 1.7 points between the priors. With OneFormer labels, the learned prior leads every fixed prior by 4.5 to 6.7 points (\cref{tab:supp_settings}).
 
 \section{Further Qualitative Results}
