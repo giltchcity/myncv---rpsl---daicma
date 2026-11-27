@@ -407,7 +407,7 @@ For 3RScan, scores are averaged over visits within a room and then over the eigh
 We record changes to map elements over time, so the 4D map can be queried at every mapping round. On BedRoom, this covers 244 rounds across three visits, about one every 2\,s. The stored history takes 8.4\,MB for occupancy, 231\,MB for TSDF, and 316\,MB for 3D Gaussians, in addition to the final map. Like the history recovery of CL-Splats~\cite{Ackermann_2025_ICCV}, this avoids saving a copy of the map at every time. An occupancy query returns occupied, free, and unknown space at each of these rounds.
 
 \paragraph{Cost.}
-Tab.~6 of the main paper reports speed and memory. Khronos keeps its history as a full copy of the map at every update. \ours stores only what each update changes. In Gaussian maps, a new object begins a new state. Earlier keyframes are rendered at their capture time and do not contain it, so no stored keyframe has to be masked. Our occupancy maps add object states to Wavemap and run slower than it.
+Tab.~6 of the main paper reports speed and memory. Khronos keeps all object fragments in memory. Our history stores only what each update changes. In Gaussian maps, a new object begins a new state. Earlier keyframes are rendered at their capture time and do not contain it, so no stored keyframe has to be masked. Our occupancy maps add object states to Wavemap and run slower than it.
 
 
 
@@ -613,7 +613,7 @@ are not retired as a whole, moved objects stay and 12 more changes are missed. C
 
 \paragraph{Valid domains (TSDF, Home and Flat).}
 A depth ray that was correct when captured can harm the map later. Before an object arrives, a ray passes through its future place and reaches the wall behind. Left in the average after the object arrives, it carves the new surface. In the same way, frames that saw a moved object at its old site fuse it back. Valid domains stop both, and without them change F1 on Home falls from 97.9 to 82.8
-(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 39.22\,GB for Khronos. The frame archive takes about 0.7\,GB of this peak.
+(\cref{tab:supp_valid_domains}). On Flat, changes happen between visits, so the frames of a visit all see the same scene. Valid domains then have little to exclude, and the scores stay within 0.1 points. On Home, our TSDF maps run at 5.1 FPS with a peak of 9.97\,GB of RAM, against 5.0 FPS and 19.85\,GB for Khronos. The frame archive takes about 0.7\,GB of this peak.
 
 \begin{table}[!t]
 \tablepairw{0.485}{%
